@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/load/engine/DataFetcherGenerator;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "DataFetcherGenerator.java"
 
 
 # annotations

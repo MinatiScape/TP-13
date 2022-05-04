@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/module/GlideModule;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "GlideModule.java"
 
 # interfaces
 .implements Lcom/bumptech/glide/module/RegistersComponents;

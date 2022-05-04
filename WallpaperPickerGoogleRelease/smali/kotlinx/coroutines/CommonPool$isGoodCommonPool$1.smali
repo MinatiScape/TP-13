@@ -1,6 +1,6 @@
 .class public final Lkotlinx/coroutines/CommonPool$isGoodCommonPool$1;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "CommonPool.kt"
 
 # interfaces
 .implements Ljava/lang/Runnable;

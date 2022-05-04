@@ -30,7 +30,6 @@
     <string name="abc_slice_more">More</string>
     <string name="abc_slice_more_content">+ %1$d</string>
     <string name="abc_slice_permission_allow">Allow</string>
-    <string name="abc_slice_permission_checkbox">Allow %1$s to show slices from any app</string>
     <string name="abc_slice_permission_deny">Deny</string>
     <string name="abc_slice_permission_text_1">- It can read information from %1$s</string>
     <string name="abc_slice_permission_text_2">- It can take actions inside %1$s</string>
@@ -51,6 +50,7 @@
     <string name="accessibility_preview_pager">Page %1$d of %2$d</string>
     <string name="accessibility_work_profile_app_description">Work %s</string>
     <string name="adaptive_color_title">Dynamic</string>
+    <string name="androidx_startup">androidx.startup</string>
     <string name="app_name">Wallpaper &amp; style</string>
     <string name="app_not_found">"App isn't installed."</string>
     <string name="appbar_scrolling_view_behavior">com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior</string>
@@ -78,6 +78,7 @@
     <string name="character_counter_overflowed_content_description">Character limit exceeded %1$d of %2$d</string>
     <string name="character_counter_pattern">%1$d/%2$d</string>
     <string name="chip_text">Chip text</string>
+    <string name="cinematic_effects_toogle">3D wallpapers</string>
     <string name="circular_border">M50,0 A50,50,0,1,1,50,100 A50,50,0,1,1,50,0</string>
     <string name="clear_text_end_icon_content_description">Clear text</string>
     <string name="clock_preview_content_description">%1$s clock preview</string>
@@ -126,6 +127,9 @@
     <string name="delete_live_wallpaper">Delete</string>
     <string name="delete_wallpaper_confirmation">Delete this wallpaper from your phone?</string>
     <string name="edit_custom_theme_lbl">Tap to edit</string>
+    <string name="effect_error_dialog_body">"We were unable to apply the effects.
+Try with another photo."</string>
+    <string name="effect_error_dialog_title">Oh no!</string>
     <string name="error_icon_content_description">Error</string>
     <string name="expand_button_title">Advanced</string>
     <string name="explore">Explore</string>
@@ -169,6 +173,23 @@
     <string name="load_wallpaper_error_message">Unable to load wallpaper. The image is either corrupted or unavailable.</string>
     <string name="lock_screen_message">Lock screen</string>
     <string name="lockscreen_wallpaper_preview_card_content_description">Lockscreen wallpaper preview</string>
+    <string name="m3_ref_typeface_brand_display_regular">sans-serif</string>
+    <string name="m3_ref_typeface_brand_medium">sans-serif-medium</string>
+    <string name="m3_ref_typeface_brand_regular">sans-serif</string>
+    <string name="m3_ref_typeface_plain_medium">sans-serif-medium</string>
+    <string name="m3_ref_typeface_plain_regular">sans-serif</string>
+    <string name="m3_sys_motion_easing_accelerated">cubic-bezier(0.4, 0.0, 1.0, 1.0)</string>
+    <string name="m3_sys_motion_easing_decelerated">cubic-bezier(0.0, 0.0, 0.2, 1.0)</string>
+    <string name="m3_sys_motion_easing_emphasized">path(M 0,0 C 0.05, 0, 0.133333, 0.06, 0.166666, 0.4 C 0.208333, 0.82, 0.25, 1, 1, 1)</string>
+    <string name="m3_sys_motion_easing_emphasized_accelerate">cubic-bezier(0.3, 0.0, 0.8, 0.2)</string>
+    <string name="m3_sys_motion_easing_emphasized_decelerate">cubic-bezier(0.1, 0.7, 0.1, 1.0)</string>
+    <string name="m3_sys_motion_easing_legacy">cubic-bezier(0.4, 0.0, 0.2, 1.0)</string>
+    <string name="m3_sys_motion_easing_legacy_accelerate">cubic-bezier(0.4, 0.0, 1.0, 1.0)</string>
+    <string name="m3_sys_motion_easing_legacy_decelerate">cubic-bezier(0.0, 0.0, 0.2, 1.0)</string>
+    <string name="m3_sys_motion_easing_linear">cubic-bezier(0.0, 0.0, 1.0, 1.0)</string>
+    <string name="m3_sys_motion_easing_standard">cubic-bezier(0.2, 0.0, 0.0, 1.0)</string>
+    <string name="m3_sys_motion_easing_standard_accelerate">cubic-bezier(0.3, 0.0, 1.0, 1.0)</string>
+    <string name="m3_sys_motion_easing_standard_decelerate">cubic-bezier(0.0, 0.0, 0.0, 1.0)</string>
     <string name="material_clock_display_divider">:</string>
     <string name="material_clock_toggle_content_description">Select AM or PM</string>
     <string name="material_hour_selection">Select hour</string>
@@ -205,7 +226,7 @@
     <string name="mtrl_picker_a11y_prev_month">Change to previous month</string>
     <string name="mtrl_picker_announce_current_selection">Current selection: %1$s</string>
     <string name="mtrl_picker_cancel">@android:string/cancel</string>
-    <string name="mtrl_picker_confirm">@android:string/ok</string>
+    <string name="mtrl_picker_confirm">OK</string>
     <string name="mtrl_picker_date_header_selected">%1$s</string>
     <string name="mtrl_picker_date_header_title">Select Date</string>
     <string name="mtrl_picker_date_header_unselected">Selected date</string>
@@ -232,6 +253,8 @@
     <string name="mtrl_picker_toggle_to_day_selection">Tap to switch to selecting a day</string>
     <string name="mtrl_picker_toggle_to_text_input_mode">Switch to text input mode</string>
     <string name="mtrl_picker_toggle_to_year_selection">Tap to switch to selecting a year</string>
+    <string name="mtrl_timepicker_confirm">OK</string>
+    <string name="my_photos">My Photos</string>
     <string name="my_photos_category_title">My photos</string>
     <string name="my_photos_generic_wallpaper_title">My photo</string>
     <string name="name_component_title">Name your style</string>
@@ -277,7 +300,7 @@ To change this setting, go to the Permissions area of Wallpapers’ app info."</
     <string name="search_menu_title">Search</string>
     <string name="select_wallpaper_label">Wallpaper categories</string>
     <string name="set_theme_wallpaper_dialog_message">Set style wallpaper</string>
-    <string name="set_wallpaper_both_destination">Home and lock screen</string>
+    <string name="set_wallpaper_both_destination">Home and lock screens</string>
     <string name="set_wallpaper_button_text">Set Wallpaper</string>
     <string name="set_wallpaper_dialog_message">Set wallpaper on</string>
     <string name="set_wallpaper_error_message">Unable to set wallpaper.</string>
@@ -285,10 +308,9 @@ To change this setting, go to the Permissions area of Wallpapers’ app info."</
     <string name="set_wallpaper_lock_screen_destination">Lock screen</string>
     <string name="set_wallpaper_progress_message">Setting wallpaper…</string>
     <string name="settings_button_label">Settings</string>
-    <string name="settingslib_config_bodyFontFamily">@android:string/fingerprint_acquired_too_slow</string>
-    <string name="settingslib_config_bodyFontFamilyMedium">@android:string/fingerprint_error_canceled</string>
-    <string name="settingslib_config_headlineFontFamily">@android:string/httpErrorOk</string>
-    <string name="settingslib_config_headlineFontFamilyMedium">@android:string/httpErrorProxyAuth</string>
+    <string name="settings_snackbar_description">Please enable files and media in settings.</string>
+    <string name="settings_snackbar_enable">Enable</string>
+    <string name="settingslib_config_headlineFontFamily" />
     <string name="shape_component_title">Choose shape</string>
     <string name="shape_preview_content_description">Shape preview</string>
     <string name="show_ui_preview_text">Show UI Preview</string>
@@ -306,6 +328,7 @@ To change this setting, go to the Permissions area of Wallpapers’ app info."</
     <string name="style_info_description">Preview of font, icons, app shape, and color</string>
     <string name="summary_collapsed_preference_list">%1$s, %2$s</string>
     <string name="tab_customize">Customize</string>
+    <string name="tab_effects">Effects</string>
     <string name="tab_info">Info</string>
     <string name="theme_description">Font: %1$s, icons: %2$s, shape: %3$s, color: %4$s</string>
     <string name="theme_font_example">ABC</string>
@@ -329,6 +352,8 @@ To change this setting, go to the Permissions area of Wallpapers’ app info."</
     <string name="wallpaper_destination_both">Home &amp; Lock screen</string>
     <string name="wallpaper_disabled_by_administrator_message">Setting a wallpaper is disabled by your device administrator</string>
     <string name="wallpaper_disabled_message">Setting a wallpaper is disabled on this device</string>
+    <string name="wallpaper_effects_subtitle">Make your photo a 3D wallpaper that moves when your phone moves</string>
+    <string name="wallpaper_effects_title">3D Wallpapers</string>
     <string name="wallpaper_picker_entry_title">Change wallpaper</string>
     <string name="wallpaper_preview_card_content_description">Wallpaper preview</string>
     <string name="wallpaper_set_successfully_message">Wallpaper set successfully</string>

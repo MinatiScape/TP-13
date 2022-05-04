@@ -1,6 +1,6 @@
 .class public Lcom/google/android/material/internal/NavigationMenuView;
 .super Landroidx/recyclerview/widget/RecyclerView;
-.source "SourceFile"
+.source "NavigationMenuView.java"
 
 # interfaces
 .implements Landroidx/appcompat/view/menu/MenuView;
@@ -40,9 +40,7 @@
 
     const/4 p2, 0x1
 
-    const/4 p3, 0x0
-
-    invoke-direct {p1, p2, p3}, Landroidx/recyclerview/widget/LinearLayoutManager;-><init>(IZ)V
+    invoke-direct {p1, p2}, Landroidx/recyclerview/widget/LinearLayoutManager;-><init>(I)V
 
     invoke-virtual {p0, p1}, Landroidx/recyclerview/widget/RecyclerView;->setLayoutManager(Landroidx/recyclerview/widget/RecyclerView$LayoutManager;)V
 
@@ -51,7 +49,7 @@
 
 
 # virtual methods
-.method public initialize(Landroidx/appcompat/view/menu/MenuBuilder;)V
+.method public final initialize(Landroidx/appcompat/view/menu/MenuBuilder;)V
     .locals 0
 
     return-void

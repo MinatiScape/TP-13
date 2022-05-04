@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="abc_slice_duration_days">
-        <item quantity="other">for %d dage siden</item>
-        <item quantity="one">for %d dag siden</item>
+        <item quantity="other">For %d dage siden</item>
+        <item quantity="one">For %d dag siden</item>
     </plurals>
     <plurals name="abc_slice_duration_min">
-        <item quantity="other">%d min. siden</item>
-        <item quantity="one">%d min. siden</item>
+        <item quantity="other">For %d min. siden</item>
+        <item quantity="one">For %d min. siden</item>
     </plurals>
     <plurals name="abc_slice_duration_years">
-        <item quantity="other">for %d år siden</item>
-        <item quantity="one">for %d år siden</item>
+        <item quantity="other">For %d år siden</item>
+        <item quantity="one">For %d år siden</item>
     </plurals>
     <plurals name="mtrl_badge_content_description">
         <item quantity="other">%d nye notifikationer</item>

@@ -53,6 +53,7 @@
     <item type="id" name="action_divider" />
     <item type="id" name="action_download" />
     <item type="id" name="action_edit" />
+    <item type="id" name="action_effects" />
     <item type="id" name="action_hide_ui" />
     <item type="id" name="action_image" />
     <item type="id" name="action_information" />
@@ -105,6 +106,7 @@
     <item type="id" name="chip3" />
     <item type="id" name="chip_group" />
     <item type="id" name="chronometer" />
+    <item type="id" name="cinematic_effect_switch" />
     <item type="id" name="circle_center" />
     <item type="id" name="clock_option_thumbnail" />
     <item type="id" name="clock_preview_image" />
@@ -114,12 +116,13 @@
     <item type="id" name="color_icons_section" />
     <item type="id" name="color_icons_section_title" />
     <item type="id" name="color_option_container" />
+    <item type="id" name="color_page_container" />
+    <item type="id" name="color_page_indicator" />
     <item type="id" name="color_preview_0" />
     <item type="id" name="color_preview_1" />
     <item type="id" name="color_preview_2" />
     <item type="id" name="color_preview_3" />
-    <item type="id" name="color_preview_icon" />
-    <item type="id" name="color_view_pager" />
+    <item type="id" name="color_section_view_pager" />
     <item type="id" name="component_options_title" />
     <item type="id" name="component_preview_container" />
     <item type="id" name="component_preview_content" />
@@ -157,11 +160,16 @@
     <item type="id" name="design_navigation_view" />
     <item type="id" name="desktop_wallpaper_position_options" />
     <item type="id" name="dialog_button" />
+    <item type="id" name="dialog_effect_error_body" />
+    <item type="id" name="dialog_effect_error_title" />
     <item type="id" name="dialog_set_wallpaper_options" />
     <item type="id" name="dialog_set_wallpaper_title" />
     <item type="id" name="divider" />
     <item type="id" name="edit_query" />
+    <item type="id" name="effect_error_cancel_button" />
+    <item type="id" name="effect_error_my_photos_button" />
     <item type="id" name="end_padder" />
+    <item type="id" name="error_bunny_illustration" />
     <item type="id" name="error_message" />
     <item type="id" name="error_section" />
     <item type="id" name="expand_activities_button" />
@@ -177,6 +185,7 @@
     <item type="id" name="fullscreen_buttons_container" />
     <item type="id" name="ghost_view" />
     <item type="id" name="ghost_view_holder" />
+    <item type="id" name="glide_custom_view_target_tag" />
     <item type="id" name="grid_option_thumbnail" />
     <item type="id" name="grid_preview_card" />
     <item type="id" name="grid_preview_container" />
@@ -197,6 +206,10 @@
     <item type="id" name="indicator_container" />
     <item type="id" name="indicator_icon" />
     <item type="id" name="info" />
+    <item type="id" name="item1" />
+    <item type="id" name="item2" />
+    <item type="id" name="item3" />
+    <item type="id" name="item4" />
     <item type="id" name="item_touch_helper_previous_elevation" />
     <item type="id" name="last_updated" />
     <item type="id" name="line1" />
@@ -267,6 +280,8 @@
     <item type="id" name="nav_grid" />
     <item type="id" name="nav_theme" />
     <item type="id" name="nav_wallpaper" />
+    <item type="id" name="navigation_bar_item_active_indicator_view" />
+    <item type="id" name="navigation_bar_item_icon_container" />
     <item type="id" name="navigation_bar_item_icon_view" />
     <item type="id" name="navigation_bar_item_labels_group" />
     <item type="id" name="navigation_bar_item_large_label_view" />
@@ -387,6 +402,7 @@
     <item type="id" name="subcontent" />
     <item type="id" name="submenuarrow" />
     <item type="id" name="submit_area" />
+    <item type="id" name="support_action_bar" />
     <item type="id" name="switchWidget" />
     <item type="id" name="systempalettecolor" />
     <item type="id" name="tab_layout" />
@@ -468,6 +484,8 @@
     <item type="id" name="visible_removing_fragment_view_tag" />
     <item type="id" name="wallpaper_container" />
     <item type="id" name="wallpaper_disabled_message" />
+    <item type="id" name="wallpaper_effects_subtitle" />
+    <item type="id" name="wallpaper_effects_title" />
     <item type="id" name="wallpaper_full_preview_card" />
     <item type="id" name="wallpaper_grid" />
     <item type="id" name="wallpaper_info_explore_button" />
@@ -485,6 +503,7 @@
     <item type="id" name="wallpaper_preview_spinner" />
     <item type="id" name="wallpaper_preview_surface" />
     <item type="id" name="wallpaper_surface" />
+    <item type="id" name="wallpaper_surface_cinematic" />
     <item type="id" name="workspace_surface" />
     <item type="id" name="zero_corner_chip" />
 </resources>

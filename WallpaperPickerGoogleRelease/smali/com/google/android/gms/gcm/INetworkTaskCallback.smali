@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/android/gms/gcm/INetworkTaskCallback;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "INetworkTaskCallback.java"
 
 # interfaces
 .implements Landroid/os/IInterface;

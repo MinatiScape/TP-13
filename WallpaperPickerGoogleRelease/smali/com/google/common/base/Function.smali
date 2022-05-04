@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/common/base/Function;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Function.java"
 
 
 # annotations

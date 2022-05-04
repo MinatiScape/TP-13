@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/davemorrissey/labs/subscaleview/decoder/DecoderFactory;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "DecoderFactory.java"
 
 
 # annotations

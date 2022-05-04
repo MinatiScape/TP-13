@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/appcompat/app/ActionBar$OnMenuVisibilityListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ActionBar.java"
 
 
 # annotations
@@ -15,5 +15,5 @@
 
 
 # virtual methods
-.method public abstract onMenuVisibilityChanged(Z)V
+.method public abstract onMenuVisibilityChanged()V
 .end method

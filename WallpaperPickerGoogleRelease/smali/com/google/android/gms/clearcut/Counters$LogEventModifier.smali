@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/android/gms/clearcut/Counters$LogEventModifier;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Counters.java"
 
 
 # annotations
@@ -15,5 +15,5 @@
 
 
 # virtual methods
-.method public abstract modify(Lcom/google/android/gms/clearcut/ClearcutLogger$LogEventBuilder;)Lcom/google/android/gms/clearcut/ClearcutLogger$LogEventBuilder;
+.method public abstract modify()Lcom/google/android/gms/clearcut/ClearcutLogger$LogEventBuilder;
 .end method

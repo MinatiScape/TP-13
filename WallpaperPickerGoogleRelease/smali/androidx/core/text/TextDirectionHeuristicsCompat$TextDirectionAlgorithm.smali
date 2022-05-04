@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/core/text/TextDirectionHeuristicsCompat$TextDirectionAlgorithm;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "TextDirectionHeuristicsCompat.java"
 
 
 # annotations
@@ -15,17 +15,5 @@
 
 
 # virtual methods
-.method public abstract checkRtl(Ljava/lang/CharSequence;II)I
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0,
-            0x0,
-            0x0
-        }
-        names = {
-            "cs",
-            "start",
-            "count"
-        }
-    .end annotation
+.method public abstract checkRtl(Ljava/lang/CharSequence;I)I
 .end method

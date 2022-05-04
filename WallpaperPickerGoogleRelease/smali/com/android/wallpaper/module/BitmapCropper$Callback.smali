@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/module/BitmapCropper$Callback;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "BitmapCropper.java"
 
 
 # annotations
@@ -18,5 +18,5 @@
 .method public abstract onBitmapCropped(Landroid/graphics/Bitmap;)V
 .end method
 
-.method public abstract onError(Ljava/lang/Throwable;)V
+.method public abstract onError(Ljava/lang/OutOfMemoryError;)V
 .end method

@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/util/pool/FactoryPools$Poolable;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "FactoryPools.java"
 
 
 # annotations
@@ -15,5 +15,5 @@
 
 
 # virtual methods
-.method public abstract getVerifier()Lcom/bumptech/glide/util/pool/StateVerifier;
+.method public abstract getVerifier()Lcom/bumptech/glide/util/pool/StateVerifier$DefaultStateVerifier;
 .end method

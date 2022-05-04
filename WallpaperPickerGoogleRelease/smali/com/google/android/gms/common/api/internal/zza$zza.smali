@@ -1,3 +1,3 @@
-.class public Lcom/google/android/gms/common/api/internal/zza$zza;
+.class Lcom/google/android/gms/common/api/internal/zza$zza;
 .super Lcom/google/android/gms/common/api/internal/LifecycleCallback;
-.source "SourceFile"
+.source "ActivityLifecycleObserverImpl.java"

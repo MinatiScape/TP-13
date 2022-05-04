@@ -1,6 +1,6 @@
-.class public Landroid/support/v4/media/MediaBrowserCompat$CustomActionResultReceiver;
+.class Landroid/support/v4/media/MediaBrowserCompat$CustomActionResultReceiver;
 .super Landroid/support/v4/os/ResultReceiver;
-.source "SourceFile"
+.source "MediaBrowserCompat.java"
 
 
 # annotations
@@ -15,7 +15,7 @@
 
 
 # virtual methods
-.method public onReceiveResult(ILandroid/os/Bundle;)V
+.method public final onReceiveResult(ILandroid/os/Bundle;)V
     .locals 0
 
     return-void

@@ -1,6 +1,6 @@
 .class public abstract Lcom/google/protobuf/GeneratedMessageLite$ExtendableMessage;
 .super Lcom/google/protobuf/GeneratedMessageLite;
-.source "SourceFile"
+.source "GeneratedMessageLite.java"
 
 # interfaces
 .implements Lcom/google/protobuf/MessageLiteOrBuilder;
@@ -24,7 +24,8 @@
         "Ljava/lang/Object;",
         ">",
         "Lcom/google/protobuf/GeneratedMessageLite<",
-        "TMessageType;TBuilderType;>;"
+        "TMessageType;TBuilderType;>;",
+        "Lcom/google/protobuf/MessageLiteOrBuilder;"
     }
 .end annotation
 
@@ -43,51 +44,9 @@
 
 # direct methods
 .method public constructor <init>()V
-    .locals 1
+    .locals 0
 
-    .line 1
-    invoke-direct {p0}, Lcom/google/protobuf/GeneratedMessageLite;-><init>()V
+    const/4 p0, 0x0
 
-    .line 2
-    sget-object v0, Lcom/google/protobuf/FieldSet;->DEFAULT_INSTANCE:Lcom/google/protobuf/FieldSet;
-
-    .line 3
-    iput-object v0, p0, Lcom/google/protobuf/GeneratedMessageLite$ExtendableMessage;->extensions:Lcom/google/protobuf/FieldSet;
-
-    return-void
-.end method
-
-
-# virtual methods
-.method public ensureExtensionsAreMutable()Lcom/google/protobuf/FieldSet;
-    .locals 2
-    .annotation system Ldalvik/annotation/Signature;
-        value = {
-            "()",
-            "Lcom/google/protobuf/FieldSet<",
-            "Lcom/google/protobuf/GeneratedMessageLite$ExtensionDescriptor;",
-            ">;"
-        }
-    .end annotation
-
-    .line 1
-    iget-object v0, p0, Lcom/google/protobuf/GeneratedMessageLite$ExtendableMessage;->extensions:Lcom/google/protobuf/FieldSet;
-
-    .line 2
-    iget-boolean v1, v0, Lcom/google/protobuf/FieldSet;->isImmutable:Z
-
-    if-eqz v1, :cond_0
-
-    .line 3
-    invoke-virtual {v0}, Lcom/google/protobuf/FieldSet;->clone()Lcom/google/protobuf/FieldSet;
-
-    move-result-object v0
-
-    iput-object v0, p0, Lcom/google/protobuf/GeneratedMessageLite$ExtendableMessage;->extensions:Lcom/google/protobuf/FieldSet;
-
-    .line 4
-    :cond_0
-    iget-object p0, p0, Lcom/google/protobuf/GeneratedMessageLite$ExtendableMessage;->extensions:Lcom/google/protobuf/FieldSet;
-
-    return-object p0
+    throw p0
 .end method

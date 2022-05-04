@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/constraintlayout/solver/LinearSystem$Row;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "LinearSystem.java"
 
 
 # annotations
@@ -15,11 +15,5 @@
 
 
 # virtual methods
-.method public abstract addError(Landroidx/constraintlayout/solver/SolverVariable;)V
-.end method
-
-.method public abstract clear()V
-.end method
-
-.method public abstract getPivotCandidate(Landroidx/constraintlayout/solver/LinearSystem;[Z)Landroidx/constraintlayout/solver/SolverVariable;
+.method public abstract getPivotCandidate([Z)Landroidx/constraintlayout/solver/SolverVariable;
 .end method

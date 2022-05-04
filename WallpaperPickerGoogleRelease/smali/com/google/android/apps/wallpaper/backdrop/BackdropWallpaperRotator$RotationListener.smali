@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/android/apps/wallpaper/backdrop/BackdropWallpaperRotator$RotationListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "BackdropWallpaperRotator.java"
 
 
 # annotations

@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/picker/StartRotationDialogFragment$Listener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "StartRotationDialogFragment.java"
 
 
 # annotations
@@ -15,5 +15,5 @@
 
 
 # virtual methods
-.method public abstract onStartRotationDialogDismiss(Landroid/content/DialogInterface;)V
+.method public abstract onStartRotationDialogDismiss()V
 .end method

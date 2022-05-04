@@ -5,6 +5,6 @@
     <Space android:layout_width="wrap_content" android:layout_height="24.0dip" />
     <ImageView android:layout_gravity="center" android:layout_width="@dimen/set_wallpaper_dialog_icon_size" android:layout_height="@dimen/set_wallpaper_dialog_icon_size" android:src="@drawable/ic_baseline_wallpaper_24" android:tint="?android:colorAccent" />
     <Space android:layout_width="wrap_content" android:layout_height="16.0dip" />
-    <TextView android:textSize="24.0sp" android:textColor="?android:textColorPrimary" android:gravity="center" android:id="@id/dialog_set_wallpaper_title" android:layout_width="fill_parent" android:layout_height="wrap_content" android:minHeight="32.0dip" android:fontFamily="@android:string/httpErrorOk" />
+    <TextView android:textSize="24.0sp" android:textColor="?android:textColorPrimary" android:gravity="center" android:id="@id/dialog_set_wallpaper_title" android:layout_width="fill_parent" android:layout_height="wrap_content" android:minHeight="32.0dip" android:fontFamily="@android:string/ime_action_default" />
     <Space android:layout_width="wrap_content" android:layout_height="8.0dip" />
 </LinearLayout>

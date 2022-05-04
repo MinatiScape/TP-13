@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/common/base/Supplier;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Supplier.java"
 
 
 # annotations

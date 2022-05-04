@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/widget/BottomActionBar$BottomActionBarHost;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "BottomActionBar.java"
 
 
 # annotations

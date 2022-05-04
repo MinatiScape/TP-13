@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/slice/SliceViewManager$SliceCallback;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "SliceViewManager.java"
 
 
 # annotations

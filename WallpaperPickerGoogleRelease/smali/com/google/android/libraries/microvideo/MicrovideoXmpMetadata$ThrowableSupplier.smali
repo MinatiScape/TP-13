@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/android/libraries/microvideo/MicrovideoXmpMetadata$ThrowableSupplier;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "MicrovideoXmpMetadata.java"
 
 
 # annotations

@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/photos/base/BaseImageUrlUtil$UriWrapper;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "BaseImageUrlUtil.java"
 
 
 # annotations

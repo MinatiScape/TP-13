@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/util/FullScreenAnimation$FullScreenStatusListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "FullScreenAnimation.java"
 
 
 # annotations

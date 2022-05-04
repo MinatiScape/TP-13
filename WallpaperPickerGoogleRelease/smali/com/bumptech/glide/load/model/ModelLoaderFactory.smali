@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/load/model/ModelLoaderFactory;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ModelLoaderFactory.java"
 
 
 # annotations
@@ -18,15 +18,6 @@
 
 # virtual methods
 .method public abstract build(Lcom/bumptech/glide/load/model/MultiModelLoaderFactory;)Lcom/bumptech/glide/load/model/ModelLoader;
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "multiFactory"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(",

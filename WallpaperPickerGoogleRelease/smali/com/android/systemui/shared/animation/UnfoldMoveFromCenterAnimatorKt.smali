@@ -1,6 +1,6 @@
 .class public final Lcom/android/systemui/shared/animation/UnfoldMoveFromCenterAnimatorKt;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "UnfoldMoveFromCenterAnimator.kt"
 
 
 # static fields

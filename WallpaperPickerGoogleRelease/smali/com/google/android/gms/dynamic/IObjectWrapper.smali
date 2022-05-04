@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/android/gms/dynamic/IObjectWrapper;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "IObjectWrapper.java"
 
 # interfaces
 .implements Landroid/os/IInterface;

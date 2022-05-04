@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/load/Encoder;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Encoder.java"
 
 
 # annotations
@@ -16,19 +16,6 @@
 
 # virtual methods
 .method public abstract encode(Ljava/lang/Object;Ljava/io/File;Lcom/bumptech/glide/load/Options;)Z
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0,
-            0x0,
-            0x0
-        }
-        names = {
-            "data",
-            "file",
-            "options"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(TT;",

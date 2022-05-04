@@ -26,18 +26,17 @@
     <string name="abc_searchview_description_voice">Ovozli qidiruv</string>
     <string name="abc_shareactionprovider_share_with">Ulashish</string>
     <string name="abc_shareactionprovider_share_with_application">%s orqali ulashish</string>
-    <string name="abc_slice_error">Ulanib bo‘lmadi</string>
+    <string name="abc_slice_error">Ulanmadi</string>
     <string name="abc_slice_more">Yana</string>
     <string name="abc_slice_more_content">+ %1$d</string>
     <string name="abc_slice_permission_allow">Ruxsat</string>
-    <string name="abc_slice_permission_checkbox">%1$s ilovasiga boshqa ilovalardan fragmentlarni ko‘rsatishga ruxsat berish</string>
     <string name="abc_slice_permission_deny">Rad etish</string>
-    <string name="abc_slice_permission_text_1">– %1$s ma’lumotlarini o‘qiy oladi</string>
+    <string name="abc_slice_permission_text_1">– %1$s maʼlumotlarini oʻqiy oladi</string>
     <string name="abc_slice_permission_text_2">– %1$s ichida amallar bajara oladi</string>
-    <string name="abc_slice_permission_title">%1$s ilovasiga %2$s ilovasidan fragmentlar ko‘rsatishga ruxsat berilsinmi?</string>
+    <string name="abc_slice_permission_title">%1$s ilovasiga %2$s ilovasidan fragmentlar koʻrsatishga ruxsat berilsinmi?</string>
     <string name="abc_slice_show_more">Yana</string>
     <string name="abc_slice_updated">Yangilandi: %1$s</string>
-    <string name="abc_slices_permission_request">%1$s ilovasi %2$s ilovasidan fragmentlar ko‘rsatish uchun ruxsat so‘ramoqda</string>
+    <string name="abc_slices_permission_request">%1$s ilovasi %2$s ilovasidan fragmentlar koʻrsatish uchun ruxsat soʻramoqda</string>
     <string name="abc_toolbar_collapse_description">Yig‘ish</string>
     <string name="accessibility_custom_color_title">Maxsus rang</string>
     <string name="accessibility_custom_font_title">Maxsus shrift</string>
@@ -72,6 +71,7 @@
     <string name="center_wallpaper_position">Markazlash</string>
     <string name="character_counter_content_description">%1$d/%2$d ta belgi kiritildi</string>
     <string name="character_counter_overflowed_content_description">Harflar soni (%1$d) cheklovdan (%2$d) oshib ketdi</string>
+    <string name="cinematic_effects_toogle">3D fon rasmlari</string>
     <string name="clear_text_end_icon_content_description">Matnni tozalash</string>
     <string name="clock_preview_content_description">%1$s soatiga razm solish</string>
     <string name="clock_title">Soat</string>
@@ -117,6 +117,9 @@
     <string name="delete_live_wallpaper">Oʻchirish</string>
     <string name="delete_wallpaper_confirmation">Bu fon rasmi telefoningizdan oʻchirib tashlansinmi?</string>
     <string name="edit_custom_theme_lbl">Tahrirlash uchun tegining</string>
+    <string name="effect_error_dialog_body">"Biz effektdan foydalana olmaymiz.
+Boshqa rasmni sinab koʻring."</string>
+    <string name="effect_error_dialog_title">Ana xolos!</string>
     <string name="error_icon_content_description">Xato</string>
     <string name="expand_button_title">Kengaytirilgan</string>
     <string name="explore">Batafsil</string>
@@ -199,6 +202,7 @@
     <string name="mtrl_picker_toggle_to_day_selection">Kunni tanlash uchun bosing</string>
     <string name="mtrl_picker_toggle_to_text_input_mode">Matn kiritish rejimiga oʻtish</string>
     <string name="mtrl_picker_toggle_to_year_selection">Yilni tanlash uchun bosing</string>
+    <string name="my_photos">Mening suratlarim</string>
     <string name="my_photos_category_title">Suratlarim</string>
     <string name="my_photos_generic_wallpaper_title">Suratim</string>
     <string name="name_component_title">Uslub nomini kiriting</string>
@@ -238,7 +242,7 @@ Bu parametrni o‘zgartirish uchun Fon rasmlari ilova ma’lumotlaridagi Ruxsatl
     <string name="search_menu_title">Qidiruv</string>
     <string name="select_wallpaper_label">Fon rasmi turkumlari</string>
     <string name="set_theme_wallpaper_dialog_message">Fon rasmi uslubini sozlash</string>
-    <string name="set_wallpaper_both_destination">Bosh ekran va ekran qulfi</string>
+    <string name="set_wallpaper_both_destination">Bosh ekran va ekran qulflari</string>
     <string name="set_wallpaper_button_text">Fon rasmi qilish</string>
     <string name="set_wallpaper_dialog_message">Fon rasmi oʻrnatiladigan joyni tanlang</string>
     <string name="set_wallpaper_error_message">Fonga rasm o‘rnatib bo‘lmadi.</string>
@@ -246,6 +250,8 @@ Bu parametrni o‘zgartirish uchun Fon rasmlari ilova ma’lumotlaridagi Ruxsatl
     <string name="set_wallpaper_lock_screen_destination">Ekran qulfi</string>
     <string name="set_wallpaper_progress_message">Fonga rasm o‘rnatilmoqda…</string>
     <string name="settings_button_label">Sozlamalar</string>
+    <string name="settings_snackbar_description">Fayllar va mediani sozlamalar orqali yoqing.</string>
+    <string name="settings_snackbar_enable">Yoqish</string>
     <string name="shape_component_title">Shakl tanlang</string>
     <string name="shape_preview_content_description">Shaklga razm solish</string>
     <string name="show_ui_preview_text">Interfeys namunasini chiqarish</string>
@@ -263,6 +269,7 @@ Bu parametrni o‘zgartirish uchun Fon rasmlari ilova ma’lumotlaridagi Ruxsatl
     <string name="style_info_description">Shrift, belgilar, ilova shakllari va ranglarga razm solish</string>
     <string name="summary_collapsed_preference_list">%1$s, %2$s</string>
     <string name="tab_customize">Sozlash</string>
+    <string name="tab_effects">Effektlar</string>
     <string name="tab_info">Axborot</string>
     <string name="theme_description">Shrifti: %1$s, belgilar: %2$s, shakli: %3$s, rangi: %4$s</string>
     <string name="theme_preview_card_content_description">Dizaynga razm solish</string>
@@ -282,6 +289,8 @@ Bu parametrni o‘zgartirish uchun Fon rasmlari ilova ma’lumotlaridagi Ruxsatl
     <string name="wallpaper_destination_both">Bosh ekran va ekran qulfi</string>
     <string name="wallpaper_disabled_by_administrator_message">Fon rasmini o‘rnatish qurilma administratori tomonidan bloklangan</string>
     <string name="wallpaper_disabled_message">Fon rasmini o‘rnatish bu qurilmada bloklangan</string>
+    <string name="wallpaper_effects_subtitle">Rasmingizni 3D fon rasmi qiling. Telefoningizni siljitsangiz, u ham siljiydi.</string>
+    <string name="wallpaper_effects_title">3D fon rasmlari</string>
     <string name="wallpaper_picker_entry_title">Fon rasmini almashtirish</string>
     <string name="wallpaper_preview_card_content_description">Fon rasmiga razm solish</string>
     <string name="wallpaper_set_successfully_message">Fon rasmi o‘rnatildi</string>

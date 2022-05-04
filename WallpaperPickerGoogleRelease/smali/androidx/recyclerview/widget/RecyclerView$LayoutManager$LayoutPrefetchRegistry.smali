@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/recyclerview/widget/RecyclerView$LayoutManager$LayoutPrefetchRegistry;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "RecyclerView.java"
 
 
 # annotations

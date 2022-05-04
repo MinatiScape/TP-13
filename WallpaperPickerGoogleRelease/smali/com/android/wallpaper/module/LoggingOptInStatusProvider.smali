@@ -1,3 +1,3 @@
 .class public interface abstract Lcom/android/wallpaper/module/LoggingOptInStatusProvider;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "LoggingOptInStatusProvider.java"

@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/recyclerview/widget/RecyclerView$ChildDrawingOrderCallback;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "RecyclerView.java"
 
 
 # annotations
@@ -15,15 +15,5 @@
 
 
 # virtual methods
-.method public abstract onGetChildDrawingOrder(II)I
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0,
-            0x0
-        }
-        names = {
-            "childCount",
-            "i"
-        }
-    .end annotation
+.method public abstract onGetChildDrawingOrder()I
 .end method

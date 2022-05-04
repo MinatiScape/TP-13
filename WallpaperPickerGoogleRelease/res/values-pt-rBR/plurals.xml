@@ -5,12 +5,12 @@
         <item quantity="one">%d dia atrás</item>
     </plurals>
     <plurals name="abc_slice_duration_min">
-        <item quantity="other">%d min atrás</item>
-        <item quantity="one">%d min atrás</item>
+        <item quantity="other">Há %dmin</item>
+        <item quantity="one">Há %dmin</item>
     </plurals>
     <plurals name="abc_slice_duration_years">
-        <item quantity="other">%d anos atrás</item>
-        <item quantity="one">%d ano atrás</item>
+        <item quantity="other">Há %d anos</item>
+        <item quantity="one">Há %d ano</item>
     </plurals>
     <plurals name="mtrl_badge_content_description">
         <item quantity="other">%d novas notificações</item>

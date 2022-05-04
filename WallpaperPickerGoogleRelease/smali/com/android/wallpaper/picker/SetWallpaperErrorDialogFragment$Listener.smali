@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/picker/SetWallpaperErrorDialogFragment$Listener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "SetWallpaperErrorDialogFragment.java"
 
 
 # annotations

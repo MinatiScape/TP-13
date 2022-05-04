@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/model/InlinePreviewIntentFactory;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "InlinePreviewIntentFactory.java"
 
 
 # virtual methods

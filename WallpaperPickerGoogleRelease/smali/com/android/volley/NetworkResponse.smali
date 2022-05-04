@@ -1,6 +1,6 @@
-.class public Lcom/android/volley/NetworkResponse;
+.class public final Lcom/android/volley/NetworkResponse;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "NetworkResponse.java"
 
 
 # instance fields

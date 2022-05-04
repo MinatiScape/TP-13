@@ -1,6 +1,6 @@
 .class public Lcom/google/android/material/appbar/AppBarLayout$Behavior;
 .super Lcom/google/android/material/appbar/AppBarLayout$BaseBehavior;
-.source "SourceFile"
+.source "AppBarLayout.java"
 
 
 # annotations

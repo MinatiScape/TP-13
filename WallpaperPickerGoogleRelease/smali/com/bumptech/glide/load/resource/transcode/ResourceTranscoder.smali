@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/load/resource/transcode/ResourceTranscoder;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ResourceTranscoder.java"
 
 
 # annotations
@@ -18,17 +18,6 @@
 
 # virtual methods
 .method public abstract transcode(Lcom/bumptech/glide/load/engine/Resource;Lcom/bumptech/glide/load/Options;)Lcom/bumptech/glide/load/engine/Resource;
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0,
-            0x0
-        }
-        names = {
-            "toTranscode",
-            "options"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(",

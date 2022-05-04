@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/android/gms/common/api/GoogleApiClient$ConnectionCallbacks;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "GoogleApiClient.java"
 
 
 # annotations
@@ -15,8 +15,8 @@
 
 
 # virtual methods
-.method public abstract onConnected(Landroid/os/Bundle;)V
+.method public abstract onConnected()V
 .end method
 
-.method public abstract onConnectionSuspended(I)V
+.method public abstract onConnectionSuspended()V
 .end method

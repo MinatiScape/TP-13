@@ -1,6 +1,6 @@
 .class public Lkotlin/jvm/KotlinReflectionNotSupportedError;
 .super Ljava/lang/Error;
-.source "SourceFile"
+.source "KotlinReflectionNotSupportedError.kt"
 
 
 # direct methods

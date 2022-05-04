@@ -1,6 +1,6 @@
-.class public final Lcom/android/systemui/unfold/updates/DeviceFoldStateProvider$FoldStateListener$1;
+.class final Lcom/android/systemui/unfold/updates/DeviceFoldStateProvider$FoldStateListener$1;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "DeviceFoldStateProvider.kt"
 
 # interfaces
 .implements Ljava/util/function/Consumer;
@@ -18,10 +18,11 @@
 
 .annotation system Ldalvik/annotation/Signature;
     value = {
+        "<T:",
         "Ljava/lang/Object;",
-        "Ljava/util/function/Consumer<",
-        "Ljava/lang/Boolean;",
-        ">;"
+        ">",
+        "Ljava/lang/Object;",
+        "Ljava/util/function/Consumer;"
     }
 .end annotation
 
@@ -89,7 +90,7 @@
     .line 5
     iget-object p1, p0, Lcom/android/systemui/unfold/updates/DeviceFoldStateProvider$FoldStateListener$1;->this$0:Lcom/android/systemui/unfold/updates/DeviceFoldStateProvider;
 
-    const/4 v1, 0x7
+    const/4 v1, 0x5
 
     invoke-static {p1, v1}, Lcom/android/systemui/unfold/updates/DeviceFoldStateProvider;->access$notifyFoldUpdate(Lcom/android/systemui/unfold/updates/DeviceFoldStateProvider;I)V
 

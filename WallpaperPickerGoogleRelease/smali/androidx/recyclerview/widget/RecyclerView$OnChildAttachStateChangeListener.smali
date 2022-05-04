@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/recyclerview/widget/RecyclerView$OnChildAttachStateChangeListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "RecyclerView.java"
 
 
 # annotations
@@ -16,23 +16,7 @@
 
 # virtual methods
 .method public abstract onChildViewAttachedToWindow(Landroid/view/View;)V
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "view"
-        }
-    .end annotation
 .end method
 
-.method public abstract onChildViewDetachedFromWindow(Landroid/view/View;)V
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "view"
-        }
-    .end annotation
+.method public abstract onChildViewDetachedFromWindow()V
 .end method

@@ -1,6 +1,6 @@
 .class public interface abstract annotation Lkotlin/coroutines/jvm/internal/DebugMetadata;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "DebugMetadata.kt"
 
 # interfaces
 .implements Ljava/lang/annotation/Annotation;

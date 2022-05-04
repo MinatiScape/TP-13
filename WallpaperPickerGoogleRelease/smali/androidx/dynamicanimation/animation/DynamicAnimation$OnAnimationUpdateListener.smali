@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/dynamicanimation/animation/DynamicAnimation$OnAnimationUpdateListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "DynamicAnimation.java"
 
 
 # annotations
@@ -15,17 +15,5 @@
 
 
 # virtual methods
-.method public abstract onAnimationUpdate(Landroidx/dynamicanimation/animation/DynamicAnimation;FF)V
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0,
-            0x0,
-            0x0
-        }
-        names = {
-            "animation",
-            "value",
-            "velocity"
-        }
-    .end annotation
+.method public abstract onAnimationUpdate()V
 .end method

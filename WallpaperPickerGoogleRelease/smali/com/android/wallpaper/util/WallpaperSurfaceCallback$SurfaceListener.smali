@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/util/WallpaperSurfaceCallback$SurfaceListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "WallpaperSurfaceCallback.java"
 
 
 # annotations

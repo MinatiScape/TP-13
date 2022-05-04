@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/systemui/shared/tracing/ProtoTraceable;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ProtoTraceable.java"
 
 
 # annotations

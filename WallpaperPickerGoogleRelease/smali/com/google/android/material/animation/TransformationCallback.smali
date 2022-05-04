@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/android/material/animation/TransformationCallback;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "TransformationCallback.java"
 
 
 # annotations
@@ -15,18 +15,8 @@
 
 
 # virtual methods
-.method public abstract onScaleChanged(Landroid/view/View;)V
-    .annotation system Ldalvik/annotation/Signature;
-        value = {
-            "(TT;)V"
-        }
-    .end annotation
+.method public abstract onScaleChanged()V
 .end method
 
-.method public abstract onTranslationChanged(Landroid/view/View;)V
-    .annotation system Ldalvik/annotation/Signature;
-        value = {
-            "(TT;)V"
-        }
-    .end annotation
+.method public abstract onTranslationChanged()V
 .end method

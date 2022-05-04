@@ -1,6 +1,6 @@
 .class public abstract Lcom/google/common/util/concurrent/Striped$PowerOfTwoStriped;
 .super Lcom/google/common/util/concurrent/Striped;
-.source "SourceFile"
+.source "Striped.java"
 
 
 # annotations

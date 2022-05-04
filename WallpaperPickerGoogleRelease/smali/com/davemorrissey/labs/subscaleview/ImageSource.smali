@@ -1,6 +1,6 @@
 .class public final Lcom/davemorrissey/labs/subscaleview/ImageSource;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ImageSource.java"
 
 
 # instance fields
@@ -9,10 +9,6 @@
 .field public cached:Z
 
 .field public final resource:Ljava/lang/Integer;
-
-.field public sHeight:I
-
-.field public sWidth:I
 
 .field public tile:Z
 
@@ -49,7 +45,7 @@
     return-void
 .end method
 
-.method public constructor <init>(Landroid/graphics/Bitmap;Z)V
+.method public constructor <init>(Landroid/graphics/Bitmap;)V
     .locals 1
 
     .line 1
@@ -74,19 +70,11 @@
     .line 6
     invoke-virtual {p1}, Landroid/graphics/Bitmap;->getWidth()I
 
-    move-result v0
-
-    iput v0, p0, Lcom/davemorrissey/labs/subscaleview/ImageSource;->sWidth:I
-
     .line 7
     invoke-virtual {p1}, Landroid/graphics/Bitmap;->getHeight()I
 
-    move-result p1
-
-    iput p1, p0, Lcom/davemorrissey/labs/subscaleview/ImageSource;->sHeight:I
-
     .line 8
-    iput-boolean p2, p0, Lcom/davemorrissey/labs/subscaleview/ImageSource;->cached:Z
+    iput-boolean v0, p0, Lcom/davemorrissey/labs/subscaleview/ImageSource;->cached:Z
 
     return-void
 .end method

@@ -1,3 +1,3 @@
-.class public Landroidx/appcompat/widget/TintResources;
+.class public final Landroidx/appcompat/widget/TintResources;
 .super Landroidx/appcompat/widget/ResourcesWrapper;
-.source "SourceFile"
+.source "TintResources.java"

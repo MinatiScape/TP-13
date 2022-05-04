@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/android/gms/common/internal/BaseGmsClient$ConnectionProgressReportCallbacks;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "BaseGmsClient.java"
 
 
 # annotations

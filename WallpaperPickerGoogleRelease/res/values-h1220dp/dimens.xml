@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="full_preview_page_default_padding_top">103.0dip</dimen>
+    <item type="dimen" name="full_preview_page_vertical_bias">0.0</item>
+    <item type="dimen" name="preview_card_vertical_bias">0.0</item>
+</resources>

@@ -1,6 +1,6 @@
 .class public final synthetic Lcom/android/systemui/shared/system/ViewTreeObserverWrapper$$ExternalSyntheticLambda0;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "R8$$SyntheticClass"
 
 # interfaces
 .implements Landroid/view/ViewTreeObserver$OnComputeInternalInsetsListener;

@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/systemui/unfold/updates/screen/ScreenStatusProvider$ScreenListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ScreenStatusProvider.kt"
 
 
 # annotations

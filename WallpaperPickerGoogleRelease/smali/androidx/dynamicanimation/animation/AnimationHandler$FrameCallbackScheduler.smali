@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/dynamicanimation/animation/AnimationHandler$FrameCallbackScheduler;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "AnimationHandler.java"
 
 
 # annotations
@@ -18,13 +18,5 @@
 .method public abstract isCurrentThread()Z
 .end method
 
-.method public abstract postFrameCallback(Ljava/lang/Runnable;)V
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "frameCallback"
-        }
-    .end annotation
+.method public abstract postFrameCallback(Landroidx/dynamicanimation/animation/AnimationHandler$$ExternalSyntheticLambda0;)V
 .end method

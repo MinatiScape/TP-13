@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/load/engine/Resource;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Resource.java"
 
 
 # annotations

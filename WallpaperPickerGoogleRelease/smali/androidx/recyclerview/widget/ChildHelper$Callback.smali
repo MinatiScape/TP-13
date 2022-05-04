@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/recyclerview/widget/ChildHelper$Callback;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ChildHelper.java"
 
 
 # annotations

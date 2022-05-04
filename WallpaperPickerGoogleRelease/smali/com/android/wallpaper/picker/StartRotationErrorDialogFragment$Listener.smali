@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/picker/StartRotationErrorDialogFragment$Listener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "StartRotationErrorDialogFragment.java"
 
 
 # annotations

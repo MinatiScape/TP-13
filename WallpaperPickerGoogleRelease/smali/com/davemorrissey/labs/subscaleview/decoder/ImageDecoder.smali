@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/davemorrissey/labs/subscaleview/decoder/ImageDecoder;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ImageDecoder.java"
 
 
 # virtual methods

@@ -1,6 +1,6 @@
 .class public final synthetic Lcom/android/systemui/shared/plugins/PluginManagerImpl$PluginExceptionHandler$$ExternalSyntheticLambda0;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "R8$$SyntheticClass"
 
 # interfaces
 .implements Ljava/util/function/Consumer;
@@ -36,7 +36,7 @@
 
     check-cast p1, Ljava/lang/Thread$UncaughtExceptionHandler;
 
-    invoke-static {v0, p0, p1}, Lcom/android/systemui/shared/plugins/PluginManagerImpl$PluginExceptionHandler;->$r8$lambda$zP9ibK1dbUiFTVS9DQzDnfkI6Kg(Ljava/lang/Thread;Ljava/lang/Throwable;Ljava/lang/Thread$UncaughtExceptionHandler;)V
+    invoke-static {v0, p0, p1}, Lcom/android/systemui/shared/plugins/PluginManagerImpl$PluginExceptionHandler;->$r8$lambda$z9t9P8v3jgTN-_uKOhiAblr02AQ(Ljava/lang/Thread;Ljava/lang/Throwable;Ljava/lang/Thread$UncaughtExceptionHandler;)V
 
     return-void
 .end method

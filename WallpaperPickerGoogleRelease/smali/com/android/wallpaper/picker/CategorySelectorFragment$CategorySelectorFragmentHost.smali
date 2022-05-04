@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/picker/CategorySelectorFragment$CategorySelectorFragmentHost;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "CategorySelectorFragment.java"
 
 
 # annotations
@@ -21,13 +21,10 @@
 .method public abstract fetchCategories()V
 .end method
 
-.method public abstract isHostToolbarShown()Z
+.method public abstract isHostToolbarShown()V
 .end method
 
-.method public abstract requestCustomPhotoPicker(Lcom/android/wallpaper/picker/MyPhotosStarter$PermissionChangedListener;)V
-.end method
-
-.method public abstract setToolbarTitle(Ljava/lang/CharSequence;)V
+.method public abstract requestCustomPhotoPicker(Lcom/android/wallpaper/picker/CategorySelectorFragment$CategoryHolder$1;)V
 .end method
 
 .method public abstract show(Lcom/android/wallpaper/model/Category;)V

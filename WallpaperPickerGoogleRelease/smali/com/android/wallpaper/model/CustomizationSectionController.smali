@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/model/CustomizationSectionController;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "CustomizationSectionController.java"
 
 
 # annotations

@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/util/TimeUtils$TimeTicker$TimeListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "TimeUtils.java"
 
 
 # annotations

@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/load/engine/Initializable;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Initializable.java"
 
 
 # virtual methods

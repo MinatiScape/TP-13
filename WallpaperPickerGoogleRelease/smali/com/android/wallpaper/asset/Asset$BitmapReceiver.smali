@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/asset/Asset$BitmapReceiver;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Asset.java"
 
 
 # annotations

@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/load/model/ModelLoader;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ModelLoader.java"
 
 
 # annotations
@@ -24,21 +24,6 @@
 
 # virtual methods
 .method public abstract buildLoadData(Ljava/lang/Object;IILcom/bumptech/glide/load/Options;)Lcom/bumptech/glide/load/model/ModelLoader$LoadData;
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0,
-            0x0,
-            0x0,
-            0x0
-        }
-        names = {
-            "model",
-            "width",
-            "height",
-            "options"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(TModel;II",
@@ -51,15 +36,6 @@
 .end method
 
 .method public abstract handles(Ljava/lang/Object;)Z
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "model"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(TModel;)Z"

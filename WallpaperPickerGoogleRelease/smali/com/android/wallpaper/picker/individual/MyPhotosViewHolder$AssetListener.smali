@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/picker/individual/MyPhotosViewHolder$AssetListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "MyPhotosViewHolder.java"
 
 
 # annotations

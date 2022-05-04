@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/module/CurrentWallpaperInfoFactory$WallpaperInfoCallback;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "CurrentWallpaperInfoFactory.java"
 
 
 # annotations
@@ -15,5 +15,5 @@
 
 
 # virtual methods
-.method public abstract onWallpaperInfoCreated(Lcom/android/wallpaper/model/WallpaperInfo;Lcom/android/wallpaper/model/WallpaperInfo;I)V
+.method public abstract onWallpaperInfoCreated(Lcom/android/wallpaper/model/WallpaperInfo;Lcom/android/wallpaper/model/WallpaperInfo;)V
 .end method

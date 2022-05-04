@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/module/PackageStatusNotifier$Listener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "PackageStatusNotifier.java"
 
 
 # annotations

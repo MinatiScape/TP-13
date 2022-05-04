@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/systemui/unfold/UnfoldTransitionProgressProvider$TransitionProgressListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "UnfoldTransitionProgressProvider.kt"
 
 
 # annotations

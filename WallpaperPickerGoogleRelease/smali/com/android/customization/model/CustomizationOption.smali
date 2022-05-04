@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/customization/model/CustomizationOption;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "CustomizationOption.java"
 
 
 # annotations

@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/appcompat/widget/WithHint;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "WithHint.java"
 
 
 # virtual methods

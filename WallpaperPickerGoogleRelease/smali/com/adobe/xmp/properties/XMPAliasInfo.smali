@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/adobe/xmp/properties/XMPAliasInfo;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "XMPAliasInfo.java"
 
 
 # virtual methods

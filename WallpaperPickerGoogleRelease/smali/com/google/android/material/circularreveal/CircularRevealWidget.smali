@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/android/material/circularreveal/CircularRevealWidget;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "CircularRevealWidget.java"
 
 
 # annotations
@@ -27,11 +27,11 @@
 .method public abstract getRevealInfo()Lcom/google/android/material/circularreveal/CircularRevealWidget$RevealInfo;
 .end method
 
-.method public abstract setCircularRevealOverlayDrawable(Landroid/graphics/drawable/Drawable;)V
+.method public abstract setCircularRevealOverlayDrawable()V
 .end method
 
-.method public abstract setCircularRevealScrimColor(I)V
+.method public abstract setCircularRevealScrimColor()V
 .end method
 
-.method public abstract setRevealInfo(Lcom/google/android/material/circularreveal/CircularRevealWidget$RevealInfo;)V
+.method public abstract setRevealInfo()V
 .end method

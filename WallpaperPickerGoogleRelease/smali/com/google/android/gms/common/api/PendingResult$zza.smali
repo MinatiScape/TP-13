@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/android/gms/common/api/PendingResult$zza;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "PendingResult.java"
 
 
 # annotations
@@ -15,5 +15,5 @@
 
 
 # virtual methods
-.method public abstract zza(Lcom/google/android/gms/common/api/Status;)V
+.method public abstract zza()V
 .end method

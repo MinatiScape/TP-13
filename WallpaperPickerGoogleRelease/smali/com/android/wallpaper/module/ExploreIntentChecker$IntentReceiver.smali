@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/module/ExploreIntentChecker$IntentReceiver;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ExploreIntentChecker.java"
 
 
 # annotations
@@ -12,8 +12,3 @@
     accessFlags = 0x609
     name = "IntentReceiver"
 .end annotation
-
-
-# virtual methods
-.method public abstract onIntentReceived(Landroid/content/Intent;)V
-.end method

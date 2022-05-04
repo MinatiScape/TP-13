@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/picker/WorkspaceSurfaceHolderCallback$WorkspaceRenderListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "WorkspaceSurfaceHolderCallback.java"
 
 
 # annotations

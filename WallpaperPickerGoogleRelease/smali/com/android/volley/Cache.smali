@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/volley/Cache;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Cache.java"
 
 
 # annotations

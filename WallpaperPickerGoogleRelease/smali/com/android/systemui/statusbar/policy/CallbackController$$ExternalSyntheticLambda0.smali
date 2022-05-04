@@ -1,6 +1,6 @@
 .class public final synthetic Lcom/android/systemui/statusbar/policy/CallbackController$$ExternalSyntheticLambda0;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "R8$$SyntheticClass"
 
 # interfaces
 .implements Landroidx/lifecycle/LifecycleEventObserver;

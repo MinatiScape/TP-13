@@ -1,6 +1,6 @@
-.class public Landroid/arch/lifecycle/FullLifecycleObserverAdapter;
+.class Landroid/arch/lifecycle/FullLifecycleObserverAdapter;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "FullLifecycleObserverAdapter.java"
 
 # interfaces
 .implements Landroid/arch/lifecycle/GenericLifecycleObserver;

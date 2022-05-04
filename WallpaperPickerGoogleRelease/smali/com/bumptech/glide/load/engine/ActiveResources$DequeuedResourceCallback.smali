@@ -1,6 +1,6 @@
-.class public interface abstract Lcom/bumptech/glide/load/engine/ActiveResources$DequeuedResourceCallback;
+.class interface abstract Lcom/bumptech/glide/load/engine/ActiveResources$DequeuedResourceCallback;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ActiveResources.java"
 
 
 # annotations

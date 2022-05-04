@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/request/transition/Transition;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Transition.java"
 
 
 # annotations
@@ -22,17 +22,6 @@
 
 # virtual methods
 .method public abstract transition(Ljava/lang/Object;Lcom/bumptech/glide/request/transition/Transition$ViewAdapter;)Z
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0,
-            0x0
-        }
-        names = {
-            "current",
-            "adapter"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(TR;",

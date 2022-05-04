@@ -1,6 +1,6 @@
 .class public Lcom/android/volley/NetworkError;
 .super Lcom/android/volley/VolleyError;
-.source "SourceFile"
+.source "NetworkError.java"
 
 
 # direct methods
@@ -13,11 +13,11 @@
     return-void
 .end method
 
-.method public constructor <init>(Ljava/lang/Throwable;)V
+.method public constructor <init>(Ljava/io/IOException;)V
     .locals 0
 
     .line 2
-    invoke-direct {p0, p1}, Lcom/android/volley/VolleyError;-><init>(Ljava/lang/Throwable;)V
+    invoke-direct {p0, p1}, Lcom/android/volley/VolleyError;-><init>(Ljava/lang/Exception;)V
 
     return-void
 .end method

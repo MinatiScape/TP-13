@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/protobuf/Internal$ProtobufList;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Internal.java"
 
 # interfaces
 .implements Ljava/util/List;

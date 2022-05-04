@@ -5,8 +5,8 @@
         <item quantity="one">%d dag gelede</item>
     </plurals>
     <plurals name="abc_slice_duration_min">
-        <item quantity="other">%d m. gelede</item>
-        <item quantity="one">%d m. gelede</item>
+        <item quantity="other">%d min. gelede</item>
+        <item quantity="one">%d min. gelede</item>
     </plurals>
     <plurals name="abc_slice_duration_years">
         <item quantity="other">%d jaar gelede</item>

@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/systemui/plugins/Plugin;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Plugin.java"
 
 
 # virtual methods

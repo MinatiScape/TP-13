@@ -1,6 +1,6 @@
 .class public final Lcom/google/android/gms/common/internal/zza;
 .super Lcom/google/android/gms/common/internal/IAccountAccessor$zza;
-.source "SourceFile"
+.source "AccountAccessor.java"
 
 
 # static fields

@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/activity/OnBackPressedDispatcherOwner;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "OnBackPressedDispatcherOwner.java"
 
 # interfaces
 .implements Landroidx/lifecycle/LifecycleOwner;

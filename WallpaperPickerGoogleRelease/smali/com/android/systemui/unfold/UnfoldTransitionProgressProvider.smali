@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/systemui/unfold/UnfoldTransitionProgressProvider;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "UnfoldTransitionProgressProvider.kt"
 
 # interfaces
 .implements Lcom/android/systemui/statusbar/policy/CallbackController;

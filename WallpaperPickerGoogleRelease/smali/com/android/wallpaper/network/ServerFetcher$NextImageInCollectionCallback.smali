@@ -1,17 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/network/ServerFetcher$NextImageInCollectionCallback;
 .super Ljava/lang/Object;
-.source "SourceFile"
-
-
-# annotations
-.annotation system Ldalvik/annotation/EnclosingClass;
-    value = Lcom/android/wallpaper/network/ServerFetcher;
-.end annotation
-
-.annotation system Ldalvik/annotation/InnerClass;
-    accessFlags = 0x609
-    name = "NextImageInCollectionCallback"
-.end annotation
+.source "ServerFetcher.java"
 
 
 # virtual methods

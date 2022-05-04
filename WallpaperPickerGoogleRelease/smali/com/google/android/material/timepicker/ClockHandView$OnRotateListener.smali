@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/android/material/timepicker/ClockHandView$OnRotateListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ClockHandView.java"
 
 
 # annotations
@@ -15,5 +15,5 @@
 
 
 # virtual methods
-.method public abstract onRotate(FZ)V
+.method public abstract onRotate(F)V
 .end method

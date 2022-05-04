@@ -1,6 +1,6 @@
-.class public Lcom/google/android/gms/clearcut/Counters$Counter;
+.class public final Lcom/google/android/gms/clearcut/Counters$Counter;
 .super Lcom/google/android/gms/clearcut/Counters$AbstractCounter;
-.source "SourceFile"
+.source "Counters.java"
 
 
 # annotations
@@ -15,16 +15,16 @@
 
 
 # direct methods
-.method public constructor <init>(Lcom/google/android/gms/clearcut/Counters;Lcom/google/android/gms/clearcut/Counters$Counter;ZLcom/google/android/gms/clearcut/zzp;)V
+.method public constructor <init>(Lcom/google/android/gms/clearcut/Counters;Lcom/google/android/gms/clearcut/Counters$Counter;)V
     .locals 0
 
     .line 2
-    invoke-direct {p0, p1, p2, p3}, Lcom/google/android/gms/clearcut/Counters$AbstractCounter;-><init>(Lcom/google/android/gms/clearcut/Counters;Lcom/google/android/gms/clearcut/Counters$AbstractCounter;Z)V
+    invoke-direct {p0, p1, p2}, Lcom/google/android/gms/clearcut/Counters$AbstractCounter;-><init>(Lcom/google/android/gms/clearcut/Counters;Lcom/google/android/gms/clearcut/Counters$AbstractCounter;)V
 
     return-void
 .end method
 
-.method public constructor <init>(Lcom/google/android/gms/clearcut/Counters;Ljava/lang/String;Lcom/google/android/gms/clearcut/zzp;)V
+.method public constructor <init>(Lcom/google/android/gms/clearcut/Counters;Ljava/lang/String;)V
     .locals 0
 
     .line 1

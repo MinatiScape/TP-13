@@ -1,6 +1,6 @@
 .class public final synthetic Lcom/android/systemui/shared/system/RemoteTransitionCompat$1$$ExternalSyntheticLambda2;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "R8$$SyntheticClass"
 
 # interfaces
 .implements Ljava/lang/Runnable;
@@ -15,11 +15,13 @@
 
 .field public final synthetic f$3:Landroid/view/SurfaceControl$Transaction;
 
-.field public final synthetic f$4:Ljava/lang/Runnable;
+.field public final synthetic f$4:Landroid/os/IBinder;
+
+.field public final synthetic f$5:Ljava/lang/Runnable;
 
 
 # direct methods
-.method public synthetic constructor <init>(Lcom/android/systemui/shared/system/RemoteTransitionRunner;Landroid/os/IBinder;Landroid/window/TransitionInfo;Landroid/view/SurfaceControl$Transaction;Ljava/lang/Runnable;)V
+.method public synthetic constructor <init>(Lcom/android/systemui/shared/system/RemoteTransitionRunner;Landroid/os/IBinder;Landroid/window/TransitionInfo;Landroid/view/SurfaceControl$Transaction;Landroid/os/IBinder;Lcom/android/systemui/shared/system/RemoteTransitionCompat$1$$ExternalSyntheticLambda1;)V
     .locals 0
 
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
@@ -32,7 +34,9 @@
 
     iput-object p4, p0, Lcom/android/systemui/shared/system/RemoteTransitionCompat$1$$ExternalSyntheticLambda2;->f$3:Landroid/view/SurfaceControl$Transaction;
 
-    iput-object p5, p0, Lcom/android/systemui/shared/system/RemoteTransitionCompat$1$$ExternalSyntheticLambda2;->f$4:Ljava/lang/Runnable;
+    iput-object p5, p0, Lcom/android/systemui/shared/system/RemoteTransitionCompat$1$$ExternalSyntheticLambda2;->f$4:Landroid/os/IBinder;
+
+    iput-object p6, p0, Lcom/android/systemui/shared/system/RemoteTransitionCompat$1$$ExternalSyntheticLambda2;->f$5:Ljava/lang/Runnable;
 
     return-void
 .end method
@@ -40,7 +44,7 @@
 
 # virtual methods
 .method public final run()V
-    .locals 4
+    .locals 6
 
     iget-object v0, p0, Lcom/android/systemui/shared/system/RemoteTransitionCompat$1$$ExternalSyntheticLambda2;->f$0:Lcom/android/systemui/shared/system/RemoteTransitionRunner;
 
@@ -50,9 +54,11 @@
 
     iget-object v3, p0, Lcom/android/systemui/shared/system/RemoteTransitionCompat$1$$ExternalSyntheticLambda2;->f$3:Landroid/view/SurfaceControl$Transaction;
 
-    iget-object p0, p0, Lcom/android/systemui/shared/system/RemoteTransitionCompat$1$$ExternalSyntheticLambda2;->f$4:Ljava/lang/Runnable;
+    iget-object v4, p0, Lcom/android/systemui/shared/system/RemoteTransitionCompat$1$$ExternalSyntheticLambda2;->f$4:Landroid/os/IBinder;
 
-    invoke-static {v0, v1, v2, v3, p0}, Lcom/android/systemui/shared/system/RemoteTransitionCompat$1;->$r8$lambda$hsPmf7vBlVPyR7fn8VTjavmbzl0(Lcom/android/systemui/shared/system/RemoteTransitionRunner;Landroid/os/IBinder;Landroid/window/TransitionInfo;Landroid/view/SurfaceControl$Transaction;Ljava/lang/Runnable;)V
+    iget-object v5, p0, Lcom/android/systemui/shared/system/RemoteTransitionCompat$1$$ExternalSyntheticLambda2;->f$5:Ljava/lang/Runnable;
+
+    invoke-static/range {v0 .. v5}, Lcom/android/systemui/shared/system/RemoteTransitionCompat$1;->$r8$lambda$aP60ABl4T7pZOMUM80gsj4ATUEI(Lcom/android/systemui/shared/system/RemoteTransitionRunner;Landroid/os/IBinder;Landroid/window/TransitionInfo;Landroid/view/SurfaceControl$Transaction;Landroid/os/IBinder;Ljava/lang/Runnable;)V
 
     return-void
 .end method

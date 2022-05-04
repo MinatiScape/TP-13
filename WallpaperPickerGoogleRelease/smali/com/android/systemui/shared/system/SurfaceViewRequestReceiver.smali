@@ -1,6 +1,6 @@
 .class public Lcom/android/systemui/shared/system/SurfaceViewRequestReceiver;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "SurfaceViewRequestReceiver.java"
 
 
 # instance fields

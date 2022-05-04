@@ -1,6 +1,6 @@
-.class public interface abstract Lcom/bumptech/glide/load/resource/bitmap/VideoDecoder$MediaMetadataRetrieverInitializer;
+.class interface abstract Lcom/bumptech/glide/load/resource/bitmap/VideoDecoder$MediaMetadataRetrieverInitializer;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "VideoDecoder.java"
 
 
 # annotations
@@ -25,17 +25,6 @@
 
 # virtual methods
 .method public abstract initialize(Landroid/media/MediaMetadataRetriever;Ljava/lang/Object;)V
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0,
-            0x0
-        }
-        names = {
-            "retriever",
-            "data"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(",

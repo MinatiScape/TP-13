@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/protobuf/MessageLite;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "MessageLite.java"
 
 # interfaces
 .implements Lcom/google/protobuf/MessageLiteOrBuilder;
@@ -18,10 +18,10 @@
 .method public abstract getSerializedSize()I
 .end method
 
-.method public abstract newBuilderForType()Lcom/google/protobuf/MessageLite$Builder;
+.method public abstract newBuilderForType$1()Lcom/google/protobuf/GeneratedMessageLite$Builder;
 .end method
 
-.method public abstract toBuilder()Lcom/google/protobuf/MessageLite$Builder;
+.method public abstract toBuilder$1()Lcom/google/protobuf/GeneratedMessageLite$Builder;
 .end method
 
 .method public abstract toByteArray()[B

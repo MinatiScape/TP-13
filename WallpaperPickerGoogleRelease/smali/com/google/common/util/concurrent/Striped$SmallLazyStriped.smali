@@ -1,6 +1,6 @@
-.class public Lcom/google/common/util/concurrent/Striped$SmallLazyStriped;
+.class Lcom/google/common/util/concurrent/Striped$SmallLazyStriped;
 .super Lcom/google/common/util/concurrent/Striped$PowerOfTwoStriped;
-.source "SourceFile"
+.source "Striped.java"
 
 
 # annotations

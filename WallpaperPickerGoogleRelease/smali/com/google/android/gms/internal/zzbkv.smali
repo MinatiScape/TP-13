@@ -1,6 +1,6 @@
 .class public abstract Lcom/google/android/gms/internal/zzbkv;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "AbstractSafeParcelable.java"
 
 # interfaces
 .implements Lcom/google/android/gms/internal/zzbkz;
@@ -10,7 +10,6 @@
 .method public constructor <init>()V
     .locals 0
 
-    .line 1
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
 
     return-void

@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/load/model/AssetUriLoader$AssetFetcherFactory;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "AssetUriLoader.java"
 
 
 # annotations
@@ -25,17 +25,6 @@
 
 # virtual methods
 .method public abstract buildFetcher(Landroid/content/res/AssetManager;Ljava/lang/String;)Lcom/bumptech/glide/load/data/DataFetcher;
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0,
-            0x0
-        }
-        names = {
-            "assetManager",
-            "assetPath"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(",

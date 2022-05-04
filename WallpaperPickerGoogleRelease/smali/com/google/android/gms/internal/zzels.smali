@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/android/gms/internal/zzels;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ISignInService.java"
 
 # interfaces
 .implements Landroid/os/IInterface;

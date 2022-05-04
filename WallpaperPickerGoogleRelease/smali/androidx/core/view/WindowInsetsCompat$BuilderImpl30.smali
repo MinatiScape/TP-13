@@ -1,6 +1,6 @@
-.class public Landroidx/core/view/WindowInsetsCompat$BuilderImpl30;
+.class public final Landroidx/core/view/WindowInsetsCompat$BuilderImpl30;
 .super Landroidx/core/view/WindowInsetsCompat$BuilderImpl29;
-.source "SourceFile"
+.source "WindowInsetsCompat.java"
 
 
 # annotations
@@ -26,14 +26,6 @@
 
 .method public constructor <init>(Landroidx/core/view/WindowInsetsCompat;)V
     .locals 0
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "insets"
-        }
-    .end annotation
 
     .line 2
     invoke-direct {p0, p1}, Landroidx/core/view/WindowInsetsCompat$BuilderImpl29;-><init>(Landroidx/core/view/WindowInsetsCompat;)V

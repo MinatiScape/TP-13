@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/systemui/unfold/updates/hinge/HingeAngleProvider;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "HingeAngleProvider.kt"
 
 # interfaces
 .implements Lcom/android/systemui/statusbar/policy/CallbackController;

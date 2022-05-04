@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/load/model/UriLoader$LocalUriFetcherFactory;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "UriLoader.java"
 
 
 # annotations
@@ -25,15 +25,6 @@
 
 # virtual methods
 .method public abstract build(Landroid/net/Uri;)Lcom/bumptech/glide/load/data/DataFetcher;
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "uri"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(",

@@ -1,9 +1,6 @@
 .class public interface abstract Lcom/google/android/gms/common/api/Api$Client;
 .super Ljava/lang/Object;
-.source "SourceFile"
-
-# interfaces
-.implements Lcom/google/android/gms/common/api/Api$zzb;
+.source "Api.java"
 
 
 # annotations
@@ -42,17 +39,17 @@
 .method public abstract isConnecting()Z
 .end method
 
-.method public abstract onUserSignOut(Lcom/google/android/gms/common/internal/BaseGmsClient$SignOutCallbacks;)V
+.method public abstract onUserSignOut(Lcom/google/android/gms/common/api/internal/zzbt;)V
 .end method
 
-.method public abstract requiresGooglePlayServices()Z
+.method public abstract requiresGooglePlayServices()V
 .end method
 
 .method public abstract requiresSignIn()Z
 .end method
 
-.method public abstract zza()I
+.method public abstract zza()V
 .end method
 
-.method public abstract zzab()Ljava/lang/String;
+.method public abstract zzab()V
 .end method

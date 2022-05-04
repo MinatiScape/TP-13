@@ -1,6 +1,6 @@
 .class public Landroidx/core/view/accessibility/AccessibilityNodeProviderCompat;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "AccessibilityNodeProviderCompat.java"
 
 
 # annotations
@@ -34,16 +34,8 @@
     return-void
 .end method
 
-.method public constructor <init>(Ljava/lang/Object;)V
+.method public constructor <init>(Landroid/view/accessibility/AccessibilityNodeProvider;)V
     .locals 0
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "provider"
-        }
-    .end annotation
 
     .line 3
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
@@ -58,14 +50,6 @@
 # virtual methods
 .method public createAccessibilityNodeInfo(I)Landroidx/core/view/accessibility/AccessibilityNodeInfoCompat;
     .locals 0
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "virtualViewId"
-        }
-    .end annotation
 
     const/4 p0, 0x0
 
@@ -74,14 +58,6 @@
 
 .method public findFocus(I)Landroidx/core/view/accessibility/AccessibilityNodeInfoCompat;
     .locals 0
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "focus"
-        }
-    .end annotation
 
     const/4 p0, 0x0
 
@@ -90,18 +66,6 @@
 
 .method public performAction(IILandroid/os/Bundle;)Z
     .locals 0
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0,
-            0x0,
-            0x0
-        }
-        names = {
-            "virtualViewId",
-            "action",
-            "arguments"
-        }
-    .end annotation
 
     const/4 p0, 0x0
 

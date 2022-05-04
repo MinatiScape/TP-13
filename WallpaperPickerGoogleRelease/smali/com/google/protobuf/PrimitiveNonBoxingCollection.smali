@@ -1,3 +1,3 @@
 .class public interface abstract Lcom/google/protobuf/PrimitiveNonBoxingCollection;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "PrimitiveNonBoxingCollection.java"

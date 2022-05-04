@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/systemui/shared/recents/ISystemUiProxy;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ISystemUiProxy.java"
 
 # interfaces
 .implements Landroid/os/IInterface;
@@ -33,6 +33,9 @@
         value = {
             Landroid/os/RemoteException;
         }
+    .end annotation
+
+    .annotation runtime Ljava/lang/Deprecated;
     .end annotation
 .end method
 
@@ -181,6 +184,9 @@
             Landroid/os/RemoteException;
         }
     .end annotation
+
+    .annotation runtime Ljava/lang/Deprecated;
+    .end annotation
 .end method
 
 .method public abstract startAssistant(Landroid/os/Bundle;)V
@@ -200,6 +206,14 @@
 .end method
 
 .method public abstract stopScreenPinning()V
+    .annotation system Ldalvik/annotation/Throws;
+        value = {
+            Landroid/os/RemoteException;
+        }
+    .end annotation
+.end method
+
+.method public abstract toggleNotificationPanel()V
     .annotation system Ldalvik/annotation/Throws;
         value = {
             Landroid/os/RemoteException;

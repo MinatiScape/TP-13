@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/volley/RequestQueue$RequestEventListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "RequestQueue.java"
 
 
 # annotations
@@ -15,12 +15,5 @@
 
 
 # virtual methods
-.method public abstract onRequestEvent(Lcom/android/volley/Request;I)V
-    .annotation system Ldalvik/annotation/Signature;
-        value = {
-            "(",
-            "Lcom/android/volley/Request<",
-            "*>;I)V"
-        }
-    .end annotation
+.method public abstract onRequestEvent()V
 .end method

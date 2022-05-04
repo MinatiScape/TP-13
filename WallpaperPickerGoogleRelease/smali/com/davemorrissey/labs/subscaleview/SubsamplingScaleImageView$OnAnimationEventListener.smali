@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/davemorrissey/labs/subscaleview/SubsamplingScaleImageView$OnAnimationEventListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "SubsamplingScaleImageView.java"
 
 
 # annotations

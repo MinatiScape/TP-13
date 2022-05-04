@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/widget/WallpaperColorsLoader$Callback;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "WallpaperColorsLoader.java"
 
 
 # annotations

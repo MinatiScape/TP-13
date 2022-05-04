@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/customization/model/CustomizationManager$Callback;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "CustomizationManager.java"
 
 
 # annotations
@@ -15,7 +15,7 @@
 
 
 # virtual methods
-.method public abstract onError(Ljava/lang/Throwable;)V
+.method public abstract onError()V
 .end method
 
 .method public abstract onSuccess()V

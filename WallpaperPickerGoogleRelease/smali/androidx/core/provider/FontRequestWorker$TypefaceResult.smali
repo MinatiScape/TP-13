@@ -1,6 +1,6 @@
 .class public final Landroidx/core/provider/FontRequestWorker$TypefaceResult;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "FontRequestWorker.java"
 
 
 # annotations
@@ -23,14 +23,6 @@
 # direct methods
 .method public constructor <init>(I)V
     .locals 1
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "result"
-        }
-    .end annotation
 
     .line 1
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
@@ -51,15 +43,6 @@
     .annotation build Landroid/annotation/SuppressLint;
         value = {
             "WrongConstant"
-        }
-    .end annotation
-
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "typeface"
         }
     .end annotation
 

@@ -1,6 +1,6 @@
 .class public interface abstract Lkotlin/reflect/KProperty1;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "KProperty.kt"
 
 # interfaces
 .implements Lkotlin/reflect/KProperty;

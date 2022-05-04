@@ -5,8 +5,8 @@
         <item quantity="one">Il y a %d jour</item>
     </plurals>
     <plurals name="abc_slice_duration_min">
-        <item quantity="other">Il y a %d minutes</item>
-        <item quantity="one">Il y a %d minute</item>
+        <item quantity="other">Il y a %d min</item>
+        <item quantity="one">Il y a %d min</item>
     </plurals>
     <plurals name="abc_slice_duration_years">
         <item quantity="other">Il y a %d ans</item>

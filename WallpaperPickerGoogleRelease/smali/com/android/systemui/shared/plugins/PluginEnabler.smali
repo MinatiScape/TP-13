@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/systemui/shared/plugins/PluginEnabler;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "PluginEnabler.java"
 
 
 # annotations

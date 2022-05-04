@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/common/collect/MapMakerInternalMap$WeakValueEntry;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "MapMakerInternalMap.java"
 
 # interfaces
 .implements Lcom/google/common/collect/MapMakerInternalMap$InternalEntry;

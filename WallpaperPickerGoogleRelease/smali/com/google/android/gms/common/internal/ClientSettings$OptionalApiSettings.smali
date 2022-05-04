@@ -1,6 +1,6 @@
 .class public final Lcom/google/android/gms/common/internal/ClientSettings$OptionalApiSettings;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ClientSettings.java"
 
 
 # annotations

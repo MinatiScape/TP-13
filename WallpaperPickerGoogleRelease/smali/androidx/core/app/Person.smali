@@ -1,3 +1,3 @@
-.class public Landroidx/core/app/Person;
+.class public final Landroidx/core/app/Person;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Person.java"

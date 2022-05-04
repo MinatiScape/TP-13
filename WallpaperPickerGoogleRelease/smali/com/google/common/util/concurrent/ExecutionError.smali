@@ -1,6 +1,6 @@
 .class public Lcom/google/common/util/concurrent/ExecutionError;
 .super Ljava/lang/Error;
-.source "SourceFile"
+.source "ExecutionError.java"
 
 
 # static fields

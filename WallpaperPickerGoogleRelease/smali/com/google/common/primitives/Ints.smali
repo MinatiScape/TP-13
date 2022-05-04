@@ -1,6 +1,6 @@
 .class public final Lcom/google/common/primitives/Ints;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Ints.java"
 
 
 # direct methods

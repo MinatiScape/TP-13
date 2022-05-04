@@ -1,6 +1,6 @@
-.class public Lcom/bumptech/glide/load/model/ModelLoader$LoadData;
+.class public final Lcom/bumptech/glide/load/model/ModelLoader$LoadData;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ModelLoader.java"
 
 
 # annotations
@@ -47,19 +47,16 @@
 
 
 # direct methods
-.method public constructor <init>(Lcom/bumptech/glide/load/Key;Lcom/bumptech/glide/load/data/DataFetcher;)V
-    .locals 2
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0,
-            0x0
-        }
-        names = {
-            "sourceKey",
-            "fetcher"
-        }
-    .end annotation
+.method public constructor <init>()V
+    .locals 0
 
+    const/4 p0, 0x0
+
+    throw p0
+.end method
+
+.method public constructor <init>(Lcom/bumptech/glide/load/Key;Lcom/bumptech/glide/load/data/DataFetcher;)V
+    .locals 1
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(",
@@ -77,24 +74,19 @@
     .line 2
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
 
-    const-string v1, "Argument must not be null"
-
     .line 3
-    invoke-static {p1, v1}, Ljava/util/Objects;->requireNonNull(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
+    invoke-static {p1}, Landroidx/collection/ContainerHelpers;->checkNotNull(Ljava/lang/Object;)V
 
-    .line 4
     iput-object p1, p0, Lcom/bumptech/glide/load/model/ModelLoader$LoadData;->sourceKey:Lcom/bumptech/glide/load/Key;
 
-    .line 5
-    invoke-static {v0, v1}, Ljava/util/Objects;->requireNonNull(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
+    .line 4
+    invoke-static {v0}, Landroidx/collection/ContainerHelpers;->checkNotNull(Ljava/lang/Object;)V
 
-    .line 6
     iput-object v0, p0, Lcom/bumptech/glide/load/model/ModelLoader$LoadData;->alternateKeys:Ljava/util/List;
 
-    .line 7
-    invoke-static {p2, v1}, Ljava/util/Objects;->requireNonNull(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
+    .line 5
+    invoke-static {p2}, Landroidx/collection/ContainerHelpers;->checkNotNull(Ljava/lang/Object;)V
 
-    .line 8
     iput-object p2, p0, Lcom/bumptech/glide/load/model/ModelLoader$LoadData;->fetcher:Lcom/bumptech/glide/load/data/DataFetcher;
 
     return-void

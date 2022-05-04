@@ -1,3 +1,3 @@
-.class public interface abstract Lcom/google/common/io/Closer$Suppressor;
+.class interface abstract Lcom/google/common/io/Closer$Suppressor;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Closer.java"

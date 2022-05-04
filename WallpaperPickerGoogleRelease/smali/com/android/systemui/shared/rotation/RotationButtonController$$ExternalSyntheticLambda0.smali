@@ -1,6 +1,6 @@
 .class public final synthetic Lcom/android/systemui/shared/rotation/RotationButtonController$$ExternalSyntheticLambda0;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "R8$$SyntheticClass"
 
 # interfaces
 .implements Landroid/view/View$OnHoverListener;

@@ -1,6 +1,6 @@
 .class public interface abstract annotation Lcom/android/systemui/unfold/updates/FoldStateProvider$FoldUpdate;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "FoldStateProvider.kt"
 
 # interfaces
 .implements Ljava/lang/annotation/Annotation;

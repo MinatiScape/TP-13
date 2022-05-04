@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/util/PreviewUtils$WorkspacePreviewCallback;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "PreviewUtils.java"
 
 
 # annotations

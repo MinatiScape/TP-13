@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/slice/core/SliceAction;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "SliceAction.java"
 
 
 # virtual methods

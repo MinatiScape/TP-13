@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/module/ExploreIntentChecker;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ExploreIntentChecker.java"
 
 
 # annotations

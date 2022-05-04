@@ -1,6 +1,6 @@
 .class public interface abstract Lkotlinx/coroutines/ChildHandle;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Job.kt"
 
 # interfaces
 .implements Lkotlinx/coroutines/DisposableHandle;

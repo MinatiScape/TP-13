@@ -1,6 +1,6 @@
 .class public Landroidx/appcompat/widget/LinearLayoutCompat$LayoutParams;
 .super Landroid/widget/LinearLayout$LayoutParams;
-.source "SourceFile"
+.source "LinearLayoutCompat.java"
 
 
 # annotations
@@ -15,11 +15,13 @@
 
 
 # direct methods
-.method public constructor <init>(II)V
-    .locals 0
+.method public constructor <init>(I)V
+    .locals 1
+
+    const/4 v0, -0x2
 
     .line 2
-    invoke-direct {p0, p1, p2}, Landroid/widget/LinearLayout$LayoutParams;-><init>(II)V
+    invoke-direct {p0, p1, v0}, Landroid/widget/LinearLayout$LayoutParams;-><init>(II)V
 
     return-void
 .end method

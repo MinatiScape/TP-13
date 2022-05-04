@@ -1,6 +1,6 @@
-.class public Lcom/google/android/material/circularreveal/CircularRevealWidget$RevealInfo;
+.class public final Lcom/google/android/material/circularreveal/CircularRevealWidget$RevealInfo;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "CircularRevealWidget.java"
 
 
 # annotations
@@ -26,34 +26,33 @@
 .method public constructor <init>()V
     .locals 0
 
-    .line 1
-    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+    const/4 p0, 0x0
 
-    return-void
+    throw p0
 .end method
 
 .method public constructor <init>(FFF)V
     .locals 0
 
-    .line 3
+    .line 2
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
 
-    .line 4
+    .line 3
     iput p1, p0, Lcom/google/android/material/circularreveal/CircularRevealWidget$RevealInfo;->centerX:F
 
-    .line 5
+    .line 4
     iput p2, p0, Lcom/google/android/material/circularreveal/CircularRevealWidget$RevealInfo;->centerY:F
 
-    .line 6
+    .line 5
     iput p3, p0, Lcom/google/android/material/circularreveal/CircularRevealWidget$RevealInfo;->radius:F
 
     return-void
 .end method
 
-.method public constructor <init>(Lcom/google/android/material/circularreveal/CircularRevealWidget$1;)V
+.method public constructor <init>(I)V
     .locals 0
 
-    .line 2
+    .line 1
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
 
     return-void

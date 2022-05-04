@@ -1,6 +1,6 @@
 .class public interface abstract Lkotlinx/coroutines/CoroutineScope;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "CoroutineScope.kt"
 
 
 # virtual methods

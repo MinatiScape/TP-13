@@ -1,6 +1,6 @@
 .class public final Landroidx/fragment/app/FragmentLifecycleCallbacksDispatcher$FragmentLifecycleCallbacksHolder;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "FragmentLifecycleCallbacksDispatcher.java"
 
 
 # annotations

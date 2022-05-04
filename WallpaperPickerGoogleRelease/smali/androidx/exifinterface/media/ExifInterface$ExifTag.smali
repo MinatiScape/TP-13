@@ -1,6 +1,6 @@
-.class public Landroidx/exifinterface/media/ExifInterface$ExifTag;
+.class public final Landroidx/exifinterface/media/ExifInterface$ExifTag;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ExifInterface.java"
 
 
 # annotations

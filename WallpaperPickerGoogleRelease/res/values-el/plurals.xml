@@ -5,12 +5,12 @@
         <item quantity="one">%d ημ. πριν</item>
     </plurals>
     <plurals name="abc_slice_duration_min">
-        <item quantity="other">%d λεπ. πριν</item>
-        <item quantity="one">%d λεπ. πριν</item>
+        <item quantity="other">%d λ. πριν</item>
+        <item quantity="one">%d λ. πριν</item>
     </plurals>
     <plurals name="abc_slice_duration_years">
-        <item quantity="other">%d χρ. πριν</item>
-        <item quantity="one">%d χρ. πριν</item>
+        <item quantity="other">%d έτη πριν</item>
+        <item quantity="one">%d έτος πριν</item>
     </plurals>
     <plurals name="mtrl_badge_content_description">
         <item quantity="other">%d νέες ειδοποιήσεις</item>

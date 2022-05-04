@@ -1,6 +1,6 @@
 .class public final Lcom/adobe/xmp/options/AliasOptions;
 .super Lcom/adobe/xmp/options/Options;
-.source "SourceFile"
+.source "AliasOptions.java"
 
 
 # direct methods
@@ -38,7 +38,7 @@
 
 
 # virtual methods
-.method public getValidOptions()I
+.method public final getValidOptions()I
     .locals 0
 
     const/16 p0, 0x1e00

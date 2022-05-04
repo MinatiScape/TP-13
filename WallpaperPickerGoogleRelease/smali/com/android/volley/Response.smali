@@ -1,6 +1,6 @@
-.class public Lcom/android/volley/Response;
+.class public final Lcom/android/volley/Response;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Response.java"
 
 
 # annotations
@@ -63,15 +63,8 @@
     return-void
 .end method
 
-.method public constructor <init>(Ljava/lang/Object;Lcom/android/volley/Cache$Entry;)V
+.method public constructor <init>(Lcom/google/protobuf/MessageLite;Lcom/android/volley/Cache$Entry;)V
     .locals 1
-    .annotation system Ldalvik/annotation/Signature;
-        value = {
-            "(TT;",
-            "Lcom/android/volley/Cache$Entry;",
-            ")V"
-        }
-    .end annotation
 
     .line 1
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V

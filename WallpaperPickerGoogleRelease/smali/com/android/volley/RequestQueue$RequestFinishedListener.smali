@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/volley/RequestQueue$RequestFinishedListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "RequestQueue.java"
 
 
 # annotations
@@ -27,12 +27,5 @@
 
 
 # virtual methods
-.method public abstract onRequestFinished(Lcom/android/volley/Request;)V
-    .annotation system Ldalvik/annotation/Signature;
-        value = {
-            "(",
-            "Lcom/android/volley/Request<",
-            "TT;>;)V"
-        }
-    .end annotation
+.method public abstract onRequestFinished()V
 .end method

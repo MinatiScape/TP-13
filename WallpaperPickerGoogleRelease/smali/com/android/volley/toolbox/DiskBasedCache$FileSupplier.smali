@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/volley/toolbox/DiskBasedCache$FileSupplier;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "DiskBasedCache.java"
 
 
 # annotations

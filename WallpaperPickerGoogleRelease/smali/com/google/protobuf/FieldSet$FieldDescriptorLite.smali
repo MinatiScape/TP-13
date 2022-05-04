@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/protobuf/FieldSet$FieldDescriptorLite;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "FieldSet.java"
 
 # interfaces
 .implements Ljava/lang/Comparable;
@@ -32,17 +32,17 @@
 .method public abstract getLiteJavaType()Lcom/google/protobuf/WireFormat$JavaType;
 .end method
 
-.method public abstract getLiteType()Lcom/google/protobuf/WireFormat$FieldType;
+.method public abstract getLiteType()V
 .end method
 
-.method public abstract getNumber()I
+.method public abstract getNumber()V
 .end method
 
-.method public abstract internalMergeFrom(Lcom/google/protobuf/MessageLite$Builder;Lcom/google/protobuf/MessageLite;)Lcom/google/protobuf/MessageLite$Builder;
+.method public abstract internalMergeFrom(Lcom/google/protobuf/MessageLite$Builder;Lcom/google/protobuf/MessageLite;)Lcom/google/protobuf/GeneratedMessageLite$Builder;
 .end method
 
-.method public abstract isPacked()Z
+.method public abstract isPacked()V
 .end method
 
-.method public abstract isRepeated()Z
+.method public abstract isRepeated()V
 .end method

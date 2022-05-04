@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/systemui/shared/rotation/RotationButton$RotationButtonUpdatesCallback;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "RotationButton.java"
 
 
 # annotations

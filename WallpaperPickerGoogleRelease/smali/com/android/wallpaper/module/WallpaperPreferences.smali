@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/module/WallpaperPreferences;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "WallpaperPreferences.java"
 
 
 # virtual methods
@@ -19,26 +19,10 @@
 .method public abstract getAppLaunchCount()I
 .end method
 
-.method public abstract getDailyRotationsInLastWeek()Ljava/util/List;
-    .annotation system Ldalvik/annotation/Signature;
-        value = {
-            "()",
-            "Ljava/util/List<",
-            "Ljava/lang/Long;",
-            ">;"
-        }
-    .end annotation
+.method public abstract getDailyRotationsInLastWeek()Ljava/util/ArrayList;
 .end method
 
-.method public abstract getDailyRotationsPreviousDay()Ljava/util/List;
-    .annotation system Ldalvik/annotation/Signature;
-        value = {
-            "()",
-            "Ljava/util/List<",
-            "Ljava/lang/Long;",
-            ">;"
-        }
-    .end annotation
+.method public abstract getDailyRotationsPreviousDay()Ljava/util/ArrayList;
 .end method
 
 .method public abstract getDailyWallpaperEnabledTimestamp()J
@@ -79,9 +63,6 @@
 .method public abstract getHomeWallpaperBackingFileName()Ljava/lang/String;
 .end method
 
-.method public abstract getHomeWallpaperBaseImageUrl()Ljava/lang/String;
-.end method
-
 .method public abstract getHomeWallpaperCollectionId()Ljava/lang/String;
 .end method
 
@@ -107,9 +88,6 @@
 .end method
 
 .method public abstract getLastDailyRotationTimestamp()J
-.end method
-
-.method public abstract getLastSyncTimestamp()J
 .end method
 
 .method public abstract getLockWallpaperActionIconRes()I
@@ -160,6 +138,9 @@
 .end method
 
 .method public abstract getPendingWallpaperSetStatus()I
+.end method
+
+.method public abstract getWallpaperColors(Ljava/lang/String;)Landroid/app/WallpaperColors;
 .end method
 
 .method public abstract getWallpaperPresentationMode()I
@@ -239,9 +220,6 @@
 .method public abstract setLastDailyLogTimestamp(J)V
 .end method
 
-.method public abstract setLastSyncTimestamp(J)V
-.end method
-
 .method public abstract setLockWallpaperActionIconRes(I)V
 .end method
 
@@ -280,13 +258,13 @@
 .method public abstract setPendingDailyWallpaperUpdateStatus(I)V
 .end method
 
-.method public abstract setPendingDailyWallpaperUpdateStatusSync(I)V
+.method public abstract setPendingDailyWallpaperUpdateStatusSync()V
 .end method
 
 .method public abstract setPendingWallpaperSetStatus(I)V
 .end method
 
-.method public abstract setPendingWallpaperSetStatusSync(I)V
+.method public abstract setPendingWallpaperSetStatusSync()V
 .end method
 
 .method public abstract setWallpaperPresentationMode(I)V
@@ -322,6 +300,9 @@
     .end annotation
 
     return-void
+.end method
+
+.method public abstract storeWallpaperColors(Ljava/lang/String;Landroid/app/WallpaperColors;)V
 .end method
 
 .method public abstract updateDailyWallpaperSet(ILjava/lang/String;Ljava/lang/String;)V

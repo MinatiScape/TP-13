@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/appcompat/widget/DecorToolbar;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "DecorToolbar.java"
 
 
 # virtual methods
@@ -19,13 +19,7 @@
 .method public abstract getDisplayOptions()I
 .end method
 
-.method public abstract getMenu()Landroid/view/Menu;
-.end method
-
-.method public abstract getNavigationMode()I
-.end method
-
-.method public abstract getViewGroup()Landroid/view/ViewGroup;
+.method public abstract getNavigationMode()V
 .end method
 
 .method public abstract hasExpandedActionView()Z
@@ -52,22 +46,16 @@
 .method public abstract setDisplayOptions(I)V
 .end method
 
-.method public abstract setEmbeddedTabView(Landroidx/appcompat/widget/ScrollingTabContainerView;)V
+.method public abstract setEmbeddedTabView()V
 .end method
 
-.method public abstract setHomeButtonEnabled(Z)V
+.method public abstract setHomeButtonEnabled()V
 .end method
 
-.method public abstract setMenu(Landroid/view/Menu;Landroidx/appcompat/view/menu/MenuPresenter$Callback;)V
-.end method
-
-.method public abstract setMenuCallbacks(Landroidx/appcompat/view/menu/MenuPresenter$Callback;Landroidx/appcompat/view/menu/MenuBuilder$Callback;)V
+.method public abstract setMenu(Landroidx/appcompat/view/menu/MenuBuilder;Landroidx/appcompat/app/AppCompatDelegateImpl$ActionMenuPresenterCallback;)V
 .end method
 
 .method public abstract setMenuPrepared()V
-.end method
-
-.method public abstract setTitle(Ljava/lang/CharSequence;)V
 .end method
 
 .method public abstract setVisibility(I)V

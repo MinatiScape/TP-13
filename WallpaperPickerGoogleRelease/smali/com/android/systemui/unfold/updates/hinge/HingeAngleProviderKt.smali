@@ -1,6 +1,6 @@
 .class public final Lcom/android/systemui/unfold/updates/hinge/HingeAngleProviderKt;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "HingeAngleProvider.kt"
 
 
 # static fields

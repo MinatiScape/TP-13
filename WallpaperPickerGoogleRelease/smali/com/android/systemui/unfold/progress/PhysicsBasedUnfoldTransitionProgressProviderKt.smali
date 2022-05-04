@@ -1,6 +1,6 @@
 .class public final Lcom/android/systemui/unfold/progress/PhysicsBasedUnfoldTransitionProgressProviderKt;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "PhysicsBasedUnfoldTransitionProgressProvider.kt"
 
 
 # static fields

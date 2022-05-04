@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/systemui/plugins/PluginListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "PluginListener.java"
 
 
 # annotations

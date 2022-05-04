@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/slice/widget/SliceViewPolicy$PolicyChangeListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "SliceViewPolicy.java"
 
 
 # annotations

@@ -1,9 +1,9 @@
 .class public interface abstract Lkotlin/reflect/KProperty$Getter;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "KProperty.kt"
 
 # interfaces
-.implements Lkotlin/reflect/KCallable;
+.implements Lkotlin/reflect/KFunction;
 
 
 # annotations
@@ -21,6 +21,8 @@
         "<V:",
         "Ljava/lang/Object;",
         ">",
-        "Ljava/lang/Object;"
+        "Ljava/lang/Object;",
+        "Lkotlin/reflect/KFunction<",
+        "TV;>;"
     }
 .end annotation

@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/picker/individual/IndividualPickerFragment$IndividualPickerFragmentHost;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "IndividualPickerFragment.java"
 
 
 # annotations
@@ -15,17 +15,11 @@
 
 
 # virtual methods
-.method public abstract isHostToolbarShown()Z
+.method public abstract isHostToolbarShown()V
 .end method
 
 .method public abstract moveToPreviousFragment()V
 .end method
 
 .method public abstract removeToolbarMenu()V
-.end method
-
-.method public abstract setToolbarMenu(I)V
-.end method
-
-.method public abstract setToolbarTitle(Ljava/lang/CharSequence;)V
 .end method

@@ -28,16 +28,15 @@
     <string name="abc_shareactionprovider_share_with_application">Comparteix amb %s</string>
     <string name="abc_slice_error">"No s'ha pogut connectar"</string>
     <string name="abc_slice_more">Més</string>
-    <string name="abc_slice_more_content">%1$d més</string>
+    <string name="abc_slice_more_content">+ %1$d</string>
     <string name="abc_slice_permission_allow">Permet</string>
-    <string name="abc_slice_permission_checkbox">Permet que %1$s mostri porcions de qualsevol aplicació</string>
     <string name="abc_slice_permission_deny">Denega</string>
     <string name="abc_slice_permission_text_1">"- Pot llegir informació de l'aplicació %1$s"</string>
     <string name="abc_slice_permission_text_2">"- Pot dur a terme accions dins de l'aplicació %1$s"</string>
-    <string name="abc_slice_permission_title">"Vols permetre que %1$s mostri porcions de l'aplicació %2$s?"</string>
+    <string name="abc_slice_permission_title">"Vols permetre que %1$s mostri fragments de l'aplicació %2$s?"</string>
     <string name="abc_slice_show_more">"Mostra'n més"</string>
-    <string name="abc_slice_updated">"S'ha actualitzat %1$s"</string>
-    <string name="abc_slices_permission_request">"%1$s vol mostrar porcions de l'aplicació %2$s"</string>
+    <string name="abc_slice_updated">Actualitzat %1$s</string>
+    <string name="abc_slices_permission_request">"%1$s vol mostrar fragments de l'aplicació %2$s"</string>
     <string name="abc_toolbar_collapse_description">Replega</string>
     <string name="accessibility_custom_color_title">Color personalitzat</string>
     <string name="accessibility_custom_font_title">Tipus de lletra personalitzat</string>
@@ -72,6 +71,7 @@
     <string name="center_wallpaper_position">Centra</string>
     <string name="character_counter_content_description">Caràcters introduïts: %1$d de %2$d</string>
     <string name="character_counter_overflowed_content_description">"S'ha superat el límit de caràcters (%1$d de %2$d)"</string>
+    <string name="cinematic_effects_toogle">Fons de pantalla 3D</string>
     <string name="clear_text_end_icon_content_description">Esborra el text</string>
     <string name="clock_preview_content_description">Previsualització de rellotge %1$s</string>
     <string name="clock_title">Rellotge</string>
@@ -117,6 +117,9 @@
     <string name="delete_live_wallpaper">Suprimeix</string>
     <string name="delete_wallpaper_confirmation">Vols suprimir aquest fons de pantalla del telèfon?</string>
     <string name="edit_custom_theme_lbl">Toca per editar</string>
+    <string name="effect_error_dialog_body">"No hem pogut aplicar els efectes.
+Prova amb una altra foto."</string>
+    <string name="effect_error_dialog_title">Vaja!</string>
     <string name="error_icon_content_description">Error</string>
     <string name="expand_button_title">Opcions avançades</string>
     <string name="explore">Explora</string>
@@ -199,6 +202,7 @@
     <string name="mtrl_picker_toggle_to_day_selection">Toca per canviar a la selecció del dia</string>
     <string name="mtrl_picker_toggle_to_text_input_mode">"Canvia al mode d'introducció de text"</string>
     <string name="mtrl_picker_toggle_to_year_selection">"Toca per canviar a la selecció de l'any"</string>
+    <string name="my_photos">Les meves fotos</string>
     <string name="my_photos_category_title">Les meves fotos</string>
     <string name="my_photos_generic_wallpaper_title">La meva foto</string>
     <string name="name_component_title">"Posa un nom a l'estil"</string>
@@ -238,7 +242,7 @@ Pots canviar aquesta opció de configuració a l'apartat Permisos de la informac
     <string name="search_menu_title">Cerca</string>
     <string name="select_wallpaper_label">Categories de fons de pantalla</string>
     <string name="set_theme_wallpaper_dialog_message">Estableix el fons de pantalla temàtic</string>
-    <string name="set_wallpaper_both_destination">"Pantalla d'inici i de bloqueig"</string>
+    <string name="set_wallpaper_both_destination">"Pantalles d'inici i de bloqueig"</string>
     <string name="set_wallpaper_button_text">Estableix el fons de pantalla</string>
     <string name="set_wallpaper_dialog_message">Estableix un fons de pantalla a</string>
     <string name="set_wallpaper_error_message">No es pot establir el fons de pantalla.</string>
@@ -246,6 +250,8 @@ Pots canviar aquesta opció de configuració a l'apartat Permisos de la informac
     <string name="set_wallpaper_lock_screen_destination">Pantalla de bloqueig</string>
     <string name="set_wallpaper_progress_message">"S'està establint el fons de pantalla…"</string>
     <string name="settings_button_label">Configuració</string>
+    <string name="settings_snackbar_description">Activa Fitxers i contingut multimèdia a la configuració.</string>
+    <string name="settings_snackbar_enable">Activa</string>
     <string name="shape_component_title">Tria una forma</string>
     <string name="shape_preview_content_description">Previsualització de la forma</string>
     <string name="show_ui_preview_text">Mostra la previsualització de IU</string>
@@ -263,6 +269,7 @@ Pots canviar aquesta opció de configuració a l'apartat Permisos de la informac
     <string name="style_info_description">"Previsualització de font, icones, forma d'aplicacions i color"</string>
     <string name="summary_collapsed_preference_list">%1$s, %2$s</string>
     <string name="tab_customize">Personalitza</string>
+    <string name="tab_effects">Efectes</string>
     <string name="tab_info">Informació</string>
     <string name="theme_description">Tipus de lletra: %1$s; icones: %2$s; forma: %3$s; color: %4$s</string>
     <string name="theme_preview_card_content_description">"Previsualització de l'estil"</string>
@@ -282,6 +289,8 @@ Pots canviar aquesta opció de configuració a l'apartat Permisos de la informac
     <string name="wallpaper_destination_both">"Pantalla d'inici i de bloqueig"</string>
     <string name="wallpaper_disabled_by_administrator_message">"L'administrador del dispositiu ha desactivat l'opció de definir un fons de pantalla"</string>
     <string name="wallpaper_disabled_message">"L'opció de definir un fons de pantalla està desactivada en aquest dispositiu"</string>
+    <string name="wallpaper_effects_subtitle">Converteix la teva foto en un fons de pantalla 3D que es mogui quan ho fa el telèfon</string>
+    <string name="wallpaper_effects_title">Fons de pantalla 3D</string>
     <string name="wallpaper_picker_entry_title">Canvia el fons de pantalla</string>
     <string name="wallpaper_preview_card_content_description">Previsualitz. fons de pantalla</string>
     <string name="wallpaper_set_successfully_message">"El fons de pantalla s'ha configurat correctament"</string>

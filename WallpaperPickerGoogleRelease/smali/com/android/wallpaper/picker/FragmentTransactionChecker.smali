@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/picker/FragmentTransactionChecker;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "FragmentTransactionChecker.java"
 
 
 # virtual methods

@@ -28,15 +28,14 @@
     <string name="abc_shareactionprovider_share_with_application">هم‌رسانی با %s</string>
     <string name="abc_slice_error">متصل نشد</string>
     <string name="abc_slice_more">بیشتر</string>
-    <string name="abc_slice_more_content">‎+ %1$d‎</string>
-    <string name="abc_slice_permission_allow">مجاز</string>
-    <string name="abc_slice_permission_checkbox">به %1$s اجازه داده شود تکه‌هایی از برنامه‌ها نشان دهد</string>
-    <string name="abc_slice_permission_deny">مجاز نبودن</string>
+    <string name="abc_slice_more_content">+ %1$d</string>
+    <string name="abc_slice_permission_allow">اجازه دادن</string>
+    <string name="abc_slice_permission_deny">رد کردن</string>
     <string name="abc_slice_permission_text_1">- می‌تواند اطلاعات %1$s را بخواند</string>
     <string name="abc_slice_permission_text_2">- می‌تواند در %1$s اقدام انجام دهد</string>
     <string name="abc_slice_permission_title">به %1$s اجازه داده شود تکه‌های %2$s را نشان دهد؟</string>
     <string name="abc_slice_show_more">بیشتر ببینید</string>
-    <string name="abc_slice_updated">زمان به‌روزرسانی %1$s</string>
+    <string name="abc_slice_updated">%1$s به‌روزرسانی شد</string>
     <string name="abc_slices_permission_request">%1$s می‌خواهد تکه‌های %2$s را نشان دهد</string>
     <string name="abc_toolbar_collapse_description">کوچک کردن</string>
     <string name="accessibility_custom_color_title">رنگ سفارشی</string>
@@ -72,6 +71,7 @@
     <string name="center_wallpaper_position">وسط</string>
     <string name="character_counter_content_description">نویسه‌های واردشده %1$d از %2$d</string>
     <string name="character_counter_overflowed_content_description">محدودیت نویسه از حد مجاز %1$d از %2$d بیشتر شده است</string>
+    <string name="cinematic_effects_toogle">کاغذدیواری سه‌بعدی</string>
     <string name="clear_text_end_icon_content_description">پاک کردن نوشتار</string>
     <string name="clock_preview_content_description">%1$s پیش‌نمایش ساعت</string>
     <string name="clock_title">ساعت</string>
@@ -117,6 +117,9 @@
     <string name="delete_live_wallpaper">حذف</string>
     <string name="delete_wallpaper_confirmation">این کاغذدیواری از تلفن حذف شود؟</string>
     <string name="edit_custom_theme_lbl">برای ویرایش ضربه بزنید</string>
+    <string name="effect_error_dialog_body">"نتوانستیم جلوه‌ها را اعمال کنیم.
+با عکس دیگری امتحان کنید."</string>
+    <string name="effect_error_dialog_title">اوه، نه!</string>
     <string name="error_icon_content_description">خطا</string>
     <string name="expand_button_title">پیشرفته</string>
     <string name="explore">کاوش</string>
@@ -199,6 +202,7 @@
     <string name="mtrl_picker_toggle_to_day_selection">رفتن به رفتن به حالت انتخاب روز ضربه بزنید</string>
     <string name="mtrl_picker_toggle_to_text_input_mode">رفتن به حالت ورودی نوشتاری</string>
     <string name="mtrl_picker_toggle_to_year_selection">برای رفتن به حالت انتخاب سال ضربه بزنید</string>
+    <string name="my_photos">عکس‌های من</string>
     <string name="my_photos_category_title">عکس‌های من</string>
     <string name="my_photos_generic_wallpaper_title">عکس من</string>
     <string name="name_component_title">نام‌گذاری سبک</string>
@@ -207,7 +211,7 @@
     <string name="no_backup_image_wallpaper_description">سرویس کاغذ‌دیواری پویا برای کاغذدیواری‌های چرخشی</string>
     <string name="no_backup_image_wallpaper_label">کاغذ‌دیواری با تصویر چرخشی</string>
     <string name="no_thanks">نه، متشکرم</string>
-    <string name="not_set">تنظیم نشده است</string>
+    <string name="not_set">تنظیم نشده</string>
     <string name="on_device_wallpaper_title">‏کاغذ‌دیواری Android</string>
     <string name="on_device_wallpapers_category_title">کاغذدیواری‌های موجود در دستگاه</string>
     <string name="on_device_wallpapers_category_title_desktop">در دستگاه</string>
@@ -231,9 +235,9 @@
     <string name="preview_name_wallpaper">کاغذدیواری</string>
     <string name="previous_page_content_description">قبلی</string>
     <string name="refresh_daily_wallpaper_content_description">بازخوانی کاغذدیواری روزانه</string>
-    <string name="refresh_daily_wallpaper_failed_message">کاغذدیواری روزانه بازخوانی نشد. لطفاً اتصال شبکه‌تان را بررسی و دوباره امتحان کنید.</string>
+    <string name="refresh_daily_wallpaper_failed_message">کاغذدیواری روزانه بازآوری نشد. لطفاً اتصال شبکه‌تان را بررسی و دوباره امتحان کنید.</string>
     <string name="refresh_daily_wallpaper_home_content_description">بازخوانی کاغذدیواری روزانه در صفحه اصلی</string>
-    <string name="refreshing_daily_wallpaper_dialog_message">درحال بازخوانی کاغذدیواری روزانه…</string>
+    <string name="refreshing_daily_wallpaper_dialog_message">درحال بازآوری کاغذدیواری روزانه…</string>
     <string name="rotating_wallpaper_presentation_mode_message">کاغذ‌دیواری روزانه</string>
     <string name="search_menu_title">جستجو</string>
     <string name="select_wallpaper_label">دسته‌های کاغذدیواری</string>
@@ -246,6 +250,8 @@
     <string name="set_wallpaper_lock_screen_destination">صفحه در حالت قفل</string>
     <string name="set_wallpaper_progress_message">در حال تنظیم کاغذدیواری...</string>
     <string name="settings_button_label">تنظیمات</string>
+    <string name="settings_snackbar_description">لطفاً فایل‌ها و رسانه‌ها را در تنظیمات فعال کنید.</string>
+    <string name="settings_snackbar_enable">فعال کردن</string>
     <string name="shape_component_title">انتخاب شکل</string>
     <string name="shape_preview_content_description">پیش‌نمایش شکل</string>
     <string name="show_ui_preview_text">نمایش دادن پیش‌نمای رابط کاربری</string>
@@ -263,6 +269,7 @@
     <string name="style_info_description">پیش‌نمایش قلم، نمادها، شکل و رنگ برنامه</string>
     <string name="summary_collapsed_preference_list">%1$s، %2$s</string>
     <string name="tab_customize">سفارشی کردن</string>
+    <string name="tab_effects">جلوه‌ها</string>
     <string name="tab_info">اطلاعات</string>
     <string name="theme_description">قلم: %1$s، نمادها: %2$s، شکل: %3$s، رنگ: %4$s</string>
     <string name="theme_preview_card_content_description">پیش‌نمایش سبک</string>
@@ -282,6 +289,8 @@
     <string name="wallpaper_destination_both">صفحه اصلی و صفحه قفل</string>
     <string name="wallpaper_disabled_by_administrator_message">تنظیم کاغذدیواری توسط سرپرست دستگاهتان غیرفعال شده است</string>
     <string name="wallpaper_disabled_message">تنظیم کاغذدیواری در این دستگاه غیرفعال شده است</string>
+    <string name="wallpaper_effects_subtitle">عکستان را به کاغذ دیواری سه‌بعدی تبدیل کنید که هنگام تکان خوردن تلفن حرکت می‌کند</string>
+    <string name="wallpaper_effects_title">کاغذدیواری سه‌بعدی</string>
     <string name="wallpaper_picker_entry_title">تغییر کاغذدیواری</string>
     <string name="wallpaper_preview_card_content_description">پیش‌نمای کاغذدیواری</string>
     <string name="wallpaper_set_successfully_message">کاغذدیواری باموفقیت تنظیم شد</string>

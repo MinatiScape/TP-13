@@ -1,6 +1,6 @@
 .class public interface abstract Lkotlinx/coroutines/ParentJob;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Job.kt"
 
 # interfaces
 .implements Lkotlinx/coroutines/Job;

@@ -1,6 +1,6 @@
 .class public interface abstract Lkotlinx/coroutines/CoroutineExceptionHandler;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "CoroutineExceptionHandler.kt"
 
 # interfaces
 .implements Lkotlin/coroutines/CoroutineContext$Element;
@@ -12,10 +12,6 @@
         Lkotlinx/coroutines/CoroutineExceptionHandler$Key;
     }
 .end annotation
-
-
-# static fields
-.field public static final synthetic $r8$clinit:I
 
 
 # virtual methods

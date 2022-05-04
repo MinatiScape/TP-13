@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/systemui/shared/plugins/PluginManager;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "PluginManager.java"
 
 
 # annotations

@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/widget/BottomActionBar$VisibilityChangeListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "BottomActionBar.java"
 
 
 # annotations
@@ -15,5 +15,5 @@
 
 
 # virtual methods
-.method public abstract onVisibilityChange(Z)V
+.method public abstract onVisibilityChange()V
 .end method

@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/lifecycle/LifecycleRegistryOwner;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "LifecycleRegistryOwner.java"
 
 # interfaces
 .implements Landroidx/lifecycle/LifecycleOwner;
@@ -12,5 +12,5 @@
 
 
 # virtual methods
-.method public abstract getLifecycle()Landroidx/lifecycle/LifecycleRegistry;
+.method public abstract getLifecycle$1()Landroidx/lifecycle/LifecycleRegistry;
 .end method

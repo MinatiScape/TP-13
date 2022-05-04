@@ -30,14 +30,13 @@
     <string name="abc_slice_more">Бусад</string>
     <string name="abc_slice_more_content">+ %1$d</string>
     <string name="abc_slice_permission_allow">Зөвшөөрөх</string>
-    <string name="abc_slice_permission_checkbox">%1$s-д дурын аппаас хэсэг харуулахыг зөвшөөрөх</string>
     <string name="abc_slice_permission_deny">Татгалзах</string>
-    <string name="abc_slice_permission_text_1">- Энэ %1$s-с мэдээлэл унших боломжтой</string>
-    <string name="abc_slice_permission_text_2">- Энэ %1$s дотор үйлдэл хийх боломжтой</string>
+    <string name="abc_slice_permission_text_1">- Энэ нь %1$s-с мэдээллийг унших боломжтой</string>
+    <string name="abc_slice_permission_text_2">- Энэ нь %1$s-д үйлдэл хийх боломжтой</string>
     <string name="abc_slice_permission_title">%1$s-д %2$s-н хэсгүүдийг харуулахыг зөвшөөрөх үү?</string>
-    <string name="abc_slice_show_more">Дэлгэрэнгүй үзэх</string>
-    <string name="abc_slice_updated">%1$s шинэчилсэн</string>
-    <string name="abc_slices_permission_request">%1$s %2$s-н хэсгүүдийг харуулах хүсэлтэй байна</string>
+    <string name="abc_slice_show_more">Дэлгэрэнгүй харуулах</string>
+    <string name="abc_slice_updated">%1$s-д шинэчилсэн</string>
+    <string name="abc_slices_permission_request">%1$s нь %2$s-н хэсгүүдийг харуулахыг хүсэж байна</string>
     <string name="abc_toolbar_collapse_description">Буулгах</string>
     <string name="accessibility_custom_color_title">Захиалгат өнгө</string>
     <string name="accessibility_custom_font_title">Захиалгат фонт</string>
@@ -72,6 +71,7 @@
     <string name="center_wallpaper_position">Гол хэсэг</string>
     <string name="character_counter_content_description">%2$d-н %1$d тэмдэгтийг оруулсан</string>
     <string name="character_counter_overflowed_content_description">Тэмдэгтийн хязгаар %2$d-н %1$d-с хэтэрсэн</string>
+    <string name="cinematic_effects_toogle">3D дэлгэцийн зураг</string>
     <string name="clear_text_end_icon_content_description">Текстийг арилгах</string>
     <string name="clock_preview_content_description">%1$s цагийг урьдчилан үзэх</string>
     <string name="clock_title">Цаг</string>
@@ -117,6 +117,9 @@
     <string name="delete_live_wallpaper">Устгах</string>
     <string name="delete_wallpaper_confirmation">Энэ дэлгэцийн зургийг утаснаасаа устгах уу?</string>
     <string name="edit_custom_theme_lbl">Засахын тулд товшино уу</string>
+    <string name="effect_error_dialog_body">"Бид эффектийг ашиглаж чадсангүй.
+Өөр зураг оруулж үзнэ үү."</string>
+    <string name="effect_error_dialog_title">Өө!</string>
     <string name="error_icon_content_description">Алдаа</string>
     <string name="expand_button_title">Дэлгэрэнгүй</string>
     <string name="explore">Судлах</string>
@@ -199,6 +202,7 @@
     <string name="mtrl_picker_toggle_to_day_selection">Өдөр сонгох руу сэлгэхийн тулд товшино уу</string>
     <string name="mtrl_picker_toggle_to_text_input_mode">Текстийн орох горим руу сэлгэх</string>
     <string name="mtrl_picker_toggle_to_year_selection">Он сонгох руу сэлгэхийн тулд товшино уу</string>
+    <string name="my_photos">Миний Зураг</string>
     <string name="my_photos_category_title">Миний зураг</string>
     <string name="my_photos_generic_wallpaper_title">Миний зураг</string>
     <string name="name_component_title">Загвараа нэрлэнэ үү</string>
@@ -246,6 +250,8 @@
     <string name="set_wallpaper_lock_screen_destination">Түгжигдсэн дэлгэц</string>
     <string name="set_wallpaper_progress_message">Дэлгэцийн зургийг тохируулж байна…</string>
     <string name="settings_button_label">Тохиргоо</string>
+    <string name="settings_snackbar_description">Тохиргоо хэсгээс файл болон мeдиаг идэвхжүүлнэ үү.</string>
+    <string name="settings_snackbar_enable">Идэвхжүүлэх</string>
     <string name="shape_component_title">Дүрс сонгох</string>
     <string name="shape_preview_content_description">Хэлбэрийг урьдчилан үзэх</string>
     <string name="show_ui_preview_text">UI урьдчилан үзэлтийг харуулах</string>
@@ -263,6 +269,7 @@
     <string name="style_info_description">Фонт, дүрс тэмдэг, аппын хэлбэр болон өнгөний урьдчилан үзэлт</string>
     <string name="summary_collapsed_preference_list">%1$s, %2$s</string>
     <string name="tab_customize">Өөрчлөх</string>
+    <string name="tab_effects">Эффект</string>
     <string name="tab_info">Мэдээлэл</string>
     <string name="theme_description">Фонт: %1$s, дүрс тэмдэг: %2$s, дүрс: %3$s, өнгө: %4$s</string>
     <string name="theme_preview_card_content_description">Загварыг урьдчилан үзэх</string>
@@ -278,10 +285,12 @@
     <string name="v7_preference_on">ИДЭВХТЭЙ</string>
     <string name="wallpaper_app_name">Дэлгэцийн зураг</string>
     <string name="wallpaper_color_tab">Дэлгэцийн зургийн өнгө</string>
-    <string name="wallpaper_color_title">Дэвсгэр өнгө</string>
+    <string name="wallpaper_color_title">Дэлгэцийн зургийн өнгө</string>
     <string name="wallpaper_destination_both">Нүүр болон түгжигдсэн дэлгэц</string>
     <string name="wallpaper_disabled_by_administrator_message">Таны төхөөрөмжийн админ дэлгэцийн зураг тохируулах тохиргоог идэвхгүй болгосон байна</string>
     <string name="wallpaper_disabled_message">Дэлгэцийн зураг тохируулах тохиргоог энэ төхөөрөмжид идэвхгүй болгосон байна</string>
+    <string name="wallpaper_effects_subtitle">Утсаа хөдөлгөхөд гэрэл зургаа хөдөлдөг 3D дэлгэцийн зураг болго</string>
+    <string name="wallpaper_effects_title">3D дэлгэцийн зураг</string>
     <string name="wallpaper_picker_entry_title">Дэлгэцийн зургийг өөрчлөх</string>
     <string name="wallpaper_preview_card_content_description">Дэлгэцийн зургийг урьдчилан үзэх</string>
     <string name="wallpaper_set_successfully_message">Дэлгэцийн зургийг амжилттай тохирууллаа</string>

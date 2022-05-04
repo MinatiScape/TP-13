@@ -1,6 +1,6 @@
-.class public final Lcom/android/systemui/monet/ColorScheme$Companion$humanReadable$1;
+.class final Lcom/android/systemui/monet/ColorScheme$Companion$humanReadable$1;
 .super Lkotlin/jvm/internal/Lambda;
-.source "SourceFile"
+.source "ColorScheme.kt"
 
 # interfaces
 .implements Lkotlin/jvm/functions/Function1;

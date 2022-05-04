@@ -1,6 +1,6 @@
 .class public abstract Lcom/google/android/gms/common/internal/IAccountAccessor$zza;
 .super Lcom/google/android/gms/internal/zzfa;
-.source "SourceFile"
+.source "IAccountAccessor.java"
 
 # interfaces
 .implements Lcom/google/android/gms/common/internal/IAccountAccessor;

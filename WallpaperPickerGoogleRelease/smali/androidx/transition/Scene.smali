@@ -1,3 +1,3 @@
-.class public Landroidx/transition/Scene;
+.class public final Landroidx/transition/Scene;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Scene.java"

@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/load/model/FileLoader$FileOpener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "FileLoader.java"
 
 
 # annotations
@@ -25,15 +25,6 @@
 
 # virtual methods
 .method public abstract close(Ljava/lang/Object;)V
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "data"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(TData;)V"
@@ -58,15 +49,6 @@
 .end method
 
 .method public abstract open(Ljava/io/File;)Ljava/lang/Object;
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "file"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(",

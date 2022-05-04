@@ -30,14 +30,13 @@
     <string name="abc_slice_more">Viac</string>
     <string name="abc_slice_more_content">+ %1$d</string>
     <string name="abc_slice_permission_allow">Povoliť</string>
-    <string name="abc_slice_permission_checkbox">Povoliť aplikácii %1$s zobrazovať rezy z ľubovoľnej aplikácie</string>
     <string name="abc_slice_permission_deny">Zamietnuť</string>
     <string name="abc_slice_permission_text_1">– Môže čítať informácie z aplikácie %1$s</string>
     <string name="abc_slice_permission_text_2">– Môže vykonávať akcie v aplikácii %1$s</string>
-    <string name="abc_slice_permission_title">Povoliť aplikácii %1$s zobrazovať rezy z aplikácie %2$s?</string>
+    <string name="abc_slice_permission_title">Chcete povoliť aplikácii %1$s zobrazovať výňatok z aplikácie %2$s?</string>
     <string name="abc_slice_show_more">Zobraziť viac</string>
     <string name="abc_slice_updated">Aktualizované %1$s</string>
-    <string name="abc_slices_permission_request">%1$s chce zobrazovať rezy z aplikácie %2$s</string>
+    <string name="abc_slices_permission_request">%1$s chce zobrazovať výňatky z aplikácie %2$s</string>
     <string name="abc_toolbar_collapse_description">Zbaliť</string>
     <string name="accessibility_custom_color_title">Vlastná farba</string>
     <string name="accessibility_custom_font_title">Vlastné písmo</string>
@@ -72,6 +71,7 @@
     <string name="center_wallpaper_position">Vycentrovať</string>
     <string name="character_counter_content_description">Zadané znaky: %1$d z %2$d</string>
     <string name="character_counter_overflowed_content_description">Bol prekročený povolený počet znakov (%1$d z %2$d)</string>
+    <string name="cinematic_effects_toogle">Plastické tapety</string>
     <string name="clear_text_end_icon_content_description">Vymazať text</string>
     <string name="clock_preview_content_description">Ukážka ciferníka %1$s</string>
     <string name="clock_title">Hodiny</string>
@@ -117,6 +117,9 @@
     <string name="delete_live_wallpaper">Odstrániť</string>
     <string name="delete_wallpaper_confirmation">Chcete túto tapetu odstrániť z telefónu?</string>
     <string name="edit_custom_theme_lbl">Klepnutím upravte</string>
+    <string name="effect_error_dialog_body">"Efekty sa nepodarilo použiť.
+Vyskúšajte to s inou fotkou."</string>
+    <string name="effect_error_dialog_title">Ale nie!</string>
     <string name="error_icon_content_description">Chyba</string>
     <string name="expand_button_title">Rozšírené</string>
     <string name="explore">Preskúmať</string>
@@ -199,6 +202,7 @@
     <string name="mtrl_picker_toggle_to_day_selection">Klepnutím prepnete na výber dňa</string>
     <string name="mtrl_picker_toggle_to_text_input_mode">Prepnúť na textový režim vstupu</string>
     <string name="mtrl_picker_toggle_to_year_selection">Klepnutím prepnete na výber roka</string>
+    <string name="my_photos">Moje fotky</string>
     <string name="my_photos_category_title">Moje fotky</string>
     <string name="my_photos_generic_wallpaper_title">Moja fotka</string>
     <string name="name_component_title">Pomenovanie štýlu</string>
@@ -238,7 +242,7 @@ Ak chcete zmeniť toto nastavenie, prejdite do časti Povolenia v informáciác
     <string name="search_menu_title">Hľadať</string>
     <string name="select_wallpaper_label">Kategórie tapiet</string>
     <string name="set_theme_wallpaper_dialog_message">Nastaviť štýlovú tapetu</string>
-    <string name="set_wallpaper_both_destination">Plocha a uzamknutá obrazovka</string>
+    <string name="set_wallpaper_both_destination">Plocha a uzamknuté obrazovky</string>
     <string name="set_wallpaper_button_text">Nastaviť tapetu</string>
     <string name="set_wallpaper_dialog_message">Nastavenie tapety</string>
     <string name="set_wallpaper_error_message">Tapetu nie je možné nastaviť.</string>
@@ -246,6 +250,8 @@ Ak chcete zmeniť toto nastavenie, prejdite do časti Povolenia v informáciác
     <string name="set_wallpaper_lock_screen_destination">Uzamknutá obrazovka</string>
     <string name="set_wallpaper_progress_message">Nastavuje sa tapeta…</string>
     <string name="settings_button_label">Nastavenia</string>
+    <string name="settings_snackbar_description">V nastaveniach povoľte súbory a médiá.</string>
+    <string name="settings_snackbar_enable">Povoliť</string>
     <string name="shape_component_title">Vyberte tvar ikon</string>
     <string name="shape_preview_content_description">Ukážka tvaru</string>
     <string name="show_ui_preview_text">Zobr. ukážku použ. rozhrania</string>
@@ -263,6 +269,7 @@ Ak chcete zmeniť toto nastavenie, prejdite do časti Povolenia v informáciác
     <string name="style_info_description">Ukážka písma, ikon, tvaru aplikácie a farby</string>
     <string name="summary_collapsed_preference_list">%1$s, %2$s</string>
     <string name="tab_customize">Prispôsobenie</string>
+    <string name="tab_effects">Efekty</string>
     <string name="tab_info">Informácie</string>
     <string name="theme_description">Písmo: %1$s, ikony: %2$s, tvar: %3$s, farba: %4$s</string>
     <string name="theme_preview_card_content_description">Ukážka štýlu</string>
@@ -274,14 +281,16 @@ Ak chcete zmeniť toto nastavenie, prejdite do časti Povolenia v informáciác
     <string name="use_style_button">Použiť %1$s</string>
     <string name="use_style_instead_body">Vybrané komponenty zodpovedajú štýlu %1$s. Chcete radšej použiť %1$s?</string>
     <string name="use_style_instead_title">Chcete radšej použiť %1$s?</string>
-    <string name="v7_preference_off">VYP.</string>
-    <string name="v7_preference_on">ZAP.</string>
+    <string name="v7_preference_off">Vypnuté</string>
+    <string name="v7_preference_on">Zapnuté</string>
     <string name="wallpaper_app_name">Tapety</string>
     <string name="wallpaper_color_tab">Farby tapety</string>
     <string name="wallpaper_color_title">Farba tapety</string>
     <string name="wallpaper_destination_both">Plocha a uzamknutá obrazovka</string>
     <string name="wallpaper_disabled_by_administrator_message">Možnosť nastavenia tapety je zakázaná správcom zariadenia</string>
     <string name="wallpaper_disabled_message">Možnosť nastavenia tapety je v tomto zariadení zakázaná</string>
+    <string name="wallpaper_effects_subtitle">Nastavte svoju fotku ako plastickú tapetu, ktorá sa bude pri pohyboch telefónu tiež hýbať</string>
+    <string name="wallpaper_effects_title">Plastické tapety</string>
     <string name="wallpaper_picker_entry_title">Zmeniť tapetu</string>
     <string name="wallpaper_preview_card_content_description">Ukážka tapety</string>
     <string name="wallpaper_set_successfully_message">Tapeta bola úspešne nastavená</string>

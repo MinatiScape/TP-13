@@ -1,6 +1,6 @@
 .class public interface abstract Lkotlin/jvm/internal/ClassBasedDeclarationContainer;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ClassBasedDeclarationContainer.kt"
 
 # interfaces
 .implements Lkotlin/reflect/KDeclarationContainer;

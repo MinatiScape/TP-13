@@ -1,6 +1,6 @@
 .class public abstract Lcom/google/android/gms/common/api/PendingResult;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "PendingResult.java"
 
 
 # annotations
@@ -24,7 +24,6 @@
 .method public constructor <init>()V
     .locals 0
 
-    .line 1
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
 
     return-void

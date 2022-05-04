@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/protobuf/MessageInfoFactory;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "MessageInfoFactory.java"
 
 
 # virtual methods

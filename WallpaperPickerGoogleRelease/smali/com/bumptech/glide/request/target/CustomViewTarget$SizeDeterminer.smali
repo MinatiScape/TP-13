@@ -1,6 +1,6 @@
-.class public final Lcom/bumptech/glide/request/target/CustomViewTarget$SizeDeterminer;
+.class final Lcom/bumptech/glide/request/target/CustomViewTarget$SizeDeterminer;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "CustomViewTarget.java"
 
 
 # static fields

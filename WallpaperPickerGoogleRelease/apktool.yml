@@ -16,10 +16,13 @@ doNotCompress:
 - META-INF/androidx.customview_customview.version
 - META-INF/androidx.drawerlayout_drawerlayout.version
 - META-INF/androidx.dynamicanimation_dynamicanimation.version
+- META-INF/androidx.emoji2_emoji2-views-helper.version
+- META-INF/androidx.emoji2_emoji2.version
 - META-INF/androidx.exifinterface_exifinterface.version
 - META-INF/androidx.fragment_fragment.version
 - META-INF/androidx.interpolator_interpolator.version
 - META-INF/androidx.lifecycle_lifecycle-livedata-core.version
+- META-INF/androidx.lifecycle_lifecycle-process.version
 - META-INF/androidx.lifecycle_lifecycle-runtime-ktx.version
 - META-INF/androidx.lifecycle_lifecycle-runtime.version
 - META-INF/androidx.lifecycle_lifecycle-viewmodel-savedstate.version
@@ -30,6 +33,7 @@ doNotCompress:
 - META-INF/androidx.savedstate_savedstate.version
 - META-INF/androidx.slice_slice-core.version
 - META-INF/androidx.slice_slice-view.version
+- META-INF/androidx.startup_startup-runtime.version
 - META-INF/androidx.tracing_tracing.version
 - META-INF/androidx.transition_transition.version
 - META-INF/androidx.vectordrawable_vectordrawable-animated.version
@@ -38,11 +42,14 @@ doNotCompress:
 - META-INF/androidx.viewpager2_viewpager2.version
 - META-INF/androidx.viewpager_viewpager.version
 - META-INF/com.google.android.material_material.version
+- META-INF/external__kotlinx.coroutines__android_common__kotlinx_coroutines_android.kotlin_module
 - kotlin_module
 - META-INF/maven/com.google.code.findbugs/jsr305/pom.properties
 - META-INF/maven/com.google.code.findbugs/jsr305/pom.xml
 - META-INF/maven/org.codehaus.mojo/animal-sniffer-annotations/pom.properties
 - META-INF/maven/org.codehaus.mojo/animal-sniffer-annotations/pom.xml
+- META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler
+- META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory
 - res/drawable-hdpi-v4/abc_ab_share_pack_mtrl_alpha.9.png
 - png
 - res/drawable-hdpi-v4/abc_btn_switch_to_on_mtrl_00001.9.png
@@ -175,19 +182,19 @@ packageInfo:
   forcedPackageId: '127'
   renameManifestPackage: null
 sdkInfo:
-  minSdkVersion: '32'
+  minSdkVersion: Tiramisu
   targetSdkVersion: '31'
 sharedLibrary: false
 sparseResources: false
 unknownFiles:
   flags.xml: '0'
+  DebugProbesKt.bin: '8'
   protobuf.meta: '8'
   stamp-cert-sha256: '8'
   auto/Auto_factory.gwt.xml: '0'
   auto/Auto_value.gwt.xml: '0'
   com/google/auto/factory/Factory.gwt.xml: '0'
   error_prone/Annotations.gwt.xml: '0'
-  javax/inject/Inject.gwt.xml: '0'
   jsr305_annotations/Jsr305_annotations.gwt.xml: '0'
   jsr330_inject/Jsr330_inject.gwt.xml: '0'
   third_party/java_src/auto/factory/Factory.gwt.xml: '0'
@@ -201,4 +208,4 @@ usesFramework:
 version: 2.4.0-dirty
 versionInfo:
   versionCode: '200000201'
-  versionName: '12'
+  versionName: Tiramisu

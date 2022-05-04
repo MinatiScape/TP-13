@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/common/collect/MapMakerInternalMap$InternalEntryHelper;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "MapMakerInternalMap.java"
 
 
 # annotations
@@ -77,7 +77,7 @@
     .end annotation
 .end method
 
-.method public abstract newSegment(Lcom/google/common/collect/MapMakerInternalMap;II)Lcom/google/common/collect/MapMakerInternalMap$Segment;
+.method public abstract newSegment(Lcom/google/common/collect/MapMakerInternalMap;I)Lcom/google/common/collect/MapMakerInternalMap$Segment;
     .annotation system Ldalvik/annotation/MethodParameters;
         accessFlags = {
             0x0,
@@ -88,14 +88,6 @@
             "map",
             "initialCapacity",
             "maxSegmentSize"
-        }
-    .end annotation
-
-    .annotation system Ldalvik/annotation/Signature;
-        value = {
-            "(",
-            "Lcom/google/common/collect/MapMakerInternalMap<",
-            "TK;TV;TE;TS;>;II)TS;"
         }
     .end annotation
 .end method

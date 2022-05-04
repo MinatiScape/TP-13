@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/util/pool/FactoryPools$Resetter;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "FactoryPools.java"
 
 
 # annotations
@@ -25,15 +25,6 @@
 
 # virtual methods
 .method public abstract reset(Ljava/lang/Object;)V
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "object"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(TT;)V"

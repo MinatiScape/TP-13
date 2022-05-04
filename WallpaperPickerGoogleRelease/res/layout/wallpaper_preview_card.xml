@@ -2,6 +2,7 @@
 <androidx.cardview.widget.CardView android:clipChildren="true" android:layout_width="fill_parent" android:layout_height="fill_parent" android:contentDescription="@string/wallpaper_preview_card_content_description" style="@style/FullContentPreviewCard"
   xmlns:android="http://schemas.android.com/apk/res/android">
     <SurfaceView android:id="@id/wallpaper_surface" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+    <SurfaceView android:id="@id/wallpaper_surface_cinematic" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="fill_parent" />
     <SurfaceView android:id="@id/workspace_surface" android:layout_width="fill_parent" android:layout_height="fill_parent" android:importantForAccessibility="noHideDescendants" />
     <FrameLayout android:id="@id/lock_screen_preview_container" android:layout_width="fill_parent" android:layout_height="fill_parent" android:importantForAccessibility="noHideDescendants" />
     <androidx.core.widget.ContentLoadingProgressBar android:layout_gravity="center" android:id="@id/wallpaper_preview_spinner" android:background="@android:color/transparent" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" style="?android:progressBarStyleLarge" />

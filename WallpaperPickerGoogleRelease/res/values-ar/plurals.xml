@@ -3,7 +3,7 @@
     <plurals name="abc_slice_duration_days">
         <item quantity="other">قبل %d يوم</item>
         <item quantity="zero">قبل %d يوم</item>
-        <item quantity="one">قبل %d يوم</item>
+        <item quantity="one">قبل يوم واحد (%d)</item>
         <item quantity="two">قبل يومين (%d)</item>
         <item quantity="few">قبل %d أيام</item>
         <item quantity="many">قبل %d يومًا</item>
@@ -11,7 +11,7 @@
     <plurals name="abc_slice_duration_min">
         <item quantity="other">قبل %d دقيقة</item>
         <item quantity="zero">قبل %d دقيقة</item>
-        <item quantity="one">قبل %d دقيقة</item>
+        <item quantity="one">قبل دقيقة واحدة (%d)</item>
         <item quantity="two">قبل دقيقتين (%d)</item>
         <item quantity="few">قبل %d دقائق</item>
         <item quantity="many">قبل %d دقيقة</item>

@@ -1,6 +1,6 @@
-.class public Landroidx/appcompat/widget/ActionMenuView$LayoutParams;
+.class public final Landroidx/appcompat/widget/ActionMenuView$LayoutParams;
 .super Landroidx/appcompat/widget/LinearLayoutCompat$LayoutParams;
-.source "SourceFile"
+.source "ActionMenuView.java"
 
 
 # annotations
@@ -44,16 +44,18 @@
 
 
 # direct methods
-.method public constructor <init>(II)V
-    .locals 0
+.method public constructor <init>()V
+    .locals 1
+
+    const/4 v0, -0x2
 
     .line 5
-    invoke-direct {p0, p1, p2}, Landroidx/appcompat/widget/LinearLayoutCompat$LayoutParams;-><init>(II)V
+    invoke-direct {p0, v0}, Landroidx/appcompat/widget/LinearLayoutCompat$LayoutParams;-><init>(I)V
 
-    const/4 p1, 0x0
+    const/4 v0, 0x0
 
     .line 6
-    iput-boolean p1, p0, Landroidx/appcompat/widget/ActionMenuView$LayoutParams;->isOverflowButton:Z
+    iput-boolean v0, p0, Landroidx/appcompat/widget/ActionMenuView$LayoutParams;->isOverflowButton:Z
 
     return-void
 .end method

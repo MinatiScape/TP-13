@@ -30,10 +30,9 @@
     <string name="abc_slice_more">More</string>
     <string name="abc_slice_more_content">+ %1$d</string>
     <string name="abc_slice_permission_allow">Allow</string>
-    <string name="abc_slice_permission_checkbox">Allow %1$s to show slices from any app</string>
     <string name="abc_slice_permission_deny">Deny</string>
-    <string name="abc_slice_permission_text_1">– It can read information from %1$s</string>
-    <string name="abc_slice_permission_text_2">– It can take actions inside %1$s</string>
+    <string name="abc_slice_permission_text_1">- It can read information from %1$s</string>
+    <string name="abc_slice_permission_text_2">- It can take actions inside %1$s</string>
     <string name="abc_slice_permission_title">Allow %1$s to show %2$s slices?</string>
     <string name="abc_slice_show_more">Show more</string>
     <string name="abc_slice_updated">Updated %1$s</string>
@@ -72,6 +71,7 @@
     <string name="center_wallpaper_position">Centre</string>
     <string name="character_counter_content_description">Characters entered %1$d of %2$d</string>
     <string name="character_counter_overflowed_content_description">Character limit exceeded %1$d of %2$d</string>
+    <string name="cinematic_effects_toogle">3D wallpapers</string>
     <string name="clear_text_end_icon_content_description">Clear text</string>
     <string name="clock_preview_content_description">%1$s clock preview</string>
     <string name="clock_title">Clock</string>
@@ -117,6 +117,9 @@
     <string name="delete_live_wallpaper">Delete</string>
     <string name="delete_wallpaper_confirmation">Delete this wallpaper from your phone?</string>
     <string name="edit_custom_theme_lbl">Tap to edit</string>
+    <string name="effect_error_dialog_body">"We were unable to apply the effects.
+Try with another photo."</string>
+    <string name="effect_error_dialog_title">Oh no!</string>
     <string name="error_icon_content_description">Error</string>
     <string name="expand_button_title">Advanced</string>
     <string name="explore">Explore</string>
@@ -199,6 +202,7 @@
     <string name="mtrl_picker_toggle_to_day_selection">Tap to switch to selecting a day</string>
     <string name="mtrl_picker_toggle_to_text_input_mode">Switch to text input mode</string>
     <string name="mtrl_picker_toggle_to_year_selection">Tap to switch to selecting a year</string>
+    <string name="my_photos">My Photos</string>
     <string name="my_photos_category_title">My photos</string>
     <string name="my_photos_generic_wallpaper_title">My photo</string>
     <string name="name_component_title">Name your style</string>
@@ -206,7 +210,7 @@
     <string name="next_wallpaper">Next wallpaper</string>
     <string name="no_backup_image_wallpaper_description">Live wallpaper service for rotating wallpapers</string>
     <string name="no_backup_image_wallpaper_label">Rotating Image Wallpaper</string>
-    <string name="no_thanks">No thanks</string>
+    <string name="no_thanks">No, thanks</string>
     <string name="not_set">Not set</string>
     <string name="on_device_wallpaper_title">Android wallpaper</string>
     <string name="on_device_wallpapers_category_title">On-device wallpapers</string>
@@ -238,7 +242,7 @@ To change this setting, go to the Permissions area of the Wallpapers’ app info
     <string name="search_menu_title">Search</string>
     <string name="select_wallpaper_label">Wallpaper categories</string>
     <string name="set_theme_wallpaper_dialog_message">Set style wallpaper</string>
-    <string name="set_wallpaper_both_destination">Home and lock screen</string>
+    <string name="set_wallpaper_both_destination">Home and lock screens</string>
     <string name="set_wallpaper_button_text">Set wallpaper</string>
     <string name="set_wallpaper_dialog_message">Set wallpaper on</string>
     <string name="set_wallpaper_error_message">Unable to set wallpaper.</string>
@@ -246,6 +250,8 @@ To change this setting, go to the Permissions area of the Wallpapers’ app info
     <string name="set_wallpaper_lock_screen_destination">Lock screen</string>
     <string name="set_wallpaper_progress_message">Setting wallpaper…</string>
     <string name="settings_button_label">Settings</string>
+    <string name="settings_snackbar_description">Please enable files and media in settings.</string>
+    <string name="settings_snackbar_enable">Enable</string>
     <string name="shape_component_title">Choose shape</string>
     <string name="shape_preview_content_description">Shape preview</string>
     <string name="show_ui_preview_text">Show UI preview</string>
@@ -263,6 +269,7 @@ To change this setting, go to the Permissions area of the Wallpapers’ app info
     <string name="style_info_description">Preview of font, icons, app shape and colour</string>
     <string name="summary_collapsed_preference_list">%1$s, %2$s</string>
     <string name="tab_customize">Customise</string>
+    <string name="tab_effects">Effects</string>
     <string name="tab_info">Info</string>
     <string name="theme_description">Font: %1$s, icons: %2$s, shape: %3$s, colour: %4$s</string>
     <string name="theme_preview_card_content_description">Style preview</string>
@@ -282,6 +289,8 @@ To change this setting, go to the Permissions area of the Wallpapers’ app info
     <string name="wallpaper_destination_both">Home &amp; Lock screen</string>
     <string name="wallpaper_disabled_by_administrator_message">Setting a wallpaper is disabled by your device administrator</string>
     <string name="wallpaper_disabled_message">Setting a wallpaper is disabled on this device</string>
+    <string name="wallpaper_effects_subtitle">Make your photo a 3D wallpaper that moves when your phone moves</string>
+    <string name="wallpaper_effects_title">3D wallpapers</string>
     <string name="wallpaper_picker_entry_title">Change wallpaper</string>
     <string name="wallpaper_preview_card_content_description">Wallpaper preview</string>
     <string name="wallpaper_set_successfully_message">Wallpaper set successfully</string>

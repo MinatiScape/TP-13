@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/asset/StreamableAsset$StreamReceiver;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "StreamableAsset.java"
 
 
 # annotations

@@ -1,6 +1,6 @@
 .class public final synthetic Lcom/android/customization/model/color/ColorOption$$ExternalSyntheticLambda1;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "R8$$SyntheticClass"
 
 # interfaces
 .implements Ljava/util/function/Function;

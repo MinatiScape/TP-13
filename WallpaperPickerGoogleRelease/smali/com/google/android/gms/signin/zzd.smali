@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/android/gms/signin/zzd;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "SignInClient.java"
 
 # interfaces
 .implements Lcom/google/android/gms/common/api/Api$Client;

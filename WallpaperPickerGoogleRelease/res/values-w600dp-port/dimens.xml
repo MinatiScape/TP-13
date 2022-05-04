@@ -1,12 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="bottom_actions_horizontal_margin">36.0dip</dimen>
+    <dimen name="bottom_actions_horizontal_padding">130.0dip</dimen>
+    <dimen name="bottom_sheet_margin">64.0dip</dimen>
     <dimen name="category_grid_edge_space">64.0dip</dimen>
+    <dimen name="color_seed_chip_margin">15.0dip</dimen>
+    <dimen name="component_color_chip_small_size_default">30.0dip</dimen>
+    <dimen name="featured_wallpaper_grid_edge_space">57.0dip</dimen>
+    <dimen name="full_preview_page_default_horizontal_padding">138.0dip</dimen>
+    <dimen name="full_preview_page_tabs_horizontal_padding">134.0dip</dimen>
     <dimen name="grid_item_category_padding_bottom">24.0dip</dimen>
     <dimen name="grid_item_featured_category_padding_bottom">24.0dip</dimen>
     <dimen name="grid_options_container_horizontal_margin">64.0dip</dimen>
+    <dimen name="option_tile_grid_padding_horizontal">8.0dip</dimen>
+    <dimen name="option_tile_width">79.0dip</dimen>
+    <dimen name="preview_attribution_pane_horizontal_padding">36.0dip</dimen>
     <dimen name="section_horizontal_padding">64.0dip</dimen>
-    <dimen name="separated_tabs_horizontal_padding">58.0dip</dimen>
-    <dimen name="separated_tabs_inset_horizontal">6.0dip</dimen>
+    <dimen name="separated_tabs_horizontal_padding">60.0dip</dimen>
+    <dimen name="separated_tabs_inset_horizontal">4.0dip</dimen>
     <dimen name="wallpaper_grid_edge_space">64.0dip</dimen>
+    <dimen name="wallpaper_info_pane_explore_button_top_margin">24.0dip</dimen>
+    <dimen name="wallpaper_info_pane_padding">36.0dip</dimen>
+    <dimen name="wallpaper_info_pane_subtitle1_top_margin">8.0dip</dimen>
+    <dimen name="wallpaper_section_horizontal_padding">64.0dip</dimen>
 </resources>

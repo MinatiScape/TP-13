@@ -1,6 +1,6 @@
 .class public interface abstract annotation Lcom/android/systemui/plugins/annotations/ProvidesInterface;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ProvidesInterface.java"
 
 # interfaces
 .implements Ljava/lang/annotation/Annotation;

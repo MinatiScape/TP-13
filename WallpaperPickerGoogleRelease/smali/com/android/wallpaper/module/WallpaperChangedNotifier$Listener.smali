@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/module/WallpaperChangedNotifier$Listener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "WallpaperChangedNotifier.java"
 
 
 # annotations

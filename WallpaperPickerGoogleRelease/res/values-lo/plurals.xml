@@ -10,7 +10,7 @@
     </plurals>
     <plurals name="abc_slice_duration_years">
         <item quantity="other">%d ປີກ່ອນ</item>
-        <item quantity="one">%d ປີກ່ອນ</item>
+        <item quantity="one">%d ປິກ່ອນ</item>
     </plurals>
     <plurals name="mtrl_badge_content_description">
         <item quantity="other">%d ການແຈ້ງເຕືອນໃໝ່</item>

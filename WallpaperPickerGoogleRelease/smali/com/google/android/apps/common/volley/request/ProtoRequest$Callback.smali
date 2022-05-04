@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/android/apps/common/volley/request/ProtoRequest$Callback;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ProtoRequest.java"
 
 # interfaces
 .implements Lcom/android/volley/Response$Listener;

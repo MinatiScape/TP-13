@@ -1,6 +1,6 @@
 .class public interface abstract Lkotlinx/coroutines/ThreadContextElement;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ThreadContextElement.kt"
 
 # interfaces
 .implements Lkotlin/coroutines/CoroutineContext$Element;
@@ -33,16 +33,9 @@
     .end annotation
 .end method
 
-.method public abstract updateThreadContext(Lkotlin/coroutines/CoroutineContext;)Ljava/lang/Object;
+.method public abstract updateThreadContext(Lkotlin/coroutines/CoroutineContext;)Ljava/lang/String;
     .param p1    # Lkotlin/coroutines/CoroutineContext;
         .annotation build Lorg/jetbrains/annotations/NotNull;
         .end annotation
     .end param
-    .annotation system Ldalvik/annotation/Signature;
-        value = {
-            "(",
-            "Lkotlin/coroutines/CoroutineContext;",
-            ")TS;"
-        }
-    .end annotation
 .end method

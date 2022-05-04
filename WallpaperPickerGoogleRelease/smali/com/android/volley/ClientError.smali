@@ -1,6 +1,6 @@
 .class public Lcom/android/volley/ClientError;
 .super Lcom/android/volley/ServerError;
-.source "SourceFile"
+.source "ClientError.java"
 
 
 # direct methods

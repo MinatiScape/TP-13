@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/systemui/unfold/updates/FoldStateProvider;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "FoldStateProvider.kt"
 
 # interfaces
 .implements Lcom/android/systemui/statusbar/policy/CallbackController;

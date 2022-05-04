@@ -1,3 +1,3 @@
 .class public Lkotlin/collections/CollectionsKt__ReversedViewsKt;
 .super Lkotlin/collections/CollectionsKt__MutableCollectionsJVMKt;
-.source "SourceFile"
+.source "ReversedViews.kt"

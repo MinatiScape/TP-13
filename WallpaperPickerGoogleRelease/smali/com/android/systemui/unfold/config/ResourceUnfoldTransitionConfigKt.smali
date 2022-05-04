@@ -1,6 +1,6 @@
 .class public final Lcom/android/systemui/unfold/config/ResourceUnfoldTransitionConfigKt;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ResourceUnfoldTransitionConfig.kt"
 
 
 # static fields

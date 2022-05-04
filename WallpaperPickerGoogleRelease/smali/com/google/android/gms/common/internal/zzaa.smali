@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/android/gms/common/internal/zzaa;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ICertData.java"
 
 # interfaces
 .implements Landroid/os/IInterface;

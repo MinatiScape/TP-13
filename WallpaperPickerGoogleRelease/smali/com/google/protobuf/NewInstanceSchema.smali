@@ -1,8 +1,8 @@
 .class public interface abstract Lcom/google/protobuf/NewInstanceSchema;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "NewInstanceSchema.java"
 
 
 # virtual methods
-.method public abstract newInstance(Ljava/lang/Object;)Ljava/lang/Object;
+.method public abstract newInstance(Lcom/google/protobuf/MessageLite;)Ljava/lang/Object;
 .end method

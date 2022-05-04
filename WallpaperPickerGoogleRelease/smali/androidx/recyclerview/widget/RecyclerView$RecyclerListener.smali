@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/recyclerview/widget/RecyclerView$RecyclerListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "RecyclerView.java"
 
 
 # annotations
@@ -15,13 +15,5 @@
 
 
 # virtual methods
-.method public abstract onViewRecycled(Landroidx/recyclerview/widget/RecyclerView$ViewHolder;)V
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "holder"
-        }
-    .end annotation
+.method public abstract onViewRecycled()V
 .end method

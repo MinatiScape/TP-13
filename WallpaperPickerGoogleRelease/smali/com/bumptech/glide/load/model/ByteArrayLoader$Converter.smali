@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/load/model/ByteArrayLoader$Converter;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ByteArrayLoader.java"
 
 
 # annotations
@@ -25,15 +25,6 @@
 
 # virtual methods
 .method public abstract convert([B)Ljava/lang/Object;
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "model"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "([B)TData;"

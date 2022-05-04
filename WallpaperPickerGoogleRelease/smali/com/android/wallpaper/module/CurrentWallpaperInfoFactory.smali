@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/module/CurrentWallpaperInfoFactory;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "CurrentWallpaperInfoFactory.java"
 
 
 # annotations

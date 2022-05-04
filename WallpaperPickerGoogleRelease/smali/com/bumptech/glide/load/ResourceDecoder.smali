@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/load/ResourceDecoder;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ResourceDecoder.java"
 
 
 # annotations
@@ -18,21 +18,6 @@
 
 # virtual methods
 .method public abstract decode(Ljava/lang/Object;IILcom/bumptech/glide/load/Options;)Lcom/bumptech/glide/load/engine/Resource;
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0,
-            0x0,
-            0x0,
-            0x0
-        }
-        names = {
-            "source",
-            "width",
-            "height",
-            "options"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(TT;II",
@@ -51,17 +36,6 @@
 .end method
 
 .method public abstract handles(Ljava/lang/Object;Lcom/bumptech/glide/load/Options;)Z
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0,
-            0x0
-        }
-        names = {
-            "source",
-            "options"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(TT;",

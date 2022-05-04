@@ -1,6 +1,6 @@
 .class public final Landroidx/fragment/app/FragmentTransaction$Op;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "FragmentTransaction.java"
 
 
 # annotations
@@ -25,13 +25,13 @@
 
 .field public mFragment:Landroidx/fragment/app/Fragment;
 
+.field public mFromExpandedOp:Z
+
 .field public mOldMaxState:Landroidx/lifecycle/Lifecycle$State;
 
 .field public mPopEnterAnim:I
 
 .field public mPopExitAnim:I
-
-.field public mTopmostFragment:Z
 
 
 # direct methods
@@ -59,7 +59,7 @@
     const/4 p1, 0x0
 
     .line 5
-    iput-boolean p1, p0, Landroidx/fragment/app/FragmentTransaction$Op;->mTopmostFragment:Z
+    iput-boolean p1, p0, Landroidx/fragment/app/FragmentTransaction$Op;->mFromExpandedOp:Z
 
     .line 6
     sget-object p1, Landroidx/lifecycle/Lifecycle$State;->RESUMED:Landroidx/lifecycle/Lifecycle$State;
@@ -72,7 +72,7 @@
     return-void
 .end method
 
-.method public constructor <init>(ILandroidx/fragment/app/Fragment;Z)V
+.method public constructor <init>(ILandroidx/fragment/app/Fragment;I)V
     .locals 0
 
     .line 8
@@ -84,8 +84,10 @@
     .line 10
     iput-object p2, p0, Landroidx/fragment/app/FragmentTransaction$Op;->mFragment:Landroidx/fragment/app/Fragment;
 
+    const/4 p1, 0x1
+
     .line 11
-    iput-boolean p3, p0, Landroidx/fragment/app/FragmentTransaction$Op;->mTopmostFragment:Z
+    iput-boolean p1, p0, Landroidx/fragment/app/FragmentTransaction$Op;->mFromExpandedOp:Z
 
     .line 12
     sget-object p1, Landroidx/lifecycle/Lifecycle$State;->RESUMED:Landroidx/lifecycle/Lifecycle$State;

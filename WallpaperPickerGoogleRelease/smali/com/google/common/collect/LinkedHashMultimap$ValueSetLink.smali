@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/common/collect/LinkedHashMultimap$ValueSetLink;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "LinkedHashMultimap.java"
 
 
 # annotations

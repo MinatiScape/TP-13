@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/request/transition/TransitionFactory;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "TransitionFactory.java"
 
 
 # annotations
@@ -16,17 +16,6 @@
 
 # virtual methods
 .method public abstract build(Lcom/bumptech/glide/load/DataSource;Z)Lcom/bumptech/glide/request/transition/Transition;
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0,
-            0x0
-        }
-        names = {
-            "dataSource",
-            "isFirstResource"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(",

@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/systemui/unfold/config/UnfoldTransitionConfig;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "UnfoldTransitionConfig.kt"
 
 
 # virtual methods

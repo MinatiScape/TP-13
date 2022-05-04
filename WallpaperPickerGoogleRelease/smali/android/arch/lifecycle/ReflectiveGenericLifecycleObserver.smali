@@ -1,6 +1,6 @@
-.class public Landroid/arch/lifecycle/ReflectiveGenericLifecycleObserver;
+.class Landroid/arch/lifecycle/ReflectiveGenericLifecycleObserver;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ReflectiveGenericLifecycleObserver.java"
 
 # interfaces
 .implements Landroid/arch/lifecycle/GenericLifecycleObserver;

@@ -1,13 +1,13 @@
 .class public interface abstract Lcom/adobe/xmp/XMPDateTime;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "XMPDateTime.java"
 
 # interfaces
 .implements Ljava/lang/Comparable;
 
 
 # virtual methods
-.method public abstract getCalendar()Ljava/util/Calendar;
+.method public abstract getCalendar()Ljava/util/GregorianCalendar;
 .end method
 
 .method public abstract getDay()I

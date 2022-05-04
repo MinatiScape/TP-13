@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/module/WallpaperRefresher;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "WallpaperRefresher.java"
 
 
 # annotations

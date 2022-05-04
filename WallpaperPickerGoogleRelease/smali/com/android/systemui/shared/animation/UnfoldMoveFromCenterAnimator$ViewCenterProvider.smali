@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/systemui/shared/animation/UnfoldMoveFromCenterAnimator$ViewCenterProvider;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "UnfoldMoveFromCenterAnimator.kt"
 
 
 # annotations

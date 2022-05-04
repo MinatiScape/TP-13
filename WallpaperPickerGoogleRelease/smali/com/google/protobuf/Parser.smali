@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/protobuf/Parser;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Parser.java"
 
 
 # annotations
@@ -15,13 +15,7 @@
 
 
 # virtual methods
-.method public abstract parseFrom([B)Ljava/lang/Object;
-    .annotation system Ldalvik/annotation/Signature;
-        value = {
-            "([B)TMessageType;"
-        }
-    .end annotation
-
+.method public abstract parseFrom([B)Lcom/google/protobuf/GeneratedMessageLite;
     .annotation system Ldalvik/annotation/Throws;
         value = {
             Lcom/google/protobuf/InvalidProtocolBufferException;

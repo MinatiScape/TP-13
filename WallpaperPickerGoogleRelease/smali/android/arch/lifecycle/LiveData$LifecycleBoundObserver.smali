@@ -1,6 +1,6 @@
-.class public Landroid/arch/lifecycle/LiveData$LifecycleBoundObserver;
-.super Ljava/lang/Object;
-.source "SourceFile"
+.class Landroid/arch/lifecycle/LiveData$LifecycleBoundObserver;
+.super Landroidx/transition/PathMotion;
+.source "LiveData.java"
 
 # interfaces
 .implements Landroid/arch/lifecycle/GenericLifecycleObserver;
@@ -9,7 +9,7 @@
 # annotations
 .annotation system Ldalvik/annotation/Signature;
     value = {
-        "Ljava/lang/Object;",
+        "Landroidx/transition/PathMotion;",
         "Landroid/arch/lifecycle/GenericLifecycleObserver;"
     }
 .end annotation

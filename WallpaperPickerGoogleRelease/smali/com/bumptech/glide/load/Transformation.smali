@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/load/Transformation;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Transformation.java"
 
 # interfaces
 .implements Lcom/bumptech/glide/load/Key;
@@ -19,30 +19,5 @@
 
 
 # virtual methods
-.method public abstract transform(Landroid/content/Context;Lcom/bumptech/glide/load/engine/Resource;II)Lcom/bumptech/glide/load/engine/Resource;
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0,
-            0x0,
-            0x0,
-            0x0
-        }
-        names = {
-            "context",
-            "resource",
-            "outWidth",
-            "outHeight"
-        }
-    .end annotation
-
-    .annotation system Ldalvik/annotation/Signature;
-        value = {
-            "(",
-            "Landroid/content/Context;",
-            "Lcom/bumptech/glide/load/engine/Resource<",
-            "TT;>;II)",
-            "Lcom/bumptech/glide/load/engine/Resource<",
-            "TT;>;"
-        }
-    .end annotation
+.method public abstract transform(Lcom/bumptech/glide/GlideContext;Lcom/bumptech/glide/load/engine/Resource;II)Lcom/bumptech/glide/load/engine/Resource;
 .end method

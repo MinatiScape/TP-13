@@ -5,12 +5,12 @@
         <item quantity="one">%d dag geleden</item>
     </plurals>
     <plurals name="abc_slice_duration_min">
-        <item quantity="other">%d min geleden</item>
-        <item quantity="one">%d min geleden</item>
+        <item quantity="other">%d min geleden</item>
+        <item quantity="one">%d min geleden</item>
     </plurals>
     <plurals name="abc_slice_duration_years">
-        <item quantity="other">%d jaar geleden</item>
-        <item quantity="one">%d jaar geleden</item>
+        <item quantity="other">%d jr geleden</item>
+        <item quantity="one">%d jr geleden</item>
     </plurals>
     <plurals name="mtrl_badge_content_description">
         <item quantity="other">%d nieuwe meldingen</item>

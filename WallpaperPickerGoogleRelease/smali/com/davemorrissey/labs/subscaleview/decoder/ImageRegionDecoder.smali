@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/davemorrissey/labs/subscaleview/decoder/ImageRegionDecoder;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ImageRegionDecoder.java"
 
 
 # virtual methods

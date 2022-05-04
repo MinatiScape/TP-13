@@ -5,8 +5,8 @@
         <item quantity="one">%d dag sedan</item>
     </plurals>
     <plurals name="abc_slice_duration_min">
-        <item quantity="other">%d minuter sedan</item>
-        <item quantity="one">%d minut sedan</item>
+        <item quantity="other">%d min sedan</item>
+        <item quantity="one">%d min sedan</item>
     </plurals>
     <plurals name="abc_slice_duration_years">
         <item quantity="other">%d år sedan</item>

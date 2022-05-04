@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/common/collect/MapMakerInternalMap$WeakValueReference;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "MapMakerInternalMap.java"
 
 
 # annotations
@@ -31,7 +31,7 @@
 .method public abstract clear()V
 .end method
 
-.method public abstract copyFor(Ljava/lang/ref/ReferenceQueue;Lcom/google/common/collect/MapMakerInternalMap$InternalEntry;)Lcom/google/common/collect/MapMakerInternalMap$WeakValueReference;
+.method public abstract copyFor(Ljava/lang/ref/ReferenceQueue;Lcom/google/common/collect/MapMakerInternalMap$WeakValueEntry;)Lcom/google/common/collect/MapMakerInternalMap$WeakValueReference;
     .annotation system Ldalvik/annotation/MethodParameters;
         accessFlags = {
             0x0,
@@ -40,16 +40,6 @@
         names = {
             "queue",
             "entry"
-        }
-    .end annotation
-
-    .annotation system Ldalvik/annotation/Signature;
-        value = {
-            "(",
-            "Ljava/lang/ref/ReferenceQueue<",
-            "TV;>;TE;)",
-            "Lcom/google/common/collect/MapMakerInternalMap$WeakValueReference<",
-            "TK;TV;TE;>;"
         }
     .end annotation
 .end method

@@ -30,13 +30,12 @@
     <string name="abc_slice_more">Lagi</string>
     <string name="abc_slice_more_content">+ %1$d</string>
     <string name="abc_slice_permission_allow">Benarkan</string>
-    <string name="abc_slice_permission_checkbox">Benarkan %1$s menunjukkan hirisan daripada mana-mana apl</string>
     <string name="abc_slice_permission_deny">Tolak</string>
     <string name="abc_slice_permission_text_1">- Hos hirisan boleh membaca maklumat daripada %1$s</string>
     <string name="abc_slice_permission_text_2">- Hos hirisan boleh mengambil tindakan dalam %1$s</string>
     <string name="abc_slice_permission_title">Benarkan %1$s menunjukkan hirisan %2$s?</string>
     <string name="abc_slice_show_more">Tunjukkan lagi</string>
-    <string name="abc_slice_updated">Dikemas kini pada %1$s</string>
+    <string name="abc_slice_updated">Dikemas kini %1$s</string>
     <string name="abc_slices_permission_request">%1$s mahu menunjukkan hirisan %2$s</string>
     <string name="abc_toolbar_collapse_description">Runtuhkan</string>
     <string name="accessibility_custom_color_title">Warna tersuai</string>
@@ -72,6 +71,7 @@
     <string name="center_wallpaper_position">Tengah</string>
     <string name="character_counter_content_description">Aksara dimasukkan %1$d daripada %2$d</string>
     <string name="character_counter_overflowed_content_description">Melebihi had aksara %1$d daripada %2$d</string>
+    <string name="cinematic_effects_toogle">Kertas dinding 3D</string>
     <string name="clear_text_end_icon_content_description">Kosongkan teks</string>
     <string name="clock_preview_content_description">%1$s pratonton jam</string>
     <string name="clock_title">Jam</string>
@@ -117,6 +117,9 @@
     <string name="delete_live_wallpaper">Padam</string>
     <string name="delete_wallpaper_confirmation">Padamkan kertas dinding ini daripada telefon anda?</string>
     <string name="edit_custom_theme_lbl">Ketik untuk edit</string>
+    <string name="effect_error_dialog_body">"Kami tidak dapat menggunakan kesan itu.
+Cuba dengan foto lain."</string>
+    <string name="effect_error_dialog_title">Oh tidak!</string>
     <string name="error_icon_content_description">Ralat</string>
     <string name="expand_button_title">Terperinci</string>
     <string name="explore">Teroka</string>
@@ -199,6 +202,7 @@
     <string name="mtrl_picker_toggle_to_day_selection">Ketik untuk beralih kepada pemilihan hari</string>
     <string name="mtrl_picker_toggle_to_text_input_mode">Beralih kepada mod input teks</string>
     <string name="mtrl_picker_toggle_to_year_selection">Ketik untuk beralih kepada pemilihan tahun</string>
+    <string name="my_photos">Foto Saya</string>
     <string name="my_photos_category_title">Foto saya</string>
     <string name="my_photos_generic_wallpaper_title">Foto saya</string>
     <string name="name_component_title">Namakan gaya anda</string>
@@ -246,6 +250,8 @@ Untuk menukar tetapan ini, pergi ke kawasan Kebenaran bagi maklumat apl Kertas D
     <string name="set_wallpaper_lock_screen_destination">Kunci skrin</string>
     <string name="set_wallpaper_progress_message">Menetapkan kertas dinding…</string>
     <string name="settings_button_label">Tetapan</string>
+    <string name="settings_snackbar_description">Sila dayakan fail dan media dalam tetapan.</string>
+    <string name="settings_snackbar_enable">Dayakan</string>
     <string name="shape_component_title">Pilih bentuk</string>
     <string name="shape_preview_content_description">Pratonton bentuk</string>
     <string name="show_ui_preview_text">Tunjukkan Pratonton UI</string>
@@ -263,6 +269,7 @@ Untuk menukar tetapan ini, pergi ke kawasan Kebenaran bagi maklumat apl Kertas D
     <string name="style_info_description">Pratonton fon, ikon, bentuk apl dan warna</string>
     <string name="summary_collapsed_preference_list">%1$s, %2$s</string>
     <string name="tab_customize">Sesuaikan</string>
+    <string name="tab_effects">Kesan</string>
     <string name="tab_info">Maklumat</string>
     <string name="theme_description">Fon: %1$s, ikon: %2$s, bentuk: %3$s, warna: %4$s</string>
     <string name="theme_preview_card_content_description">Pratonton Gaya</string>
@@ -282,6 +289,8 @@ Untuk menukar tetapan ini, pergi ke kawasan Kebenaran bagi maklumat apl Kertas D
     <string name="wallpaper_destination_both">Skrin utama &amp; Skrin kunci</string>
     <string name="wallpaper_disabled_by_administrator_message">Tetapan kertas dinding dilumpuhkan oleh pentadbir peranti anda</string>
     <string name="wallpaper_disabled_message">Menetapkan kertas dinding dilumpuhkan pada peranti ini</string>
+    <string name="wallpaper_effects_subtitle">Jadikan foto anda sebagai kertas dinding 3D yang bergerak apabila telefon anda bergerak</string>
+    <string name="wallpaper_effects_title">Kertas dinding 3D</string>
     <string name="wallpaper_picker_entry_title">Tukar kertas dinding</string>
     <string name="wallpaper_preview_card_content_description">Pratonton kertas dinding</string>
     <string name="wallpaper_set_successfully_message">Kertas dinding berjaya ditetapkan</string>

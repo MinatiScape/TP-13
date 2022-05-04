@@ -1,6 +1,6 @@
 .class public interface abstract Lkotlin/reflect/KAnnotatedElement;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "KAnnotatedElement.kt"
 
 
 # virtual methods

@@ -1,6 +1,6 @@
-.class public Landroidx/core/app/ActivityCompat;
+.class public final Landroidx/core/app/ActivityCompat;
 .super Landroidx/core/content/ContextCompat;
-.source "SourceFile"
+.source "ActivityCompat.java"
 
 
 # annotations

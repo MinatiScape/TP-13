@@ -1,6 +1,6 @@
 .class public interface abstract annotation Lcom/android/systemui/shared/system/QuickStepContract$SystemUiStateFlags;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "QuickStepContract.java"
 
 # interfaces
 .implements Ljava/lang/annotation/Annotation;

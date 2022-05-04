@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/systemui/shared/system/InputConsumerController$RegistrationListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "InputConsumerController.java"
 
 
 # annotations

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set android:ordering="together"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt">
+    <objectAnimator android:interpolator="@drawable/$$ic_dialog_error_illustration_animated__1__0" android:duration="1817" android:startOffset="0" android:propertyName="translateXY" android:pathData="M 0,31.069C -0.833,31.069 0.833,31.069 0,31.069" android:propertyXName="translateX" android:propertyYName="translateY" />
+    <objectAnimator android:interpolator="@drawable/$$ic_dialog_error_illustration_animated__1__1" android:duration="500" android:startOffset="1817" android:propertyName="translateXY" android:pathData="M 0,31.069C -0.833,31.069 -4.167,31.069 -5,31.069" android:propertyXName="translateX" android:propertyYName="translateY" />
+    <objectAnimator android:interpolator="@drawable/$$ic_dialog_error_illustration_animated__1__2" android:duration="250" android:startOffset="2317" android:propertyName="translateXY" android:pathData="M -5,31.069C -5,31.069 -5,31.069 -5,31.069" android:propertyXName="translateX" android:propertyYName="translateY" />
+    <objectAnimator android:interpolator="@drawable/$$ic_dialog_error_illustration_animated__1__3" android:duration="500" android:startOffset="2567" android:propertyName="translateXY" android:pathData="M -5,31.069C -3.333,31.069 3.333,31.069 5,31.069" android:propertyXName="translateX" android:propertyYName="translateY" />
+    <objectAnimator android:interpolator="@drawable/$$ic_dialog_error_illustration_animated__1__4" android:duration="250" android:startOffset="3067" android:propertyName="translateXY" android:pathData="M 5,31.069C 5,31.069 5,31.069 5,31.069" android:propertyXName="translateX" android:propertyYName="translateY" />
+    <objectAnimator android:interpolator="@drawable/$$ic_dialog_error_illustration_animated__1__5" android:duration="433" android:startOffset="3317" android:propertyName="translateXY" android:pathData="M 5,31.069C 4.167,31.069 0.833,31.069 0,31.069" android:propertyXName="translateX" android:propertyYName="translateY" />
+</set>

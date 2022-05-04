@@ -1,6 +1,6 @@
 .class public interface abstract Lkotlin/jvm/functions/Function1;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Functions.kt"
 
 
 # annotations

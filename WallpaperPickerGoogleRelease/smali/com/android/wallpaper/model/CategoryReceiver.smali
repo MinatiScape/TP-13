@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/model/CategoryReceiver;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "CategoryReceiver.java"
 
 
 # virtual methods

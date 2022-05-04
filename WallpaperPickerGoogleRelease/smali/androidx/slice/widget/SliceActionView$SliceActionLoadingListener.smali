@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/slice/widget/SliceActionView$SliceActionLoadingListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "SliceActionView.java"
 
 
 # annotations

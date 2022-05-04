@@ -2,7 +2,7 @@
 <resources>
     <string name="abc_action_bar_home_description">హోమ్‌కు నావిగేట్ చేస్తుంది</string>
     <string name="abc_action_bar_up_description">పైకి నావిగేట్ చేస్తుంది</string>
-    <string name="abc_action_menu_overflow_description">మరిన్ని ఎంపికలు</string>
+    <string name="abc_action_menu_overflow_description">మరిన్ని ఆప్షన్‌లు</string>
     <string name="abc_action_mode_done">పూర్తయింది</string>
     <string name="abc_activity_chooser_view_see_all">అన్నీ చూడండి</string>
     <string name="abc_activitychooserview_choose_application">యాప్‌ను ఎంచుకోండి</string>
@@ -29,15 +29,14 @@
     <string name="abc_slice_error">కనెక్ట్ చేయడం సాధ్యపడలేదు</string>
     <string name="abc_slice_more">మరింత</string>
     <string name="abc_slice_more_content">+ %1$d</string>
-    <string name="abc_slice_permission_allow">అనుమతించు</string>
-    <string name="abc_slice_permission_checkbox">ఏ యాప్ నుండి అయినా స్లైస్‌లను చూపించడానికి %1$sని అనుమతించండి</string>
-    <string name="abc_slice_permission_deny">తిరస్కరించు</string>
-    <string name="abc_slice_permission_text_1">- ఇది %1$s నుండి సమాచారాన్ని చదవగలుగుతుంది</string>
-    <string name="abc_slice_permission_text_2">- ఇది %1$s లోపల చర్యలు తీసుకోగలుగుతుంది</string>
-    <string name="abc_slice_permission_title">%2$s స్లైస్‌లను చూపించడానికి %1$sని అనుమతించాలా?</string>
-    <string name="abc_slice_show_more">మరింత చూపు</string>
-    <string name="abc_slice_updated">అప్‌డేట్ చేసిన సమయం %1$s</string>
-    <string name="abc_slices_permission_request">%1$s %2$s స్లైస్‌లను చూపించాలనుకుంటోంది</string>
+    <string name="abc_slice_permission_allow">అనుమతించండి</string>
+    <string name="abc_slice_permission_deny">నిరాకరించండి</string>
+    <string name="abc_slice_permission_text_1">- ఇది %1$s నుండి సమాచారాన్ని చదవగలదు</string>
+    <string name="abc_slice_permission_text_2">- ఇది %1$s లోపల చర్యలు తీసుకోగలదు</string>
+    <string name="abc_slice_permission_title">%2$s స్లైస్‌లను చూపించడానికి %1$sను అనుమతించాలా?</string>
+    <string name="abc_slice_show_more">మరింత కంటెంట్‌ను చూడండి</string>
+    <string name="abc_slice_updated">%1$s అప్‌డేట్ చేయబడింది</string>
+    <string name="abc_slices_permission_request">%1$s, %2$s స్లైస్‌లను చూపించాలనుకుంటోంది</string>
     <string name="abc_toolbar_collapse_description">కుదిస్తుంది</string>
     <string name="accessibility_custom_color_title">అనుకూల రంగు</string>
     <string name="accessibility_custom_font_title">అనుకూల ఫాంట్</string>
@@ -72,6 +71,7 @@
     <string name="center_wallpaper_position">మధ్య</string>
     <string name="character_counter_content_description">%2$dలో %1$d అక్షరాలు నమోదు చేయబడ్డాయి</string>
     <string name="character_counter_overflowed_content_description">అక్షర పరిధి %2$dలో %1$dను అధిగమించింది</string>
+    <string name="cinematic_effects_toogle">3D వాల్‌పేపర్‌లు</string>
     <string name="clear_text_end_icon_content_description">రాసినదాన్ని తీసివేయి</string>
     <string name="clock_preview_content_description">%1$s గడియార ప్రివ్యూ</string>
     <string name="clock_title">గడియారం</string>
@@ -117,6 +117,9 @@
     <string name="delete_live_wallpaper">తొలగించు</string>
     <string name="delete_wallpaper_confirmation">మీ ఫోన్ నుండి ఈ వాల్‌పేపర్‌ను తొలగించాలా?</string>
     <string name="edit_custom_theme_lbl">ఎడిట్ చేయడానికి నొక్కండి</string>
+    <string name="effect_error_dialog_body">"మేము ఎఫెక్ట్‌లను వర్తింపజేయలేకపోయాము.
+మరొక ఫోటోతో ట్రై చేయండి."</string>
+    <string name="effect_error_dialog_title">అయ్యో!</string>
     <string name="error_icon_content_description">ఎర్రర్</string>
     <string name="expand_button_title">అధునాతన సెట్టింగ్‌లు</string>
     <string name="explore">అన్వేషించు</string>
@@ -199,6 +202,7 @@
     <string name="mtrl_picker_toggle_to_day_selection">"'రోజును ఎంపిక చేసుకోవడం'కు మారడానికి నొక్కండి"</string>
     <string name="mtrl_picker_toggle_to_text_input_mode">వచన ఇన్‌పుట్ మోడ్‌కు మారుస్తుంది</string>
     <string name="mtrl_picker_toggle_to_year_selection">"'సంవత్సరాన్ని ఎంపిక చేసుకోవడం'కు మారడానికి నొక్కండి"</string>
+    <string name="my_photos">నా ఫోటోలు</string>
     <string name="my_photos_category_title">నా ఫోటోలు</string>
     <string name="my_photos_generic_wallpaper_title">నా ఫోటో</string>
     <string name="name_component_title">మీ శైలికి పేరు పెట్టండి</string>
@@ -246,6 +250,8 @@
     <string name="set_wallpaper_lock_screen_destination">లాక్ స్క్రీన్</string>
     <string name="set_wallpaper_progress_message">వాల్‌పేపర్‌ను సెట్ చేస్తోంది…</string>
     <string name="settings_button_label">సెట్టింగ్‌లు</string>
+    <string name="settings_snackbar_description">దయచేసి సెట్టింగ్‌లలో ఫైల్‌లు, మీడియాను ఎనేబుల్ చేయండి.</string>
+    <string name="settings_snackbar_enable">ఎనేబుల్ చేయండి</string>
     <string name="shape_component_title">ఆకారాన్ని ఎంచుకోండి</string>
     <string name="shape_preview_content_description">ఆకారం ప్రివ్యూ</string>
     <string name="show_ui_preview_text">UI ప్రివ్యూని చూపించు</string>
@@ -263,6 +269,7 @@
     <string name="style_info_description">ఫాంట్, చిహ్నాలు, యాప్ ఆకారం, రంగుల ప్రివ్యూ</string>
     <string name="summary_collapsed_preference_list">%1$s, %2$s</string>
     <string name="tab_customize">అనుకూలీకరించండి</string>
+    <string name="tab_effects">ఎఫెక్ట్‌లు</string>
     <string name="tab_info">సమాచారం</string>
     <string name="theme_description">ఫాంట్: %1$s, చిహ్నాలు: %2$s, ఆకారం: %3$s, రంగు: %4$s</string>
     <string name="theme_preview_card_content_description">స్టైల్ ప్రివ్యూ</string>
@@ -282,6 +289,8 @@
     <string name="wallpaper_destination_both">హోమ్ &amp; లాక్ స్క్రీన్</string>
     <string name="wallpaper_disabled_by_administrator_message">మీ పరికర నిర్వాహకులు వాల్‌పేపర్‌ను సెట్ చేయడం నిలిపివేసారు</string>
     <string name="wallpaper_disabled_message">ఈ పరికరంలో వాల్‌పేపర్‌ను సెట్ చేయడం నిలిపివేయబడింది</string>
+    <string name="wallpaper_effects_subtitle">మీ ఫోన్ కదులుతున్నప్పుడు మీ ఫోటోను 3D వాల్‌పేపర్‌గా మార్చండి</string>
+    <string name="wallpaper_effects_title">3D వాల్‌పేపర్‌లు</string>
     <string name="wallpaper_picker_entry_title">వాల్‌పేపర్‌ను మార్చండి</string>
     <string name="wallpaper_preview_card_content_description">వాల్‌పేపర్ ప్రివ్యూ</string>
     <string name="wallpaper_set_successfully_message">వాల్‌పేపర్ విజయవంతంగా సెట్ చేయబడింది</string>

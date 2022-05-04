@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/core/app/ActivityCompat$RequestPermissionsRequestCodeValidator;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ActivityCompat.java"
 
 
 # annotations
@@ -15,13 +15,5 @@
 
 
 # virtual methods
-.method public abstract validateRequestPermissionsRequestCode(I)V
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "requestCode"
-        }
-    .end annotation
+.method public abstract validateRequestPermissionsRequestCode()V
 .end method

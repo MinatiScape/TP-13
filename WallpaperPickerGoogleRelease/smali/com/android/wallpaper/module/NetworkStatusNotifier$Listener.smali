@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/module/NetworkStatusNotifier$Listener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "NetworkStatusNotifier.java"
 
 
 # annotations

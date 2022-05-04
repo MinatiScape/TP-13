@@ -1,18 +1,9 @@
-.class public final Lcom/google/android/apps/wallpaper/module/RecentWallpaperUtils$recentFromLiveWallpaper$1;
+.class final Lcom/google/android/apps/wallpaper/module/RecentWallpaperUtils$recentFromLiveWallpaper$1;
 .super Lkotlin/coroutines/jvm/internal/ContinuationImpl;
-.source "SourceFile"
+.source "RecentWallpaperUtils.kt"
 
 
 # annotations
-.annotation system Ldalvik/annotation/EnclosingMethod;
-    value = Lcom/google/android/apps/wallpaper/module/RecentWallpaperUtils;->recentFromLiveWallpaper(Lcom/android/wallpaper/model/LiveWallpaperInfo;Landroid/content/Context;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-.end annotation
-
-.annotation system Ldalvik/annotation/InnerClass;
-    accessFlags = 0x19
-    name = null
-.end annotation
-
 .annotation runtime Lkotlin/coroutines/jvm/internal/DebugMetadata;
     c = "com.google.android.apps.wallpaper.module.RecentWallpaperUtils"
     f = "RecentWallpaperUtils.kt"
@@ -78,7 +69,7 @@
 
     const/4 p1, 0x0
 
-    invoke-static {p1, p1, p0}, Lcom/google/android/apps/wallpaper/module/RecentWallpaperUtils;->recentFromLiveWallpaper(Lcom/android/wallpaper/model/LiveWallpaperInfo;Landroid/content/Context;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+    invoke-static {p1, p1, p0}, Lcom/google/android/apps/wallpaper/module/RecentWallpaperUtils;->access$recentFromLiveWallpaper(Lcom/android/wallpaper/model/LiveWallpaperInfo;Landroid/content/Context;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 
     move-result-object p0
 

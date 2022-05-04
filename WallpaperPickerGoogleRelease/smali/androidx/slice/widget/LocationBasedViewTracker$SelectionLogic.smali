@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/slice/widget/LocationBasedViewTracker$SelectionLogic;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "LocationBasedViewTracker.java"
 
 
 # annotations
@@ -16,12 +16,4 @@
 
 # virtual methods
 .method public abstract selectView(Landroid/view/View;)V
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "view"
-        }
-    .end annotation
 .end method

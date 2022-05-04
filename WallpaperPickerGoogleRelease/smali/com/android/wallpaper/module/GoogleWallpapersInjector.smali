@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/module/GoogleWallpapersInjector;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "GoogleWallpapersInjector.java"
 
 # interfaces
 .implements Lcom/android/customization/module/CustomizationInjector;
@@ -10,5 +10,5 @@
 .method public abstract getGooglePreferences(Landroid/content/Context;)Lcom/google/android/apps/wallpaper/module/GoogleWallpaperPreferences;
 .end method
 
-.method public abstract getServerFetcher(Landroid/content/Context;)Lcom/android/wallpaper/network/ServerFetcher;
+.method public abstract getServerFetcher(Landroid/content/Context;)Lcom/google/android/apps/wallpaper/backdrop/BackdropFetcher;
 .end method

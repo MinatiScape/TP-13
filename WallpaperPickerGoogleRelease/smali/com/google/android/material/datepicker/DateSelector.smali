@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/android/material/datepicker/DateSelector;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "DateSelector.java"
 
 # interfaces
 .implements Landroid/os/Parcelable;
@@ -22,28 +22,10 @@
 .method public abstract getDefaultThemeResId(Landroid/content/Context;)I
 .end method
 
-.method public abstract getSelectedDays()Ljava/util/Collection;
-    .annotation system Ldalvik/annotation/Signature;
-        value = {
-            "()",
-            "Ljava/util/Collection<",
-            "Ljava/lang/Long;",
-            ">;"
-        }
-    .end annotation
+.method public abstract getSelectedDays()Ljava/util/ArrayList;
 .end method
 
-.method public abstract getSelectedRanges()Ljava/util/Collection;
-    .annotation system Ldalvik/annotation/Signature;
-        value = {
-            "()",
-            "Ljava/util/Collection<",
-            "Landroidx/core/util/Pair<",
-            "Ljava/lang/Long;",
-            "Ljava/lang/Long;",
-            ">;>;"
-        }
-    .end annotation
+.method public abstract getSelectedRanges()Ljava/util/ArrayList;
 .end method
 
 .method public abstract getSelection()Ljava/lang/Object;
@@ -60,19 +42,7 @@
 .method public abstract isSelectionComplete()Z
 .end method
 
-.method public abstract onCreateTextInputView(Landroid/view/LayoutInflater;Landroid/view/ViewGroup;Landroid/os/Bundle;Lcom/google/android/material/datepicker/CalendarConstraints;Lcom/google/android/material/datepicker/OnSelectionChangedListener;)Landroid/view/View;
-    .annotation system Ldalvik/annotation/Signature;
-        value = {
-            "(",
-            "Landroid/view/LayoutInflater;",
-            "Landroid/view/ViewGroup;",
-            "Landroid/os/Bundle;",
-            "Lcom/google/android/material/datepicker/CalendarConstraints;",
-            "Lcom/google/android/material/datepicker/OnSelectionChangedListener<",
-            "TS;>;)",
-            "Landroid/view/View;"
-        }
-    .end annotation
+.method public abstract onCreateTextInputView(Landroid/view/LayoutInflater;Landroid/view/ViewGroup;Lcom/google/android/material/datepicker/CalendarConstraints;Lcom/google/android/material/datepicker/MaterialTextInputPicker$1;)Landroid/view/View;
 .end method
 
 .method public abstract select(J)V

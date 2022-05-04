@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/module/WallpaperPersister;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "WallpaperPersister.java"
 
 
 # annotations

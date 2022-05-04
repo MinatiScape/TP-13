@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/load/data/DataFetcher$DataCallback;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "DataFetcher.java"
 
 
 # annotations
@@ -25,15 +25,6 @@
 
 # virtual methods
 .method public abstract onDataReady(Ljava/lang/Object;)V
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "data"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(TT;)V"
@@ -42,12 +33,4 @@
 .end method
 
 .method public abstract onLoadFailed(Ljava/lang/Exception;)V
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "e"
-        }
-    .end annotation
 .end method

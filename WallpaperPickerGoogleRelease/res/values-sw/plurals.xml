@@ -5,8 +5,8 @@
         <item quantity="one">Siku %d iliyopita</item>
     </plurals>
     <plurals name="abc_slice_duration_min">
-        <item quantity="other">Dakika %d zilizopita</item>
-        <item quantity="one">Dakika %d iliyopita</item>
+        <item quantity="other">Dak %d zilizopita</item>
+        <item quantity="one">Dak %d iliyopita</item>
     </plurals>
     <plurals name="abc_slice_duration_years">
         <item quantity="other">Miaka %d iliyopita</item>

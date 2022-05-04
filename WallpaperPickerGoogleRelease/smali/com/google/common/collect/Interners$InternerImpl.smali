@@ -1,6 +1,6 @@
-.class public final Lcom/google/common/collect/Interners$InternerImpl;
+.class final Lcom/google/common/collect/Interners$InternerImpl;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Interners.java"
 
 
 # annotations
@@ -19,7 +19,9 @@
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "Lcom/google/common/collect/MapMakerInternalMap<",
-            "TE;***>;"
+            "TE;",
+            "Ljava/lang/Object;",
+            "**>;"
         }
     .end annotation
 .end field

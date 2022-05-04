@@ -1,6 +1,6 @@
 .class public abstract Lcom/google/android/gms/gcm/INetworkTaskCallback$Stub;
 .super Lcom/google/android/gms/internal/zzfa;
-.source "SourceFile"
+.source "INetworkTaskCallback.java"
 
 # interfaces
 .implements Lcom/google/android/gms/gcm/INetworkTaskCallback;

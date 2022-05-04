@@ -1,6 +1,6 @@
 .class public Landroidx/preference/UnPressableLinearLayout;
 .super Landroid/widget/LinearLayout;
-.source "SourceFile"
+.source "UnPressableLinearLayout.java"
 
 
 # direct methods
@@ -26,7 +26,7 @@
 
 
 # virtual methods
-.method public dispatchSetPressed(Z)V
+.method public final dispatchSetPressed(Z)V
     .locals 0
 
     return-void

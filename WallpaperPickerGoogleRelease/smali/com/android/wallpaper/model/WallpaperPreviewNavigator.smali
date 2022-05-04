@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/model/WallpaperPreviewNavigator;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "WallpaperPreviewNavigator.java"
 
 
 # virtual methods

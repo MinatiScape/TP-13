@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set android:ordering="together"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt">
+    <objectAnimator android:interpolator="@drawable/$$ic_dialog_error_illustration_animated__20__0" android:duration="5383" android:startOffset="0" android:valueFrom="181.463" android:valueTo="181.463" android:valueType="floatType" android:propertyName="translateX" />
+    <objectAnimator android:interpolator="@drawable/$$ic_dialog_error_illustration_animated__20__1" android:duration="286" android:startOffset="5383" android:valueFrom="181.463" android:valueTo="180.5" android:valueType="floatType" android:propertyName="translateX" />
+</set>

@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/concurrent/futures/CallbackToFutureAdapter$Resolver;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "CallbackToFutureAdapter.java"
 
 
 # annotations

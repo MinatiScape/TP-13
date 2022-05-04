@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/widget/BottomActionBar$OnActionSelectedListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "BottomActionBar.java"
 
 
 # annotations
@@ -15,5 +15,5 @@
 
 
 # virtual methods
-.method public abstract onActionSelected(Z)V
+.method public abstract onActionSelected()V
 .end method

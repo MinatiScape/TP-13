@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/module/RegistersComponents;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "RegistersComponents.java"
 
 
 # annotations
@@ -9,17 +9,5 @@
 
 
 # virtual methods
-.method public abstract registerComponents(Landroid/content/Context;Lcom/bumptech/glide/Glide;Lcom/bumptech/glide/Registry;)V
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0,
-            0x0,
-            0x0
-        }
-        names = {
-            "context",
-            "glide",
-            "registry"
-        }
-    .end annotation
+.method public abstract registerComponents(Lcom/bumptech/glide/Registry;)V
 .end method

@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/module/UserEventLogger;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "UserEventLogger.java"
 
 
 # virtual methods
@@ -47,9 +47,6 @@
 .end method
 
 .method public abstract logNumDaysDailyRotationNotAttempted(I)V
-.end method
-
-.method public abstract logRefreshDailyWallpaperButtonClicked()V
 .end method
 
 .method public abstract logRestored()V

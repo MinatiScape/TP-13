@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/load/resource/bitmap/Downsampler$DecodeCallbacks;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Downsampler.java"
 
 
 # annotations
@@ -16,17 +16,6 @@
 
 # virtual methods
 .method public abstract onDecodeComplete(Lcom/bumptech/glide/load/engine/bitmap_recycle/BitmapPool;Landroid/graphics/Bitmap;)V
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0,
-            0x0
-        }
-        names = {
-            "bitmapPool",
-            "downsampled"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Throws;
         value = {
             Ljava/io/IOException;

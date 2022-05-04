@@ -1,6 +1,6 @@
-.class public Landroidx/appcompat/widget/VectorEnabledTintResources;
-.super Landroid/content/res/Resources;
-.source "SourceFile"
+.class public final Landroidx/appcompat/widget/VectorEnabledTintResources;
+.super Landroidx/appcompat/widget/ResourcesWrapper;
+.source "VectorEnabledTintResources.java"
 
 
 # static fields

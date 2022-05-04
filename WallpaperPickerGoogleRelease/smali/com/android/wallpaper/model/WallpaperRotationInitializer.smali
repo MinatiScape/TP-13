@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/model/WallpaperRotationInitializer;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "WallpaperRotationInitializer.java"
 
 # interfaces
 .implements Landroid/os/Parcelable;
@@ -15,8 +15,8 @@
 
 
 # virtual methods
-.method public abstract setFirstWallpaperInRotation(Landroid/content/Context;ILcom/android/wallpaper/model/WallpaperRotationInitializer$Listener;)V
+.method public abstract setFirstWallpaperInRotation(Landroid/content/Context;ILcom/android/wallpaper/picker/individual/IndividualPickerFragment$3;)V
 .end method
 
-.method public abstract startRotation(Landroid/content/Context;)Z
+.method public abstract startRotation(Landroid/content/Context;)V
 .end method

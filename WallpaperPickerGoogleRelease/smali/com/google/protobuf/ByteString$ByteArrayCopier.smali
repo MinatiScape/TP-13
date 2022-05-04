@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/protobuf/ByteString$ByteArrayCopier;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ByteString.java"
 
 
 # annotations

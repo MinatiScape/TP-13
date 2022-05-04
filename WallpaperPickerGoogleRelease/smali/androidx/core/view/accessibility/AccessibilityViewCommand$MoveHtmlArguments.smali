@@ -1,6 +1,6 @@
 .class public final Landroidx/core/view/accessibility/AccessibilityViewCommand$MoveHtmlArguments;
 .super Landroidx/core/view/accessibility/AccessibilityViewCommand$CommandArguments;
-.source "SourceFile"
+.source "AccessibilityViewCommand.java"
 
 
 # annotations
@@ -18,8 +18,7 @@
 .method public constructor <init>()V
     .locals 0
 
-    .line 1
-    invoke-direct {p0}, Landroidx/core/view/accessibility/AccessibilityViewCommand$CommandArguments;-><init>()V
+    const/4 p0, 0x0
 
-    return-void
+    throw p0
 .end method

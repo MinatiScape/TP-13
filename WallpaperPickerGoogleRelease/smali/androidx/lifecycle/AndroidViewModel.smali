@@ -1,3 +1,3 @@
-.class public Landroidx/lifecycle/AndroidViewModel;
+.class public final Landroidx/lifecycle/AndroidViewModel;
 .super Landroidx/lifecycle/ViewModel;
-.source "SourceFile"
+.source "AndroidViewModel.java"

@@ -1,16 +1,8 @@
 .class public interface abstract Lcom/bumptech/glide/load/model/Model;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Model.java"
 
 
 # virtual methods
-.method public abstract isEquivalentTo(Ljava/lang/Object;)Z
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "other"
-        }
-    .end annotation
+.method public abstract isEquivalentTo()Z
 .end method

@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/android/gms/clearcut/ClearcutLogger$LogSampler;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ClearcutLogger.java"
 
 
 # annotations

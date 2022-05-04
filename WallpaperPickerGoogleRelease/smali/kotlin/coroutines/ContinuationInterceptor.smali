@@ -1,6 +1,6 @@
 .class public interface abstract Lkotlin/coroutines/ContinuationInterceptor;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ContinuationInterceptor.kt"
 
 # interfaces
 .implements Lkotlin/coroutines/CoroutineContext$Element;
@@ -19,23 +19,11 @@
 
 
 # virtual methods
-.method public abstract interceptContinuation(Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+.method public abstract interceptContinuation(Lkotlin/coroutines/Continuation;)Lkotlinx/coroutines/internal/DispatchedContinuation;
     .param p1    # Lkotlin/coroutines/Continuation;
         .annotation build Lorg/jetbrains/annotations/NotNull;
         .end annotation
     .end param
-    .annotation system Ldalvik/annotation/Signature;
-        value = {
-            "<T:",
-            "Ljava/lang/Object;",
-            ">(",
-            "Lkotlin/coroutines/Continuation<",
-            "-TT;>;)",
-            "Lkotlin/coroutines/Continuation<",
-            "TT;>;"
-        }
-    .end annotation
-
     .annotation build Lorg/jetbrains/annotations/NotNull;
     .end annotation
 .end method

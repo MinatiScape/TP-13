@@ -1,10 +1,10 @@
 .class public interface abstract Landroidx/viewpager2/adapter/StatefulAdapter;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "StatefulAdapter.java"
 
 
 # virtual methods
-.method public abstract restoreState(Landroid/os/Parcelable;)V
+.method public abstract restoreState()V
 .end method
 
 .method public abstract saveState()Landroid/os/Parcelable;

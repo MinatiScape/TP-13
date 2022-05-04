@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/common/collect/Multimap;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Multimap.java"
 
 
 # annotations
@@ -30,4 +30,17 @@
 .end method
 
 .method public abstract clear()V
+.end method
+
+.method public abstract put(Lcom/google/photos/base/BaseImageUrlUtil$OptionInfo;Ljava/lang/String;)Z
+    .annotation system Ldalvik/annotation/MethodParameters;
+        accessFlags = {
+            0x0,
+            0x0
+        }
+        names = {
+            "key",
+            "value"
+        }
+    .end annotation
 .end method

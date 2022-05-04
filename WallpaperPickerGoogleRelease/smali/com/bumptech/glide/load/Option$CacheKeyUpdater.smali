@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/load/Option$CacheKeyUpdater;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Option.java"
 
 
 # annotations
@@ -25,19 +25,6 @@
 
 # virtual methods
 .method public abstract update([BLjava/lang/Object;Ljava/security/MessageDigest;)V
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0,
-            0x0,
-            0x0
-        }
-        names = {
-            "keyBytes",
-            "value",
-            "messageDigest"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "([BTT;",

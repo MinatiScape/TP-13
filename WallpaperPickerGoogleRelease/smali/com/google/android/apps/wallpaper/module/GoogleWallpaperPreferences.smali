@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/android/apps/wallpaper/module/GoogleWallpaperPreferences;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "GoogleWallpaperPreferences.kt"
 
 # interfaces
 .implements Lcom/android/wallpaper/module/WallpaperPreferences;
@@ -32,7 +32,7 @@
     .end param
 .end method
 
-.method public abstract setThemesSanitized(Z)V
+.method public abstract setThemesSanitized()V
 .end method
 
 .method public abstract updateLastWallpaper(Ljava/lang/String;)V

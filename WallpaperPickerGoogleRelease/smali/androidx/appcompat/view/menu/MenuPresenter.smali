@@ -1,6 +1,6 @@
 .class public interface abstract Landroidx/appcompat/view/menu/MenuPresenter;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "MenuPresenter.java"
 
 
 # annotations
@@ -12,10 +12,10 @@
 
 
 # virtual methods
-.method public abstract collapseItemActionView(Landroidx/appcompat/view/menu/MenuBuilder;Landroidx/appcompat/view/menu/MenuItemImpl;)Z
+.method public abstract collapseItemActionView(Landroidx/appcompat/view/menu/MenuItemImpl;)Z
 .end method
 
-.method public abstract expandItemActionView(Landroidx/appcompat/view/menu/MenuBuilder;Landroidx/appcompat/view/menu/MenuItemImpl;)Z
+.method public abstract expandItemActionView(Landroidx/appcompat/view/menu/MenuItemImpl;)Z
 .end method
 
 .method public abstract flagActionItems()Z
@@ -33,5 +33,5 @@
 .method public abstract setCallback(Landroidx/appcompat/view/menu/MenuPresenter$Callback;)V
 .end method
 
-.method public abstract updateMenuView(Z)V
+.method public abstract updateMenuView()V
 .end method

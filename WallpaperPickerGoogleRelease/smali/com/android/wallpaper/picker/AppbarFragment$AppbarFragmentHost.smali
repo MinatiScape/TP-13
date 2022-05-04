@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/picker/AppbarFragment$AppbarFragmentHost;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "AppbarFragment.java"
 
 
 # annotations

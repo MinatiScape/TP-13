@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/load/engine/bitmap_recycle/ArrayAdapterInterface;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ArrayAdapterInterface.java"
 
 
 # annotations
@@ -16,15 +16,6 @@
 
 # virtual methods
 .method public abstract getArrayLength(Ljava/lang/Object;)I
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "array"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(TT;)I"
@@ -39,15 +30,6 @@
 .end method
 
 .method public abstract newArray(I)Ljava/lang/Object;
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "length"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(I)TT;"

@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/picker/MyPhotosStarter$PermissionChangedListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "MyPhotosStarter.java"
 
 
 # annotations

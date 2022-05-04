@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/protobuf/Internal$EnumVerifier;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Internal.java"
 
 
 # annotations

@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/load/data/DataRewinder$Factory;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "DataRewinder.java"
 
 
 # annotations
@@ -25,15 +25,6 @@
 
 # virtual methods
 .method public abstract build(Ljava/lang/Object;)Lcom/bumptech/glide/load/data/DataRewinder;
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0
-        }
-        names = {
-            "data"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(TT;)",

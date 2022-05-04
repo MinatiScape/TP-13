@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/common/collect/Multiset;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Multiset.java"
 
 # interfaces
 .implements Ljava/util/Collection;

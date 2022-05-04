@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/customization/picker/WallpaperPreviewer$WallpaperColorsListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "WallpaperPreviewer.java"
 
 
 # annotations
@@ -15,5 +15,5 @@
 
 
 # virtual methods
-.method public abstract onWallpaperColorsChanged(Landroid/app/WallpaperColors;)V
+.method public abstract onWallpaperColorsChanged()V
 .end method

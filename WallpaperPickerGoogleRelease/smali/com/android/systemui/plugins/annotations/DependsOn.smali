@@ -1,6 +1,6 @@
 .class public interface abstract annotation Lcom/android/systemui/plugins/annotations/DependsOn;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "DependsOn.java"
 
 # interfaces
 .implements Ljava/lang/annotation/Annotation;

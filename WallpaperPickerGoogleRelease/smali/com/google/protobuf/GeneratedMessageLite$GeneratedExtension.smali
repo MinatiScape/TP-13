@@ -1,6 +1,6 @@
-.class public Lcom/google/protobuf/GeneratedMessageLite$GeneratedExtension;
+.class public final Lcom/google/protobuf/GeneratedMessageLite$GeneratedExtension;
 .super Lcom/google/protobuf/ExtensionLite;
-.source "SourceFile"
+.source "GeneratedMessageLite.java"
 
 
 # annotations

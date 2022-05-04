@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/load/data/DataFetcher;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "DataFetcher.java"
 
 
 # annotations
@@ -41,17 +41,6 @@
 .end method
 
 .method public abstract loadData(Lcom/bumptech/glide/Priority;Lcom/bumptech/glide/load/data/DataFetcher$DataCallback;)V
-    .annotation system Ldalvik/annotation/MethodParameters;
-        accessFlags = {
-            0x0,
-            0x0
-        }
-        names = {
-            "priority",
-            "callback"
-        }
-    .end annotation
-
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(",

@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/load/model/LazyHeaderFactory;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "LazyHeaderFactory.java"
 
 
 # virtual methods

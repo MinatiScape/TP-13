@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/android/gms/common/api/GoogleApiClient$OnConnectionFailedListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "GoogleApiClient.java"
 
 
 # annotations

@@ -1,6 +1,6 @@
 .class public interface abstract Lkotlinx/coroutines/DisposableHandle;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Job.kt"
 
 
 # virtual methods

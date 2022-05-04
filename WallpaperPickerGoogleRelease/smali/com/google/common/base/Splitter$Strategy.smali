@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/common/base/Splitter$Strategy;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Splitter.java"
 
 
 # annotations

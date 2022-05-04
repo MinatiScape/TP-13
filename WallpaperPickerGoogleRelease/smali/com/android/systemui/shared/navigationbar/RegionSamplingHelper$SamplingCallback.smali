@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/systemui/shared/navigationbar/RegionSamplingHelper$SamplingCallback;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "RegionSamplingHelper.java"
 
 
 # annotations

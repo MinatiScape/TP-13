@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/wallpaper/picker/SectionView$SectionViewListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "SectionView.java"
 
 
 # annotations

@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/systemui/shared/tracing/FrameProtoTracer$ProtoTraceParams;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "FrameProtoTracer.java"
 
 
 # annotations

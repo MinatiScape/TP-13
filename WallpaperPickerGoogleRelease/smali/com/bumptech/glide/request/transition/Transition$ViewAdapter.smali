@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/bumptech/glide/request/transition/Transition$ViewAdapter;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Transition.java"
 
 
 # annotations

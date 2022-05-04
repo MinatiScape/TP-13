@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/customization/module/ThemesUserEventLogger;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ThemesUserEventLogger.java"
 
 # interfaces
 .implements Lcom/android/wallpaper/module/UserEventLogger;

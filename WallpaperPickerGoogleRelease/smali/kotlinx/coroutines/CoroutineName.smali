@@ -1,6 +1,6 @@
 .class public final Lkotlinx/coroutines/CoroutineName;
 .super Lkotlin/coroutines/AbstractCoroutineContextElement;
-.source "SourceFile"
+.source "CoroutineName.kt"
 
 
 # annotations
@@ -13,17 +13,18 @@
 
 # static fields
 .field public static final Key:Lkotlinx/coroutines/CoroutineName$Key;
+    .annotation build Lorg/jetbrains/annotations/NotNull;
+    .end annotation
+.end field
 
 
 # direct methods
 .method public static constructor <clinit>()V
-    .locals 2
+    .locals 1
 
     new-instance v0, Lkotlinx/coroutines/CoroutineName$Key;
 
-    const/4 v1, 0x0
-
-    invoke-direct {v0, v1}, Lkotlinx/coroutines/CoroutineName$Key;-><init>(Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+    invoke-direct {v0}, Lkotlinx/coroutines/CoroutineName$Key;-><init>()V
 
     sput-object v0, Lkotlinx/coroutines/CoroutineName;->Key:Lkotlinx/coroutines/CoroutineName$Key;
 
@@ -32,22 +33,32 @@
 
 
 # virtual methods
-.method public equals(Ljava/lang/Object;)Z
-    .locals 0
+.method public final equals(Ljava/lang/Object;)Z
+    .locals 2
     .param p1    # Ljava/lang/Object;
         .annotation build Lorg/jetbrains/annotations/Nullable;
         .end annotation
     .end param
 
-    if-eq p0, p1, :cond_1
+    const/4 v0, 0x1
 
+    if-ne p0, p1, :cond_0
+
+    return v0
+
+    :cond_0
     instance-of p0, p1, Lkotlinx/coroutines/CoroutineName;
 
-    if-eqz p0, :cond_0
+    const/4 v1, 0x0
 
+    if-nez p0, :cond_1
+
+    return v1
+
+    :cond_1
     check-cast p1, Lkotlinx/coroutines/CoroutineName;
 
-    invoke-static {p1}, Ljava/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;
+    invoke-virtual {p1}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
     const/4 p0, 0x0
 
@@ -55,31 +66,23 @@
 
     move-result p0
 
-    if-eqz p0, :cond_0
+    if-nez p0, :cond_2
 
-    goto :goto_0
+    return v1
 
-    :cond_0
-    const/4 p0, 0x0
-
-    return p0
-
-    :cond_1
-    :goto_0
-    const/4 p0, 0x1
-
-    return p0
+    :cond_2
+    return v0
 .end method
 
-.method public hashCode()I
+.method public final hashCode()I
     .locals 0
 
     const/4 p0, 0x0
 
-    return p0
+    throw p0
 .end method
 
-.method public toString()Ljava/lang/String;
+.method public final toString()Ljava/lang/String;
     .locals 0
     .annotation build Lorg/jetbrains/annotations/NotNull;
     .end annotation

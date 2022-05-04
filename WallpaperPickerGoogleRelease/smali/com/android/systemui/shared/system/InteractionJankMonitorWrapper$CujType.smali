@@ -1,6 +1,6 @@
 .class public interface abstract annotation Lcom/android/systemui/shared/system/InteractionJankMonitorWrapper$CujType;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "InteractionJankMonitorWrapper.java"
 
 # interfaces
 .implements Ljava/lang/annotation/Annotation;

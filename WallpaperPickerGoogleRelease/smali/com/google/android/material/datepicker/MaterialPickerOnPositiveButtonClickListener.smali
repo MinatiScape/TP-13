@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/android/material/datepicker/MaterialPickerOnPositiveButtonClickListener;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "MaterialPickerOnPositiveButtonClickListener.java"
 
 
 # annotations
@@ -15,10 +15,5 @@
 
 
 # virtual methods
-.method public abstract onPositiveButtonClick(Ljava/lang/Object;)V
-    .annotation system Ldalvik/annotation/Signature;
-        value = {
-            "(TS;)V"
-        }
-    .end annotation
+.method public abstract onPositiveButtonClick()V
 .end method

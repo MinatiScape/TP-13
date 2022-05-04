@@ -1,3 +1,3 @@
-.class public Landroidx/core/app/NotificationCompat$Action;
+.class public final Landroidx/core/app/NotificationCompat$Action;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "NotificationCompat.java"

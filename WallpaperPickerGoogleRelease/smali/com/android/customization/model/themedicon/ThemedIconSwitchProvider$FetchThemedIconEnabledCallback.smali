@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/android/customization/model/themedicon/ThemedIconSwitchProvider$FetchThemedIconEnabledCallback;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "ThemedIconSwitchProvider.java"
 
 
 # annotations

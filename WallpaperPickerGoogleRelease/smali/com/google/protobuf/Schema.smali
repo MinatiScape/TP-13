@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/protobuf/Schema;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "Schema.java"
 
 
 # annotations
@@ -87,15 +87,7 @@
     .end annotation
 .end method
 
-.method public abstract writeTo(Ljava/lang/Object;Lcom/google/protobuf/Writer;)V
-    .annotation system Ldalvik/annotation/Signature;
-        value = {
-            "(TT;",
-            "Lcom/google/protobuf/Writer;",
-            ")V"
-        }
-    .end annotation
-
+.method public abstract writeTo(Ljava/lang/Object;Lcom/google/protobuf/CodedOutputStreamWriter;)V
     .annotation system Ldalvik/annotation/Throws;
         value = {
             Ljava/io/IOException;

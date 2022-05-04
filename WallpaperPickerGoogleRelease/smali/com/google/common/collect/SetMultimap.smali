@@ -1,6 +1,6 @@
 .class public interface abstract Lcom/google/common/collect/SetMultimap;
 .super Ljava/lang/Object;
-.source "SourceFile"
+.source "SetMultimap.java"
 
 # interfaces
 .implements Lcom/google/common/collect/Multimap;
@@ -19,3 +19,24 @@
         "TK;TV;>;"
     }
 .end annotation
+
+
+# virtual methods
+.method public abstract get(Ljava/lang/Object;)Ljava/util/Set;
+    .annotation system Ldalvik/annotation/MethodParameters;
+        accessFlags = {
+            0x0
+        }
+        names = {
+            "key"
+        }
+    .end annotation
+
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(TK;)",
+            "Ljava/util/Set<",
+            "TV;>;"
+        }
+    .end annotation
+.end method
