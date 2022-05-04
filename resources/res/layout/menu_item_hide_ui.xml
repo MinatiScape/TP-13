@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:androidprv="http://schemas.android.com/apk/prv/res/android" xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="wrap_content" android:layout_height="wrap_content">
+    <View android:textColor="?android:^attr-private/toLeft" android:gravity="center" android:id="@+id/hide_ui_view" android:background="@drawable/menu_item_hide_ui_background" android:layout_width="@dimen/menu_item_hide_ui_background_width" android:layout_height="@dimen/menu_item_hide_ui_background_height" android:contentDescription="@string/hide_ui_preview_text" android:layout_marginHorizontal="@dimen/menu_item_full_preview_margin"/>
+</LinearLayout>

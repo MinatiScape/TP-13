@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/action_hide_ui" android:title="@string/hide_ui_preview_text" android:showAsAction="always" android:actionLayout="@layout/menu_item_hide_ui"/>
+    <item android:id="@+id/action_set_wallpaper" android:title="@string/apply_btn" android:showAsAction="always" android:actionLayout="@layout/menu_item_set_wallpaper"/>
+</menu>
