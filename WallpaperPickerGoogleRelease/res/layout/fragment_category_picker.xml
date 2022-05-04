@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <include layout="@layout/section_header" />
+    <androidx.constraintlayout.widget.ConstraintLayout android:id="@id/content_section" android:layout_width="fill_parent" android:layout_height="0.0dip" android:layout_weight="1.0">
+        <com.android.wallpaper.widget.PreviewPager android:id="@id/wallpaper_preview_pager" android:layout_width="fill_parent" android:layout_height="0.0dip" app:card_style="screen_aspect_ratio" app:layout_constrainedHeight="true" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintHeight_max="@dimen/preview_pager_max_height" app:layout_constraintHeight_percent="@dimen/preview_pager_maximum_height_ratio" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" />
+        <include android:id="@id/permission_needed" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="0.0dip" app:layout_constrainedHeight="true" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintHeight_max="@dimen/preview_pager_max_height" app:layout_constraintHeight_percent="@dimen/preview_pager_maximum_height_ratio" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" layout="@layout/permission_needed_layout" />
+        <androidx.coordinatorlayout.widget.CoordinatorLayout android:id="@id/root_container" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent">
+            <FrameLayout android:id="@id/category_fragment_container" android:background="?android:colorBackground" android:layout_width="fill_parent" android:layout_height="wrap_content" app:layout_behavior="@string/bottom_sheet_behavior" />
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

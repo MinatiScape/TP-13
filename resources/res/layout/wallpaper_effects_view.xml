@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<com.android.wallpaper.picker.WallpaperEffectsView xmlns:android="http://schemas.android.com/apk/res/android" android:theme="@style/WallpaperPicker_BottomPaneStyle" android:orientation="vertical" android:padding="@dimen/wallpaper_info_pane_padding" android:layout_width="match_parent" android:layout_height="wrap_content">
-    <TextView android:textAppearance="@style/TitleTextAppearance" android:textColor="?android:attr/textColorPrimary" android:id="@+id/wallpaper_effects_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/wallpaper_effects_title" android:lineHeight="24dp"/>
-    <TextView android:textSize="14sp" android:textColor="?android:attr/textColorTertiary" android:id="@+id/wallpaper_effects_subtitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/wallpaper_info_pane_subtitle1_top_margin" android:text="@string/wallpaper_effects_subtitle" android:lineHeight="20dp"/>
-    <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="26dp">
-        <TextView android:textColor="?android:attr/textColorTertiary" android:id="@+id/dark_mode_toggle_title" android:layout_width="0dp" android:layout_height="wrap_content" android:text="@string/cinematic_effects_toogle" android:layout_weight="1"/>
-        <Switch android:id="@+id/cinematic_effect_switch" android:background="@null" android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/Switch_SettingsLib"/>
-    </LinearLayout>
-</com.android.wallpaper.picker.WallpaperEffectsView>

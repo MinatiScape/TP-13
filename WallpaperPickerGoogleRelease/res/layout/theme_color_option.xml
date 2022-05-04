@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout android:layout_gravity="center" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="28.0dip" android:layout_marginHorizontal="@dimen/component_options_margin_horizontal"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView android:layout_gravity="center" android:id="@id/option_tile" android:layout_width="@dimen/component_color_chip_container_size" android:layout_height="@dimen/component_color_chip_container_size" android:scaleType="center" />
+</FrameLayout>

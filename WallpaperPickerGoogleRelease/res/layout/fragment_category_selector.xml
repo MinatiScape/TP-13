@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <include android:id="@id/header_bar" layout="@layout/section_header" />
+    <androidx.recyclerview.widget.RecyclerView android:scrollbarSize="@dimen/grid_padding" android:scrollbarThumbVertical="?android:textColorSecondary" android:scrollbarStyle="outsideOverlay" android:id="@id/category_grid" android:paddingTop="@dimen/category_grid_padding_top" android:scrollbars="vertical" android:clipToPadding="false" android:layout_width="fill_parent" android:layout_height="fill_parent" android:paddingHorizontal="@dimen/category_grid_edge_space" />
+</LinearLayout>

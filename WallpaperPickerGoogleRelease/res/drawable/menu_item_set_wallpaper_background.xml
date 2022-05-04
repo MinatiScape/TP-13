@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple android:color="?android:colorControlHighlight"
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:androidprv="http://schemas.android.com/apk/prv/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <size android:height="@dimen/menu_item_set_wallpaper_background_height" android:width="@dimen/menu_item_set_wallpaper_background_width" />
+            <corners android:radius="@dimen/menu_item_set_wallpaper_background_radius" />
+            <solid android:color="?android:bool/config_bluetooth_le_peripheral_mode_supported" />
+        </shape>
+    </item>
+</ripple>

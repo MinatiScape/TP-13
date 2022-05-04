@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape android:shape="rectangle"
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:androidprv="http://schemas.android.com/apk/prv/res/android">
+    <size android:height="@dimen/beta_tag_background_height" android:width="@dimen/beta_tag_background_width" />
+    <corners android:radius="@dimen/beta_tag_background_height" />
+    <solid android:color="?android:bool/config_bluetooth_le_peripheral_mode_supported" />
+</shape>

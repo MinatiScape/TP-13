@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="bottom_actions_horizontal_margin">36.0dip</dimen>
+    <dimen name="category_grid_edge_space">64.0dip</dimen>
+    <dimen name="grid_item_category_padding_bottom">24.0dip</dimen>
+    <dimen name="grid_item_featured_category_padding_bottom">24.0dip</dimen>
+    <dimen name="grid_options_container_horizontal_margin">64.0dip</dimen>
+    <dimen name="section_horizontal_padding">64.0dip</dimen>
+    <dimen name="separated_tabs_horizontal_padding">58.0dip</dimen>
+    <dimen name="separated_tabs_inset_horizontal">6.0dip</dimen>
+    <dimen name="wallpaper_grid_edge_space">64.0dip</dimen>
+</resources>

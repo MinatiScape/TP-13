@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="PreviewHeaderStyle">
-        <item name="android:paddingBottom">@dimen/settingslib_toolbar_layout_height</item>
-    </style>
-    <style name="ScreenPreviewLayoutStyle">
-        <item name="android:layout_marginTop">@dimen/settingslib_toolbar_layout_height</item>
-    </style>
-</resources>

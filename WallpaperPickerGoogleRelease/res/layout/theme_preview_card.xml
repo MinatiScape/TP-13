@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView android:layout_gravity="center" android:id="@id/theme_preview_card" android:layout_width="fill_parent" android:layout_height="fill_parent" android:contentDescription="@string/theme_preview_card_content_description" style="@style/FullContentPreviewCard"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView android:id="@id/wallpaper_preview_image" android:background="?android:colorPrimary" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+    <SurfaceView android:id="@id/wallpaper_preview_surface" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+    <FrameLayout android:id="@id/theme_preview_container" android:layout_width="fill_parent" android:layout_height="fill_parent" android:importantForAccessibility="noHideDescendants" />
+</androidx.cardview.widget.CardView>

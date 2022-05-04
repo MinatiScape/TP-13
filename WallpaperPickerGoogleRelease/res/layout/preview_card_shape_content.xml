@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:gravity="center_horizontal" android:layout_gravity="center" android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:gravity="center_horizontal" android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="wrap_content">
+        <FrameLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1.0">
+            <ImageView android:layout_gravity="center_horizontal" android:id="@id/shape_preview_icon_0" android:layout_width="@dimen/preview_theme_shape_size" android:layout_height="@dimen/preview_theme_shape_size" android:layout_margin="4.0dip" android:elevation="4.0dip" />
+        </FrameLayout>
+        <Space android:layout_width="@dimen/preview_theme_shape_size" android:layout_height="fill_parent" android:layout_weight="0.0" />
+        <FrameLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1.0">
+            <ImageView android:layout_gravity="center_horizontal" android:id="@id/shape_preview_icon_1" android:layout_width="@dimen/preview_theme_shape_size" android:layout_height="@dimen/preview_theme_shape_size" android:layout_margin="4.0dip" android:elevation="4.0dip" />
+        </FrameLayout>
+        <Space android:layout_width="@dimen/preview_theme_shape_size" android:layout_height="fill_parent" android:layout_weight="0.0" />
+        <FrameLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1.0">
+            <ImageView android:layout_gravity="center_horizontal" android:id="@id/shape_preview_icon_2" android:layout_width="@dimen/preview_theme_shape_size" android:layout_height="@dimen/preview_theme_shape_size" android:layout_margin="4.0dip" android:elevation="4.0dip" />
+        </FrameLayout>
+    </LinearLayout>
+    <Space android:layout_width="fill_parent" android:layout_height="60.0dip" />
+    <LinearLayout android:gravity="bottom|center" android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="wrap_content">
+        <FrameLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1.0">
+            <ImageView android:layout_gravity="center_horizontal" android:id="@id/shape_preview_icon_3" android:layout_width="@dimen/preview_theme_shape_size" android:layout_height="@dimen/preview_theme_shape_size" android:layout_margin="4.0dip" android:elevation="4.0dip" />
+        </FrameLayout>
+        <Space android:layout_width="@dimen/preview_theme_shape_size" android:layout_height="fill_parent" android:layout_weight="0.0" />
+        <FrameLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1.0">
+            <ImageView android:layout_gravity="center_horizontal" android:id="@id/shape_preview_icon_4" android:layout_width="@dimen/preview_theme_shape_size" android:layout_height="@dimen/preview_theme_shape_size" android:layout_margin="4.0dip" android:elevation="4.0dip" />
+        </FrameLayout>
+        <Space android:layout_width="@dimen/preview_theme_shape_size" android:layout_height="fill_parent" android:layout_weight="0.0" />
+        <FrameLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1.0">
+            <ImageView android:layout_gravity="center_horizontal" android:id="@id/shape_preview_icon_5" android:layout_width="@dimen/preview_theme_shape_size" android:layout_height="@dimen/preview_theme_shape_size" android:layout_margin="4.0dip" android:elevation="4.0dip" />
+        </FrameLayout>
+    </LinearLayout>
+</LinearLayout>

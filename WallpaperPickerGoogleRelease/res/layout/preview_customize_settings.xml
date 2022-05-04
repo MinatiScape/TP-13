@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:theme="@style/WallpaperPicker.CustomizationPaneStyle" android:gravity="center_horizontal" android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:paddingHorizontal="@dimen/preview_attribution_pane_horizontal_padding"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <androidx.slice.widget.SliceView android:id="@id/settings_slice" android:layout_width="fill_parent" android:layout_height="wrap_content" />
+</LinearLayout>

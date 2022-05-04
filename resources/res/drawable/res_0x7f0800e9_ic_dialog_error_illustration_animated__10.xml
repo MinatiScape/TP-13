@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<set xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt" android:ordering="together">
-    <objectAnimator android:interpolator="@drawable/res_0x7f080000_ic_dialog_error_illustration_animated__10__0" android:duration="4750" android:startOffset="0" android:valueFrom="0" android:valueTo="0" android:valueType="floatType" android:propertyName="fillAlpha"/>
-    <objectAnimator android:interpolator="@drawable/res_0x7f080001_ic_dialog_error_illustration_animated__10__1" android:duration="67" android:startOffset="4750" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" android:propertyName="fillAlpha"/>
-    <objectAnimator android:interpolator="@drawable/res_0x7f080002_ic_dialog_error_illustration_animated__10__2" android:duration="3600" android:startOffset="4817" android:valueFrom="1" android:valueTo="1" android:valueType="floatType" android:propertyName="fillAlpha"/>
-    <objectAnimator android:interpolator="@drawable/res_0x7f080003_ic_dialog_error_illustration_animated__10__3" android:duration="83" android:startOffset="8417" android:valueFrom="1" android:valueTo="0" android:valueType="floatType" android:propertyName="fillAlpha"/>
-</set>

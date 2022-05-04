@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<set xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt" android:ordering="together">
-    <objectAnimator android:interpolator="@drawable/res_0x7f080011_ic_dialog_error_illustration_animated__14__0" android:duration="4750" android:startOffset="0" android:valueFrom="0.25" android:valueTo="0.25" android:valueType="floatType" android:propertyName="scaleX"/>
-    <objectAnimator android:interpolator="@drawable/res_0x7f080012_ic_dialog_error_illustration_animated__14__1" android:duration="4750" android:startOffset="0" android:valueFrom="0.25" android:valueTo="0.25" android:valueType="floatType" android:propertyName="scaleY"/>
-    <objectAnimator android:interpolator="@drawable/res_0x7f080013_ic_dialog_error_illustration_animated__14__2" android:duration="229" android:startOffset="4750" android:valueFrom="0.25" android:valueTo="1.0359" android:valueType="floatType" android:propertyName="scaleX"/>
-    <objectAnimator android:interpolator="@drawable/res_0x7f080014_ic_dialog_error_illustration_animated__14__3" android:duration="229" android:startOffset="4750" android:valueFrom="0.25" android:valueTo="1.0359" android:valueType="floatType" android:propertyName="scaleY"/>
-    <objectAnimator android:interpolator="@drawable/res_0x7f080015_ic_dialog_error_illustration_animated__14__4" android:duration="401" android:startOffset="4979" android:valueFrom="1.0359" android:valueTo="1" android:valueType="floatType" android:propertyName="scaleX"/>
-    <objectAnimator android:interpolator="@drawable/res_0x7f080016_ic_dialog_error_illustration_animated__14__5" android:duration="401" android:startOffset="4979" android:valueFrom="1.0359" android:valueTo="1" android:valueType="floatType" android:propertyName="scaleY"/>
-</set>
