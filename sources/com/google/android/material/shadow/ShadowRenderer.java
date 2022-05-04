@@ -5,7 +5,7 @@ import android.graphics.Path;
 import androidx.core.graphics.ColorUtils;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 /* loaded from: classes.dex */
-public class ShadowRenderer {
+public final class ShadowRenderer {
     public final Paint cornerShadowPaint;
     public final Paint edgeShadowPaint;
     public int shadowEndColor;
@@ -19,6 +19,13 @@ public class ShadowRenderer {
     public Paint transparentPaint = new Paint();
     public final Paint shadowPaint = new Paint();
 
+    public final void setShadowColor(int i) {
+        this.shadowStartColor = ColorUtils.setAlphaComponent(i, 68);
+        this.shadowMiddleColor = ColorUtils.setAlphaComponent(i, 20);
+        this.shadowEndColor = ColorUtils.setAlphaComponent(i, 0);
+        this.shadowPaint.setColor(this.shadowStartColor);
+    }
+
     public ShadowRenderer() {
         setShadowColor(-16777216);
         this.transparentPaint.setColor(0);
@@ -26,12 +33,5 @@ public class ShadowRenderer {
         this.cornerShadowPaint = paint;
         paint.setStyle(Paint.Style.FILL);
         this.edgeShadowPaint = new Paint(paint);
-    }
-
-    public void setShadowColor(int i) {
-        this.shadowStartColor = ColorUtils.setAlphaComponent(i, 68);
-        this.shadowMiddleColor = ColorUtils.setAlphaComponent(i, 20);
-        this.shadowEndColor = ColorUtils.setAlphaComponent(i, 0);
-        this.shadowPaint.setColor(this.shadowStartColor);
     }
 }

@@ -9,28 +9,10 @@ import java.util.RandomAccess;
 public abstract class AbstractProtobufList<E> extends AbstractList<E> implements Internal.ProtobufList<E> {
     public boolean isMutable = true;
 
-    @Override // java.util.AbstractList, java.util.AbstractCollection, java.util.Collection, java.util.List
-    public boolean add(E e) {
-        ensureIsMutable();
-        return super.add(e);
-    }
-
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
     public boolean addAll(Collection<? extends E> collection) {
         ensureIsMutable();
         return super.addAll(collection);
-    }
-
-    @Override // java.util.AbstractList, java.util.AbstractCollection, java.util.Collection, java.util.List
-    public void clear() {
-        ensureIsMutable();
-        super.clear();
-    }
-
-    public void ensureIsMutable() {
-        if (!this.isMutable) {
-            throw new UnsupportedOperationException();
-        }
     }
 
     @Override // java.util.AbstractList, java.util.Collection, java.util.List
@@ -57,6 +39,35 @@ public abstract class AbstractProtobufList<E> extends AbstractList<E> implements
         return true;
     }
 
+    @Override // com.google.protobuf.Internal.ProtobufList
+    public final void makeImmutable() {
+        this.isMutable = false;
+    }
+
+    public final void ensureIsMutable() {
+        if (!this.isMutable) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    @Override // java.util.AbstractList, java.util.AbstractCollection, java.util.Collection, java.util.List
+    public final boolean add(E e) {
+        ensureIsMutable();
+        return super.add(e);
+    }
+
+    @Override // java.util.AbstractList, java.util.List
+    public boolean addAll(int i, Collection<? extends E> collection) {
+        ensureIsMutable();
+        return super.addAll(i, collection);
+    }
+
+    @Override // java.util.AbstractList, java.util.AbstractCollection, java.util.Collection, java.util.List
+    public void clear() {
+        ensureIsMutable();
+        super.clear();
+    }
+
     @Override // java.util.AbstractList, java.util.Collection, java.util.List
     public int hashCode() {
         int size = size();
@@ -67,16 +78,6 @@ public abstract class AbstractProtobufList<E> extends AbstractList<E> implements
         return i;
     }
 
-    @Override // com.google.protobuf.Internal.ProtobufList
-    public boolean isModifiable() {
-        return this.isMutable;
-    }
-
-    @Override // com.google.protobuf.Internal.ProtobufList
-    public final void makeImmutable() {
-        this.isMutable = false;
-    }
-
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
     public boolean remove(Object obj) {
         ensureIsMutable();
@@ -84,20 +85,19 @@ public abstract class AbstractProtobufList<E> extends AbstractList<E> implements
     }
 
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
-    public boolean removeAll(Collection<?> collection) {
+    public final boolean removeAll(Collection<?> collection) {
         ensureIsMutable();
         return super.removeAll(collection);
     }
 
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
-    public boolean retainAll(Collection<?> collection) {
+    public final boolean retainAll(Collection<?> collection) {
         ensureIsMutable();
         return super.retainAll(collection);
     }
 
-    @Override // java.util.AbstractList, java.util.List
-    public boolean addAll(int i, Collection<? extends E> collection) {
-        ensureIsMutable();
-        return super.addAll(i, collection);
+    @Override // com.google.protobuf.Internal.ProtobufList
+    public final boolean isModifiable() {
+        return this.isMutable;
     }
 }

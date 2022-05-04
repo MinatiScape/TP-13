@@ -2,80 +2,19 @@ package com.google.android.gms.common.server.response;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import androidx.slice.view.R$layout;
+import androidx.core.R$id;
+import com.android.wallpaper.util.LaunchUtils;
 import com.google.android.gms.common.server.response.FastJsonResponse;
 import com.google.android.gms.internal.zzbkv;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public class FieldMappingDictionary extends zzbkv {
     public static final Parcelable.Creator<FieldMappingDictionary> CREATOR = new zzj();
     public final int zza;
     public final HashMap<String, Map<String, FastJsonResponse.Field<?, ?>>> zzb;
     public final String zzd;
-
-    public FieldMappingDictionary(int i, ArrayList<Entry> arrayList, String str) {
-        this.zza = i;
-        HashMap<String, Map<String, FastJsonResponse.Field<?, ?>>> hashMap = new HashMap<>();
-        int size = arrayList.size();
-        for (int i2 = 0; i2 < size; i2++) {
-            Entry entry = arrayList.get(i2);
-            String str2 = entry.zza;
-            HashMap hashMap2 = new HashMap();
-            int size2 = entry.zzb.size();
-            for (int i3 = 0; i3 < size2; i3++) {
-                FieldMapPair fieldMapPair = entry.zzb.get(i3);
-                hashMap2.put(fieldMapPair.zza, fieldMapPair.zzb);
-            }
-            hashMap.put(str2, hashMap2);
-        }
-        this.zzb = hashMap;
-        Objects.requireNonNull(str, "null reference");
-        this.zzd = str;
-        for (String str3 : hashMap.keySet()) {
-            Map<String, FastJsonResponse.Field<?, ?>> map = this.zzb.get(str3);
-            for (String str4 : map.keySet()) {
-                map.get(str4).zzb = this;
-            }
-        }
-    }
-
-    public Map<String, FastJsonResponse.Field<?, ?>> getFieldMapping(String str) {
-        return this.zzb.get(str);
-    }
-
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (String str : this.zzb.keySet()) {
-            sb.append(str);
-            sb.append(":\n");
-            Map<String, FastJsonResponse.Field<?, ?>> map = this.zzb.get(str);
-            for (String str2 : map.keySet()) {
-                sb.append("  ");
-                sb.append(str2);
-                sb.append(": ");
-                sb.append(map.get(str2));
-            }
-        }
-        return sb.toString();
-    }
-
-    @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
-        int zzb = R$layout.zzb(parcel, 20293);
-        int i2 = this.zza;
-        R$layout.zzb(parcel, 1, 4);
-        parcel.writeInt(i2);
-        ArrayList arrayList = new ArrayList();
-        for (String str : this.zzb.keySet()) {
-            arrayList.add(new Entry(str, this.zzb.get(str)));
-        }
-        R$layout.zzc(parcel, 2, arrayList, false);
-        R$layout.zza(parcel, 3, this.zzd, false);
-        R$layout.zzc(parcel, zzb);
-    }
 
     /* loaded from: classes.dex */
     public static class Entry extends zzbkv {
@@ -91,14 +30,14 @@ public class FieldMappingDictionary extends zzbkv {
         }
 
         @Override // android.os.Parcelable
-        public void writeToParcel(Parcel parcel, int i) {
-            int zzb = R$layout.zzb(parcel, 20293);
+        public final void writeToParcel(Parcel parcel, int i) {
+            int zzb = R$id.zzb(parcel, 20293);
             int i2 = this.zzc;
-            R$layout.zzb(parcel, 1, 4);
+            R$id.zzb(parcel, 1, 4);
             parcel.writeInt(i2);
-            R$layout.zza(parcel, 2, this.zza, false);
-            R$layout.zzc(parcel, 3, this.zzb, false);
-            R$layout.zzc(parcel, zzb);
+            R$id.zza(parcel, 2, this.zza);
+            R$id.zzc(parcel, 3, this.zzb);
+            R$id.zzc(parcel, zzb);
         }
 
         public Entry(String str, Map<String, FastJsonResponse.Field<?, ?>> map) {
@@ -131,20 +70,77 @@ public class FieldMappingDictionary extends zzbkv {
         }
 
         @Override // android.os.Parcelable
-        public void writeToParcel(Parcel parcel, int i) {
-            int zzb = R$layout.zzb(parcel, 20293);
+        public final void writeToParcel(Parcel parcel, int i) {
+            int zzb = R$id.zzb(parcel, 20293);
             int i2 = this.zzc;
-            R$layout.zzb(parcel, 1, 4);
+            R$id.zzb(parcel, 1, 4);
             parcel.writeInt(i2);
-            R$layout.zza(parcel, 2, this.zza, false);
-            R$layout.zza(parcel, 3, this.zzb, i, false);
-            R$layout.zzc(parcel, zzb);
+            R$id.zza(parcel, 2, this.zza);
+            R$id.zza(parcel, 3, this.zzb, i);
+            R$id.zzc(parcel, zzb);
         }
 
         public FieldMapPair(String str, FastJsonResponse.Field<?, ?> field) {
             this.zzc = 1;
             this.zza = str;
             this.zzb = field;
+        }
+    }
+
+    public final String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (String str : this.zzb.keySet()) {
+            sb.append(str);
+            sb.append(":\n");
+            Map<String, FastJsonResponse.Field<?, ?>> map = this.zzb.get(str);
+            for (String str2 : map.keySet()) {
+                sb.append("  ");
+                sb.append(str2);
+                sb.append(": ");
+                sb.append(map.get(str2));
+            }
+        }
+        return sb.toString();
+    }
+
+    @Override // android.os.Parcelable
+    public final void writeToParcel(Parcel parcel, int i) {
+        int zzb = R$id.zzb(parcel, 20293);
+        int i2 = this.zza;
+        R$id.zzb(parcel, 1, 4);
+        parcel.writeInt(i2);
+        ArrayList arrayList = new ArrayList();
+        for (String str : this.zzb.keySet()) {
+            arrayList.add(new Entry(str, this.zzb.get(str)));
+        }
+        R$id.zzc(parcel, 2, arrayList);
+        R$id.zza(parcel, 3, this.zzd);
+        R$id.zzc(parcel, zzb);
+    }
+
+    public FieldMappingDictionary(int i, ArrayList<Entry> arrayList, String str) {
+        this.zza = i;
+        HashMap<String, Map<String, FastJsonResponse.Field<?, ?>>> hashMap = new HashMap<>();
+        int size = arrayList.size();
+        for (int i2 = 0; i2 < size; i2++) {
+            Entry entry = arrayList.get(i2);
+            String str2 = entry.zza;
+            HashMap hashMap2 = new HashMap();
+            int size2 = entry.zzb.size();
+            for (int i3 = 0; i3 < size2; i3++) {
+                FieldMapPair fieldMapPair = entry.zzb.get(i3);
+                hashMap2.put(fieldMapPair.zza, fieldMapPair.zzb);
+            }
+            hashMap.put(str2, hashMap2);
+        }
+        this.zzb = hashMap;
+        LaunchUtils.zza(str);
+        this.zzd = str;
+        for (String str3 : hashMap.keySet()) {
+            Map<String, FastJsonResponse.Field<?, ?>> map = this.zzb.get(str3);
+            for (String str4 : map.keySet()) {
+                map.get(str4).zzb = this;
+            }
         }
     }
 }

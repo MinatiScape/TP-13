@@ -5,7 +5,7 @@ import android.util.SparseIntArray;
 import com.android.systemui.monet.ColorScheme;
 import java.util.List;
 /* loaded from: classes.dex */
-public class WallpaperColorResources {
+public final class WallpaperColorResources {
     public final SparseIntArray mColorOverlay = new SparseIntArray();
 
     public WallpaperColorResources(WallpaperColors wallpaperColors) {

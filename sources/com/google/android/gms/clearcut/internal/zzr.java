@@ -6,6 +6,7 @@ import android.os.RemoteException;
 import com.google.android.gms.clearcut.LogEventParcelable;
 import com.google.android.gms.internal.zzez;
 import com.google.android.gms.internal.zzfb;
+/* compiled from: IClearcutLoggerService.java */
 /* loaded from: classes.dex */
 public final class zzr extends zzez implements zzq {
     public zzr(IBinder iBinder) {
@@ -13,19 +14,16 @@ public final class zzr extends zzez implements zzq {
     }
 
     @Override // com.google.android.gms.clearcut.internal.zzq
-    public final void zza(zzo zzoVar, LogEventParcelable logEventParcelable) throws RemoteException {
+    public final void zza(zzh zzhVar, LogEventParcelable logEventParcelable) throws RemoteException {
         Parcel a_ = a_();
-        zzfb.zza(a_, zzoVar);
+        int i = zzfb.$r8$clinit;
+        a_.writeStrongBinder(zzhVar);
         if (logEventParcelable == null) {
             a_.writeInt(0);
         } else {
             a_.writeInt(1);
             logEventParcelable.writeToParcel(a_, 0);
         }
-        try {
-            this.zza.transact(1, a_, null, 1);
-        } finally {
-            a_.recycle();
-        }
+        zzc(a_);
     }
 }

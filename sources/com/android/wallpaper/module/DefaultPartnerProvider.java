@@ -7,6 +7,20 @@ public class DefaultPartnerProvider implements PartnerProvider {
     public final String mPackageName;
     public final Resources mResources;
 
+    public final File getLegacyWallpaperDirectory() {
+        int i;
+        Resources resources = this.mResources;
+        if (resources != null) {
+            i = resources.getIdentifier("system_wallpaper_directory", "string", this.mPackageName);
+        } else {
+            i = 0;
+        }
+        if (i != 0) {
+            return new File(resources.getString(i));
+        }
+        return null;
+    }
+
     /* JADX WARN: Removed duplicated region for block: B:24:0x0074  */
     /* JADX WARN: Removed duplicated region for block: B:25:0x0079  */
     /*
@@ -93,14 +107,5 @@ public class DefaultPartnerProvider implements PartnerProvider {
             return
         */
         throw new UnsupportedOperationException("Method not decompiled: com.android.wallpaper.module.DefaultPartnerProvider.<init>(android.content.Context):void");
-    }
-
-    public File getLegacyWallpaperDirectory() {
-        Resources resources = this.mResources;
-        int identifier = resources != null ? resources.getIdentifier("system_wallpaper_directory", "string", this.mPackageName) : 0;
-        if (identifier != 0) {
-            return new File(resources.getString(identifier));
-        }
-        return null;
     }
 }

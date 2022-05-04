@@ -6,11 +6,11 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.view.View;
 /* loaded from: classes.dex */
-public class Placeholder extends View {
+public final class Placeholder extends View {
     public View mContent;
 
     @Override // android.view.View
-    public void onDraw(Canvas canvas) {
+    public final void onDraw(Canvas canvas) {
         if (isInEditMode()) {
             canvas.drawRGB(223, 223, 223);
             Paint paint = new Paint();

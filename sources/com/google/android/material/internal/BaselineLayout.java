@@ -12,31 +12,35 @@ public class BaselineLayout extends ViewGroup {
         super(context, null, 0);
     }
 
-    @Override // android.view.View
-    public int getBaseline() {
-        return this.baseline;
+    public BaselineLayout(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet, 0);
     }
 
     @Override // android.view.ViewGroup, android.view.View
-    public void onLayout(boolean z, int i, int i2, int i3, int i4) {
+    public final void onLayout(boolean z, int i, int i2, int i3, int i4) {
+        int i5;
         int childCount = getChildCount();
         int paddingLeft = getPaddingLeft();
         int paddingRight = ((i3 - i) - getPaddingRight()) - paddingLeft;
         int paddingTop = getPaddingTop();
-        for (int i5 = 0; i5 < childCount; i5++) {
-            View childAt = getChildAt(i5);
+        for (int i6 = 0; i6 < childCount; i6++) {
+            View childAt = getChildAt(i6);
             if (childAt.getVisibility() != 8) {
                 int measuredWidth = childAt.getMeasuredWidth();
                 int measuredHeight = childAt.getMeasuredHeight();
-                int i6 = ((paddingRight - measuredWidth) / 2) + paddingLeft;
-                int baseline = (this.baseline == -1 || childAt.getBaseline() == -1) ? paddingTop : (this.baseline + paddingTop) - childAt.getBaseline();
-                childAt.layout(i6, baseline, measuredWidth + i6, measuredHeight + baseline);
+                int i7 = ((paddingRight - measuredWidth) / 2) + paddingLeft;
+                if (this.baseline == -1 || childAt.getBaseline() == -1) {
+                    i5 = paddingTop;
+                } else {
+                    i5 = (this.baseline + paddingTop) - childAt.getBaseline();
+                }
+                childAt.layout(i7, i5, measuredWidth + i7, measuredHeight + i5);
             }
         }
     }
 
     @Override // android.view.View
-    public void onMeasure(int i, int i2) {
+    public final void onMeasure(int i, int i2) {
         int childCount = getChildCount();
         int i3 = -1;
         int i4 = -1;
@@ -64,11 +68,12 @@ public class BaselineLayout extends ViewGroup {
         setMeasuredDimension(View.resolveSizeAndState(Math.max(i6, getSuggestedMinimumWidth()), i, i7), View.resolveSizeAndState(Math.max(i5, getSuggestedMinimumHeight()), i2, i7 << 16));
     }
 
-    public BaselineLayout(Context context, AttributeSet attributeSet) {
-        super(context, attributeSet, 0);
-    }
-
     public BaselineLayout(Context context, AttributeSet attributeSet, int i) {
         super(context, attributeSet, i);
+    }
+
+    @Override // android.view.View
+    public final int getBaseline() {
+        return this.baseline;
     }
 }

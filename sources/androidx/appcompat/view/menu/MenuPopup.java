@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.HeaderViewListAdapter;
@@ -14,10 +13,9 @@ import android.widget.PopupWindow;
 public abstract class MenuPopup implements ShowableListMenu, MenuPresenter, AdapterView.OnItemClickListener {
     public Rect mEpicenterBounds;
 
-    public static int measureIndividualMenuWidth(ListAdapter listAdapter, ViewGroup viewGroup, Context context, int i) {
+    public static int measureIndividualMenuWidth(MenuAdapter menuAdapter, Context context, int i) {
         int makeMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, 0);
         int makeMeasureSpec2 = View.MeasureSpec.makeMeasureSpec(0, 0);
-        MenuAdapter menuAdapter = (MenuAdapter) listAdapter;
         int count = menuAdapter.getCount();
         int i2 = 0;
         int i3 = 0;
@@ -45,43 +43,20 @@ public abstract class MenuPopup implements ShowableListMenu, MenuPresenter, Adap
         return i2;
     }
 
-    public static boolean shouldPreserveIconSpacing(MenuBuilder menuBuilder) {
-        int size = menuBuilder.size();
-        for (int i = 0; i < size; i++) {
-            MenuItem item = menuBuilder.getItem(i);
-            if (item.isVisible() && item.getIcon() != null) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public abstract void addMenu(MenuBuilder menuBuilder);
 
     @Override // androidx.appcompat.view.menu.MenuPresenter
-    public boolean collapseItemActionView(MenuBuilder menuBuilder, MenuItemImpl menuItemImpl) {
+    public final boolean collapseItemActionView(MenuItemImpl menuItemImpl) {
         return false;
     }
 
     @Override // androidx.appcompat.view.menu.MenuPresenter
-    public boolean expandItemActionView(MenuBuilder menuBuilder, MenuItemImpl menuItemImpl) {
+    public final boolean expandItemActionView(MenuItemImpl menuItemImpl) {
         return false;
     }
 
     @Override // androidx.appcompat.view.menu.MenuPresenter
-    public void initForMenu(Context context, MenuBuilder menuBuilder) {
-    }
-
-    @Override // android.widget.AdapterView.OnItemClickListener
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long j) {
-        MenuAdapter menuAdapter;
-        ListAdapter listAdapter = (ListAdapter) adapterView.getAdapter();
-        if (listAdapter instanceof HeaderViewListAdapter) {
-            menuAdapter = (MenuAdapter) ((HeaderViewListAdapter) listAdapter).getWrappedAdapter();
-        } else {
-            menuAdapter = (MenuAdapter) listAdapter;
-        }
-        menuAdapter.mAdapterMenu.performItemAction((MenuItem) listAdapter.getItem(i), this, (this instanceof CascadingMenuPopup) ^ true ? 0 : 4);
+    public final void initForMenu(Context context, MenuBuilder menuBuilder) {
     }
 
     public abstract void setAnchorView(View view);
@@ -97,4 +72,35 @@ public abstract class MenuPopup implements ShowableListMenu, MenuPresenter, Adap
     public abstract void setShowTitle(boolean z);
 
     public abstract void setVerticalOffset(int i);
+
+    public static boolean shouldPreserveIconSpacing(MenuBuilder menuBuilder) {
+        int size = menuBuilder.size();
+        for (int i = 0; i < size; i++) {
+            MenuItem item = menuBuilder.getItem(i);
+            if (item.isVisible() && item.getIcon() != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override // android.widget.AdapterView.OnItemClickListener
+    public final void onItemClick(AdapterView<?> adapterView, View view, int i, long j) {
+        MenuAdapter menuAdapter;
+        int i2;
+        ListAdapter listAdapter = (ListAdapter) adapterView.getAdapter();
+        if (listAdapter instanceof HeaderViewListAdapter) {
+            menuAdapter = (MenuAdapter) ((HeaderViewListAdapter) listAdapter).getWrappedAdapter();
+        } else {
+            menuAdapter = (MenuAdapter) listAdapter;
+        }
+        MenuBuilder menuBuilder = menuAdapter.mAdapterMenu;
+        MenuItem menuItem = (MenuItem) listAdapter.getItem(i);
+        if (!(this instanceof CascadingMenuPopup)) {
+            i2 = 0;
+        } else {
+            i2 = 4;
+        }
+        menuBuilder.performItemAction(menuItem, this, i2);
+    }
 }

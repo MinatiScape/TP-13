@@ -7,6 +7,7 @@ import android.provider.Settings;
 import com.android.systemui.unfold.UnfoldTransitionProgressProvider;
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
+/* compiled from: ScaleAwareTransitionProgressProvider.kt */
 /* loaded from: classes.dex */
 public final class ScaleAwareTransitionProgressProvider implements UnfoldTransitionProgressProvider {
     @NotNull
@@ -16,13 +17,20 @@ public final class ScaleAwareTransitionProgressProvider implements UnfoldTransit
     @NotNull
     private final ScopedUnfoldTransitionProgressProvider scopedUnfoldTransitionProgressProvider;
 
+    /* compiled from: ScaleAwareTransitionProgressProvider.kt */
+    /* loaded from: classes.dex */
+    public interface Factory {
+        @NotNull
+        ScaleAwareTransitionProgressProvider wrap(@NotNull UnfoldTransitionProgressProvider unfoldTransitionProgressProvider);
+    }
+
     /* JADX WARN: Multi-variable type inference failed */
     /* JADX WARN: Type inference failed for: r3v1, types: [com.android.systemui.unfold.util.ScaleAwareTransitionProgressProvider$animatorDurationScaleObserver$1, android.database.ContentObserver] */
-    public ScaleAwareTransitionProgressProvider(@NotNull UnfoldTransitionProgressProvider unfoldTransitionProgressProvider, @NotNull ContentResolver contentResolver) {
-        Intrinsics.checkNotNullParameter(unfoldTransitionProgressProvider, "unfoldTransitionProgressProvider");
+    public ScaleAwareTransitionProgressProvider(@NotNull UnfoldTransitionProgressProvider progressProviderToWrap, @NotNull ContentResolver contentResolver) {
+        Intrinsics.checkNotNullParameter(progressProviderToWrap, "progressProviderToWrap");
         Intrinsics.checkNotNullParameter(contentResolver, "contentResolver");
         this.contentResolver = contentResolver;
-        this.scopedUnfoldTransitionProgressProvider = new ScopedUnfoldTransitionProgressProvider(unfoldTransitionProgressProvider);
+        this.scopedUnfoldTransitionProgressProvider = new ScopedUnfoldTransitionProgressProvider(progressProviderToWrap);
         ?? scaleAwareTransitionProgressProvider$animatorDurationScaleObserver$1 = new ContentObserver() { // from class: com.android.systemui.unfold.util.ScaleAwareTransitionProgressProvider$animatorDurationScaleObserver$1
             {
                 super(null);
@@ -38,9 +46,9 @@ public final class ScaleAwareTransitionProgressProvider implements UnfoldTransit
         onAnimatorScaleChanged();
     }
 
-    /* JADX INFO: Access modifiers changed from: private */
-    public final void onAnimatorScaleChanged() {
-        this.scopedUnfoldTransitionProgressProvider.setReadyToHandleTransition(ValueAnimator.areAnimatorsEnabled());
+    public void addCallback(@NotNull UnfoldTransitionProgressProvider.TransitionProgressListener listener) {
+        Intrinsics.checkNotNullParameter(listener, "listener");
+        this.scopedUnfoldTransitionProgressProvider.addCallback(listener);
     }
 
     @Override // com.android.systemui.unfold.UnfoldTransitionProgressProvider
@@ -49,13 +57,13 @@ public final class ScaleAwareTransitionProgressProvider implements UnfoldTransit
         this.scopedUnfoldTransitionProgressProvider.destroy();
     }
 
-    public void addCallback(@NotNull UnfoldTransitionProgressProvider.TransitionProgressListener listener) {
-        Intrinsics.checkNotNullParameter(listener, "listener");
-        this.scopedUnfoldTransitionProgressProvider.addCallback(listener);
-    }
-
     public void removeCallback(@NotNull UnfoldTransitionProgressProvider.TransitionProgressListener listener) {
         Intrinsics.checkNotNullParameter(listener, "listener");
         this.scopedUnfoldTransitionProgressProvider.removeCallback(listener);
+    }
+
+    /* JADX INFO: Access modifiers changed from: private */
+    public final void onAnimatorScaleChanged() {
+        this.scopedUnfoldTransitionProgressProvider.setReadyToHandleTransition(ValueAnimator.areAnimatorsEnabled());
     }
 }

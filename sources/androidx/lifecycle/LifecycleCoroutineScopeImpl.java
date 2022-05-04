@@ -3,8 +3,9 @@ package androidx.lifecycle;
 import androidx.lifecycle.Lifecycle;
 import kotlin.coroutines.CoroutineContext;
 import kotlin.jvm.internal.Intrinsics;
-import kotlinx.coroutines.JobKt;
+import kotlinx.coroutines.Job;
 import org.jetbrains.annotations.NotNull;
+/* compiled from: Lifecycle.kt */
 /* loaded from: classes.dex */
 public final class LifecycleCoroutineScopeImpl extends LifecycleCoroutineScope implements LifecycleEventObserver {
     @NotNull
@@ -13,29 +14,31 @@ public final class LifecycleCoroutineScopeImpl extends LifecycleCoroutineScope i
     public final Lifecycle lifecycle;
 
     public LifecycleCoroutineScopeImpl(@NotNull Lifecycle lifecycle, @NotNull CoroutineContext coroutineContext) {
+        Job job;
         Intrinsics.checkNotNullParameter(coroutineContext, "coroutineContext");
         this.lifecycle = lifecycle;
         this.coroutineContext = coroutineContext;
-        if (((LifecycleRegistry) lifecycle).mState == Lifecycle.State.DESTROYED) {
-            JobKt.cancel$default(coroutineContext, null, 1, null);
+        if (((LifecycleRegistry) lifecycle).mState == Lifecycle.State.DESTROYED && (job = (Job) coroutineContext.get(Job.Key.$$INSTANCE)) != null) {
+            job.cancel(null);
+        }
+    }
+
+    @Override // androidx.lifecycle.LifecycleEventObserver
+    public final void onStateChanged(@NotNull LifecycleOwner lifecycleOwner, @NotNull Lifecycle.Event event) {
+        if (((LifecycleRegistry) this.lifecycle).mState.compareTo(Lifecycle.State.DESTROYED) <= 0) {
+            this.lifecycle.removeObserver(this);
+            CoroutineContext coroutineContext = this.coroutineContext;
+            Intrinsics.checkNotNullParameter(coroutineContext, "<this>");
+            Job job = (Job) coroutineContext.get(Job.Key.$$INSTANCE);
+            if (job != null) {
+                job.cancel(null);
+            }
         }
     }
 
     @Override // kotlinx.coroutines.CoroutineScope
     @NotNull
-    public CoroutineContext getCoroutineContext() {
+    public final CoroutineContext getCoroutineContext() {
         return this.coroutineContext;
-    }
-
-    @Override // androidx.lifecycle.LifecycleEventObserver
-    public void onStateChanged(@NotNull LifecycleOwner source, @NotNull Lifecycle.Event event) {
-        Intrinsics.checkNotNullParameter(source, "source");
-        Intrinsics.checkNotNullParameter(event, "event");
-        if (((LifecycleRegistry) this.lifecycle).mState.compareTo(Lifecycle.State.DESTROYED) <= 0) {
-            LifecycleRegistry lifecycleRegistry = (LifecycleRegistry) this.lifecycle;
-            lifecycleRegistry.enforceMainThreadIfNeeded("removeObserver");
-            lifecycleRegistry.mObserverMap.remove(this);
-            JobKt.cancel$default(this.coroutineContext, null, 1, null);
-        }
     }
 }

@@ -5,18 +5,14 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.ViewPropertyAnimatorCompat;
 import java.util.WeakHashMap;
 /* loaded from: classes.dex */
-public class ViewOffsetHelper {
+public final class ViewOffsetHelper {
     public int layoutLeft;
     public int layoutTop;
     public int offsetLeft;
     public int offsetTop;
     public final View view;
 
-    public ViewOffsetHelper(View view) {
-        this.view = view;
-    }
-
-    public void applyOffsets() {
+    public final void applyOffsets() {
         View view = this.view;
         int top = this.offsetTop - (view.getTop() - this.layoutTop);
         WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
@@ -25,12 +21,16 @@ public class ViewOffsetHelper {
         view2.offsetLeftAndRight(this.offsetLeft - (view2.getLeft() - this.layoutLeft));
     }
 
-    public boolean setTopAndBottomOffset(int i) {
+    public final boolean setTopAndBottomOffset(int i) {
         if (this.offsetTop == i) {
             return false;
         }
         this.offsetTop = i;
         applyOffsets();
         return true;
+    }
+
+    public ViewOffsetHelper(View view) {
+        this.view = view;
     }
 }

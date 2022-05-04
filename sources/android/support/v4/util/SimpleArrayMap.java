@@ -12,27 +12,6 @@ public class SimpleArrayMap<K, V> {
     public Object[] mArray = ContainerHelpers.EMPTY_OBJECTS;
     public int mSize = 0;
 
-    public static int binarySearchHashes(int[] iArr, int i, int i2) {
-        int i3 = i - 1;
-        int i4 = 0;
-        while (i4 <= i3) {
-            int i5 = (i4 + i3) >>> 1;
-            try {
-                int i6 = iArr[i5];
-                if (i6 < i2) {
-                    i4 = i5 + 1;
-                } else if (i6 <= i2) {
-                    return i5;
-                } else {
-                    i3 = i5 - 1;
-                }
-            } catch (ArrayIndexOutOfBoundsException unused) {
-                throw new ConcurrentModificationException();
-            }
-        }
-        return ~i4;
-    }
-
     public static void freeArrays(int[] iArr, Object[] objArr, int i) {
         if (iArr.length == 8) {
             synchronized (ArrayMap.class) {
@@ -93,7 +72,84 @@ public class SimpleArrayMap<K, V> {
         this.mArray = new Object[i << 1];
     }
 
-    public void clear() {
+    public final boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof SimpleArrayMap) {
+            SimpleArrayMap simpleArrayMap = (SimpleArrayMap) obj;
+            if (this.mSize != simpleArrayMap.mSize) {
+                return false;
+            }
+            for (int i = 0; i < this.mSize; i++) {
+                try {
+                    Object[] objArr = this.mArray;
+                    int i2 = i << 1;
+                    Object obj2 = objArr[i2];
+                    Object obj3 = objArr[i2 + 1];
+                    Object obj4 = simpleArrayMap.get(obj2);
+                    if (obj3 == null) {
+                        if (obj4 != null || !simpleArrayMap.containsKey(obj2)) {
+                            return false;
+                        }
+                    } else if (!obj3.equals(obj4)) {
+                        return false;
+                    }
+                } catch (ClassCastException | NullPointerException unused) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        if (obj instanceof Map) {
+            Map map = (Map) obj;
+            if (this.mSize != map.size()) {
+                return false;
+            }
+            for (int i3 = 0; i3 < this.mSize; i3++) {
+                try {
+                    Object[] objArr2 = this.mArray;
+                    int i4 = i3 << 1;
+                    Object obj5 = objArr2[i4];
+                    Object obj6 = objArr2[i4 + 1];
+                    Object obj7 = map.get(obj5);
+                    if (obj6 == null) {
+                        if (obj7 != null || !map.containsKey(obj5)) {
+                            return false;
+                        }
+                    } else if (!obj6.equals(obj7)) {
+                        return false;
+                    }
+                } catch (ClassCastException | NullPointerException unused2) {
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public static int binarySearchHashes(int[] iArr, int i, int i2) {
+        int i3 = i - 1;
+        int i4 = 0;
+        while (i4 <= i3) {
+            int i5 = (i4 + i3) >>> 1;
+            try {
+                int i6 = iArr[i5];
+                if (i6 < i2) {
+                    i4 = i5 + 1;
+                } else if (i6 <= i2) {
+                    return i5;
+                } else {
+                    i3 = i5 - 1;
+                }
+            } catch (ArrayIndexOutOfBoundsException unused) {
+                throw new ConcurrentModificationException();
+            }
+        }
+        return ~i4;
+    }
+
+    public final void clear() {
         int i = this.mSize;
         if (i > 0) {
             int[] iArr = this.mHashes;
@@ -108,97 +164,39 @@ public class SimpleArrayMap<K, V> {
         }
     }
 
-    public boolean containsKey(Object obj) {
-        return indexOfKey(obj) >= 0;
-    }
-
-    public boolean containsValue(Object obj) {
-        return indexOfValue(obj) >= 0;
-    }
-
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj instanceof SimpleArrayMap) {
-            SimpleArrayMap simpleArrayMap = (SimpleArrayMap) obj;
-            if (this.mSize != simpleArrayMap.mSize) {
-                return false;
-            }
-            for (int i = 0; i < this.mSize; i++) {
-                try {
-                    K keyAt = keyAt(i);
-                    V valueAt = valueAt(i);
-                    Object obj2 = simpleArrayMap.get(keyAt);
-                    if (valueAt == null) {
-                        if (obj2 != null || !simpleArrayMap.containsKey(keyAt)) {
-                            return false;
-                        }
-                    } else if (!valueAt.equals(obj2)) {
-                        return false;
-                    }
-                } catch (ClassCastException | NullPointerException unused) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        if (obj instanceof Map) {
-            Map map = (Map) obj;
-            if (this.mSize != map.size()) {
-                return false;
-            }
-            for (int i2 = 0; i2 < this.mSize; i2++) {
-                try {
-                    K keyAt2 = keyAt(i2);
-                    V valueAt2 = valueAt(i2);
-                    Object obj3 = map.get(keyAt2);
-                    if (valueAt2 == null) {
-                        if (obj3 != null || !map.containsKey(keyAt2)) {
-                            return false;
-                        }
-                    } else if (!valueAt2.equals(obj3)) {
-                        return false;
-                    }
-                } catch (ClassCastException | NullPointerException unused2) {
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
-    public V get(Object obj) {
-        int indexOfKey = indexOfKey(obj);
-        if (indexOfKey >= 0) {
-            return (V) this.mArray[(indexOfKey << 1) + 1];
-        }
-        return null;
-    }
-
-    public int hashCode() {
+    public final int hashCode() {
+        int i;
         int[] iArr = this.mHashes;
         Object[] objArr = this.mArray;
-        int i = this.mSize;
-        int i2 = 1;
-        int i3 = 0;
+        int i2 = this.mSize;
+        int i3 = 1;
         int i4 = 0;
-        while (i3 < i) {
-            Object obj = objArr[i2];
-            i4 += (obj == null ? 0 : obj.hashCode()) ^ iArr[i3];
-            i3++;
-            i2 += 2;
+        int i5 = 0;
+        while (i4 < i2) {
+            Object obj = objArr[i3];
+            int i6 = iArr[i4];
+            if (obj == null) {
+                i = 0;
+            } else {
+                i = obj.hashCode();
+            }
+            i5 += i ^ i6;
+            i4++;
+            i3 += 2;
         }
-        return i4;
+        return i5;
     }
 
-    public int indexOf(Object obj, int i) {
+    public final int indexOf(Object obj, int i) {
         int i2 = this.mSize;
         if (i2 == 0) {
             return -1;
         }
         int binarySearchHashes = binarySearchHashes(this.mHashes, i2, i);
-        if (binarySearchHashes < 0 || obj.equals(this.mArray[binarySearchHashes << 1])) {
+        if (binarySearchHashes < 0) {
+            return binarySearchHashes;
+        }
+        if (obj.equals(this.mArray[binarySearchHashes << 1])) {
             return binarySearchHashes;
         }
         int i3 = binarySearchHashes + 1;
@@ -216,17 +214,23 @@ public class SimpleArrayMap<K, V> {
         return ~i3;
     }
 
-    public int indexOfKey(Object obj) {
-        return obj == null ? indexOfNull() : indexOf(obj, obj.hashCode());
+    public final int indexOfKey(Object obj) {
+        if (obj == null) {
+            return indexOfNull();
+        }
+        return indexOf(obj, obj.hashCode());
     }
 
-    public int indexOfNull() {
+    public final int indexOfNull() {
         int i = this.mSize;
         if (i == 0) {
             return -1;
         }
         int binarySearchHashes = binarySearchHashes(this.mHashes, i, 0);
-        if (binarySearchHashes < 0 || this.mArray[binarySearchHashes << 1] == null) {
+        if (binarySearchHashes < 0) {
+            return binarySearchHashes;
+        }
+        if (this.mArray[binarySearchHashes << 1] == null) {
             return binarySearchHashes;
         }
         int i2 = binarySearchHashes + 1;
@@ -245,7 +249,7 @@ public class SimpleArrayMap<K, V> {
     }
 
     /* JADX INFO: Access modifiers changed from: package-private */
-    public int indexOfValue(Object obj) {
+    public final int indexOfValue(Object obj) {
         int i = this.mSize * 2;
         Object[] objArr = this.mArray;
         if (obj == null) {
@@ -264,15 +268,14 @@ public class SimpleArrayMap<K, V> {
         return -1;
     }
 
-    public boolean isEmpty() {
-        return this.mSize <= 0;
+    public final boolean isEmpty() {
+        if (this.mSize <= 0) {
+            return true;
+        }
+        return false;
     }
 
-    public K keyAt(int i) {
-        return (K) this.mArray[i << 1];
-    }
-
-    public V put(K k, V v) {
+    public final V put(K k, V v) {
         int i;
         int i2;
         int i3 = this.mSize;
@@ -336,15 +339,7 @@ public class SimpleArrayMap<K, V> {
         throw new ConcurrentModificationException();
     }
 
-    public V remove(Object obj) {
-        int indexOfKey = indexOfKey(obj);
-        if (indexOfKey >= 0) {
-            return removeAt(indexOfKey);
-        }
-        return null;
-    }
-
-    public V removeAt(int i) {
+    public final V removeAt(int i) {
         Object[] objArr = this.mArray;
         int i2 = i << 1;
         V v = (V) objArr[i2 + 1];
@@ -399,11 +394,37 @@ public class SimpleArrayMap<K, V> {
         throw new ConcurrentModificationException();
     }
 
-    public int size() {
-        return this.mSize;
+    public final boolean containsKey(Object obj) {
+        if (indexOfKey(obj) >= 0) {
+            return true;
+        }
+        return false;
     }
 
-    public String toString() {
+    public final boolean containsValue(Object obj) {
+        if (indexOfValue(obj) >= 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public final V get(Object obj) {
+        int indexOfKey = indexOfKey(obj);
+        if (indexOfKey >= 0) {
+            return (V) this.mArray[(indexOfKey << 1) + 1];
+        }
+        return null;
+    }
+
+    public final V remove(Object obj) {
+        int indexOfKey = indexOfKey(obj);
+        if (indexOfKey >= 0) {
+            return removeAt(indexOfKey);
+        }
+        return null;
+    }
+
+    public final String toString() {
         if (isEmpty()) {
             return "{}";
         }
@@ -413,16 +434,17 @@ public class SimpleArrayMap<K, V> {
             if (i > 0) {
                 sb.append(", ");
             }
-            K keyAt = keyAt(i);
-            if (keyAt != this) {
-                sb.append(keyAt);
+            int i2 = i << 1;
+            Object obj = this.mArray[i2];
+            if (obj != this) {
+                sb.append(obj);
             } else {
                 sb.append("(this Map)");
             }
             sb.append('=');
-            V valueAt = valueAt(i);
-            if (valueAt != this) {
-                sb.append(valueAt);
+            Object obj2 = this.mArray[i2 + 1];
+            if (obj2 != this) {
+                sb.append(obj2);
             } else {
                 sb.append("(this Map)");
             }
@@ -431,7 +453,7 @@ public class SimpleArrayMap<K, V> {
         return sb.toString();
     }
 
-    public V valueAt(int i) {
-        return (V) this.mArray[(i << 1) + 1];
+    public final int size() {
+        return this.mSize;
     }
 }

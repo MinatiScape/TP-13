@@ -3,10 +3,10 @@ package com.google.android.gms.phenotype;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Base64;
-import androidx.appcompat.R$dimen;
-import androidx.slice.view.R$layout;
-import androidx.viewpager2.widget.FakeDrag$$ExternalSyntheticOutline0;
-import com.adobe.xmp.XMPPathFactory$$ExternalSyntheticOutline0;
+import androidx.appcompat.R$layout;
+import androidx.core.R$id;
+import com.adobe.xmp.impl.ParseRDF$$ExternalSyntheticOutline0;
+import com.adobe.xmp.impl.XMPNode$$ExternalSyntheticOutline0;
 import com.google.android.gms.internal.zzbkv;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,22 +23,6 @@ public class ExperimentTokens extends zzbkv {
     public final byte[][] pseudonymousCrossExperimentTokens;
     public final String user;
     public final int[] weakExperimentIds;
-
-    static {
-        byte[][] bArr = new byte[0];
-        new ExperimentTokens("", null, bArr, bArr, bArr, bArr, null, null);
-    }
-
-    public ExperimentTokens(String str, byte[] bArr, byte[][] bArr2, byte[][] bArr3, byte[][] bArr4, byte[][] bArr5, int[] iArr, byte[][] bArr6) {
-        this.user = str;
-        this.directExperimentToken = bArr;
-        this.gaiaCrossExperimentTokens = bArr2;
-        this.pseudonymousCrossExperimentTokens = bArr3;
-        this.alwaysCrossExperimentTokens = bArr4;
-        this.otherCrossExperimentTokens = bArr5;
-        this.weakExperimentIds = iArr;
-        this.additionalDirectExperimentTokens = bArr6;
-    }
 
     public static void zza(StringBuilder sb, String str, byte[][] bArr) {
         sb.append(str);
@@ -65,6 +49,11 @@ public class ExperimentTokens extends zzbkv {
         sb.append(")");
     }
 
+    static {
+        byte[][] bArr = new byte[0];
+        new ExperimentTokens("", null, bArr, bArr, bArr, bArr, null, null);
+    }
+
     public static List<String> zzb(byte[][] bArr) {
         if (bArr == null) {
             return Collections.emptyList();
@@ -77,21 +66,27 @@ public class ExperimentTokens extends zzbkv {
         return arrayList;
     }
 
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         if (obj instanceof ExperimentTokens) {
             ExperimentTokens experimentTokens = (ExperimentTokens) obj;
-            if (R$dimen.zza(this.user, experimentTokens.user) && Arrays.equals(this.directExperimentToken, experimentTokens.directExperimentToken) && R$dimen.zza(zzb(this.gaiaCrossExperimentTokens), zzb(experimentTokens.gaiaCrossExperimentTokens)) && R$dimen.zza(zzb(this.pseudonymousCrossExperimentTokens), zzb(experimentTokens.pseudonymousCrossExperimentTokens)) && R$dimen.zza(zzb(this.alwaysCrossExperimentTokens), zzb(experimentTokens.alwaysCrossExperimentTokens)) && R$dimen.zza(zzb(this.otherCrossExperimentTokens), zzb(experimentTokens.otherCrossExperimentTokens)) && R$dimen.zza(zza(this.weakExperimentIds), zza(experimentTokens.weakExperimentIds)) && R$dimen.zza(zzb(this.additionalDirectExperimentTokens), zzb(experimentTokens.additionalDirectExperimentTokens))) {
+            if (R$layout.zza(this.user, experimentTokens.user) && Arrays.equals(this.directExperimentToken, experimentTokens.directExperimentToken) && R$layout.zza(zzb(this.gaiaCrossExperimentTokens), zzb(experimentTokens.gaiaCrossExperimentTokens)) && R$layout.zza(zzb(this.pseudonymousCrossExperimentTokens), zzb(experimentTokens.pseudonymousCrossExperimentTokens)) && R$layout.zza(zzb(this.alwaysCrossExperimentTokens), zzb(experimentTokens.alwaysCrossExperimentTokens)) && R$layout.zza(zzb(this.otherCrossExperimentTokens), zzb(experimentTokens.otherCrossExperimentTokens)) && R$layout.zza(zza(this.weakExperimentIds), zza(experimentTokens.weakExperimentIds)) && R$layout.zza(zzb(this.additionalDirectExperimentTokens), zzb(experimentTokens.additionalDirectExperimentTokens))) {
                 return true;
             }
         }
         return false;
     }
 
-    public String toString() {
+    public final String toString() {
+        String str;
         StringBuilder sb = new StringBuilder("ExperimentTokens");
         sb.append("(");
-        String str = this.user;
-        sb.append(str == null ? "null" : FakeDrag$$ExternalSyntheticOutline0.m(XMPPathFactory$$ExternalSyntheticOutline0.m(str, 2), "'", str, "'"));
+        String str2 = this.user;
+        if (str2 == null) {
+            str = "null";
+        } else {
+            str = XMPNode$$ExternalSyntheticOutline0.m(ParseRDF$$ExternalSyntheticOutline0.m(str2, 2), "'", str2, "'");
+        }
+        sb.append(str);
         sb.append(", ");
         byte[] bArr = this.directExperimentToken;
         sb.append("direct");
@@ -140,17 +135,28 @@ public class ExperimentTokens extends zzbkv {
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
-        int zzb = R$layout.zzb(parcel, 20293);
-        R$layout.zza(parcel, 2, this.user, false);
-        R$layout.zza(parcel, 3, this.directExperimentToken, false);
-        R$layout.zza(parcel, 4, this.gaiaCrossExperimentTokens);
-        R$layout.zza(parcel, 5, this.pseudonymousCrossExperimentTokens);
-        R$layout.zza(parcel, 6, this.alwaysCrossExperimentTokens);
-        R$layout.zza(parcel, 7, this.otherCrossExperimentTokens);
-        R$layout.zza(parcel, 8, this.weakExperimentIds, false);
-        R$layout.zza(parcel, 9, this.additionalDirectExperimentTokens);
-        R$layout.zzc(parcel, zzb);
+    public final void writeToParcel(Parcel parcel, int i) {
+        int zzb = R$id.zzb(parcel, 20293);
+        R$id.zza(parcel, 2, this.user);
+        R$id.zza(parcel, 3, this.directExperimentToken);
+        R$id.zza(parcel, 4, this.gaiaCrossExperimentTokens);
+        R$id.zza(parcel, 5, this.pseudonymousCrossExperimentTokens);
+        R$id.zza(parcel, 6, this.alwaysCrossExperimentTokens);
+        R$id.zza(parcel, 7, this.otherCrossExperimentTokens);
+        R$id.zza(parcel, 8, this.weakExperimentIds);
+        R$id.zza(parcel, 9, this.additionalDirectExperimentTokens);
+        R$id.zzc(parcel, zzb);
+    }
+
+    public ExperimentTokens(String str, byte[] bArr, byte[][] bArr2, byte[][] bArr3, byte[][] bArr4, byte[][] bArr5, int[] iArr, byte[][] bArr6) {
+        this.user = str;
+        this.directExperimentToken = bArr;
+        this.gaiaCrossExperimentTokens = bArr2;
+        this.pseudonymousCrossExperimentTokens = bArr3;
+        this.alwaysCrossExperimentTokens = bArr4;
+        this.otherCrossExperimentTokens = bArr5;
+        this.weakExperimentIds = iArr;
+        this.additionalDirectExperimentTokens = bArr6;
     }
 
     public static List<Integer> zza(int[] iArr) {

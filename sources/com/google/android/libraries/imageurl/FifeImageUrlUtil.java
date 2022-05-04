@@ -1,35 +1,27 @@
 package com.google.android.libraries.imageurl;
 
 import android.net.Uri;
-import com.google.common.base.Preconditions;
 import com.google.photos.base.BaseImageUrlUtil;
 import com.google.photos.base.ImageUrlOptionsStringBuilder;
 import com.google.photos.base.ThinBaseImageUrlUtil;
 import java.util.regex.Pattern;
 /* loaded from: classes.dex */
-public class FifeImageUrlUtil extends BaseImageUrlUtil<Uri> {
+public final class FifeImageUrlUtil extends BaseImageUrlUtil<Uri> {
 
     /* loaded from: classes.dex */
     public static class AndroidUriWrapper implements BaseImageUrlUtil.UriWrapper<Uri> {
         public final Uri uri;
 
-        public AndroidUriWrapper(Uri uri) {
-            this.uri = uri;
-        }
-
-        public String getPath() {
+        public final String getPath() {
             return this.uri.getPath();
         }
 
-        public String toString() {
+        public final String toString() {
             return this.uri.toString();
         }
-    }
 
-    /* loaded from: classes.dex */
-    public static class InvalidUrlException extends Exception {
-        public InvalidUrlException(BaseImageUrlUtil.InvalidUrlException invalidUrlException, AnonymousClass1 r2) {
-            super(invalidUrlException);
+        public AndroidUriWrapper(Uri uri) {
+            this.uri = uri;
         }
     }
 
@@ -37,13 +29,22 @@ public class FifeImageUrlUtil extends BaseImageUrlUtil<Uri> {
     public static class Options extends ImageUrlOptionsStringBuilder {
     }
 
-    public boolean isFifeHostedUri(Uri uri) {
-        boolean z = true;
-        z = false;
-        Preconditions.checkArgument(true);
+    public final Uri mergeOptions(Options options, Uri uri) throws InvalidUrlException {
+        try {
+            return changeImageUrlOptions(options, new AndroidUriWrapper(uri), false, true);
+        } catch (BaseImageUrlUtil.InvalidUrlException e) {
+            throw new InvalidUrlException(e);
+        }
+    }
+
+    public static boolean isFifeHostedUri(Uri uri) {
+        boolean z;
         String uri2 = uri.toString();
         Pattern pattern = ThinBaseImageUrlUtil.FIFE_HOSTED_IMAGE_URL_RE;
-        if (uri2 == null) {
+        if (uri2 != null) {
+            z = true;
+        } else {
+            z = false;
         }
         if (z) {
             return ThinBaseImageUrlUtil.FIFE_HOSTED_IMAGE_URL_RE.matcher(uri2).find();
@@ -51,11 +52,10 @@ public class FifeImageUrlUtil extends BaseImageUrlUtil<Uri> {
         throw new IllegalArgumentException();
     }
 
-    public Uri mergeOptions(Options options, Uri uri) throws InvalidUrlException {
-        try {
-            return changeImageUrlOptions(options, new AndroidUriWrapper(uri), false, true);
-        } catch (BaseImageUrlUtil.InvalidUrlException e) {
-            throw new InvalidUrlException(e, null);
+    /* loaded from: classes.dex */
+    public static class InvalidUrlException extends Exception {
+        public InvalidUrlException(BaseImageUrlUtil.InvalidUrlException invalidUrlException) {
+            super(invalidUrlException);
         }
     }
 }

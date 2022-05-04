@@ -114,6 +114,10 @@ public interface ISystemUiProxy extends IInterface {
         @Override // com.android.systemui.shared.recents.ISystemUiProxy
         public void stopScreenPinning() throws RemoteException {
         }
+
+        @Override // com.android.systemui.shared.recents.ISystemUiProxy
+        public void toggleNotificationPanel() throws RemoteException {
+        }
     }
 
     /* loaded from: classes.dex */
@@ -141,19 +145,161 @@ public interface ISystemUiProxy extends IInterface {
         public static final int TRANSACTION_startAssistant = 14;
         public static final int TRANSACTION_startScreenPinning = 2;
         public static final int TRANSACTION_stopScreenPinning = 18;
+        public static final int TRANSACTION_toggleNotificationPanel = 51;
+
+        @Override // android.os.IInterface
+        public IBinder asBinder() {
+            return this;
+        }
+
+        @Override // android.os.Binder
+        public boolean onTransact(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
+            if (i >= 1 && i <= 16777215) {
+                parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
+            }
+            if (i != 1598968902) {
+                if (i == 2) {
+                    int readInt = parcel.readInt();
+                    parcel.enforceNoDataAvail();
+                    startScreenPinning(readInt);
+                    parcel2.writeNoException();
+                } else if (i == 10) {
+                    parcel.enforceNoDataAvail();
+                    onStatusBarMotionEvent((MotionEvent) parcel.readTypedObject(MotionEvent.CREATOR));
+                    parcel2.writeNoException();
+                } else if (i == 26) {
+                    int readInt2 = parcel.readInt();
+                    parcel.enforceNoDataAvail();
+                    notifyPrioritizedRotation(readInt2);
+                    parcel2.writeNoException();
+                } else if (i == 7) {
+                    boolean readBoolean = parcel.readBoolean();
+                    parcel.enforceNoDataAvail();
+                    onOverviewShown(readBoolean);
+                    parcel2.writeNoException();
+                } else if (i == 8) {
+                    Rect nonMinimizedSplitScreenSecondaryBounds = getNonMinimizedSplitScreenSecondaryBounds();
+                    parcel2.writeNoException();
+                    parcel2.writeTypedObject(nonMinimizedSplitScreenSecondaryBounds, 1);
+                } else if (i == 13) {
+                    float readFloat = parcel.readFloat();
+                    parcel.enforceNoDataAvail();
+                    onAssistantProgress(readFloat);
+                    parcel2.writeNoException();
+                } else if (i == 14) {
+                    parcel.enforceNoDataAvail();
+                    startAssistant((Bundle) parcel.readTypedObject(Bundle.CREATOR));
+                    parcel2.writeNoException();
+                } else if (i == 29) {
+                    parcel.enforceNoDataAvail();
+                    handleImageBundleAsScreenshot((Bundle) parcel.readTypedObject(Bundle.CREATOR), (Rect) parcel.readTypedObject(Rect.CREATOR), (Insets) parcel.readTypedObject(Insets.CREATOR), (Task.TaskKey) parcel.readTypedObject(Task.TaskKey.CREATOR));
+                    parcel2.writeNoException();
+                } else if (i != 30) {
+                    switch (i) {
+                        case 16:
+                            int readInt3 = parcel.readInt();
+                            parcel.enforceNoDataAvail();
+                            notifyAccessibilityButtonClicked(readInt3);
+                            parcel2.writeNoException();
+                            break;
+                        case 17:
+                            notifyAccessibilityButtonLongClicked();
+                            parcel2.writeNoException();
+                            break;
+                        case 18:
+                            stopScreenPinning();
+                            parcel2.writeNoException();
+                            break;
+                        case 19:
+                            float readFloat2 = parcel.readFloat();
+                            parcel.enforceNoDataAvail();
+                            onAssistantGestureCompletion(readFloat2);
+                            parcel2.writeNoException();
+                            break;
+                        case 20:
+                            float readFloat3 = parcel.readFloat();
+                            boolean readBoolean2 = parcel.readBoolean();
+                            parcel.enforceNoDataAvail();
+                            setNavBarButtonAlpha(readFloat3, readBoolean2);
+                            parcel2.writeNoException();
+                            break;
+                        default:
+                            switch (i) {
+                                case 22:
+                                    int readInt4 = parcel.readInt();
+                                    parcel.enforceNoDataAvail();
+                                    handleImageAsScreenshot((Bitmap) parcel.readTypedObject(Bitmap.CREATOR), (Rect) parcel.readTypedObject(Rect.CREATOR), (Insets) parcel.readTypedObject(Insets.CREATOR), readInt4);
+                                    parcel2.writeNoException();
+                                    break;
+                                case 23:
+                                    boolean readBoolean3 = parcel.readBoolean();
+                                    parcel.enforceNoDataAvail();
+                                    setSplitScreenMinimized(readBoolean3);
+                                    parcel2.writeNoException();
+                                    break;
+                                case 24:
+                                    notifySwipeToHomeFinished();
+                                    parcel2.writeNoException();
+                                    break;
+                                default:
+                                    switch (i) {
+                                        case 45:
+                                            onBackPressed();
+                                            parcel2.writeNoException();
+                                            break;
+                                        case 46:
+                                            boolean readBoolean4 = parcel.readBoolean();
+                                            parcel.enforceNoDataAvail();
+                                            setHomeRotationEnabled(readBoolean4);
+                                            parcel2.writeNoException();
+                                            break;
+                                        case 47:
+                                            notifySwipeUpGestureStarted();
+                                            break;
+                                        case 48:
+                                            boolean readBoolean5 = parcel.readBoolean();
+                                            boolean readBoolean6 = parcel.readBoolean();
+                                            parcel.enforceNoDataAvail();
+                                            notifyTaskbarStatus(readBoolean5, readBoolean6);
+                                            break;
+                                        case 49:
+                                            boolean readBoolean7 = parcel.readBoolean();
+                                            parcel.enforceNoDataAvail();
+                                            notifyTaskbarAutohideSuspend(readBoolean7);
+                                            break;
+                                        case 50:
+                                            onImeSwitcherPressed();
+                                            parcel2.writeNoException();
+                                            break;
+                                        case 51:
+                                            toggleNotificationPanel();
+                                            parcel2.writeNoException();
+                                            break;
+                                        default:
+                                            return super.onTransact(i, parcel, parcel2, i2);
+                                    }
+                            }
+                    }
+                } else {
+                    expandNotificationPanel();
+                    parcel2.writeNoException();
+                }
+                return true;
+            }
+            parcel2.writeString(ISystemUiProxy.DESCRIPTOR);
+            return true;
+        }
 
         /* loaded from: classes.dex */
         public static class Proxy implements ISystemUiProxy {
-            public static ISystemUiProxy sDefaultImpl;
             private IBinder mRemote;
+
+            public String getInterfaceDescriptor() {
+                return ISystemUiProxy.DESCRIPTOR;
+            }
 
             public Proxy(IBinder iBinder) {
                 this.mRemote = iBinder;
-            }
-
-            @Override // android.os.IInterface
-            public IBinder asBinder() {
-                return this.mRemote;
             }
 
             @Override // com.android.systemui.shared.recents.ISystemUiProxy
@@ -162,19 +308,12 @@ public interface ISystemUiProxy extends IInterface {
                 Parcel obtain2 = Parcel.obtain();
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
-                    if (this.mRemote.transact(30, obtain, obtain2, 0) || Stub.getDefaultImpl() == null) {
-                        obtain2.readException();
-                    } else {
-                        Stub.getDefaultImpl().expandNotificationPanel();
-                    }
+                    this.mRemote.transact(30, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
-            }
-
-            public String getInterfaceDescriptor() {
-                return ISystemUiProxy.DESCRIPTOR;
             }
 
             @Override // com.android.systemui.shared.recents.ISystemUiProxy
@@ -183,11 +322,9 @@ public interface ISystemUiProxy extends IInterface {
                 Parcel obtain2 = Parcel.obtain();
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
-                    if (!this.mRemote.transact(8, obtain, obtain2, 0) && Stub.getDefaultImpl() != null) {
-                        return Stub.getDefaultImpl().getNonMinimizedSplitScreenSecondaryBounds();
-                    }
+                    this.mRemote.transact(8, obtain, obtain2, 0);
                     obtain2.readException();
-                    return obtain2.readInt() != 0 ? (Rect) Rect.CREATOR.createFromParcel(obtain2) : null;
+                    return (Rect) obtain2.readTypedObject(Rect.CREATOR);
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -200,30 +337,12 @@ public interface ISystemUiProxy extends IInterface {
                 Parcel obtain2 = Parcel.obtain();
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
-                    if (bitmap != null) {
-                        obtain.writeInt(1);
-                        bitmap.writeToParcel(obtain, 0);
-                    } else {
-                        obtain.writeInt(0);
-                    }
-                    if (rect != null) {
-                        obtain.writeInt(1);
-                        rect.writeToParcel(obtain, 0);
-                    } else {
-                        obtain.writeInt(0);
-                    }
-                    if (insets != null) {
-                        obtain.writeInt(1);
-                        insets.writeToParcel(obtain, 0);
-                    } else {
-                        obtain.writeInt(0);
-                    }
+                    obtain.writeTypedObject(bitmap, 0);
+                    obtain.writeTypedObject(rect, 0);
+                    obtain.writeTypedObject(insets, 0);
                     obtain.writeInt(i);
-                    if (this.mRemote.transact(22, obtain, obtain2, 0) || Stub.getDefaultImpl() == null) {
-                        obtain2.readException();
-                    } else {
-                        Stub.getDefaultImpl().handleImageAsScreenshot(bitmap, rect, insets, i);
-                    }
+                    this.mRemote.transact(22, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -236,35 +355,12 @@ public interface ISystemUiProxy extends IInterface {
                 Parcel obtain2 = Parcel.obtain();
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
-                    if (bundle != null) {
-                        obtain.writeInt(1);
-                        bundle.writeToParcel(obtain, 0);
-                    } else {
-                        obtain.writeInt(0);
-                    }
-                    if (rect != null) {
-                        obtain.writeInt(1);
-                        rect.writeToParcel(obtain, 0);
-                    } else {
-                        obtain.writeInt(0);
-                    }
-                    if (insets != null) {
-                        obtain.writeInt(1);
-                        insets.writeToParcel(obtain, 0);
-                    } else {
-                        obtain.writeInt(0);
-                    }
-                    if (taskKey != null) {
-                        obtain.writeInt(1);
-                        taskKey.writeToParcel(obtain, 0);
-                    } else {
-                        obtain.writeInt(0);
-                    }
-                    if (this.mRemote.transact(29, obtain, obtain2, 0) || Stub.getDefaultImpl() == null) {
-                        obtain2.readException();
-                    } else {
-                        Stub.getDefaultImpl().handleImageBundleAsScreenshot(bundle, rect, insets, taskKey);
-                    }
+                    obtain.writeTypedObject(bundle, 0);
+                    obtain.writeTypedObject(rect, 0);
+                    obtain.writeTypedObject(insets, 0);
+                    obtain.writeTypedObject(taskKey, 0);
+                    this.mRemote.transact(29, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -278,11 +374,8 @@ public interface ISystemUiProxy extends IInterface {
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
                     obtain.writeInt(i);
-                    if (this.mRemote.transact(16, obtain, obtain2, 0) || Stub.getDefaultImpl() == null) {
-                        obtain2.readException();
-                    } else {
-                        Stub.getDefaultImpl().notifyAccessibilityButtonClicked(i);
-                    }
+                    this.mRemote.transact(16, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -295,11 +388,8 @@ public interface ISystemUiProxy extends IInterface {
                 Parcel obtain2 = Parcel.obtain();
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
-                    if (this.mRemote.transact(17, obtain, obtain2, 0) || Stub.getDefaultImpl() == null) {
-                        obtain2.readException();
-                    } else {
-                        Stub.getDefaultImpl().notifyAccessibilityButtonLongClicked();
-                    }
+                    this.mRemote.transact(17, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -313,11 +403,8 @@ public interface ISystemUiProxy extends IInterface {
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
                     obtain.writeInt(i);
-                    if (this.mRemote.transact(26, obtain, obtain2, 0) || Stub.getDefaultImpl() == null) {
-                        obtain2.readException();
-                    } else {
-                        Stub.getDefaultImpl().notifyPrioritizedRotation(i);
-                    }
+                    this.mRemote.transact(26, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -330,11 +417,8 @@ public interface ISystemUiProxy extends IInterface {
                 Parcel obtain2 = Parcel.obtain();
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
-                    if (this.mRemote.transact(24, obtain, obtain2, 0) || Stub.getDefaultImpl() == null) {
-                        obtain2.readException();
-                    } else {
-                        Stub.getDefaultImpl().notifySwipeToHomeFinished();
-                    }
+                    this.mRemote.transact(24, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -346,9 +430,7 @@ public interface ISystemUiProxy extends IInterface {
                 Parcel obtain = Parcel.obtain();
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
-                    if (!this.mRemote.transact(47, obtain, null, 1) && Stub.getDefaultImpl() != null) {
-                        Stub.getDefaultImpl().notifySwipeUpGestureStarted();
-                    }
+                    this.mRemote.transact(47, obtain, null, 1);
                 } finally {
                     obtain.recycle();
                 }
@@ -359,10 +441,8 @@ public interface ISystemUiProxy extends IInterface {
                 Parcel obtain = Parcel.obtain();
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
-                    obtain.writeInt(z ? 1 : 0);
-                    if (!this.mRemote.transact(49, obtain, null, 1) && Stub.getDefaultImpl() != null) {
-                        Stub.getDefaultImpl().notifyTaskbarAutohideSuspend(z);
-                    }
+                    obtain.writeBoolean(z);
+                    this.mRemote.transact(49, obtain, null, 1);
                 } finally {
                     obtain.recycle();
                 }
@@ -373,15 +453,9 @@ public interface ISystemUiProxy extends IInterface {
                 Parcel obtain = Parcel.obtain();
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
-                    int i = 0;
-                    obtain.writeInt(z ? 1 : 0);
-                    if (z2) {
-                        i = 1;
-                    }
-                    obtain.writeInt(i);
-                    if (!this.mRemote.transact(48, obtain, null, 1) && Stub.getDefaultImpl() != null) {
-                        Stub.getDefaultImpl().notifyTaskbarStatus(z, z2);
-                    }
+                    obtain.writeBoolean(z);
+                    obtain.writeBoolean(z2);
+                    this.mRemote.transact(48, obtain, null, 1);
                 } finally {
                     obtain.recycle();
                 }
@@ -394,11 +468,8 @@ public interface ISystemUiProxy extends IInterface {
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
                     obtain.writeFloat(f);
-                    if (this.mRemote.transact(19, obtain, obtain2, 0) || Stub.getDefaultImpl() == null) {
-                        obtain2.readException();
-                    } else {
-                        Stub.getDefaultImpl().onAssistantGestureCompletion(f);
-                    }
+                    this.mRemote.transact(19, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -412,11 +483,8 @@ public interface ISystemUiProxy extends IInterface {
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
                     obtain.writeFloat(f);
-                    if (this.mRemote.transact(13, obtain, obtain2, 0) || Stub.getDefaultImpl() == null) {
-                        obtain2.readException();
-                    } else {
-                        Stub.getDefaultImpl().onAssistantProgress(f);
-                    }
+                    this.mRemote.transact(13, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -429,11 +497,8 @@ public interface ISystemUiProxy extends IInterface {
                 Parcel obtain2 = Parcel.obtain();
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
-                    if (this.mRemote.transact(45, obtain, obtain2, 0) || Stub.getDefaultImpl() == null) {
-                        obtain2.readException();
-                    } else {
-                        Stub.getDefaultImpl().onBackPressed();
-                    }
+                    this.mRemote.transact(45, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -446,11 +511,8 @@ public interface ISystemUiProxy extends IInterface {
                 Parcel obtain2 = Parcel.obtain();
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
-                    if (this.mRemote.transact(50, obtain, obtain2, 0) || Stub.getDefaultImpl() == null) {
-                        obtain2.readException();
-                    } else {
-                        Stub.getDefaultImpl().onImeSwitcherPressed();
-                    }
+                    this.mRemote.transact(50, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -463,12 +525,9 @@ public interface ISystemUiProxy extends IInterface {
                 Parcel obtain2 = Parcel.obtain();
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
-                    obtain.writeInt(z ? 1 : 0);
-                    if (this.mRemote.transact(7, obtain, obtain2, 0) || Stub.getDefaultImpl() == null) {
-                        obtain2.readException();
-                    } else {
-                        Stub.getDefaultImpl().onOverviewShown(z);
-                    }
+                    obtain.writeBoolean(z);
+                    this.mRemote.transact(7, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -481,17 +540,9 @@ public interface ISystemUiProxy extends IInterface {
                 Parcel obtain2 = Parcel.obtain();
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
-                    if (motionEvent != null) {
-                        obtain.writeInt(1);
-                        motionEvent.writeToParcel(obtain, 0);
-                    } else {
-                        obtain.writeInt(0);
-                    }
-                    if (this.mRemote.transact(10, obtain, obtain2, 0) || Stub.getDefaultImpl() == null) {
-                        obtain2.readException();
-                    } else {
-                        Stub.getDefaultImpl().onStatusBarMotionEvent(motionEvent);
-                    }
+                    obtain.writeTypedObject(motionEvent, 0);
+                    this.mRemote.transact(10, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -504,12 +555,9 @@ public interface ISystemUiProxy extends IInterface {
                 Parcel obtain2 = Parcel.obtain();
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
-                    obtain.writeInt(z ? 1 : 0);
-                    if (this.mRemote.transact(46, obtain, obtain2, 0) || Stub.getDefaultImpl() == null) {
-                        obtain2.readException();
-                    } else {
-                        Stub.getDefaultImpl().setHomeRotationEnabled(z);
-                    }
+                    obtain.writeBoolean(z);
+                    this.mRemote.transact(46, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -523,12 +571,9 @@ public interface ISystemUiProxy extends IInterface {
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
                     obtain.writeFloat(f);
-                    obtain.writeInt(z ? 1 : 0);
-                    if (this.mRemote.transact(20, obtain, obtain2, 0) || Stub.getDefaultImpl() == null) {
-                        obtain2.readException();
-                    } else {
-                        Stub.getDefaultImpl().setNavBarButtonAlpha(f, z);
-                    }
+                    obtain.writeBoolean(z);
+                    this.mRemote.transact(20, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -541,12 +586,9 @@ public interface ISystemUiProxy extends IInterface {
                 Parcel obtain2 = Parcel.obtain();
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
-                    obtain.writeInt(z ? 1 : 0);
-                    if (this.mRemote.transact(23, obtain, obtain2, 0) || Stub.getDefaultImpl() == null) {
-                        obtain2.readException();
-                    } else {
-                        Stub.getDefaultImpl().setSplitScreenMinimized(z);
-                    }
+                    obtain.writeBoolean(z);
+                    this.mRemote.transact(23, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -559,17 +601,9 @@ public interface ISystemUiProxy extends IInterface {
                 Parcel obtain2 = Parcel.obtain();
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
-                    if (bundle != null) {
-                        obtain.writeInt(1);
-                        bundle.writeToParcel(obtain, 0);
-                    } else {
-                        obtain.writeInt(0);
-                    }
-                    if (this.mRemote.transact(14, obtain, obtain2, 0) || Stub.getDefaultImpl() == null) {
-                        obtain2.readException();
-                    } else {
-                        Stub.getDefaultImpl().startAssistant(bundle);
-                    }
+                    obtain.writeTypedObject(bundle, 0);
+                    this.mRemote.transact(14, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -583,11 +617,8 @@ public interface ISystemUiProxy extends IInterface {
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
                     obtain.writeInt(i);
-                    if (this.mRemote.transact(2, obtain, obtain2, 0) || Stub.getDefaultImpl() == null) {
-                        obtain2.readException();
-                    } else {
-                        Stub.getDefaultImpl().startScreenPinning(i);
-                    }
+                    this.mRemote.transact(2, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -600,20 +631,32 @@ public interface ISystemUiProxy extends IInterface {
                 Parcel obtain2 = Parcel.obtain();
                 try {
                     obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
-                    if (this.mRemote.transact(18, obtain, obtain2, 0) || Stub.getDefaultImpl() == null) {
-                        obtain2.readException();
-                    } else {
-                        Stub.getDefaultImpl().stopScreenPinning();
-                    }
+                    this.mRemote.transact(18, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
             }
-        }
 
-        public Stub() {
-            attachInterface(this, ISystemUiProxy.DESCRIPTOR);
+            @Override // com.android.systemui.shared.recents.ISystemUiProxy
+            public void toggleNotificationPanel() throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
+                try {
+                    obtain.writeInterfaceToken(ISystemUiProxy.DESCRIPTOR);
+                    this.mRemote.transact(51, obtain, obtain2, 0);
+                    obtain2.readException();
+                } finally {
+                    obtain2.recycle();
+                    obtain.recycle();
+                }
+            }
+
+            @Override // android.os.IInterface
+            public IBinder asBinder() {
+                return this.mRemote;
+            }
         }
 
         public static ISystemUiProxy asInterface(IBinder iBinder) {
@@ -627,212 +670,14 @@ public interface ISystemUiProxy extends IInterface {
             return (ISystemUiProxy) queryLocalInterface;
         }
 
-        public static ISystemUiProxy getDefaultImpl() {
-            return Proxy.sDefaultImpl;
-        }
-
-        public static boolean setDefaultImpl(ISystemUiProxy iSystemUiProxy) {
-            if (Proxy.sDefaultImpl != null) {
-                throw new IllegalStateException("setDefaultImpl() called twice");
-            } else if (iSystemUiProxy == null) {
-                return false;
-            } else {
-                Proxy.sDefaultImpl = iSystemUiProxy;
-                return true;
-            }
-        }
-
-        @Override // android.os.IInterface
-        public IBinder asBinder() {
-            return this;
-        }
-
-        @Override // android.os.Binder
-        public boolean onTransact(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
-            if (i == 1598968902) {
-                parcel2.writeString(ISystemUiProxy.DESCRIPTOR);
-                return true;
-            } else if (i != 2) {
-                MotionEvent motionEvent = null;
-                Insets insets = null;
-                Task.TaskKey taskKey = null;
-                Bundle bundle = null;
-                if (i == 10) {
-                    parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                    if (parcel.readInt() != 0) {
-                        motionEvent = (MotionEvent) MotionEvent.CREATOR.createFromParcel(parcel);
-                    }
-                    onStatusBarMotionEvent(motionEvent);
-                    parcel2.writeNoException();
-                    return true;
-                } else if (i != 26) {
-                    boolean z = false;
-                    if (i == 7) {
-                        parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                        if (parcel.readInt() != 0) {
-                            z = true;
-                        }
-                        onOverviewShown(z);
-                        parcel2.writeNoException();
-                        return true;
-                    } else if (i == 8) {
-                        parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                        Rect nonMinimizedSplitScreenSecondaryBounds = getNonMinimizedSplitScreenSecondaryBounds();
-                        parcel2.writeNoException();
-                        if (nonMinimizedSplitScreenSecondaryBounds != null) {
-                            parcel2.writeInt(1);
-                            nonMinimizedSplitScreenSecondaryBounds.writeToParcel(parcel2, 1);
-                        } else {
-                            parcel2.writeInt(0);
-                        }
-                        return true;
-                    } else if (i == 13) {
-                        parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                        onAssistantProgress(parcel.readFloat());
-                        parcel2.writeNoException();
-                        return true;
-                    } else if (i == 14) {
-                        parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                        if (parcel.readInt() != 0) {
-                            bundle = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
-                        }
-                        startAssistant(bundle);
-                        parcel2.writeNoException();
-                        return true;
-                    } else if (i == 29) {
-                        parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                        Bundle bundle2 = parcel.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(parcel) : null;
-                        Rect rect = parcel.readInt() != 0 ? (Rect) Rect.CREATOR.createFromParcel(parcel) : null;
-                        Insets insets2 = parcel.readInt() != 0 ? (Insets) Insets.CREATOR.createFromParcel(parcel) : null;
-                        if (parcel.readInt() != 0) {
-                            taskKey = Task.TaskKey.CREATOR.createFromParcel(parcel);
-                        }
-                        handleImageBundleAsScreenshot(bundle2, rect, insets2, taskKey);
-                        parcel2.writeNoException();
-                        return true;
-                    } else if (i != 30) {
-                        switch (i) {
-                            case 16:
-                                parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                                notifyAccessibilityButtonClicked(parcel.readInt());
-                                parcel2.writeNoException();
-                                return true;
-                            case 17:
-                                parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                                notifyAccessibilityButtonLongClicked();
-                                parcel2.writeNoException();
-                                return true;
-                            case 18:
-                                parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                                stopScreenPinning();
-                                parcel2.writeNoException();
-                                return true;
-                            case 19:
-                                parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                                onAssistantGestureCompletion(parcel.readFloat());
-                                parcel2.writeNoException();
-                                return true;
-                            case 20:
-                                parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                                float readFloat = parcel.readFloat();
-                                if (parcel.readInt() != 0) {
-                                    z = true;
-                                }
-                                setNavBarButtonAlpha(readFloat, z);
-                                parcel2.writeNoException();
-                                return true;
-                            default:
-                                switch (i) {
-                                    case 22:
-                                        parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                                        Bitmap bitmap = parcel.readInt() != 0 ? (Bitmap) Bitmap.CREATOR.createFromParcel(parcel) : null;
-                                        Rect rect2 = parcel.readInt() != 0 ? (Rect) Rect.CREATOR.createFromParcel(parcel) : null;
-                                        if (parcel.readInt() != 0) {
-                                            insets = (Insets) Insets.CREATOR.createFromParcel(parcel);
-                                        }
-                                        handleImageAsScreenshot(bitmap, rect2, insets, parcel.readInt());
-                                        parcel2.writeNoException();
-                                        return true;
-                                    case 23:
-                                        parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                                        if (parcel.readInt() != 0) {
-                                            z = true;
-                                        }
-                                        setSplitScreenMinimized(z);
-                                        parcel2.writeNoException();
-                                        return true;
-                                    case 24:
-                                        parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                                        notifySwipeToHomeFinished();
-                                        parcel2.writeNoException();
-                                        return true;
-                                    default:
-                                        switch (i) {
-                                            case 45:
-                                                parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                                                onBackPressed();
-                                                parcel2.writeNoException();
-                                                return true;
-                                            case 46:
-                                                parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                                                if (parcel.readInt() != 0) {
-                                                    z = true;
-                                                }
-                                                setHomeRotationEnabled(z);
-                                                parcel2.writeNoException();
-                                                return true;
-                                            case 47:
-                                                parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                                                notifySwipeUpGestureStarted();
-                                                return true;
-                                            case 48:
-                                                parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                                                boolean z2 = parcel.readInt() != 0;
-                                                if (parcel.readInt() != 0) {
-                                                    z = true;
-                                                }
-                                                notifyTaskbarStatus(z2, z);
-                                                return true;
-                                            case 49:
-                                                parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                                                if (parcel.readInt() != 0) {
-                                                    z = true;
-                                                }
-                                                notifyTaskbarAutohideSuspend(z);
-                                                return true;
-                                            case 50:
-                                                parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                                                onImeSwitcherPressed();
-                                                parcel2.writeNoException();
-                                                return true;
-                                            default:
-                                                return super.onTransact(i, parcel, parcel2, i2);
-                                        }
-                                }
-                        }
-                    } else {
-                        parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                        expandNotificationPanel();
-                        parcel2.writeNoException();
-                        return true;
-                    }
-                } else {
-                    parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                    notifyPrioritizedRotation(parcel.readInt());
-                    parcel2.writeNoException();
-                    return true;
-                }
-            } else {
-                parcel.enforceInterface(ISystemUiProxy.DESCRIPTOR);
-                startScreenPinning(parcel.readInt());
-                parcel2.writeNoException();
-                return true;
-            }
+        public Stub() {
+            attachInterface(this, ISystemUiProxy.DESCRIPTOR);
         }
     }
 
     void expandNotificationPanel() throws RemoteException;
 
+    @Deprecated
     Rect getNonMinimizedSplitScreenSecondaryBounds() throws RemoteException;
 
     @Deprecated
@@ -870,6 +715,7 @@ public interface ISystemUiProxy extends IInterface {
 
     void setNavBarButtonAlpha(float f, boolean z) throws RemoteException;
 
+    @Deprecated
     void setSplitScreenMinimized(boolean z) throws RemoteException;
 
     void startAssistant(Bundle bundle) throws RemoteException;
@@ -877,4 +723,6 @@ public interface ISystemUiProxy extends IInterface {
     void startScreenPinning(int i) throws RemoteException;
 
     void stopScreenPinning() throws RemoteException;
+
+    void toggleNotificationPanel() throws RemoteException;
 }

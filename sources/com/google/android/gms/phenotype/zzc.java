@@ -3,17 +3,18 @@ package com.google.android.gms.phenotype;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.android.gms.internal.zzbkw;
+/* compiled from: ConfigurationsCreator.java */
 /* loaded from: classes.dex */
 public final class zzc implements Parcelable.Creator<Configurations> {
     @Override // android.os.Parcelable.Creator
     public final /* synthetic */ Configurations createFromParcel(Parcel parcel) {
         int zza = zzbkw.zza(parcel);
         String str = null;
-        boolean z = false;
-        long j = 0;
         String str2 = null;
         Configuration[] configurationArr = null;
         byte[] bArr = null;
+        boolean z = false;
+        long j = 0;
         while (parcel.dataPosition() < zza) {
             int readInt = parcel.readInt();
             switch (65535 & readInt) {

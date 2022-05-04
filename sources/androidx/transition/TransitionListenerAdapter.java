@@ -4,15 +4,15 @@ import androidx.transition.Transition;
 /* loaded from: classes.dex */
 public class TransitionListenerAdapter implements Transition.TransitionListener {
     @Override // androidx.transition.Transition.TransitionListener
-    public void onTransitionCancel(Transition transition) {
+    public void onTransitionCancel() {
     }
 
     @Override // androidx.transition.Transition.TransitionListener
-    public void onTransitionPause(Transition transition) {
+    public void onTransitionPause() {
     }
 
     @Override // androidx.transition.Transition.TransitionListener
-    public void onTransitionResume(Transition transition) {
+    public void onTransitionResume() {
     }
 
     @Override // androidx.transition.Transition.TransitionListener

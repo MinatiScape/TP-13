@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 /* loaded from: classes.dex */
-public class HurlStack extends BaseHttpStack {
+public final class HurlStack extends BaseHttpStack {
 
     /* loaded from: classes.dex */
     public static class UrlConnectionInputStream extends FilterInputStream {
@@ -40,7 +40,7 @@ public class HurlStack extends BaseHttpStack {
         }
 
         @Override // java.io.FilterInputStream, java.io.InputStream, java.io.Closeable, java.lang.AutoCloseable
-        public void close() throws IOException {
+        public final void close() throws IOException {
             super.close();
             this.mConnection.disconnect();
         }
@@ -58,71 +58,7 @@ public class HurlStack extends BaseHttpStack {
         return arrayList;
     }
 
-    public final void addBody(HttpURLConnection httpURLConnection, Request<?> request, byte[] bArr) throws IOException {
-        httpURLConnection.setDoOutput(true);
-        if (!httpURLConnection.getRequestProperties().containsKey("Content-Type")) {
-            httpURLConnection.setRequestProperty("Content-Type", request.getBodyContentType());
-        }
-        DataOutputStream dataOutputStream = new DataOutputStream(httpURLConnection.getOutputStream());
-        dataOutputStream.write(bArr);
-        dataOutputStream.close();
-    }
-
-    public final void addBodyIfExists(HttpURLConnection httpURLConnection, Request<?> request) throws IOException, AuthFailureError {
-        byte[] body = request.getBody();
-        if (body != null) {
-            addBody(httpURLConnection, request, body);
-        }
-    }
-
-    @Override // com.android.volley.toolbox.BaseHttpStack
-    public HttpResponse executeRequest(Request<?> request, Map<String, String> map) throws IOException, AuthFailureError {
-        Throwable th;
-        String str = request.mUrl;
-        HashMap hashMap = new HashMap();
-        hashMap.putAll(map);
-        hashMap.putAll(request.getHeaders());
-        URL url = new URL(str);
-        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-        httpURLConnection.setInstanceFollowRedirects(HttpURLConnection.getFollowRedirects());
-        int i = request.mRetryPolicy.mCurrentTimeoutMs;
-        httpURLConnection.setConnectTimeout(i);
-        httpURLConnection.setReadTimeout(i);
-        boolean z = false;
-        httpURLConnection.setUseCaches(false);
-        httpURLConnection.setDoInput(true);
-        "https".equals(url.getProtocol());
-        try {
-            for (String str2 : hashMap.keySet()) {
-                httpURLConnection.setRequestProperty(str2, (String) hashMap.get(str2));
-            }
-            setConnectionParametersForRequest(httpURLConnection, request);
-            int responseCode = httpURLConnection.getResponseCode();
-            if (responseCode != -1) {
-                if (!((request.mMethod == 4 || (100 <= responseCode && responseCode < 200) || responseCode == 204 || responseCode == 304) ? false : true)) {
-                    HttpResponse httpResponse = new HttpResponse(responseCode, convertHeaders(httpURLConnection.getHeaderFields()), -1, null);
-                    httpURLConnection.disconnect();
-                    return httpResponse;
-                }
-                try {
-                    return new HttpResponse(responseCode, convertHeaders(httpURLConnection.getHeaderFields()), httpURLConnection.getContentLength(), new UrlConnectionInputStream(httpURLConnection));
-                } catch (Throwable th2) {
-                    th = th2;
-                    z = true;
-                    if (!z) {
-                        httpURLConnection.disconnect();
-                    }
-                    throw th;
-                }
-            } else {
-                throw new IOException("Could not retrieve response code from HttpUrlConnection.");
-            }
-        } catch (Throwable th3) {
-            th = th3;
-        }
-    }
-
-    public void setConnectionParametersForRequest(HttpURLConnection httpURLConnection, Request<?> request) throws IOException, AuthFailureError {
+    public static void setConnectionParametersForRequest(HttpURLConnection httpURLConnection, Request request) throws IOException, AuthFailureError {
         switch (request.mMethod) {
             case -1:
                 return;
@@ -131,11 +67,31 @@ public class HurlStack extends BaseHttpStack {
                 return;
             case 1:
                 httpURLConnection.setRequestMethod("POST");
-                addBodyIfExists(httpURLConnection, request);
+                byte[] body = request.getBody();
+                if (body != null) {
+                    httpURLConnection.setDoOutput(true);
+                    if (!httpURLConnection.getRequestProperties().containsKey("Content-Type")) {
+                        httpURLConnection.setRequestProperty("Content-Type", request.getBodyContentType());
+                    }
+                    DataOutputStream dataOutputStream = new DataOutputStream(httpURLConnection.getOutputStream());
+                    dataOutputStream.write(body);
+                    dataOutputStream.close();
+                    return;
+                }
                 return;
             case 2:
                 httpURLConnection.setRequestMethod("PUT");
-                addBodyIfExists(httpURLConnection, request);
+                byte[] body2 = request.getBody();
+                if (body2 != null) {
+                    httpURLConnection.setDoOutput(true);
+                    if (!httpURLConnection.getRequestProperties().containsKey("Content-Type")) {
+                        httpURLConnection.setRequestProperty("Content-Type", request.getBodyContentType());
+                    }
+                    DataOutputStream dataOutputStream2 = new DataOutputStream(httpURLConnection.getOutputStream());
+                    dataOutputStream2.write(body2);
+                    dataOutputStream2.close();
+                    return;
+                }
                 return;
             case 3:
                 httpURLConnection.setRequestMethod("DELETE");
@@ -151,10 +107,73 @@ public class HurlStack extends BaseHttpStack {
                 return;
             case 7:
                 httpURLConnection.setRequestMethod("PATCH");
-                addBodyIfExists(httpURLConnection, request);
+                byte[] body3 = request.getBody();
+                if (body3 != null) {
+                    httpURLConnection.setDoOutput(true);
+                    if (!httpURLConnection.getRequestProperties().containsKey("Content-Type")) {
+                        httpURLConnection.setRequestProperty("Content-Type", request.getBodyContentType());
+                    }
+                    DataOutputStream dataOutputStream3 = new DataOutputStream(httpURLConnection.getOutputStream());
+                    dataOutputStream3.write(body3);
+                    dataOutputStream3.close();
+                    return;
+                }
                 return;
             default:
                 throw new IllegalStateException("Unknown method type.");
+        }
+    }
+
+    @Override // com.android.volley.toolbox.BaseHttpStack
+    public final HttpResponse executeRequest(Request<?> request, Map<String, String> map) throws IOException, AuthFailureError {
+        Throwable th;
+        boolean z;
+        String str = request.mUrl;
+        HashMap hashMap = new HashMap();
+        hashMap.putAll(map);
+        hashMap.putAll(request.getHeaders());
+        URL url = new URL(str);
+        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+        httpURLConnection.setInstanceFollowRedirects(HttpURLConnection.getFollowRedirects());
+        int i = request.mRetryPolicy.mCurrentTimeoutMs;
+        httpURLConnection.setConnectTimeout(i);
+        httpURLConnection.setReadTimeout(i);
+        boolean z2 = false;
+        httpURLConnection.setUseCaches(false);
+        httpURLConnection.setDoInput(true);
+        "https".equals(url.getProtocol());
+        try {
+            for (String str2 : hashMap.keySet()) {
+                httpURLConnection.setRequestProperty(str2, (String) hashMap.get(str2));
+            }
+            setConnectionParametersForRequest(httpURLConnection, request);
+            int responseCode = httpURLConnection.getResponseCode();
+            if (responseCode != -1) {
+                if (request.mMethod == 4 || ((100 <= responseCode && responseCode < 200) || responseCode == 204 || responseCode == 304)) {
+                    z = false;
+                } else {
+                    z = true;
+                }
+                if (!z) {
+                    HttpResponse httpResponse = new HttpResponse(responseCode, convertHeaders(httpURLConnection.getHeaderFields()));
+                    httpURLConnection.disconnect();
+                    return httpResponse;
+                }
+                try {
+                    return new HttpResponse(responseCode, convertHeaders(httpURLConnection.getHeaderFields()), httpURLConnection.getContentLength(), new UrlConnectionInputStream(httpURLConnection));
+                } catch (Throwable th2) {
+                    th = th2;
+                    z2 = true;
+                    if (!z2) {
+                        httpURLConnection.disconnect();
+                    }
+                    throw th;
+                }
+            } else {
+                throw new IOException("Could not retrieve response code from HttpUrlConnection.");
+            }
+        } catch (Throwable th3) {
+            th = th3;
         }
     }
 }

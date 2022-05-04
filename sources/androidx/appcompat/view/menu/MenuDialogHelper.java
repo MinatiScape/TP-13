@@ -8,22 +8,28 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.menu.ListMenuPresenter;
 import androidx.appcompat.view.menu.MenuPresenter;
 /* loaded from: classes.dex */
-public class MenuDialogHelper implements DialogInterface.OnKeyListener, DialogInterface.OnClickListener, DialogInterface.OnDismissListener, MenuPresenter.Callback {
+public final class MenuDialogHelper implements DialogInterface.OnKeyListener, DialogInterface.OnClickListener, DialogInterface.OnDismissListener, MenuPresenter.Callback {
     public AlertDialog mDialog;
     public MenuBuilder mMenu;
     public ListMenuPresenter mPresenter;
 
-    public MenuDialogHelper(MenuBuilder menuBuilder) {
-        this.mMenu = menuBuilder;
+    @Override // androidx.appcompat.view.menu.MenuPresenter.Callback
+    public final boolean onOpenSubMenu(MenuBuilder menuBuilder) {
+        return false;
     }
 
     @Override // android.content.DialogInterface.OnClickListener
-    public void onClick(DialogInterface dialogInterface, int i) {
-        this.mMenu.performItemAction(((ListMenuPresenter.MenuAdapter) this.mPresenter.getAdapter()).getItem(i), 0);
+    public final void onClick(DialogInterface dialogInterface, int i) {
+        MenuBuilder menuBuilder = this.mMenu;
+        ListMenuPresenter listMenuPresenter = this.mPresenter;
+        if (listMenuPresenter.mAdapter == null) {
+            listMenuPresenter.mAdapter = new ListMenuPresenter.MenuAdapter();
+        }
+        menuBuilder.performItemAction(listMenuPresenter.mAdapter.getItem(i), null, 0);
     }
 
     @Override // androidx.appcompat.view.menu.MenuPresenter.Callback
-    public void onCloseMenu(MenuBuilder menuBuilder, boolean z) {
+    public final void onCloseMenu(MenuBuilder menuBuilder, boolean z) {
         AlertDialog alertDialog;
         if ((z || menuBuilder == this.mMenu) && (alertDialog = this.mDialog) != null) {
             alertDialog.dismiss();
@@ -31,17 +37,12 @@ public class MenuDialogHelper implements DialogInterface.OnKeyListener, DialogIn
     }
 
     @Override // android.content.DialogInterface.OnDismissListener
-    public void onDismiss(DialogInterface dialogInterface) {
-        ListMenuPresenter listMenuPresenter = this.mPresenter;
-        MenuBuilder menuBuilder = this.mMenu;
-        MenuPresenter.Callback callback = listMenuPresenter.mCallback;
-        if (callback != null) {
-            callback.onCloseMenu(menuBuilder, true);
-        }
+    public final void onDismiss(DialogInterface dialogInterface) {
+        this.mPresenter.onCloseMenu(this.mMenu, true);
     }
 
     @Override // android.content.DialogInterface.OnKeyListener
-    public boolean onKey(DialogInterface dialogInterface, int i, KeyEvent keyEvent) {
+    public final boolean onKey(DialogInterface dialogInterface, int i, KeyEvent keyEvent) {
         Window window;
         View decorView;
         KeyEvent.DispatcherState keyDispatcherState;
@@ -63,8 +64,7 @@ public class MenuDialogHelper implements DialogInterface.OnKeyListener, DialogIn
         return this.mMenu.performShortcut(i, keyEvent, 0);
     }
 
-    @Override // androidx.appcompat.view.menu.MenuPresenter.Callback
-    public boolean onOpenSubMenu(MenuBuilder menuBuilder) {
-        return false;
+    public MenuDialogHelper(MenuBuilder menuBuilder) {
+        this.mMenu = menuBuilder;
     }
 }

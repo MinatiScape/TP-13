@@ -1,29 +1,35 @@
 package com.android.customization.model.color;
 
-import android.app.Activity;
 import android.app.WallpaperColors;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.cardview.R$style;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentViewLifecycleOwner;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
+import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 import com.android.customization.model.CustomizationManager;
+import com.android.customization.model.CustomizationOption;
 import com.android.customization.model.theme.OverlayManagerCompat;
 import com.android.customization.module.CustomizationInjector;
 import com.android.customization.module.ThemesUserEventLogger;
 import com.android.customization.picker.color.ColorSectionView;
-import com.android.customization.picker.grid.GridFragment$2$$ExternalSyntheticLambda0;
 import com.android.customization.widget.OptionSelectorController;
 import com.android.systemui.shared.R;
+import com.android.systemui.shared.plugins.PluginActionManager$$ExternalSyntheticLambda0;
 import com.android.wallpaper.model.CustomizationSectionController;
 import com.android.wallpaper.model.WallpaperColorsViewModel;
-import com.android.wallpaper.module.InjectorProvider;
-import com.android.wallpaper.util.DiskBasedLogger$$ExternalSyntheticLambda1;
+import com.android.wallpaper.picker.LivePreviewFragment$$ExternalSyntheticLambda6;
+import com.android.wallpaper.picker.PreviewFragment$$ExternalSyntheticLambda7;
+import com.android.wallpaper.util.WallpaperSurfaceCallback$$ExternalSyntheticLambda0;
+import com.android.wallpaper.widget.PageIndicator;
 import com.android.wallpaper.widget.SeparatedTabLayout;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterators;
@@ -31,15 +37,14 @@ import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import kotlin.jvm.internal.Intrinsics;
 import kotlinx.coroutines.BuildersKt;
 /* loaded from: classes.dex */
-public class ColorSectionController implements CustomizationSectionController<ColorSectionView> {
+public final class ColorSectionController implements CustomizationSectionController<ColorSectionView> {
     public final ColorCustomizationManager mColorManager;
     public ColorSectionView mColorSectionView;
-    public ViewPager2 mColorViewPager;
+    public ViewPager2 mColorSectionViewPager;
     public final ThemesUserEventLogger mEventLogger;
     public WallpaperColors mHomeWallpaperColors;
     public boolean mHomeWallpaperColorsReady;
@@ -50,26 +55,26 @@ public class ColorSectionController implements CustomizationSectionController<Co
     public SeparatedTabLayout mTabLayout;
     public Optional<Integer> mTabPositionToRestore;
     public final WallpaperColorsViewModel mWallpaperColorsViewModel;
-    public final ColorSectionAdapter mColorSectionAdapter = new ColorSectionAdapter(null);
-    public final List<ColorOption> mWallpaperColorOptions = new ArrayList();
-    public final List<ColorOption> mPresetColorOptions = new ArrayList();
+    public final ColorSectionAdapter mColorSectionAdapter = new ColorSectionAdapter();
+    public final ArrayList mWallpaperColorOptions = new ArrayList();
+    public final ArrayList mPresetColorOptions = new ArrayList();
     public long mLastColorApplyingTime = 0;
 
     /* renamed from: com.android.customization.model.color.ColorSectionController$1  reason: invalid class name */
     /* loaded from: classes.dex */
-    public class AnonymousClass1 implements CustomizationManager.OptionsFetchedListener<ColorOption> {
+    public final class AnonymousClass1 implements CustomizationManager.OptionsFetchedListener<ColorOption> {
         public AnonymousClass1() {
         }
 
         @Override // com.android.customization.model.CustomizationManager.OptionsFetchedListener
-        public void onError(Throwable th) {
+        public final void onError(Throwable th) {
             if (th != null) {
                 Log.e("ColorSectionController", "Error loading theme bundles", th);
             }
         }
 
         @Override // com.android.customization.model.CustomizationManager.OptionsFetchedListener
-        public void onOptionsLoaded(List<ColorOption> list) {
+        public final void onOptionsLoaded(List<ColorOption> list) {
             ColorOption colorOption;
             ColorOption colorOption2;
             ColorSectionController.this.mWallpaperColorOptions.clear();
@@ -82,23 +87,23 @@ public class ColorSectionController implements CustomizationSectionController<Co
                 }
             }
             ColorSectionController colorSectionController = ColorSectionController.this;
-            List<ColorOption> list2 = colorSectionController.mWallpaperColorOptions;
-            List<ColorOption> list3 = colorSectionController.mPresetColorOptions;
-            Objects.requireNonNull(colorSectionController);
-            final Iterable[] iterableArr = {list2, list3};
+            ArrayList arrayList = colorSectionController.mWallpaperColorOptions;
+            ArrayList arrayList2 = colorSectionController.mPresetColorOptions;
+            final Iterable[] iterableArr = {arrayList, arrayList2};
             for (int i = 0; i < 2; i++) {
-                Objects.requireNonNull(iterableArr[i]);
+                iterableArr[i].getClass();
             }
-            Iterator it = Lists.newArrayList(new FluentIterable<?>() { // from class: com.google.common.collect.FluentIterable.3
+            Iterator it = Lists.newArrayList(new FluentIterable<Object>() { // from class: com.google.common.collect.FluentIterable.3
+                /* JADX WARN: Type inference failed for: r0v0, types: [com.google.common.collect.FluentIterable$3$1] */
                 @Override // java.lang.Iterable
-                public Iterator<?> iterator() {
-                    return new Iterators.ConcatenatedIterator(new AbstractIndexedListIterator<Iterator<?>>(iterableArr.length) { // from class: com.google.common.collect.FluentIterable.3.1
+                public final Iterator<Object> iterator() {
+                    return new Iterators.ConcatenatedIterator(new AbstractIndexedListIterator<Iterator<Object>>(iterableArr.length) { // from class: com.google.common.collect.FluentIterable.3.1
                         {
                             AnonymousClass3.this = this;
                         }
 
                         @Override // com.google.common.collect.AbstractIndexedListIterator
-                        public Iterator<?> get(int i2) {
+                        public final Iterator<Object> get(int i2) {
                             return iterableArr[i2].iterator();
                         }
                     });
@@ -115,160 +120,178 @@ public class ColorSectionController implements CustomizationSectionController<Co
                 }
             }
             if (colorOption == null) {
-                if (list2.isEmpty()) {
-                    colorOption2 = list3.get(0);
+                if (arrayList.isEmpty()) {
+                    colorOption2 = (ColorOption) arrayList2.get(0);
                 } else {
-                    colorOption2 = list2.get(0);
+                    colorOption2 = (ColorOption) arrayList.get(0);
                 }
                 colorOption = colorOption2;
             }
             colorSectionController.mSelectedColor = colorOption;
-            ColorSectionController.this.mTabLayout.post(new DiskBasedLogger$$ExternalSyntheticLambda1(this));
+            ColorSectionController.this.mTabLayout.post(new PreviewFragment$$ExternalSyntheticLambda7(this, 1));
         }
     }
 
     /* loaded from: classes.dex */
-    public class ColorSectionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-        public final int mItemCounts = 2;
-
-        /* loaded from: classes.dex */
-        public class ColorOptionsViewHolder extends RecyclerView.ViewHolder {
-            public ColorOptionsViewHolder(ColorSectionAdapter colorSectionAdapter, View view) {
-                super(view);
-            }
-        }
-
-        public ColorSectionAdapter(AnonymousClass1 r2) {
-        }
+    public class ColorPageAdapter extends RecyclerView.Adapter<ColorOptionViewHolder> {
+        public final List<ColorOption> mColorOptions;
+        public final int mColorsPerPage;
+        public final boolean mPageEnabled = true;
 
         @Override // androidx.recyclerview.widget.RecyclerView.Adapter
-        public int getItemCount() {
-            return this.mItemCounts;
-        }
-
-        @Override // androidx.recyclerview.widget.RecyclerView.Adapter
-        public int getItemViewType(int i) {
+        public final int getItemViewType(int i) {
             return R.layout.color_options_view;
         }
 
-        @Override // androidx.recyclerview.widget.RecyclerView.Adapter
-        public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int i) {
-            View view = viewHolder.itemView;
-            if (!(view instanceof RecyclerView)) {
-                return;
+        /* loaded from: classes.dex */
+        public class ColorOptionViewHolder extends RecyclerView.ViewHolder {
+            public RecyclerView mContainer;
+
+            public ColorOptionViewHolder(View view) {
+                super(view);
+                this.mContainer = (RecyclerView) view.findViewById(R.id.color_option_container);
             }
+        }
+
+        public ColorPageAdapter(ArrayList arrayList, int i) {
+            this.mColorOptions = arrayList;
+            this.mColorsPerPage = i;
+        }
+
+        @Override // androidx.recyclerview.widget.RecyclerView.Adapter
+        public final int getItemCount() {
+            if (!this.mPageEnabled) {
+                return 1;
+            }
+            return (int) Math.ceil(this.mColorOptions.size() / this.mColorsPerPage);
+        }
+
+        @Override // androidx.recyclerview.widget.RecyclerView.Adapter
+        public final void onBindViewHolder(ColorOptionViewHolder colorOptionViewHolder, int i) {
+            final ColorSectionController colorSectionController = ColorSectionController.this;
+            RecyclerView recyclerView = colorOptionViewHolder.mContainer;
+            List<ColorOption> list = this.mColorOptions;
+            boolean z = this.mPageEnabled;
+            int i2 = this.mColorsPerPage;
+            colorSectionController.getClass();
+            int size = list.size();
+            if (size != 0) {
+                if (z) {
+                    list = list.subList(i2 * i, Math.min((i + 1) * i2, size));
+                }
+                OptionSelectorController optionSelectorController = new OptionSelectorController(recyclerView, list, true, 2);
+                optionSelectorController.initOptions(colorSectionController.mColorManager);
+                ColorOption colorOption = colorSectionController.mSelectedColor;
+                if (colorOption != null && optionSelectorController.mOptions.contains(colorOption)) {
+                    optionSelectorController.setSelectedOption(colorSectionController.mSelectedColor);
+                }
+                optionSelectorController.mListeners.add(new OptionSelectorController.OptionSelectedListener() { // from class: com.android.customization.model.color.ColorSectionController$$ExternalSyntheticLambda0
+                    @Override // com.android.customization.widget.OptionSelectorController.OptionSelectedListener
+                    public final void onOptionSelected(CustomizationOption customizationOption) {
+                        ColorSectionController colorSectionController2 = ColorSectionController.this;
+                        colorSectionController2.getClass();
+                        ColorOption colorOption2 = (ColorOption) customizationOption;
+                        if (!colorSectionController2.mSelectedColor.equals(colorOption2)) {
+                            colorSectionController2.mSelectedColor = colorOption2;
+                            new Handler().postDelayed(new PluginActionManager$$ExternalSyntheticLambda0(colorSectionController2, 1), 100L);
+                        }
+                    }
+                });
+            }
+        }
+
+        @Override // androidx.recyclerview.widget.RecyclerView.Adapter
+        public final RecyclerView.ViewHolder onCreateViewHolder(RecyclerView recyclerView, int i) {
+            return new ColorOptionViewHolder(LayoutInflater.from(recyclerView.getContext()).inflate(i, (ViewGroup) recyclerView, false));
+        }
+    }
+
+    /* loaded from: classes.dex */
+    public class ColorSectionAdapter extends RecyclerView.Adapter<ColorPageViewHolder> {
+        public final int mItemCounts = 2;
+        public int mNumColors;
+
+        @Override // androidx.recyclerview.widget.RecyclerView.Adapter
+        public final int getItemViewType(int i) {
+            return R.layout.color_pages_view;
+        }
+
+        /* loaded from: classes.dex */
+        public class ColorPageViewHolder extends RecyclerView.ViewHolder {
+            public ViewPager2 mContainer;
+            public PageIndicator mPageIndicator;
+
+            public ColorPageViewHolder(View view) {
+                super(view);
+                this.mContainer = (ViewPager2) view.findViewById(R.id.color_page_container);
+                PageIndicator pageIndicator = (PageIndicator) view.findViewById(R.id.color_page_indicator);
+                this.mPageIndicator = pageIndicator;
+                pageIndicator.setVisibility(0);
+            }
+        }
+
+        public ColorSectionAdapter() {
+        }
+
+        @Override // androidx.recyclerview.widget.RecyclerView.Adapter
+        public final void onBindViewHolder(ColorPageViewHolder colorPageViewHolder, int i) {
+            ColorPageViewHolder colorPageViewHolder2 = colorPageViewHolder;
             if (i == 0) {
                 ColorSectionController colorSectionController = ColorSectionController.this;
-                OptionSelectorController<ColorOption> optionSelectorController = new OptionSelectorController<>((RecyclerView) view, colorSectionController.mWallpaperColorOptions, true, 2);
-                optionSelectorController.initOptions(colorSectionController.mColorManager);
-                colorSectionController.setUpColorOptionsController(optionSelectorController);
+                ViewPager2 viewPager2 = colorPageViewHolder2.mContainer;
+                int i2 = this.mNumColors;
+                final PageIndicator pageIndicator = colorPageViewHolder2.mPageIndicator;
+                viewPager2.setAdapter(new ColorPageAdapter(colorSectionController.mWallpaperColorOptions, i2));
+                int indexOf = colorSectionController.mWallpaperColorOptions.indexOf(colorSectionController.mSelectedColor);
+                if (indexOf >= 0 && i2 != 0) {
+                    viewPager2.setCurrentItem(indexOf / i2, false);
+                }
+                pageIndicator.setNumPages((int) Math.ceil(colorSectionController.mWallpaperColorOptions.size() / i2));
+                viewPager2.mExternalPageChangeCallbacks.mCallbacks.add(new ViewPager2.OnPageChangeCallback() { // from class: com.android.customization.model.color.ColorSectionController.2
+                    @Override // androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
+                    public final void onPageScrolled(int i3, float f, int i4) {
+                        PageIndicator.this.setLocation(i3);
+                    }
+
+                    @Override // androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
+                    public final void onPageSelected(int i3) {
+                        PageIndicator.this.setLocation(i3);
+                    }
+                });
             } else if (i == 1) {
                 ColorSectionController colorSectionController2 = ColorSectionController.this;
-                OptionSelectorController<ColorOption> optionSelectorController2 = new OptionSelectorController<>((RecyclerView) view, colorSectionController2.mPresetColorOptions, true, 2);
-                optionSelectorController2.initOptions(colorSectionController2.mColorManager);
-                colorSectionController2.setUpColorOptionsController(optionSelectorController2);
+                ViewPager2 viewPager22 = colorPageViewHolder2.mContainer;
+                int i3 = this.mNumColors;
+                final PageIndicator pageIndicator2 = colorPageViewHolder2.mPageIndicator;
+                viewPager22.setAdapter(new ColorPageAdapter(colorSectionController2.mPresetColorOptions, i3));
+                int indexOf2 = colorSectionController2.mPresetColorOptions.indexOf(colorSectionController2.mSelectedColor);
+                if (indexOf2 >= 0 && i3 != 0) {
+                    viewPager22.setCurrentItem(indexOf2 / i3, false);
+                }
+                pageIndicator2.setNumPages((int) Math.ceil(colorSectionController2.mPresetColorOptions.size() / i3));
+                viewPager22.mExternalPageChangeCallbacks.mCallbacks.add(new ViewPager2.OnPageChangeCallback() { // from class: com.android.customization.model.color.ColorSectionController.2
+                    @Override // androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
+                    public final void onPageScrolled(int i32, float f, int i4) {
+                        PageIndicator.this.setLocation(i32);
+                    }
+
+                    @Override // androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
+                    public final void onPageSelected(int i32) {
+                        PageIndicator.this.setLocation(i32);
+                    }
+                });
             }
         }
 
         @Override // androidx.recyclerview.widget.RecyclerView.Adapter
-        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-            return new ColorOptionsViewHolder(this, LayoutInflater.from(viewGroup.getContext()).inflate(i, viewGroup, false));
+        public final RecyclerView.ViewHolder onCreateViewHolder(RecyclerView recyclerView, int i) {
+            return new ColorPageViewHolder(LayoutInflater.from(recyclerView.getContext()).inflate(i, (ViewGroup) recyclerView, false));
         }
-    }
 
-    public ColorSectionController(Activity activity, WallpaperColorsViewModel wallpaperColorsViewModel, LifecycleOwner lifecycleOwner, Bundle bundle) {
-        this.mTabPositionToRestore = Optional.empty();
-        this.mEventLogger = (ThemesUserEventLogger) ((CustomizationInjector) InjectorProvider.getInjector()).getUserEventLogger(activity);
-        this.mColorManager = ColorCustomizationManager.getInstance(activity, new OverlayManagerCompat(activity));
-        this.mWallpaperColorsViewModel = wallpaperColorsViewModel;
-        this.mLifecycleOwner = lifecycleOwner;
-        if (bundle != null && bundle.containsKey("COLOR_TAB_POSITION")) {
-            this.mTabPositionToRestore = Optional.of(Integer.valueOf(bundle.getInt("COLOR_TAB_POSITION")));
+        @Override // androidx.recyclerview.widget.RecyclerView.Adapter
+        public final int getItemCount() {
+            return this.mItemCounts;
         }
-    }
-
-    @Override // com.android.wallpaper.model.CustomizationSectionController
-    public ColorSectionView createView(Context context) {
-        ColorSectionView colorSectionView = (ColorSectionView) LayoutInflater.from(context).inflate(R.layout.color_section_view, (ViewGroup) null);
-        this.mColorSectionView = colorSectionView;
-        ViewPager2 viewPager2 = (ViewPager2) colorSectionView.findViewById(R.id.color_view_pager);
-        this.mColorViewPager = viewPager2;
-        ColorSectionAdapter colorSectionAdapter = this.mColorSectionAdapter;
-        RecyclerView.Adapter<?> adapter = viewPager2.mRecyclerView.getAdapter();
-        viewPager2.mAccessibilityProvider.onDetachAdapter(adapter);
-        if (adapter != null) {
-            adapter.mObservable.unregisterObserver(viewPager2.mCurrentItemDataSetChangeObserver);
-        }
-        viewPager2.mRecyclerView.setAdapter(colorSectionAdapter);
-        viewPager2.mCurrentItem = 0;
-        viewPager2.restorePendingState();
-        viewPager2.mAccessibilityProvider.onAttachAdapter(colorSectionAdapter);
-        if (colorSectionAdapter != null) {
-            colorSectionAdapter.mObservable.registerObserver(viewPager2.mCurrentItemDataSetChangeObserver);
-        }
-        ViewPager2 viewPager22 = this.mColorViewPager;
-        viewPager22.mUserInputEnabled = false;
-        ((ViewPager2.PageAwareAccessibilityProvider) viewPager22.mAccessibilityProvider).updatePageAccessibilityActions();
-        SeparatedTabLayout separatedTabLayout = (SeparatedTabLayout) this.mColorSectionView.findViewById(R.id.separated_tabs);
-        this.mTabLayout = separatedTabLayout;
-        ViewPager2 viewPager23 = this.mColorViewPager;
-        Objects.requireNonNull(separatedTabLayout);
-        viewPager23.mExternalPageChangeCallbacks.mCallbacks.add(new SeparatedTabLayout.SeparatedTabLayoutOnPageChangeCallback(separatedTabLayout, null));
-        SeparatedTabLayout.SeparatedTabLayoutOnTabSelectedListener separatedTabLayoutOnTabSelectedListener = new SeparatedTabLayout.SeparatedTabLayoutOnTabSelectedListener(viewPager23, null);
-        if (!separatedTabLayout.selectedListeners.contains(separatedTabLayoutOnTabSelectedListener)) {
-            separatedTabLayout.selectedListeners.add(separatedTabLayoutOnTabSelectedListener);
-        }
-        this.mWallpaperColorsViewModel.getHomeWallpaperColors().observe(this.mLifecycleOwner, new Observer(this) { // from class: com.android.customization.model.color.ColorSectionController$$ExternalSyntheticLambda0
-            public final /* synthetic */ ColorSectionController f$0;
-
-            {
-                this.f$0 = this;
-            }
-
-            @Override // androidx.lifecycle.Observer
-            public final void onChanged(Object obj) {
-                switch (r2) {
-                    case 0:
-                        ColorSectionController colorSectionController = this.f$0;
-                        colorSectionController.mHomeWallpaperColors = (WallpaperColors) obj;
-                        colorSectionController.mHomeWallpaperColorsReady = true;
-                        colorSectionController.maybeLoadColors();
-                        return;
-                    default:
-                        ColorSectionController colorSectionController2 = this.f$0;
-                        colorSectionController2.mLockWallpaperColors = (WallpaperColors) obj;
-                        colorSectionController2.mLockWallpaperColorsReady = true;
-                        colorSectionController2.maybeLoadColors();
-                        return;
-                }
-            }
-        });
-        this.mWallpaperColorsViewModel.getLockWallpaperColors().observe(this.mLifecycleOwner, new Observer(this) { // from class: com.android.customization.model.color.ColorSectionController$$ExternalSyntheticLambda0
-            public final /* synthetic */ ColorSectionController f$0;
-
-            {
-                this.f$0 = this;
-            }
-
-            @Override // androidx.lifecycle.Observer
-            public final void onChanged(Object obj) {
-                switch (r2) {
-                    case 0:
-                        ColorSectionController colorSectionController = this.f$0;
-                        colorSectionController.mHomeWallpaperColors = (WallpaperColors) obj;
-                        colorSectionController.mHomeWallpaperColorsReady = true;
-                        colorSectionController.maybeLoadColors();
-                        return;
-                    default:
-                        ColorSectionController colorSectionController2 = this.f$0;
-                        colorSectionController2.mLockWallpaperColors = (WallpaperColors) obj;
-                        colorSectionController2.mLockWallpaperColorsReady = true;
-                        colorSectionController2.maybeLoadColors();
-                        return;
-                }
-            }
-        });
-        return this.mColorSectionView;
     }
 
     /* JADX WARN: Removed duplicated region for block: B:23:0x0031  */
@@ -278,7 +301,7 @@ public class ColorSectionController implements CustomizationSectionController<Co
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public boolean isAvailable(android.content.Context r3) {
+    public final boolean isAvailable(android.content.Context r3) {
         /*
             r2 = this;
             r0 = 1
@@ -333,47 +356,81 @@ public class ColorSectionController implements CustomizationSectionController<Co
 
     /* JADX WARN: Multi-variable type inference failed */
     public final void maybeLoadColors() {
+        WallpaperColors wallpaperColors;
+        boolean z;
         if (this.mHomeWallpaperColorsReady && this.mLockWallpaperColorsReady) {
             ColorCustomizationManager colorCustomizationManager = this.mColorManager;
-            WallpaperColors wallpaperColors = this.mHomeWallpaperColors;
-            WallpaperColors wallpaperColors2 = this.mLockWallpaperColors;
-            colorCustomizationManager.mHomeWallpaperColors = wallpaperColors;
-            colorCustomizationManager.mLockWallpaperColors = wallpaperColors2;
-            AnonymousClass1 r10 = new AnonymousClass1();
-            if (wallpaperColors2 != null && wallpaperColors2.equals(wallpaperColors)) {
-                wallpaperColors2 = null;
+            WallpaperColors wallpaperColors2 = this.mHomeWallpaperColors;
+            WallpaperColors wallpaperColors3 = this.mLockWallpaperColors;
+            colorCustomizationManager.mHomeWallpaperColors = wallpaperColors2;
+            colorCustomizationManager.mLockWallpaperColors = wallpaperColors3;
+            AnonymousClass1 r9 = new AnonymousClass1();
+            if (wallpaperColors3 == null || !wallpaperColors3.equals(wallpaperColors2)) {
+                wallpaperColors = wallpaperColors3;
+            } else {
+                wallpaperColors = null;
             }
-            WallpaperColors wallpaperColors3 = wallpaperColors2;
             ColorOptionsProvider colorOptionsProvider = colorCustomizationManager.mProvider;
             WallpaperColors wallpaperColors4 = colorCustomizationManager.mHomeWallpaperColors;
             ColorProvider colorProvider = (ColorProvider) colorOptionsProvider;
-            boolean z = !Intrinsics.areEqual(colorProvider.homeWallpaperColors, wallpaperColors4) || !Intrinsics.areEqual(colorProvider.lockWallpaperColors, wallpaperColors3);
-            if (z) {
+            if (!Intrinsics.areEqual(colorProvider.homeWallpaperColors, wallpaperColors4) || !Intrinsics.areEqual(colorProvider.lockWallpaperColors, wallpaperColors)) {
+                z = true;
+            } else {
+                z = false;
+            }
+            boolean z2 = z;
+            if (z2) {
                 colorProvider.homeWallpaperColors = wallpaperColors4;
-                colorProvider.lockWallpaperColors = wallpaperColors3;
+                colorProvider.lockWallpaperColors = wallpaperColors;
             }
             List<? extends ColorOption> list = colorProvider.colorBundles;
-            if (list == null || z) {
-                BuildersKt.launch$default(colorProvider.scope, null, null, new ColorProvider$fetch$1(colorProvider, false, z, wallpaperColors4, wallpaperColors3, r10, null), 3, null);
+            if (list == null || z2) {
+                BuildersKt.launch$default(colorProvider.scope, null, new ColorProvider$fetch$1(colorProvider, false, z2, wallpaperColors4, wallpaperColors, r9, null), 3);
             } else {
-                r10.onOptionsLoaded(list);
+                r9.onOptionsLoaded(list);
             }
         }
     }
 
     @Override // com.android.wallpaper.model.CustomizationSectionController
-    public void onSaveInstanceState(Bundle bundle) {
-        ViewPager2 viewPager2 = this.mColorViewPager;
+    public final void onSaveInstanceState(Bundle bundle) {
+        ViewPager2 viewPager2 = this.mColorSectionViewPager;
         if (viewPager2 != null) {
             bundle.putInt("COLOR_TAB_POSITION", viewPager2.mCurrentItem);
         }
     }
 
-    public final void setUpColorOptionsController(OptionSelectorController<ColorOption> optionSelectorController) {
-        ColorOption colorOption = this.mSelectedColor;
-        if (colorOption != null && optionSelectorController.mOptions.contains(colorOption)) {
-            optionSelectorController.setSelectedOption(this.mSelectedColor);
+    public ColorSectionController(FragmentActivity fragmentActivity, WallpaperColorsViewModel wallpaperColorsViewModel, FragmentViewLifecycleOwner fragmentViewLifecycleOwner, Bundle bundle) {
+        this.mTabPositionToRestore = Optional.empty();
+        this.mEventLogger = ((CustomizationInjector) R$style.getInjector()).getUserEventLogger(fragmentActivity);
+        this.mColorManager = ColorCustomizationManager.getInstance(fragmentActivity, new OverlayManagerCompat(fragmentActivity));
+        this.mWallpaperColorsViewModel = wallpaperColorsViewModel;
+        this.mLifecycleOwner = fragmentViewLifecycleOwner;
+        if (bundle != null && bundle.containsKey("COLOR_TAB_POSITION")) {
+            this.mTabPositionToRestore = Optional.of(Integer.valueOf(bundle.getInt("COLOR_TAB_POSITION")));
         }
-        optionSelectorController.mListeners.add(new GridFragment$2$$ExternalSyntheticLambda0(this));
+    }
+
+    @Override // com.android.wallpaper.model.CustomizationSectionController
+    public final ColorSectionView createView(Context context) {
+        ColorSectionView colorSectionView = (ColorSectionView) LayoutInflater.from(context).inflate(R.layout.color_section_view, (ViewGroup) null);
+        this.mColorSectionView = colorSectionView;
+        ViewPager2 viewPager2 = (ViewPager2) colorSectionView.findViewById(R.id.color_section_view_pager);
+        this.mColorSectionViewPager = viewPager2;
+        viewPager2.setAdapter(this.mColorSectionAdapter);
+        ViewPager2 viewPager22 = this.mColorSectionViewPager;
+        viewPager22.mUserInputEnabled = false;
+        viewPager22.mAccessibilityProvider.updatePageAccessibilityActions();
+        this.mColorSectionViewPager.setImportantForAccessibility(2);
+        this.mTabLayout = (SeparatedTabLayout) this.mColorSectionView.findViewById(R.id.separated_tabs);
+        this.mColorSectionAdapter.mNumColors = context.getResources().getInteger(R.integer.options_grid_num_columns);
+        SeparatedTabLayout separatedTabLayout = this.mTabLayout;
+        ViewPager2 viewPager23 = this.mColorSectionViewPager;
+        separatedTabLayout.getClass();
+        viewPager23.mExternalPageChangeCallbacks.mCallbacks.add(new SeparatedTabLayout.SeparatedTabLayoutOnPageChangeCallback(separatedTabLayout));
+        separatedTabLayout.addOnTabSelectedListener(new SeparatedTabLayout.SeparatedTabLayoutOnTabSelectedListener(viewPager23));
+        ((MutableLiveData) this.mWallpaperColorsViewModel.homeWallpaperColors$delegate.getValue()).observe(this.mLifecycleOwner, new LivePreviewFragment$$ExternalSyntheticLambda6(this));
+        ((MutableLiveData) this.mWallpaperColorsViewModel.lockWallpaperColors$delegate.getValue()).observe(this.mLifecycleOwner, new WallpaperSurfaceCallback$$ExternalSyntheticLambda0(this));
+        return this.mColorSectionView;
     }
 }

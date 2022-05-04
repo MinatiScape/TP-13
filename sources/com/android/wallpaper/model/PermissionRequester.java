@@ -1,7 +1,7 @@
 package com.android.wallpaper.model;
 
-import com.android.wallpaper.picker.MyPhotosStarter;
+import com.android.wallpaper.model.WallpaperSectionController;
 /* loaded from: classes.dex */
 public interface PermissionRequester {
-    void requestExternalStoragePermission(MyPhotosStarter.PermissionChangedListener permissionChangedListener);
+    void requestExternalStoragePermission(WallpaperSectionController.AnonymousClass1 r1);
 }

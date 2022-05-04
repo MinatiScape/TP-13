@@ -12,14 +12,14 @@ public final class MediaBrowserCompat {
     /* loaded from: classes.dex */
     public static class CustomActionResultReceiver extends ResultReceiver {
         @Override // android.support.v4.os.ResultReceiver
-        public void onReceiveResult(int i, Bundle bundle) {
+        public final void onReceiveResult(int i, Bundle bundle) {
         }
     }
 
     /* loaded from: classes.dex */
     public static class ItemReceiver extends ResultReceiver {
         @Override // android.support.v4.os.ResultReceiver
-        public void onReceiveResult(int i, Bundle bundle) {
+        public final void onReceiveResult(int i, Bundle bundle) {
             if (bundle != null) {
                 bundle.setClassLoader(MediaBrowserCompat.class.getClassLoader());
             }
@@ -39,43 +39,43 @@ public final class MediaBrowserCompat {
     public static class MediaItem implements Parcelable {
         public static final Parcelable.Creator<MediaItem> CREATOR = new Parcelable.Creator<MediaItem>() { // from class: android.support.v4.media.MediaBrowserCompat.MediaItem.1
             @Override // android.os.Parcelable.Creator
-            public MediaItem createFromParcel(Parcel parcel) {
+            public final MediaItem createFromParcel(Parcel parcel) {
                 return new MediaItem(parcel);
             }
 
             @Override // android.os.Parcelable.Creator
-            public MediaItem[] newArray(int i) {
+            public final MediaItem[] newArray(int i) {
                 return new MediaItem[i];
             }
         };
         public final MediaDescriptionCompat mDescription;
         public final int mFlags;
 
-        public MediaItem(Parcel parcel) {
-            this.mFlags = parcel.readInt();
-            this.mDescription = MediaDescriptionCompat.CREATOR.createFromParcel(parcel);
-        }
-
         @Override // android.os.Parcelable
-        public int describeContents() {
+        public final int describeContents() {
             return 0;
         }
 
-        public String toString() {
+        public final String toString() {
             return "MediaItem{mFlags=" + this.mFlags + ", mDescription=" + this.mDescription + '}';
         }
 
         @Override // android.os.Parcelable
-        public void writeToParcel(Parcel parcel, int i) {
+        public final void writeToParcel(Parcel parcel, int i) {
             parcel.writeInt(this.mFlags);
             this.mDescription.writeToParcel(parcel, i);
+        }
+
+        public MediaItem(Parcel parcel) {
+            this.mFlags = parcel.readInt();
+            this.mDescription = MediaDescriptionCompat.CREATOR.createFromParcel(parcel);
         }
     }
 
     /* loaded from: classes.dex */
     public static class SearchResultReceiver extends ResultReceiver {
         @Override // android.support.v4.os.ResultReceiver
-        public void onReceiveResult(int i, Bundle bundle) {
+        public final void onReceiveResult(int i, Bundle bundle) {
             if (bundle != null) {
                 bundle.setClassLoader(MediaBrowserCompat.class.getClassLoader());
             }

@@ -1,6 +1,7 @@
 package kotlin;
 
 import org.jetbrains.annotations.NotNull;
+/* compiled from: Lazy.kt */
 /* loaded from: classes.dex */
 public final class UNINITIALIZED_VALUE {
     @NotNull

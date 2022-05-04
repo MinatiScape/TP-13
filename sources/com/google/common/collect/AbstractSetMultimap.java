@@ -6,30 +6,22 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 /* loaded from: classes.dex */
-public abstract class AbstractSetMultimap<K, V> extends AbstractMapBasedMultimap<K, V> implements SetMultimap<K, V> {
+abstract class AbstractSetMultimap<K, V> extends AbstractMapBasedMultimap<K, V> implements SetMultimap<K, V> {
     private static final long serialVersionUID = 7431625294878419160L;
 
-    public AbstractSetMultimap(Map<K, Collection<V>> map) {
-        super(map);
-    }
-
     @Override // com.google.common.collect.AbstractMultimap, com.google.common.collect.Multimap
-    public Map<K, Collection<V>> asMap() {
+    public final Map<K, Collection<V>> asMap() {
         Map<K, Collection<V>> map = this.asMap;
         if (map != null) {
             return map;
         }
-        Map<K, Collection<V>> createAsMap = createAsMap();
+        AbstractMapBasedMultimap.AsMap createAsMap = createAsMap();
         this.asMap = createAsMap;
         return createAsMap;
     }
 
-    @Override // com.google.common.collect.AbstractMultimap
-    public boolean equals(Object object) {
-        return super.equals(object);
-    }
-
-    public Set<V> get(K key) {
+    @Override // com.google.common.collect.SetMultimap
+    public final Set<V> get(K key) {
         Collection<V> collection = this.map.get(key);
         if (collection == null) {
             collection = createCollection(key);
@@ -45,5 +37,14 @@ public abstract class AbstractSetMultimap<K, V> extends AbstractMapBasedMultimap
     @Override // com.google.common.collect.AbstractMapBasedMultimap
     public Collection<V> wrapCollection(K key, Collection<V> collection) {
         return new AbstractMapBasedMultimap.WrappedSet(key, (Set) collection);
+    }
+
+    @Override // com.google.common.collect.AbstractMultimap
+    public final boolean equals(Object object) {
+        return super.equals(object);
+    }
+
+    public AbstractSetMultimap(Map<K, Collection<V>> map) {
+        super(map);
     }
 }

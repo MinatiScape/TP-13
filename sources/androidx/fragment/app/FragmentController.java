@@ -1,13 +1,15 @@
 package androidx.fragment.app;
+
+import androidx.fragment.app.FragmentActivity;
 /* loaded from: classes.dex */
-public class FragmentController {
+public final class FragmentController {
     public final FragmentHostCallback<?> mHost;
 
-    public FragmentController(FragmentHostCallback<?> fragmentHostCallback) {
-        this.mHost = fragmentHostCallback;
+    public final void noteStateNotSaved() {
+        this.mHost.mFragmentManager.noteStateNotSaved();
     }
 
-    public void noteStateNotSaved() {
-        this.mHost.mFragmentManager.noteStateNotSaved();
+    public FragmentController(FragmentActivity.HostCallbacks hostCallbacks) {
+        this.mHost = hostCallbacks;
     }
 }

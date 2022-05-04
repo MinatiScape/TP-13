@@ -3,7 +3,7 @@ package com.google.protobuf;
 public interface MessageInfo {
     MessageLite getDefaultInstance();
 
-    int getSyntax$enumunboxing$();
+    ProtoSyntax getSyntax();
 
     boolean isMessageSetWireFormat();
 }

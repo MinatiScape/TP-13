@@ -1,7 +1,7 @@
 package com.bumptech.glide.load.engine;
 
-import androidx.viewpager2.widget.FakeDrag$$ExternalSyntheticOutline0;
-import com.android.systemui.shared.R;
+import androidx.collection.ContainerHelpers;
+import androidx.collection.SimpleArrayMap;
 import com.bumptech.glide.GlideContext;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.Registry;
@@ -9,13 +9,10 @@ import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.Transformation;
 import com.bumptech.glide.load.engine.DecodeJob;
-import com.bumptech.glide.load.engine.Engine;
-import com.bumptech.glide.load.engine.cache.DiskCache;
 import com.bumptech.glide.load.model.ModelLoader;
 import com.bumptech.glide.load.resource.UnitTransformation;
 import com.bumptech.glide.load.resource.transcode.ResourceTranscoder;
 import com.bumptech.glide.load.resource.transcode.TranscoderRegistry;
-import com.bumptech.glide.load.resource.transcode.UnitTranscoder;
 import com.bumptech.glide.provider.LoadPathCache;
 import com.bumptech.glide.provider.ResourceDecoderRegistry;
 import com.bumptech.glide.util.MultiClassKey;
@@ -23,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public final class DecodeHelper<Transcode> {
     public DecodeJob.DiskCacheProvider diskCacheProvider;
@@ -42,17 +38,17 @@ public final class DecodeHelper<Transcode> {
     public Class<Transcode> transcodeClass;
     public Map<Class<?>, Transformation<?>> transformations;
     public int width;
-    public final List<ModelLoader.LoadData<?>> loadData = new ArrayList();
-    public final List<Key> cacheKeys = new ArrayList();
+    public final ArrayList loadData = new ArrayList();
+    public final ArrayList cacheKeys = new ArrayList();
 
-    public List<Key> getCacheKeys() {
+    public final ArrayList getCacheKeys() {
         if (!this.isCacheKeysSet) {
             this.isCacheKeysSet = true;
             this.cacheKeys.clear();
-            List<ModelLoader.LoadData<?>> loadData = getLoadData();
+            ArrayList loadData = getLoadData();
             int size = loadData.size();
             for (int i = 0; i < size; i++) {
-                ModelLoader.LoadData<?> loadData2 = loadData.get(i);
+                ModelLoader.LoadData loadData2 = (ModelLoader.LoadData) loadData.get(i);
                 if (!this.cacheKeys.contains(loadData2.sourceKey)) {
                     this.cacheKeys.add(loadData2.sourceKey);
                 }
@@ -66,18 +62,14 @@ public final class DecodeHelper<Transcode> {
         return this.cacheKeys;
     }
 
-    public DiskCache getDiskCache() {
-        return ((Engine.LazyDiskCacheProvider) this.diskCacheProvider).getDiskCache();
-    }
-
-    public List<ModelLoader.LoadData<?>> getLoadData() {
+    public final ArrayList getLoadData() {
         if (!this.isLoadDataSet) {
             this.isLoadDataSet = true;
             this.loadData.clear();
             List modelLoaders = this.glideContext.registry.getModelLoaders(this.model);
             int size = modelLoaders.size();
             for (int i = 0; i < size; i++) {
-                ModelLoader.LoadData<?> buildLoadData = ((ModelLoader) modelLoaders.get(i)).buildLoadData(this.model, this.width, this.height, this.options);
+                ModelLoader.LoadData buildLoadData = ((ModelLoader) modelLoaders.get(i)).buildLoadData(this.model, this.width, this.height, this.options);
                 if (buildLoadData != null) {
                     this.loadData.add(buildLoadData);
                 }
@@ -87,26 +79,30 @@ public final class DecodeHelper<Transcode> {
     }
 
     /* JADX WARN: Multi-variable type inference failed */
-    public <Data> LoadPath<Data, ?, Transcode> getLoadPath(Class<Data> dataClass) {
+    public final <Data> LoadPath<Data, ?, Transcode> getLoadPath(Class<Data> cls) {
         LoadPath<Data, ?, Transcode> loadPath;
+        LoadPath<Data, ?, Transcode> loadPath2;
+        Object obj;
         ArrayList arrayList;
+        boolean z;
         ResourceTranscoder resourceTranscoder;
+        boolean z2;
         Registry registry = this.glideContext.registry;
-        Class<?> cls = this.resourceClass;
-        Class cls2 = (Class<Transcode>) this.transcodeClass;
+        Class<?> cls2 = this.resourceClass;
+        Class cls3 = (Class<Transcode>) this.transcodeClass;
         LoadPathCache loadPathCache = registry.loadPathCache;
         MultiClassKey andSet = loadPathCache.keyRef.getAndSet(null);
         if (andSet == null) {
             andSet = new MultiClassKey();
         }
-        andSet.first = dataClass;
-        andSet.second = cls;
-        andSet.third = cls2;
+        andSet.first = cls;
+        andSet.second = cls2;
+        andSet.third = cls3;
         synchronized (loadPathCache.cache) {
             loadPath = (LoadPath<Data, ?, Transcode>) loadPathCache.cache.getOrDefault(andSet, null);
         }
         loadPathCache.keyRef.set(andSet);
-        Objects.requireNonNull(registry.loadPathCache);
+        registry.loadPathCache.getClass();
         if (LoadPathCache.NO_PATHS_SIGNAL.equals(loadPath)) {
             return null;
         }
@@ -114,20 +110,26 @@ public final class DecodeHelper<Transcode> {
             return loadPath;
         }
         ArrayList arrayList2 = new ArrayList();
-        Iterator it = ((ArrayList) registry.decoderRegistry.getResourceClasses(dataClass, cls)).iterator();
+        Iterator it = registry.decoderRegistry.getResourceClasses(cls, cls2).iterator();
         while (it.hasNext()) {
-            Class<?> cls3 = (Class) it.next();
-            Iterator it2 = ((ArrayList) registry.transcoderRegistry.getTranscodeClasses(cls3, cls2)).iterator();
+            Class<?> cls4 = (Class) it.next();
+            Iterator it2 = registry.transcoderRegistry.getTranscodeClasses(cls4, cls3).iterator();
             while (it2.hasNext()) {
-                Class<?> cls4 = (Class) it2.next();
+                Class cls5 = (Class) it2.next();
                 ResourceDecoderRegistry resourceDecoderRegistry = registry.decoderRegistry;
                 synchronized (resourceDecoderRegistry) {
                     arrayList = new ArrayList();
-                    for (String str : resourceDecoderRegistry.bucketPriorityList) {
-                        List<ResourceDecoderRegistry.Entry<?, ?>> list = resourceDecoderRegistry.decoders.get(str);
+                    Iterator it3 = resourceDecoderRegistry.bucketPriorityList.iterator();
+                    while (it3.hasNext()) {
+                        List<ResourceDecoderRegistry.Entry> list = (List) resourceDecoderRegistry.decoders.get((String) it3.next());
                         if (list != null) {
-                            for (ResourceDecoderRegistry.Entry<?, ?> entry : list) {
-                                if (entry.handles(dataClass, cls3)) {
+                            for (ResourceDecoderRegistry.Entry entry : list) {
+                                if (!entry.dataClass.isAssignableFrom(cls) || !cls4.isAssignableFrom(entry.resourceClass)) {
+                                    z2 = false;
+                                } else {
+                                    z2 = true;
+                                }
+                                if (z2) {
                                     arrayList.add(entry.decoder);
                                 }
                             }
@@ -136,31 +138,44 @@ public final class DecodeHelper<Transcode> {
                 }
                 TranscoderRegistry transcoderRegistry = registry.transcoderRegistry;
                 synchronized (transcoderRegistry) {
-                    if (cls4.isAssignableFrom(cls3)) {
-                        resourceTranscoder = UnitTranscoder.UNIT_TRANSCODER;
+                    if (cls5.isAssignableFrom(cls4)) {
+                        resourceTranscoder = ContainerHelpers.UNIT_TRANSCODER;
                     } else {
-                        for (TranscoderRegistry.Entry<?, ?> entry2 : transcoderRegistry.transcoders) {
-                            if (entry2.handles(cls3, cls4)) {
+                        Iterator it4 = transcoderRegistry.transcoders.iterator();
+                        while (it4.hasNext()) {
+                            TranscoderRegistry.Entry entry2 = (TranscoderRegistry.Entry) it4.next();
+                            if (!entry2.fromClass.isAssignableFrom(cls4) || !cls5.isAssignableFrom(entry2.toClass)) {
+                                z = false;
+                                continue;
+                            } else {
+                                z = true;
+                                continue;
+                            }
+                            if (z) {
                                 resourceTranscoder = entry2.transcoder;
                             }
                         }
-                        String valueOf = String.valueOf(cls3);
-                        String valueOf2 = String.valueOf(cls4);
-                        StringBuilder sb = new StringBuilder(valueOf.length() + 47 + valueOf2.length());
-                        sb.append("No transcoder registered to transcode from ");
-                        sb.append(valueOf);
-                        sb.append(" to ");
-                        sb.append(valueOf2);
-                        throw new IllegalArgumentException(sb.toString());
+                        throw new IllegalArgumentException("No transcoder registered to transcode from " + cls4 + " to " + cls5);
                     }
                 }
-                arrayList2.add(new DecodePath(dataClass, cls3, cls4, arrayList, resourceTranscoder, registry.throwableListPool));
+                arrayList2.add(new DecodePath(cls, cls4, cls5, arrayList, resourceTranscoder, registry.throwableListPool));
             }
         }
-        LoadPath<Data, ?, Transcode> loadPath2 = arrayList2.isEmpty() ? null : new LoadPath<>(dataClass, cls, cls2, arrayList2, registry.throwableListPool);
+        if (arrayList2.isEmpty()) {
+            loadPath2 = null;
+        } else {
+            loadPath2 = new LoadPath<>(cls, cls2, cls3, arrayList2, registry.throwableListPool);
+        }
         LoadPathCache loadPathCache2 = registry.loadPathCache;
         synchronized (loadPathCache2.cache) {
-            loadPathCache2.cache.put(new MultiClassKey(dataClass, cls, cls2), loadPath2 != null ? loadPath2 : LoadPathCache.NO_PATHS_SIGNAL);
+            SimpleArrayMap simpleArrayMap = loadPathCache2.cache;
+            MultiClassKey multiClassKey = new MultiClassKey(cls, cls2, cls3);
+            if (loadPath2 != null) {
+                obj = loadPath2;
+            } else {
+                obj = LoadPathCache.NO_PATHS_SIGNAL;
+            }
+            simpleArrayMap.put(multiClassKey, obj);
         }
         return loadPath2;
     }
@@ -172,7 +187,7 @@ public final class DecodeHelper<Transcode> {
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public <X> com.bumptech.glide.load.Encoder<X> getSourceEncoder(X r5) throws com.bumptech.glide.Registry.NoSourceEncoderAvailableException {
+    public final <X> com.bumptech.glide.load.Encoder<X> getSourceEncoder(X r5) throws com.bumptech.glide.Registry.NoSourceEncoderAvailableException {
         /*
             r4 = this;
             com.bumptech.glide.GlideContext r4 = r4.glideContext
@@ -180,7 +195,7 @@ public final class DecodeHelper<Transcode> {
             com.bumptech.glide.provider.EncoderRegistry r4 = r4.encoderRegistry
             java.lang.Class r0 = r5.getClass()
             monitor-enter(r4)
-            java.util.List<com.bumptech.glide.provider.EncoderRegistry$Entry<?>> r1 = r4.encoders     // Catch: java.lang.Throwable -> L38
+            java.util.ArrayList r1 = r4.encoders     // Catch: java.lang.Throwable -> L38
             java.util.Iterator r1 = r1.iterator()     // Catch: java.lang.Throwable -> L38
         L11:
             boolean r2 = r1.hasNext()     // Catch: java.lang.Throwable -> L38
@@ -212,8 +227,8 @@ public final class DecodeHelper<Transcode> {
         throw new UnsupportedOperationException("Method not decompiled: com.bumptech.glide.load.engine.DecodeHelper.getSourceEncoder(java.lang.Object):com.bumptech.glide.load.Encoder");
     }
 
-    public <Z> Transformation<Z> getTransformation(Class<Z> resourceClass) {
-        Transformation<Z> transformation = (Transformation<Z>) this.transformations.get(resourceClass);
+    public final <Z> Transformation<Z> getTransformation(Class<Z> cls) {
+        Transformation<Z> transformation = (Transformation<Z>) this.transformations.get(cls);
         if (transformation == null) {
             Iterator<Map.Entry<Class<?>, Transformation<?>>> it = this.transformations.entrySet().iterator();
             while (true) {
@@ -221,7 +236,7 @@ public final class DecodeHelper<Transcode> {
                     break;
                 }
                 Map.Entry<Class<?>, Transformation<?>> next = it.next();
-                if (next.getKey().isAssignableFrom(resourceClass)) {
+                if (next.getKey().isAssignableFrom(cls)) {
                     transformation = (Transformation<Z>) next.getValue();
                     break;
                 }
@@ -231,14 +246,8 @@ public final class DecodeHelper<Transcode> {
             return transformation;
         }
         if (!this.transformations.isEmpty() || !this.isTransformationRequired) {
-            return (UnitTransformation) UnitTransformation.TRANSFORMATION;
+            return UnitTransformation.TRANSFORMATION;
         }
-        String valueOf = String.valueOf(resourceClass);
-        throw new IllegalArgumentException(FakeDrag$$ExternalSyntheticOutline0.m(valueOf.length() + R.styleable.AppCompatTheme_tooltipFrameBackground, "Missing transformation for ", valueOf, ". If you wish to ignore unknown resource types, use the optional transformation methods."));
-    }
-
-    /* JADX WARN: Multi-variable type inference failed */
-    public boolean hasLoadPath(Class<?> dataClass) {
-        return getLoadPath(dataClass) != null;
+        throw new IllegalArgumentException("Missing transformation for " + cls + ". If you wish to ignore unknown resource types, use the optional transformation methods.");
     }
 }

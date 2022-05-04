@@ -20,7 +20,7 @@ public class SkiaImageDecoder implements ImageDecoder {
     }
 
     @Override // com.davemorrissey.labs.subscaleview.decoder.ImageDecoder
-    public Bitmap decode(Context context, Uri uri) throws Exception {
+    public final Bitmap decode(Context context, Uri uri) throws Exception {
         Bitmap bitmap;
         Throwable th;
         Resources resources;

@@ -10,6 +10,7 @@ import kotlin.jvm.internal.Intrinsics;
 import kotlin.jvm.internal.PropertyReference1Impl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: SmartspaceState.kt */
 /* loaded from: classes.dex */
 public final class SmartspaceState implements Parcelable {
     @NotNull
@@ -17,28 +18,11 @@ public final class SmartspaceState implements Parcelable {
     @NotNull
     private Rect boundsOnScreen;
     private int selectedPage;
+    private boolean visibleOnScreen;
 
-    /* renamed from: com.android.systemui.shared.system.smartspace.SmartspaceState$1  reason: invalid class name */
-    /* loaded from: classes.dex */
-    public /* synthetic */ class AnonymousClass1 extends PropertyReference1Impl {
-        public static final AnonymousClass1 INSTANCE = new AnonymousClass1();
-
-        public AnonymousClass1() {
-            super(JvmClassMappingKt.class, "javaClass", "getJavaClass(Ljava/lang/Object;)Ljava/lang/Class;", 1);
-        }
-
-        @Override // kotlin.jvm.internal.PropertyReference1Impl, kotlin.reflect.KProperty1
-        @Nullable
-        public Object get(@Nullable Object obj) {
-            return obj.getClass();
-        }
-    }
-
+    /* compiled from: SmartspaceState.kt */
     /* loaded from: classes.dex */
     public static final class CREATOR implements Parcelable.Creator<SmartspaceState> {
-        private CREATOR() {
-        }
-
         public /* synthetic */ CREATOR(DefaultConstructorMarker defaultConstructorMarker) {
             this();
         }
@@ -57,6 +41,9 @@ public final class SmartspaceState implements Parcelable {
         public SmartspaceState[] newArray(int i) {
             return new SmartspaceState[i];
         }
+
+        private CREATOR() {
+        }
     }
 
     public SmartspaceState() {
@@ -68,22 +55,26 @@ public final class SmartspaceState implements Parcelable {
         return 0;
     }
 
-    @NotNull
-    public final Rect getBoundsOnScreen() {
-        return this.boundsOnScreen;
-    }
+    /* compiled from: SmartspaceState.kt */
+    /* renamed from: com.android.systemui.shared.system.smartspace.SmartspaceState$1  reason: invalid class name */
+    /* loaded from: classes.dex */
+    public /* synthetic */ class AnonymousClass1 extends PropertyReference1Impl {
+        public static final AnonymousClass1 INSTANCE = new AnonymousClass1();
 
-    public final int getSelectedPage() {
-        return this.selectedPage;
+        public AnonymousClass1() {
+            super(JvmClassMappingKt.class, "javaClass", "getJavaClass(Ljava/lang/Object;)Ljava/lang/Class;", 1);
+        }
+
+        @Override // kotlin.jvm.internal.PropertyReference1Impl, kotlin.reflect.KProperty1
+        @Nullable
+        public Object get(@Nullable Object obj) {
+            return obj.getClass();
+        }
     }
 
     public final void setBoundsOnScreen(@NotNull Rect rect) {
         Intrinsics.checkNotNullParameter(rect, "<set-?>");
         this.boundsOnScreen = rect;
-    }
-
-    public final void setSelectedPage(int i) {
-        this.selectedPage = i;
     }
 
     @NotNull
@@ -92,6 +83,8 @@ public final class SmartspaceState implements Parcelable {
         m.append(this.boundsOnScreen);
         m.append(", selectedPage: ");
         m.append(this.selectedPage);
+        m.append(", visibleOnScreen: ");
+        m.append(this.visibleOnScreen);
         return m.toString();
     }
 
@@ -103,6 +96,9 @@ public final class SmartspaceState implements Parcelable {
         if (parcel != null) {
             parcel.writeInt(this.selectedPage);
         }
+        if (parcel != null) {
+            parcel.writeBoolean(this.visibleOnScreen);
+        }
     }
 
     /* JADX WARN: 'this' call moved to the top of the method (can break code semantics) */
@@ -110,8 +106,30 @@ public final class SmartspaceState implements Parcelable {
         this();
         Intrinsics.checkNotNullParameter(parcel, "parcel");
         Parcelable readParcelable = parcel.readParcelable(AnonymousClass1.INSTANCE.getClass().getClassLoader());
-        Intrinsics.checkNotNullExpressionValue(readParcelable, "parcel.readParcelable(Rect::javaClass.javaClass.classLoader)");
+        Intrinsics.checkNotNullExpressionValue(readParcelable, "parcel.readParcelable(Re…ss.javaClass.classLoader)");
         this.boundsOnScreen = (Rect) readParcelable;
         this.selectedPage = parcel.readInt();
+        this.visibleOnScreen = parcel.readBoolean();
+    }
+
+    public final void setSelectedPage(int i) {
+        this.selectedPage = i;
+    }
+
+    public final void setVisibleOnScreen(boolean z) {
+        this.visibleOnScreen = z;
+    }
+
+    @NotNull
+    public final Rect getBoundsOnScreen() {
+        return this.boundsOnScreen;
+    }
+
+    public final int getSelectedPage() {
+        return this.selectedPage;
+    }
+
+    public final boolean getVisibleOnScreen() {
+        return this.visibleOnScreen;
     }
 }

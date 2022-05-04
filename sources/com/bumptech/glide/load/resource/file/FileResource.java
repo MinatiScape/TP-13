@@ -1,27 +1,11 @@
 package com.bumptech.glide.load.resource.file;
 
+import androidx.collection.ContainerHelpers;
 import com.bumptech.glide.load.engine.Resource;
 import java.io.File;
-import java.util.Objects;
 /* loaded from: classes.dex */
-public class FileResource implements Resource {
-    public final T data;
-
-    /* JADX WARN: Multi-variable type inference failed */
-    public FileResource(File file) {
-        Objects.requireNonNull(file, "Argument must not be null");
-        this.data = file;
-    }
-
-    @Override // com.bumptech.glide.load.engine.Resource
-    public final Object get() {
-        return this.data;
-    }
-
-    @Override // com.bumptech.glide.load.engine.Resource
-    public Class getResourceClass() {
-        return this.data.getClass();
-    }
+public final class FileResource implements Resource<File> {
+    public final File data;
 
     @Override // com.bumptech.glide.load.engine.Resource
     public final /* bridge */ /* synthetic */ int getSize() {
@@ -29,6 +13,21 @@ public class FileResource implements Resource {
     }
 
     @Override // com.bumptech.glide.load.engine.Resource
-    public /* bridge */ /* synthetic */ void recycle() {
+    public final /* bridge */ /* synthetic */ void recycle() {
+    }
+
+    @Override // com.bumptech.glide.load.engine.Resource
+    public final Class<File> getResourceClass() {
+        return this.data.getClass();
+    }
+
+    public FileResource(File file) {
+        ContainerHelpers.checkNotNull(file);
+        this.data = file;
+    }
+
+    @Override // com.bumptech.glide.load.engine.Resource
+    public final File get() {
+        return this.data;
     }
 }

@@ -5,6 +5,7 @@ import kotlin.jvm.functions.Function2;
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: CoroutineContextImpl.kt */
 /* loaded from: classes.dex */
 public abstract class AbstractCoroutineContextElement implements CoroutineContext.Element {
     @NotNull
@@ -16,35 +17,32 @@ public abstract class AbstractCoroutineContextElement implements CoroutineContex
     }
 
     @Override // kotlin.coroutines.CoroutineContext
-    public <R> R fold(R r, @NotNull Function2<? super R, ? super CoroutineContext.Element, ? extends R> operation) {
-        Intrinsics.checkNotNullParameter(operation, "operation");
-        return (R) CoroutineContext.Element.DefaultImpls.fold(this, r, operation);
+    @NotNull
+    public CoroutineContext plus(@NotNull CoroutineContext context) {
+        Intrinsics.checkNotNullParameter(context, "context");
+        return CoroutineContext.DefaultImpls.plus(this, context);
+    }
+
+    @Override // kotlin.coroutines.CoroutineContext
+    public <R> R fold(R r, @NotNull Function2<? super R, ? super CoroutineContext.Element, ? extends R> function2) {
+        return (R) CoroutineContext.Element.DefaultImpls.fold(this, r, function2);
     }
 
     @Override // kotlin.coroutines.CoroutineContext.Element, kotlin.coroutines.CoroutineContext
     @Nullable
     public <E extends CoroutineContext.Element> E get(@NotNull CoroutineContext.Key<E> key) {
-        Intrinsics.checkNotNullParameter(key, "key");
         return (E) CoroutineContext.Element.DefaultImpls.get(this, key);
+    }
+
+    @Override // kotlin.coroutines.CoroutineContext
+    @NotNull
+    public CoroutineContext minusKey(@NotNull CoroutineContext.Key<?> key) {
+        return CoroutineContext.Element.DefaultImpls.minusKey(this, key);
     }
 
     @Override // kotlin.coroutines.CoroutineContext.Element
     @NotNull
     public CoroutineContext.Key<?> getKey() {
         return this.key;
-    }
-
-    @Override // kotlin.coroutines.CoroutineContext
-    @NotNull
-    public CoroutineContext minusKey(@NotNull CoroutineContext.Key<?> key) {
-        Intrinsics.checkNotNullParameter(key, "key");
-        return CoroutineContext.Element.DefaultImpls.minusKey(this, key);
-    }
-
-    @Override // kotlin.coroutines.CoroutineContext
-    @NotNull
-    public CoroutineContext plus(@NotNull CoroutineContext context) {
-        Intrinsics.checkNotNullParameter(context, "context");
-        return CoroutineContext.Element.DefaultImpls.plus(this, context);
     }
 }

@@ -6,122 +6,122 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.RandomAccess;
 /* loaded from: classes.dex */
-public class UnmodifiableLazyStringList extends AbstractList<String> implements LazyStringList, RandomAccess {
+public final class UnmodifiableLazyStringList extends AbstractList<String> implements LazyStringList, RandomAccess {
     public final LazyStringList list;
 
-    public UnmodifiableLazyStringList(LazyStringList lazyStringList) {
-        this.list = lazyStringList;
+    @Override // com.google.protobuf.LazyStringList
+    public final LazyStringList getUnmodifiableView() {
+        return this;
     }
 
     @Override // com.google.protobuf.LazyStringList
-    public void add(ByteString byteString) {
+    public final void add(ByteString byteString) {
         throw new UnsupportedOperationException();
     }
 
     @Override // java.util.AbstractList, java.util.List
-    public Object get(int i) {
+    public final Object get(int i) {
         return (String) this.list.get(i);
     }
 
     @Override // com.google.protobuf.LazyStringList
-    public Object getRaw(int i) {
+    public final Object getRaw(int i) {
         return this.list.getRaw(i);
     }
 
     @Override // com.google.protobuf.LazyStringList
-    public List<?> getUnderlyingElements() {
+    public final List<?> getUnderlyingElements() {
         return this.list.getUnderlyingElements();
     }
 
-    @Override // com.google.protobuf.LazyStringList
-    public LazyStringList getUnmodifiableView() {
-        return this;
-    }
-
     @Override // java.util.AbstractList, java.util.AbstractCollection, java.util.Collection, java.lang.Iterable, java.util.List
-    public Iterator<String> iterator() {
+    public final Iterator<String> iterator() {
         return new Iterator<String>(this) { // from class: com.google.protobuf.UnmodifiableLazyStringList.2
             public Iterator<String> iter;
 
-            {
-                this.iter = this.list.iterator();
-            }
-
             @Override // java.util.Iterator
-            public boolean hasNext() {
+            public final boolean hasNext() {
                 return this.iter.hasNext();
             }
 
             @Override // java.util.Iterator
-            public String next() {
+            public final String next() {
                 return this.iter.next();
             }
 
             @Override // java.util.Iterator
-            public void remove() {
+            public final void remove() {
                 throw new UnsupportedOperationException();
+            }
+
+            {
+                this.iter = this.list.iterator();
             }
         };
     }
 
     @Override // java.util.AbstractList, java.util.List
-    public ListIterator<String> listIterator(int i) {
+    public final ListIterator<String> listIterator(int i) {
         return new ListIterator<String>(this, i) { // from class: com.google.protobuf.UnmodifiableLazyStringList.1
             public ListIterator<String> iter;
 
-            {
-                this.iter = this.list.listIterator(i);
-            }
-
             @Override // java.util.ListIterator
-            public void add(String str) {
+            public final void add(String str) {
                 throw new UnsupportedOperationException();
             }
 
             @Override // java.util.ListIterator, java.util.Iterator
-            public boolean hasNext() {
+            public final boolean hasNext() {
                 return this.iter.hasNext();
             }
 
             @Override // java.util.ListIterator
-            public boolean hasPrevious() {
+            public final boolean hasPrevious() {
                 return this.iter.hasPrevious();
             }
 
             @Override // java.util.ListIterator, java.util.Iterator
-            public Object next() {
+            public final Object next() {
                 return this.iter.next();
             }
 
             @Override // java.util.ListIterator
-            public int nextIndex() {
+            public final int nextIndex() {
                 return this.iter.nextIndex();
             }
 
             @Override // java.util.ListIterator
-            public String previous() {
+            public final String previous() {
                 return this.iter.previous();
             }
 
             @Override // java.util.ListIterator
-            public int previousIndex() {
+            public final int previousIndex() {
                 return this.iter.previousIndex();
             }
 
             @Override // java.util.ListIterator, java.util.Iterator
-            public void remove() {
+            public final void remove() {
                 throw new UnsupportedOperationException();
             }
 
             @Override // java.util.ListIterator
-            public void set(String str) {
+            public final void set(String str) {
                 throw new UnsupportedOperationException();
+            }
+
+            {
+                this.iter = this.list.listIterator(i);
             }
         };
     }
 
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
-    public int size() {
+    public final int size() {
         return this.list.size();
+    }
+
+    public UnmodifiableLazyStringList(LazyStringList lazyStringList) {
+        this.list = lazyStringList;
     }
 }

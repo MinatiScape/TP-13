@@ -18,24 +18,62 @@ import com.google.android.material.R$styleable;
 import com.google.android.material.shape.MaterialShapeDrawable;
 import com.google.android.material.shape.RelativeCornerSize;
 import com.google.android.material.shape.ShapeAppearanceModel;
-import java.util.Objects;
 import java.util.WeakHashMap;
 /* loaded from: classes.dex */
 public class RadialViewGroup extends ConstraintLayout {
     public MaterialShapeDrawable background;
     public int radius;
-    public final Runnable updateLayoutParametersRunnable;
+    public final AnonymousClass1 updateLayoutParametersRunnable;
 
     public RadialViewGroup(Context context) {
         this(context, null);
     }
 
+    public RadialViewGroup(Context context, AttributeSet attributeSet) {
+        this(context, attributeSet, 0);
+    }
+
+    @Override // android.view.View
+    public final void setBackgroundColor(int i) {
+        this.background.setFillColor(ColorStateList.valueOf(i));
+    }
+
+    /* JADX WARN: Type inference failed for: r6v2, types: [com.google.android.material.timepicker.RadialViewGroup$1] */
+    public RadialViewGroup(Context context, AttributeSet attributeSet, int i) {
+        super(context, attributeSet, i);
+        LayoutInflater.from(context).inflate(R.layout.material_radial_view_group, this);
+        MaterialShapeDrawable materialShapeDrawable = new MaterialShapeDrawable();
+        this.background = materialShapeDrawable;
+        RelativeCornerSize relativeCornerSize = new RelativeCornerSize(0.5f);
+        ShapeAppearanceModel shapeAppearanceModel = materialShapeDrawable.drawableState.shapeAppearanceModel;
+        shapeAppearanceModel.getClass();
+        ShapeAppearanceModel.Builder builder = new ShapeAppearanceModel.Builder(shapeAppearanceModel);
+        builder.topLeftCornerSize = relativeCornerSize;
+        builder.topRightCornerSize = relativeCornerSize;
+        builder.bottomRightCornerSize = relativeCornerSize;
+        builder.bottomLeftCornerSize = relativeCornerSize;
+        materialShapeDrawable.setShapeAppearanceModel(new ShapeAppearanceModel(builder));
+        this.background.setFillColor(ColorStateList.valueOf(-1));
+        MaterialShapeDrawable materialShapeDrawable2 = this.background;
+        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
+        ViewCompat.Api16Impl.setBackground(this, materialShapeDrawable2);
+        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, R$styleable.RadialViewGroup, i, 0);
+        this.radius = obtainStyledAttributes.getDimensionPixelSize(0, 0);
+        this.updateLayoutParametersRunnable = new Runnable() { // from class: com.google.android.material.timepicker.RadialViewGroup.1
+            @Override // java.lang.Runnable
+            public final void run() {
+                RadialViewGroup.this.updateLayoutParams();
+            }
+        };
+        obtainStyledAttributes.recycle();
+    }
+
     @Override // androidx.constraintlayout.widget.ConstraintLayout, android.view.ViewGroup
-    public void addView(View view, int i, ViewGroup.LayoutParams layoutParams) {
+    public final void addView(View view, int i, ViewGroup.LayoutParams layoutParams) {
         super.addView(view, i, layoutParams);
         if (view.getId() == -1) {
             WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-            view.setId(View.generateViewId());
+            view.setId(ViewCompat.Api17Impl.generateViewId());
         }
         Handler handler = getHandler();
         if (handler != null) {
@@ -45,13 +83,13 @@ public class RadialViewGroup extends ConstraintLayout {
     }
 
     @Override // android.view.View
-    public void onFinishInflate() {
+    public final void onFinishInflate() {
         super.onFinishInflate();
         updateLayoutParams();
     }
 
     @Override // androidx.constraintlayout.widget.ConstraintLayout, android.view.ViewGroup
-    public void onViewRemoved(View view) {
+    public final void onViewRemoved(View view) {
         super.onViewRemoved(view);
         Handler handler = getHandler();
         if (handler != null) {
@@ -60,12 +98,7 @@ public class RadialViewGroup extends ConstraintLayout {
         }
     }
 
-    @Override // android.view.View
-    public void setBackgroundColor(int i) {
-        this.background.setFillColor(ColorStateList.valueOf(i));
-    }
-
-    public void updateLayoutParams() {
+    public final void updateLayoutParams() {
         int childCount = getChildCount();
         int i = 1;
         for (int i2 = 0; i2 < childCount; i2++) {
@@ -88,42 +121,6 @@ public class RadialViewGroup extends ConstraintLayout {
                 f = (360.0f / (childCount - i)) + f;
             }
         }
-        constraintSet.applyToInternal(this, true);
-        this.mConstraintSet = null;
-        requestLayout();
-    }
-
-    public RadialViewGroup(Context context, AttributeSet attributeSet) {
-        this(context, attributeSet, 0);
-    }
-
-    public RadialViewGroup(Context context, AttributeSet attributeSet, int i) {
-        super(context, attributeSet, i);
-        LayoutInflater.from(context).inflate(R.layout.material_radial_view_group, this);
-        MaterialShapeDrawable materialShapeDrawable = new MaterialShapeDrawable();
-        this.background = materialShapeDrawable;
-        RelativeCornerSize relativeCornerSize = new RelativeCornerSize(0.5f);
-        ShapeAppearanceModel shapeAppearanceModel = materialShapeDrawable.drawableState.shapeAppearanceModel;
-        Objects.requireNonNull(shapeAppearanceModel);
-        ShapeAppearanceModel.Builder builder = new ShapeAppearanceModel.Builder(shapeAppearanceModel);
-        builder.topLeftCornerSize = relativeCornerSize;
-        builder.topRightCornerSize = relativeCornerSize;
-        builder.bottomRightCornerSize = relativeCornerSize;
-        builder.bottomLeftCornerSize = relativeCornerSize;
-        materialShapeDrawable.drawableState.shapeAppearanceModel = builder.build();
-        materialShapeDrawable.invalidateSelf();
-        this.background.setFillColor(ColorStateList.valueOf(-1));
-        MaterialShapeDrawable materialShapeDrawable2 = this.background;
-        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-        setBackground(materialShapeDrawable2);
-        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, R$styleable.RadialViewGroup, i, 0);
-        this.radius = obtainStyledAttributes.getDimensionPixelSize(0, 0);
-        this.updateLayoutParametersRunnable = new Runnable() { // from class: com.google.android.material.timepicker.RadialViewGroup.1
-            @Override // java.lang.Runnable
-            public void run() {
-                RadialViewGroup.this.updateLayoutParams();
-            }
-        };
-        obtainStyledAttributes.recycle();
+        constraintSet.applyTo(this);
     }
 }

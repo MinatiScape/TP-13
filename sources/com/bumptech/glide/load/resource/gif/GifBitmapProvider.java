@@ -12,12 +12,4 @@ public final class GifBitmapProvider implements GifDecoder.BitmapProvider {
         this.bitmapPool = bitmapPool;
         this.arrayPool = arrayPool;
     }
-
-    public byte[] obtainByteArray(int size) {
-        ArrayPool arrayPool = this.arrayPool;
-        if (arrayPool == null) {
-            return new byte[size];
-        }
-        return (byte[]) arrayPool.get(size, byte[].class);
-    }
 }

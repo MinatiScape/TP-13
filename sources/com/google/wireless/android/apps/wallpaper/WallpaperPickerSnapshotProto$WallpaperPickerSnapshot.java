@@ -4,7 +4,6 @@ import com.google.protobuf.GeneratedMessageLite;
 import com.google.protobuf.MessageLiteOrBuilder;
 import com.google.protobuf.Parser;
 import com.google.protobuf.RawMessageInfo;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public final class WallpaperPickerSnapshotProto$WallpaperPickerSnapshot extends GeneratedMessageLite<WallpaperPickerSnapshotProto$WallpaperPickerSnapshot, Builder> implements MessageLiteOrBuilder {
     public static final int APP_LAUNCH_COUNT_FIELD_NUMBER = 3;
@@ -30,10 +29,24 @@ public final class WallpaperPickerSnapshotProto$WallpaperPickerSnapshot extends 
         public Builder() {
             super(WallpaperPickerSnapshotProto$WallpaperPickerSnapshot.DEFAULT_INSTANCE);
         }
+    }
 
-        public Builder(WallpaperPickerSnapshotProto$1 wallpaperPickerSnapshotProto$1) {
-            super(WallpaperPickerSnapshotProto$WallpaperPickerSnapshot.DEFAULT_INSTANCE);
-        }
+    /* renamed from: -$$Nest$msetAppLaunchCount */
+    public static void m72$$Nest$msetAppLaunchCount(WallpaperPickerSnapshotProto$WallpaperPickerSnapshot wallpaperPickerSnapshotProto$WallpaperPickerSnapshot, int i) {
+        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.bitField0_ |= 4;
+        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.appLaunchCount_ = i;
+    }
+
+    /* renamed from: -$$Nest$msetFirstLaunchDateSinceSetup */
+    public static void m73$$Nest$msetFirstLaunchDateSinceSetup(WallpaperPickerSnapshotProto$WallpaperPickerSnapshot wallpaperPickerSnapshotProto$WallpaperPickerSnapshot, int i) {
+        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.bitField0_ |= 1;
+        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.firstLaunchDateSinceSetup_ = i;
+    }
+
+    /* renamed from: -$$Nest$msetFirstWallpaperApplyDateSinceSetup */
+    public static void m74$$Nest$msetFirstWallpaperApplyDateSinceSetup(WallpaperPickerSnapshotProto$WallpaperPickerSnapshot wallpaperPickerSnapshotProto$WallpaperPickerSnapshot, int i) {
+        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.bitField0_ |= 2;
+        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.firstWallpaperApplyDateSinceSetup_ = i;
     }
 
     static {
@@ -42,55 +55,40 @@ public final class WallpaperPickerSnapshotProto$WallpaperPickerSnapshot extends 
         GeneratedMessageLite.registerDefaultInstance(WallpaperPickerSnapshotProto$WallpaperPickerSnapshot.class, wallpaperPickerSnapshotProto$WallpaperPickerSnapshot);
     }
 
-    public static void access$100(WallpaperPickerSnapshotProto$WallpaperPickerSnapshot wallpaperPickerSnapshotProto$WallpaperPickerSnapshot, int i) {
-        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.bitField0_ |= 1;
-        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.firstLaunchDateSinceSetup_ = i;
+    public static Builder newBuilder() {
+        return (Builder) ((GeneratedMessageLite.Builder) DEFAULT_INSTANCE.dynamicMethod(GeneratedMessageLite.MethodToInvoke.NEW_BUILDER));
     }
 
-    public static void access$1000(WallpaperPickerSnapshotProto$WallpaperPickerSnapshot wallpaperPickerSnapshotProto$WallpaperPickerSnapshot, String str) {
-        Objects.requireNonNull(wallpaperPickerSnapshotProto$WallpaperPickerSnapshot);
-        Objects.requireNonNull(str);
-        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.bitField0_ |= 16;
-        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.homeWallpaperId_ = str;
-    }
-
-    public static void access$1300(WallpaperPickerSnapshotProto$WallpaperPickerSnapshot wallpaperPickerSnapshotProto$WallpaperPickerSnapshot, String str) {
-        Objects.requireNonNull(wallpaperPickerSnapshotProto$WallpaperPickerSnapshot);
-        Objects.requireNonNull(str);
-        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.bitField0_ |= 32;
-        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.lockScreenWallpaperCategory_ = str;
-    }
-
-    public static void access$1600(WallpaperPickerSnapshotProto$WallpaperPickerSnapshot wallpaperPickerSnapshotProto$WallpaperPickerSnapshot, String str) {
-        Objects.requireNonNull(wallpaperPickerSnapshotProto$WallpaperPickerSnapshot);
-        Objects.requireNonNull(str);
-        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.bitField0_ |= 64;
-        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.lockScreenWallpaperId_ = str;
-    }
-
-    public static void access$300(WallpaperPickerSnapshotProto$WallpaperPickerSnapshot wallpaperPickerSnapshotProto$WallpaperPickerSnapshot, int i) {
-        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.bitField0_ |= 2;
-        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.firstWallpaperApplyDateSinceSetup_ = i;
-    }
-
-    public static void access$500(WallpaperPickerSnapshotProto$WallpaperPickerSnapshot wallpaperPickerSnapshotProto$WallpaperPickerSnapshot, int i) {
-        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.bitField0_ |= 4;
-        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.appLaunchCount_ = i;
-    }
-
-    public static void access$700(WallpaperPickerSnapshotProto$WallpaperPickerSnapshot wallpaperPickerSnapshotProto$WallpaperPickerSnapshot, String str) {
-        Objects.requireNonNull(wallpaperPickerSnapshotProto$WallpaperPickerSnapshot);
-        Objects.requireNonNull(str);
+    /* renamed from: -$$Nest$msetHomeWallpaperCategory */
+    public static void m75$$Nest$msetHomeWallpaperCategory(WallpaperPickerSnapshotProto$WallpaperPickerSnapshot wallpaperPickerSnapshotProto$WallpaperPickerSnapshot, String str) {
+        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.getClass();
         wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.bitField0_ |= 8;
         wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.homeWallpaperCategory_ = str;
     }
 
-    public static Builder newBuilder() {
-        return DEFAULT_INSTANCE.createBuilder();
+    /* renamed from: -$$Nest$msetHomeWallpaperId */
+    public static void m76$$Nest$msetHomeWallpaperId(WallpaperPickerSnapshotProto$WallpaperPickerSnapshot wallpaperPickerSnapshotProto$WallpaperPickerSnapshot, String str) {
+        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.getClass();
+        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.bitField0_ |= 16;
+        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.homeWallpaperId_ = str;
+    }
+
+    /* renamed from: -$$Nest$msetLockScreenWallpaperCategory */
+    public static void m77$$Nest$msetLockScreenWallpaperCategory(WallpaperPickerSnapshotProto$WallpaperPickerSnapshot wallpaperPickerSnapshotProto$WallpaperPickerSnapshot, String str) {
+        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.getClass();
+        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.bitField0_ |= 32;
+        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.lockScreenWallpaperCategory_ = str;
+    }
+
+    /* renamed from: -$$Nest$msetLockScreenWallpaperId */
+    public static void m78$$Nest$msetLockScreenWallpaperId(WallpaperPickerSnapshotProto$WallpaperPickerSnapshot wallpaperPickerSnapshotProto$WallpaperPickerSnapshot, String str) {
+        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.getClass();
+        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.bitField0_ |= 64;
+        wallpaperPickerSnapshotProto$WallpaperPickerSnapshot.lockScreenWallpaperId_ = str;
     }
 
     @Override // com.google.protobuf.GeneratedMessageLite
-    public final Object dynamicMethod(GeneratedMessageLite.MethodToInvoke methodToInvoke, Object obj, Object obj2) {
+    public final Object dynamicMethod(GeneratedMessageLite.MethodToInvoke methodToInvoke) {
         switch (methodToInvoke.ordinal()) {
             case 0:
                 return (byte) 1;
@@ -101,7 +99,7 @@ public final class WallpaperPickerSnapshotProto$WallpaperPickerSnapshot extends 
             case 3:
                 return new WallpaperPickerSnapshotProto$WallpaperPickerSnapshot();
             case 4:
-                return new Builder(null);
+                return new Builder();
             case 5:
                 return DEFAULT_INSTANCE;
             case 6:

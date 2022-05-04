@@ -2,7 +2,7 @@ package com.google.protobuf;
 /* loaded from: classes.dex */
 public final class ExtensionSchemas {
     public static final ExtensionSchema<?> FULL_SCHEMA;
-    public static final ExtensionSchema<?> LITE_SCHEMA = new ExtensionSchemaLite();
+    public static final ExtensionSchemaLite LITE_SCHEMA = new ExtensionSchemaLite();
 
     static {
         ExtensionSchema<?> extensionSchema;

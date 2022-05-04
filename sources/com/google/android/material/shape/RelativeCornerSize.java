@@ -6,23 +6,23 @@ import java.util.Arrays;
 public final class RelativeCornerSize implements CornerSize {
     public final float percent;
 
-    public RelativeCornerSize(float f) {
-        this.percent = f;
-    }
-
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
         return (obj instanceof RelativeCornerSize) && this.percent == ((RelativeCornerSize) obj).percent;
     }
 
+    public final int hashCode() {
+        return Arrays.hashCode(new Object[]{Float.valueOf(this.percent)});
+    }
+
     @Override // com.google.android.material.shape.CornerSize
-    public float getCornerSize(RectF rectF) {
+    public final float getCornerSize(RectF rectF) {
         return rectF.height() * this.percent;
     }
 
-    public int hashCode() {
-        return Arrays.hashCode(new Object[]{Float.valueOf(this.percent)});
+    public RelativeCornerSize(float f) {
+        this.percent = f;
     }
 }

@@ -23,15 +23,49 @@ public final class ViewStubCompat extends View {
     }
 
     @Override // android.view.View
-    public void dispatchDraw(Canvas canvas) {
+    public final void dispatchDraw(Canvas canvas) {
     }
 
     @Override // android.view.View
     @SuppressLint({"MissingSuperCall"})
-    public void draw(Canvas canvas) {
+    public final void draw(Canvas canvas) {
     }
 
-    public View inflate() {
+    @Override // android.view.View
+    public final void onMeasure(int i, int i2) {
+        setMeasuredDimension(0, 0);
+    }
+
+    public ViewStubCompat(Context context, AttributeSet attributeSet, int i) {
+        super(context, attributeSet, i);
+        this.mLayoutResource = 0;
+        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, R$styleable.ViewStubCompat, i, 0);
+        this.mInflatedId = obtainStyledAttributes.getResourceId(2, -1);
+        this.mLayoutResource = obtainStyledAttributes.getResourceId(1, 0);
+        setId(obtainStyledAttributes.getResourceId(0, -1));
+        obtainStyledAttributes.recycle();
+        setVisibility(8);
+        setWillNotDraw(true);
+    }
+
+    @Override // android.view.View
+    public final void setVisibility(int i) {
+        WeakReference<View> weakReference = this.mInflatedViewRef;
+        if (weakReference != null) {
+            View view = weakReference.get();
+            if (view != null) {
+                view.setVisibility(i);
+                return;
+            }
+            throw new IllegalStateException("setVisibility called on un-referenced view");
+        }
+        super.setVisibility(i);
+        if (i == 0 || i == 4) {
+            inflate();
+        }
+    }
+
+    public final View inflate() {
         ViewParent parent = getParent();
         if (!(parent instanceof ViewGroup)) {
             throw new IllegalStateException("ViewStub must have a non-null ViewGroup viewParent");
@@ -59,39 +93,5 @@ public final class ViewStubCompat extends View {
         } else {
             throw new IllegalArgumentException("ViewStub must have a valid layoutResource");
         }
-    }
-
-    @Override // android.view.View
-    public void onMeasure(int i, int i2) {
-        setMeasuredDimension(0, 0);
-    }
-
-    @Override // android.view.View
-    public void setVisibility(int i) {
-        WeakReference<View> weakReference = this.mInflatedViewRef;
-        if (weakReference != null) {
-            View view = weakReference.get();
-            if (view != null) {
-                view.setVisibility(i);
-                return;
-            }
-            throw new IllegalStateException("setVisibility called on un-referenced view");
-        }
-        super.setVisibility(i);
-        if (i == 0 || i == 4) {
-            inflate();
-        }
-    }
-
-    public ViewStubCompat(Context context, AttributeSet attributeSet, int i) {
-        super(context, attributeSet, i);
-        this.mLayoutResource = 0;
-        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, R$styleable.ViewStubCompat, i, 0);
-        this.mInflatedId = obtainStyledAttributes.getResourceId(2, -1);
-        this.mLayoutResource = obtainStyledAttributes.getResourceId(1, 0);
-        setId(obtainStyledAttributes.getResourceId(0, -1));
-        obtainStyledAttributes.recycle();
-        setVisibility(8);
-        setWillNotDraw(true);
     }
 }

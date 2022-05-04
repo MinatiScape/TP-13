@@ -3,30 +3,43 @@ package com.android.customization.module;
 import android.content.Intent;
 import com.android.customization.model.grid.GridOption;
 import com.android.systemui.shared.system.SysUiStatsLog;
-import com.android.wallpaper.module.NoOpUserEventLogger;
-import java.util.Objects;
+import com.bumptech.glide.manager.ApplicationLifecycle;
 /* loaded from: classes.dex */
-public class StatsLogUserEventLogger extends NoOpUserEventLogger implements ThemesUserEventLogger {
-    public final int getCollectionIdHashCode(String str) {
+public final class StatsLogUserEventLogger extends ApplicationLifecycle implements ThemesUserEventLogger {
+    @Override // com.android.wallpaper.module.UserEventLogger
+    public final void logWallpaperSet(String str, String str2) {
+        int i;
+        int i2 = 0;
         if (str != null) {
-            return str.hashCode();
+            i = str.hashCode();
+        } else {
+            i = 0;
         }
-        return 0;
+        if (str2 != null) {
+            i2 = str2.hashCode();
+        }
+        SysUiStatsLog.write(SysUiStatsLog.STYLE_UI_CHANGED, 7, 0, 0, 0, 0, 0, i, i2, 0, 0, 0, 0);
     }
 
     @Override // com.android.wallpaper.module.UserEventLogger
-    public void logActionClicked(String str, int i) {
-        SysUiStatsLog.write(SysUiStatsLog.STYLE_UI_CHANGED, 8, 0, 0, 0, 0, 0, getCollectionIdHashCode(str), 0, 0, 0, 0, 0);
+    public final void logActionClicked(String str, int i) {
+        int i2;
+        if (str != null) {
+            i2 = str.hashCode();
+        } else {
+            i2 = 0;
+        }
+        SysUiStatsLog.write(SysUiStatsLog.STYLE_UI_CHANGED, 8, 0, 0, 0, 0, 0, i2, 0, 0, 0, 0, 0);
     }
 
     /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
     @Override // com.android.wallpaper.module.UserEventLogger
-    public void logAppLaunched(Intent intent) {
+    public final void logAppLaunched(Intent intent) {
         int i;
         int i2 = 1;
         if (intent.hasExtra("com.android.wallpaper.LAUNCH_SOURCE")) {
             String stringExtra = intent.getStringExtra("com.android.wallpaper.LAUNCH_SOURCE");
-            Objects.requireNonNull(stringExtra);
+            stringExtra.getClass();
             char c = 65535;
             switch (stringExtra.hashCode()) {
                 case -1969438830:
@@ -98,42 +111,49 @@ public class StatsLogUserEventLogger extends NoOpUserEventLogger implements Them
     }
 
     @Override // com.android.wallpaper.module.UserEventLogger
-    public void logCategorySelected(String str) {
-        SysUiStatsLog.write(SysUiStatsLog.STYLE_UI_CHANGED, 5, 0, 0, 0, 0, 0, getCollectionIdHashCode(str), 0, 0, 0, 0, 0);
+    public final void logCategorySelected(String str) {
+        int i;
+        if (str != null) {
+            i = str.hashCode();
+        } else {
+            i = 0;
+        }
+        SysUiStatsLog.write(SysUiStatsLog.STYLE_UI_CHANGED, 5, 0, 0, 0, 0, 0, i, 0, 0, 0, 0, 0);
     }
 
     @Override // com.android.customization.module.ThemesUserEventLogger
-    public void logColorApplied(int i, int i2) {
+    public final void logColorApplied(int i, int i2) {
         SysUiStatsLog.write(SysUiStatsLog.STYLE_UI_CHANGED, i, 0, 0, 0, 0, 0, 0, 0, i2, 0, 0, 0);
     }
 
     @Override // com.android.customization.module.ThemesUserEventLogger
-    public void logGridApplied(GridOption gridOption) {
+    public final void logGridApplied(GridOption gridOption) {
         SysUiStatsLog.write(SysUiStatsLog.STYLE_UI_CHANGED, 4, 0, 0, 0, 0, gridOption.cols, 0, 0, 0, 0, 0, 0);
     }
 
     @Override // com.android.customization.module.ThemesUserEventLogger
-    public void logGridSelected(GridOption gridOption) {
+    public final void logGridSelected(GridOption gridOption) {
         SysUiStatsLog.write(SysUiStatsLog.STYLE_UI_CHANGED, 3, 0, 0, 0, 0, gridOption.cols, 0, 0, 0, 0, 0, 0);
     }
 
     @Override // com.android.wallpaper.module.UserEventLogger
-    public void logIndividualWallpaperSelected(String str) {
-        SysUiStatsLog.write(SysUiStatsLog.STYLE_UI_CHANGED, 6, 0, 0, 0, 0, 0, getCollectionIdHashCode(str), 0, 0, 0, 0, 0);
+    public final void logIndividualWallpaperSelected(String str) {
+        int i;
+        if (str != null) {
+            i = str.hashCode();
+        } else {
+            i = 0;
+        }
+        SysUiStatsLog.write(SysUiStatsLog.STYLE_UI_CHANGED, 6, 0, 0, 0, 0, 0, i, 0, 0, 0, 0, 0);
     }
 
     @Override // com.android.wallpaper.module.UserEventLogger
-    public void logResumed(boolean z, boolean z2) {
+    public final void logResumed(boolean z, boolean z2) {
         SysUiStatsLog.write(SysUiStatsLog.STYLE_UI_CHANGED, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
     @Override // com.android.wallpaper.module.UserEventLogger
-    public void logStopped() {
+    public final void logStopped() {
         SysUiStatsLog.write(SysUiStatsLog.STYLE_UI_CHANGED, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-    }
-
-    @Override // com.android.wallpaper.module.UserEventLogger
-    public void logWallpaperSet(String str, String str2) {
-        SysUiStatsLog.write(SysUiStatsLog.STYLE_UI_CHANGED, 7, 0, 0, 0, 0, 0, getCollectionIdHashCode(str), str2 != null ? str2.hashCode() : 0, 0, 0, 0, 0);
     }
 }

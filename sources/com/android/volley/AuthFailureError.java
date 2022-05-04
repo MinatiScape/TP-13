@@ -8,13 +8,16 @@ public class AuthFailureError extends VolleyError {
     public AuthFailureError() {
     }
 
-    @Override // java.lang.Throwable
-    public String getMessage() {
-        return this.mResolutionIntent != null ? "User needs to (re)enter credentials." : super.getMessage();
-    }
-
     public AuthFailureError(NetworkResponse networkResponse) {
         super(networkResponse);
+    }
+
+    @Override // java.lang.Throwable
+    public final String getMessage() {
+        if (this.mResolutionIntent != null) {
+            return "User needs to (re)enter credentials.";
+        }
+        return super.getMessage();
     }
 
     public AuthFailureError(String str) {

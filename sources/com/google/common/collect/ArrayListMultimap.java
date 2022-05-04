@@ -7,13 +7,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 /* loaded from: classes.dex */
-public final class ArrayListMultimap<K, V> {
+public final class ArrayListMultimap<K, V> extends ArrayListMultimapGwtSerializationDependencies<K, V> {
     private static final long serialVersionUID = 0;
     public transient int expectedValuesPerKey = 3;
 
-    public ArrayListMultimap() {
+    private ArrayListMultimap() {
         super(new CompactHashMap(12));
         CollectPreconditions.checkNonnegative(3, "expectedValuesPerKey");
+    }
+
+    public static <K, V> ArrayListMultimap<K, V> create() {
+        return new ArrayListMultimap<>();
+    }
+
+    @Override // com.google.common.collect.AbstractMapBasedMultimap
+    public final Collection createCollection() {
+        return new ArrayList(this.expectedValuesPerKey);
     }
 
     private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
@@ -40,9 +49,5 @@ public final class ArrayListMultimap<K, V> {
                 stream.writeObject(v);
             }
         }
-    }
-
-    public Collection createCollection() {
-        return new ArrayList(this.expectedValuesPerKey);
     }
 }

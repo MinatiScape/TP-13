@@ -7,7 +7,7 @@ import com.google.protobuf.MessageLiteOrBuilder;
 import com.google.protobuf.Parser;
 import com.google.protobuf.ProtobufArrayList;
 import com.google.protobuf.RawMessageInfo;
-import java.util.Objects;
+import java.util.ArrayList;
 /* loaded from: classes.dex */
 public final class ImaxWallpaperProto$GetImageFromCollectionRequest extends GeneratedMessageLite<ImaxWallpaperProto$GetImageFromCollectionRequest, Builder> implements MessageLiteOrBuilder {
     public static final int COLLECTION_IDS_FIELD_NUMBER = 1;
@@ -29,10 +29,14 @@ public final class ImaxWallpaperProto$GetImageFromCollectionRequest extends Gene
         public Builder() {
             super(ImaxWallpaperProto$GetImageFromCollectionRequest.DEFAULT_INSTANCE);
         }
+    }
 
-        public Builder(ImaxWallpaperProto$1 imaxWallpaperProto$1) {
-            super(ImaxWallpaperProto$GetImageFromCollectionRequest.DEFAULT_INSTANCE);
+    /* renamed from: -$$Nest$maddAllFilteringLabel */
+    public static void m46$$Nest$maddAllFilteringLabel(ImaxWallpaperProto$GetImageFromCollectionRequest imaxWallpaperProto$GetImageFromCollectionRequest, ArrayList arrayList) {
+        if (!imaxWallpaperProto$GetImageFromCollectionRequest.filteringLabel_.isModifiable()) {
+            imaxWallpaperProto$GetImageFromCollectionRequest.filteringLabel_ = GeneratedMessageLite.mutableCopy(imaxWallpaperProto$GetImageFromCollectionRequest.filteringLabel_);
         }
+        AbstractMessageLite.addAll(arrayList, imaxWallpaperProto$GetImageFromCollectionRequest.filteringLabel_);
     }
 
     static {
@@ -41,48 +45,44 @@ public final class ImaxWallpaperProto$GetImageFromCollectionRequest extends Gene
         GeneratedMessageLite.registerDefaultInstance(ImaxWallpaperProto$GetImageFromCollectionRequest.class, imaxWallpaperProto$GetImageFromCollectionRequest);
     }
 
-    public ImaxWallpaperProto$GetImageFromCollectionRequest() {
-        ProtobufArrayList<Object> protobufArrayList = ProtobufArrayList.EMPTY_LIST;
-        this.collectionIds_ = protobufArrayList;
-        this.filteringLabel_ = protobufArrayList;
+    public static Builder newBuilder() {
+        return (Builder) ((GeneratedMessageLite.Builder) DEFAULT_INSTANCE.dynamicMethod(GeneratedMessageLite.MethodToInvoke.NEW_BUILDER));
     }
 
-    public static void access$10000(ImaxWallpaperProto$GetImageFromCollectionRequest imaxWallpaperProto$GetImageFromCollectionRequest, String str) {
-        Objects.requireNonNull(imaxWallpaperProto$GetImageFromCollectionRequest);
-        Objects.requireNonNull(str);
-        imaxWallpaperProto$GetImageFromCollectionRequest.bitField0_ |= 1;
-        imaxWallpaperProto$GetImageFromCollectionRequest.resumeToken_ = str;
-    }
-
-    public static void access$10300(ImaxWallpaperProto$GetImageFromCollectionRequest imaxWallpaperProto$GetImageFromCollectionRequest, String str) {
-        Objects.requireNonNull(imaxWallpaperProto$GetImageFromCollectionRequest);
-        Objects.requireNonNull(str);
-        imaxWallpaperProto$GetImageFromCollectionRequest.bitField0_ |= 2;
-        imaxWallpaperProto$GetImageFromCollectionRequest.language_ = str;
-    }
-
-    public static void access$11100(ImaxWallpaperProto$GetImageFromCollectionRequest imaxWallpaperProto$GetImageFromCollectionRequest, Iterable iterable) {
-        if (!imaxWallpaperProto$GetImageFromCollectionRequest.filteringLabel_.isModifiable()) {
-            imaxWallpaperProto$GetImageFromCollectionRequest.filteringLabel_ = GeneratedMessageLite.mutableCopy(imaxWallpaperProto$GetImageFromCollectionRequest.filteringLabel_);
-        }
-        AbstractMessageLite.addAll(iterable, imaxWallpaperProto$GetImageFromCollectionRequest.filteringLabel_);
-    }
-
-    public static void access$9600(ImaxWallpaperProto$GetImageFromCollectionRequest imaxWallpaperProto$GetImageFromCollectionRequest, String str) {
-        Objects.requireNonNull(imaxWallpaperProto$GetImageFromCollectionRequest);
-        Objects.requireNonNull(str);
+    /* renamed from: -$$Nest$maddCollectionIds */
+    public static void m47$$Nest$maddCollectionIds(ImaxWallpaperProto$GetImageFromCollectionRequest imaxWallpaperProto$GetImageFromCollectionRequest, String str) {
+        imaxWallpaperProto$GetImageFromCollectionRequest.getClass();
+        str.getClass();
         if (!imaxWallpaperProto$GetImageFromCollectionRequest.collectionIds_.isModifiable()) {
             imaxWallpaperProto$GetImageFromCollectionRequest.collectionIds_ = GeneratedMessageLite.mutableCopy(imaxWallpaperProto$GetImageFromCollectionRequest.collectionIds_);
         }
         imaxWallpaperProto$GetImageFromCollectionRequest.collectionIds_.add(str);
     }
 
-    public static Builder newBuilder() {
-        return DEFAULT_INSTANCE.createBuilder();
+    /* renamed from: -$$Nest$msetLanguage */
+    public static void m48$$Nest$msetLanguage(ImaxWallpaperProto$GetImageFromCollectionRequest imaxWallpaperProto$GetImageFromCollectionRequest, String str) {
+        imaxWallpaperProto$GetImageFromCollectionRequest.getClass();
+        str.getClass();
+        imaxWallpaperProto$GetImageFromCollectionRequest.bitField0_ |= 2;
+        imaxWallpaperProto$GetImageFromCollectionRequest.language_ = str;
+    }
+
+    /* renamed from: -$$Nest$msetResumeToken */
+    public static void m49$$Nest$msetResumeToken(ImaxWallpaperProto$GetImageFromCollectionRequest imaxWallpaperProto$GetImageFromCollectionRequest, String str) {
+        imaxWallpaperProto$GetImageFromCollectionRequest.getClass();
+        str.getClass();
+        imaxWallpaperProto$GetImageFromCollectionRequest.bitField0_ |= 1;
+        imaxWallpaperProto$GetImageFromCollectionRequest.resumeToken_ = str;
+    }
+
+    public ImaxWallpaperProto$GetImageFromCollectionRequest() {
+        ProtobufArrayList<Object> protobufArrayList = ProtobufArrayList.EMPTY_LIST;
+        this.collectionIds_ = protobufArrayList;
+        this.filteringLabel_ = protobufArrayList;
     }
 
     @Override // com.google.protobuf.GeneratedMessageLite
-    public final Object dynamicMethod(GeneratedMessageLite.MethodToInvoke methodToInvoke, Object obj, Object obj2) {
+    public final Object dynamicMethod(GeneratedMessageLite.MethodToInvoke methodToInvoke) {
         switch (methodToInvoke.ordinal()) {
             case 0:
                 return (byte) 1;
@@ -93,7 +93,7 @@ public final class ImaxWallpaperProto$GetImageFromCollectionRequest extends Gene
             case 3:
                 return new ImaxWallpaperProto$GetImageFromCollectionRequest();
             case 4:
-                return new Builder(null);
+                return new Builder();
             case 5:
                 return DEFAULT_INSTANCE;
             case 6:

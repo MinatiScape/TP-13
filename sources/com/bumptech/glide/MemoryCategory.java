@@ -8,11 +8,11 @@ public enum MemoryCategory {
     
     private final float multiplier;
 
-    MemoryCategory(float multiplier) {
-        this.multiplier = multiplier;
+    MemoryCategory(float f) {
+        this.multiplier = f;
     }
 
-    public float getMultiplier() {
+    public final float getMultiplier() {
         return this.multiplier;
     }
 }

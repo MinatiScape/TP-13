@@ -5,30 +5,33 @@ import android.view.View;
 import androidx.appcompat.view.SupportMenuInflater$$ExternalSyntheticOutline0;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 /* loaded from: classes.dex */
-public class TransitionValues {
+public final class TransitionValues {
+    public final ArrayList<Transition> mTargetedTransitions;
+    public final HashMap values;
     public View view;
-    public final Map<String, Object> values = new HashMap();
-    public final ArrayList<Transition> mTargetedTransitions = new ArrayList<>();
 
     @Deprecated
     public TransitionValues() {
+        throw null;
     }
 
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         if (!(obj instanceof TransitionValues)) {
             return false;
         }
         TransitionValues transitionValues = (TransitionValues) obj;
-        return this.view == transitionValues.view && this.values.equals(transitionValues.values);
+        if (this.view != transitionValues.view || !this.values.equals(transitionValues.values)) {
+            return false;
+        }
+        return true;
     }
 
-    public int hashCode() {
+    public final int hashCode() {
         return this.values.hashCode() + (this.view.hashCode() * 31);
     }
 
-    public String toString() {
+    public final String toString() {
         StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("TransitionValues@");
         m.append(Integer.toHexString(hashCode()));
         m.append(":\n");
@@ -40,6 +43,8 @@ public class TransitionValues {
     }
 
     public TransitionValues(View view) {
+        this.values = new HashMap();
+        this.mTargetedTransitions = new ArrayList<>();
         this.view = view;
     }
 }

@@ -1,14 +1,10 @@
 package com.google.common.util.concurrent;
 
-import androidx.viewpager2.widget.FakeDrag$$ExternalSyntheticOutline0;
+import com.adobe.xmp.impl.XMPNode$$ExternalSyntheticOutline0;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ByFunctionOrdering;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
-import com.google.common.collect.NaturalOrdering;
 import com.google.common.collect.Ordering;
-import com.google.common.collect.ReverseOrdering;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -17,14 +13,17 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 /* loaded from: classes.dex */
 public final class FuturesGetChecked {
-    public static final Ordering<Constructor<?>> WITH_STRING_PARAM_FIRST;
+    public static final Ordering<Constructor<?>> WITH_STRING_PARAM_FIRST = Ordering.natural().onResultOf(new Function<Constructor<?>, Boolean>() { // from class: com.google.common.util.concurrent.FuturesGetChecked.1
+        @Override // com.google.common.base.Function
+        public final Boolean apply(Constructor<?> input) {
+            return Boolean.valueOf(Arrays.asList(input.getParameterTypes()).contains(String.class));
+        }
+    }).reverse();
 
     /* loaded from: classes.dex */
     public interface GetCheckedTypeValidator {
@@ -34,51 +33,78 @@ public final class FuturesGetChecked {
     /* loaded from: classes.dex */
     public static class GetCheckedTypeValidatorHolder {
         public static final GetCheckedTypeValidator BEST_VALIDATOR;
-        public static final String CLASS_VALUE_VALIDATOR_NAME;
 
+        /* JADX WARN: Failed to restore enum class, 'enum' modifier removed */
         /* loaded from: classes.dex */
-        public enum ClassValueValidator implements GetCheckedTypeValidator {
-            INSTANCE;
-            
-            public static final ClassValue<Boolean> isValidClass = new ClassValue<Boolean>() { // from class: com.google.common.util.concurrent.FuturesGetChecked.GetCheckedTypeValidatorHolder.ClassValueValidator.1
+        public static final class ClassValueValidator extends Enum<ClassValueValidator> implements GetCheckedTypeValidator {
+            public static final /* synthetic */ ClassValueValidator[] $VALUES;
+            public static final ClassValueValidator INSTANCE;
+            public static final AnonymousClass1 isValidClass = new ClassValue<Boolean>() { // from class: com.google.common.util.concurrent.FuturesGetChecked.GetCheckedTypeValidatorHolder.ClassValueValidator.1
             };
 
+            static {
+                ClassValueValidator classValueValidator = new ClassValueValidator();
+                INSTANCE = classValueValidator;
+                $VALUES = new ClassValueValidator[]{classValueValidator};
+            }
+
+            public static ClassValueValidator valueOf(String name) {
+                return (ClassValueValidator) Enum.valueOf(ClassValueValidator.class, name);
+            }
+
+            public static ClassValueValidator[] values() {
+                return (ClassValueValidator[]) $VALUES.clone();
+            }
+
             @Override // com.google.common.util.concurrent.FuturesGetChecked.GetCheckedTypeValidator
-            public void validateClass(Class<? extends Exception> exceptionClass) {
+            public final void validateClass(Class<? extends Exception> exceptionClass) {
                 isValidClass.get(exceptionClass);
             }
         }
 
+        /* JADX WARN: Failed to restore enum class, 'enum' modifier removed */
         /* loaded from: classes.dex */
-        public enum WeakSetValidator implements GetCheckedTypeValidator {
-            INSTANCE;
-            
-            public static final Set<WeakReference<Class<? extends Exception>>> validClasses = new CopyOnWriteArraySet();
+        public static final class WeakSetValidator extends Enum<WeakSetValidator> implements GetCheckedTypeValidator {
+            public static final /* synthetic */ WeakSetValidator[] $VALUES;
+            public static final WeakSetValidator INSTANCE;
+            public static final CopyOnWriteArraySet validClasses = new CopyOnWriteArraySet();
+
+            static {
+                WeakSetValidator weakSetValidator = new WeakSetValidator();
+                INSTANCE = weakSetValidator;
+                $VALUES = new WeakSetValidator[]{weakSetValidator};
+            }
+
+            public static WeakSetValidator valueOf(String name) {
+                return (WeakSetValidator) Enum.valueOf(WeakSetValidator.class, name);
+            }
+
+            public static WeakSetValidator[] values() {
+                return (WeakSetValidator[]) $VALUES.clone();
+            }
 
             @Override // com.google.common.util.concurrent.FuturesGetChecked.GetCheckedTypeValidator
-            public void validateClass(Class<? extends Exception> exceptionClass) {
-                Iterator it = ((CopyOnWriteArraySet) validClasses).iterator();
+            public final void validateClass(Class<? extends Exception> exceptionClass) {
+                Iterator it = validClasses.iterator();
                 while (it.hasNext()) {
                     if (exceptionClass.equals(((WeakReference) it.next()).get())) {
                         return;
                     }
                 }
                 FuturesGetChecked.checkExceptionClassValidity(exceptionClass);
-                Set<WeakReference<Class<? extends Exception>>> set = validClasses;
-                if (((CopyOnWriteArraySet) set).size() > 1000) {
-                    ((CopyOnWriteArraySet) set).clear();
+                CopyOnWriteArraySet copyOnWriteArraySet = validClasses;
+                if (copyOnWriteArraySet.size() > 1000) {
+                    copyOnWriteArraySet.clear();
                 }
-                ((CopyOnWriteArraySet) set).add(new WeakReference(exceptionClass));
+                copyOnWriteArraySet.add(new WeakReference(exceptionClass));
             }
         }
 
         /* JADX WARN: Multi-variable type inference failed */
         static {
             GetCheckedTypeValidator getCheckedTypeValidator;
-            String concat = GetCheckedTypeValidatorHolder.class.getName().concat("$ClassValueValidator");
-            CLASS_VALUE_VALIDATOR_NAME = concat;
             try {
-                getCheckedTypeValidator = (GetCheckedTypeValidator) Class.forName(concat).getEnumConstants()[0];
+                getCheckedTypeValidator = (GetCheckedTypeValidator) Class.forName(GetCheckedTypeValidatorHolder.class.getName().concat("$ClassValueValidator")).getEnumConstants()[0];
             } catch (Throwable unused) {
                 getCheckedTypeValidator = FuturesGetChecked.weakSetValidator();
             }
@@ -86,16 +112,8 @@ public final class FuturesGetChecked {
         }
     }
 
-    static {
-        NaturalOrdering naturalOrdering = NaturalOrdering.INSTANCE;
-        Function<Constructor<?>, Boolean> function = new Function<Constructor<?>, Boolean>() { // from class: com.google.common.util.concurrent.FuturesGetChecked.1
-            @Override // com.google.common.base.Function
-            public Boolean apply(Constructor<?> input) {
-                return Boolean.valueOf(Arrays.asList(input.getParameterTypes()).contains(String.class));
-            }
-        };
-        Objects.requireNonNull(naturalOrdering);
-        WITH_STRING_PARAM_FIRST = new ReverseOrdering(new ByFunctionOrdering(function, naturalOrdering));
+    public static boolean isCheckedException(Class<? extends Exception> type) {
+        return !RuntimeException.class.isAssignableFrom(type);
     }
 
     public static void checkExceptionClassValidity(Class<? extends Exception> exceptionClass) {
@@ -108,10 +126,6 @@ public final class FuturesGetChecked {
             z = false;
         }
         Preconditions.checkArgument(z, "Futures.getChecked exception type (%s) must be an accessible class with an accessible constructor whose parameters (if any) must be of type String and/or Throwable", exceptionClass);
-    }
-
-    public static GetCheckedTypeValidator classValueValidator() {
-        return GetCheckedTypeValidatorHolder.ClassValueValidator.INSTANCE;
     }
 
     public static <V, X extends Exception> V getChecked(GetCheckedTypeValidator validator, Future<V> future, Class<X> exceptionClass) throws Exception {
@@ -133,19 +147,18 @@ public final class FuturesGetChecked {
         }
     }
 
-    public static boolean isCheckedException(Class<? extends Exception> type) {
-        return !RuntimeException.class.isAssignableFrom(type);
-    }
-
     public static <X extends Exception> X newWithCause(Class<X> exceptionClass, Throwable cause) {
         Object obj;
         List asList = Arrays.asList(exceptionClass.getConstructors());
         Ordering<Constructor<?>> ordering = WITH_STRING_PARAM_FIRST;
-        Objects.requireNonNull(ordering);
+        ordering.getClass();
         if (!(asList instanceof Collection)) {
             Iterator it = asList.iterator();
             ArrayList arrayList = new ArrayList();
-            Iterators.addAll(arrayList, it);
+            it.getClass();
+            while (it.hasNext()) {
+                arrayList.add(it.next());
+            }
             asList = arrayList;
         }
         Object[] array = asList.toArray();
@@ -184,7 +197,11 @@ public final class FuturesGetChecked {
             }
         }
         String valueOf = String.valueOf(exceptionClass);
-        throw new IllegalArgumentException(FakeDrag$$ExternalSyntheticOutline0.m(valueOf.length() + 82, "No appropriate constructor for exception of type ", valueOf, " in response to chained exception"), cause);
+        throw new IllegalArgumentException(XMPNode$$ExternalSyntheticOutline0.m(valueOf.length() + 82, "No appropriate constructor for exception of type ", valueOf, " in response to chained exception"), cause);
+    }
+
+    public static GetCheckedTypeValidator classValueValidator() {
+        return GetCheckedTypeValidatorHolder.ClassValueValidator.INSTANCE;
     }
 
     public static GetCheckedTypeValidator weakSetValidator() {

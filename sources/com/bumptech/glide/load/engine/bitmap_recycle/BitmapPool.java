@@ -5,13 +5,13 @@ import android.graphics.Bitmap;
 public interface BitmapPool {
     void clearMemory();
 
-    Bitmap get(int width, int height, Bitmap.Config config);
+    Bitmap get(int i, int i2, Bitmap.Config config);
 
-    Bitmap getDirty(int width, int height, Bitmap.Config config);
+    Bitmap getDirty(int i, int i2, Bitmap.Config config);
 
     void put(Bitmap bitmap);
 
-    void setSizeMultiplier(float sizeMultiplier);
+    void setSizeMultiplier(float f);
 
-    void trimMemory(int level);
+    void trimMemory(int i);
 }

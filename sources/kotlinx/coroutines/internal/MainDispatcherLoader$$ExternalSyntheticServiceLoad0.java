@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.ServiceConfigurationError;
 import kotlinx.coroutines.android.AndroidDispatcherFactory;
+/* compiled from: R8$$SyntheticClass */
 /* loaded from: classes.dex */
 public final /* synthetic */ class MainDispatcherLoader$$ExternalSyntheticServiceLoad0 {
     public static /* synthetic */ Iterator m() {

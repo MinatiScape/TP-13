@@ -30,14 +30,13 @@
     <string name="abc_slice_more">மேலும்</string>
     <string name="abc_slice_more_content">+ %1$d</string>
     <string name="abc_slice_permission_allow">அனுமதி</string>
-    <string name="abc_slice_permission_checkbox">எந்தப் பயன்பாட்டிலிருந்தும் விழிப்பூட்டல்களைக் காண்பிக்க, %1$s ஆப்ஸை அனுமதி</string>
     <string name="abc_slice_permission_deny">நிராகரி</string>
-    <string name="abc_slice_permission_text_1">- இது, %1$s பயன்பாட்டிலிருக்கும் தகவலைப் படிக்கும்</string>
-    <string name="abc_slice_permission_text_2">- இது, %1$s பயன்பாட்டிற்குள் செயல்பாடுகளில் ஈடுபடும்</string>
-    <string name="abc_slice_permission_title">%2$s ஆப்ஸின் விழிப்பூட்டல்களைக் காண்பிக்க, %1$s ஆப்ஸை அனுமதிக்கவா?</string>
+    <string name="abc_slice_permission_text_1">- இது %1$s ஆப்ஸிலிருந்து தகவல்களைப் படிக்கும்</string>
+    <string name="abc_slice_permission_text_2">- இது %1$s ஆப்ஸுக்குள் சென்று செயல்களைச் செய்யும்</string>
+    <string name="abc_slice_permission_title">%2$s ஆப்ஸின் ஸ்லைஸ்களைக் காட்ட %1$s ஆப்ஸை அனுமதிக்கவா?</string>
     <string name="abc_slice_show_more">மேலும் காட்டு</string>
     <string name="abc_slice_updated">புதுப்பித்தது: %1$s</string>
-    <string name="abc_slices_permission_request">%2$s ஆப்ஸின் விழிப்பூட்டல்களைக் காண்பிக்க, %1$s அனுமதி கேட்கிறது</string>
+    <string name="abc_slices_permission_request">%2$s ஆப்ஸின் ஸ்லைஸ்களை %1$s ஆப்ஸ் காட்ட விரும்புகிறது</string>
     <string name="abc_toolbar_collapse_description">சுருக்கும்</string>
     <string name="accessibility_custom_color_title">பிரத்தியேக வண்ணம்</string>
     <string name="accessibility_custom_font_title">பிரத்தியேக எழுத்துரு</string>
@@ -72,6 +71,7 @@
     <string name="center_wallpaper_position">மையம்</string>
     <string name="character_counter_content_description">%2$d இல் %1$d எழுத்துகள் உள்ளிடப்பட்டுள்ளன</string>
     <string name="character_counter_overflowed_content_description">%2$d இல் %1$d எழுத்து வரம்பு மீறப்பட்டது</string>
+    <string name="cinematic_effects_toogle">3D வால்பேப்பர்கள்</string>
     <string name="clear_text_end_icon_content_description">உரையை அழிக்கும்</string>
     <string name="clock_preview_content_description">%1$s கடிகார மாதிரிக்காட்சி</string>
     <string name="clock_title">கடிகாரம்</string>
@@ -117,6 +117,8 @@
     <string name="delete_live_wallpaper">நீக்கு</string>
     <string name="delete_wallpaper_confirmation">மொபைலில் இருந்து இந்த வால்பேப்பரை நீக்கவா?</string>
     <string name="edit_custom_theme_lbl">\'தீமைத்\' திருத்த தட்டவும்</string>
+    <string name="effect_error_dialog_body">எஃபெக்ட்டுகளை எங்களால் பயன்படுத்த முடியவில்லை.\nவேறொரு படத்தில் பயன்படுத்திப் பார்க்கவும்.</string>
+    <string name="effect_error_dialog_title">அச்சச்சோ!</string>
     <string name="error_icon_content_description">பிழை</string>
     <string name="expand_button_title">மேம்பட்டவை</string>
     <string name="explore">மேலும் அறிக</string>
@@ -199,6 +201,7 @@
     <string name="mtrl_picker_toggle_to_day_selection">நாளைத் தேர்வுசெய்வதற்கு மாற்ற தட்டவும்</string>
     <string name="mtrl_picker_toggle_to_text_input_mode">உரை உள்ளீட்டு முறைக்கு மாற்றும்</string>
     <string name="mtrl_picker_toggle_to_year_selection">ஆண்டைத் தேர்வுசெய்வதற்கு மாற்ற தட்டவும்</string>
+    <string name="my_photos">எனது புகைப்படங்கள்</string>
     <string name="my_photos_category_title">எனது படங்கள்</string>
     <string name="my_photos_generic_wallpaper_title">எனது படம்</string>
     <string name="name_component_title">உங்கள் ஸ்டைலுக்குப் பெயரிடவும்</string>
@@ -236,7 +239,7 @@
     <string name="search_menu_title">தேடல்</string>
     <string name="select_wallpaper_label">வால்பேப்பர் வகைகள்</string>
     <string name="set_theme_wallpaper_dialog_message">ஸ்டைல் வால்பேப்பரை அமை</string>
-    <string name="set_wallpaper_both_destination">முகப்புத் திரையும் பூட்டுத் திரையும்</string>
+    <string name="set_wallpaper_both_destination">முகப்புத் திரைகளும் பூட்டுத் திரைகளும்</string>
     <string name="set_wallpaper_button_text">வால்பேப்பரை அமை</string>
     <string name="set_wallpaper_dialog_message">வால்பேப்பரை அமையுங்கள்</string>
     <string name="set_wallpaper_error_message">வால்பேப்பரை அமைக்க முடியவில்லை.</string>
@@ -244,6 +247,8 @@
     <string name="set_wallpaper_lock_screen_destination">பூட்டுத் திரை</string>
     <string name="set_wallpaper_progress_message">வால்பேப்பரை அமைக்கிறது…</string>
     <string name="settings_button_label">அமைப்புகள்</string>
+    <string name="settings_snackbar_description">அமைப்புகளில் உள்ள ஃபைல்களையும் மீடியாவையும் இயக்கவும்.</string>
+    <string name="settings_snackbar_enable">இயக்கு</string>
     <string name="shape_component_title">ஐகான் உருவத்தைத் தேர்ந்தெடுத்தல்</string>
     <string name="shape_preview_content_description">வடிவ மாதிரிக்காட்சி</string>
     <string name="show_ui_preview_text">UI மாதிரிக்காட்சியைக் காட்டு</string>
@@ -261,6 +266,7 @@
     <string name="style_info_description">எழுத்துரு, ஐகான்கள், ஆப்ஸ் வடிவம், வண்ணம் ஆகியவற்றின் மாதிரிக்காட்சி</string>
     <string name="summary_collapsed_preference_list">%1$s, %2$s</string>
     <string name="tab_customize">பிரத்தியேகமாக்கு</string>
+    <string name="tab_effects">எஃபெக்ட்டுகள்</string>
     <string name="tab_info">தகவல்</string>
     <string name="theme_description">எழுத்து வடிவம்: %1$s, ஐகான்கள்: %2$s, வடிவம்: %3$s, நிறம்: %4$s</string>
     <string name="theme_preview_card_content_description">ஸ்டைல் மாதிரிக்காட்சி</string>
@@ -280,6 +286,8 @@
     <string name="wallpaper_destination_both">முகப்பு &amp; பூட்டுத் திரை</string>
     <string name="wallpaper_disabled_by_administrator_message">வால்பேப்பர் அமைவைச் சாதன நிர்வாகி முடக்கியுள்ளார்</string>
     <string name="wallpaper_disabled_message">இந்தச் சாதனத்தில் வால்பேப்பர் அமைவு முடக்கப்பட்டுள்ளது</string>
+    <string name="wallpaper_effects_subtitle">உங்கள் மொபைல் அசையும்போது அசையக்கூடிய 3D வால்பேப்பராக உங்கள் படத்தை மாற்றுங்கள்</string>
+    <string name="wallpaper_effects_title">3D வால்பேப்பர்கள்</string>
     <string name="wallpaper_picker_entry_title">வால்பேப்பரை மாற்றுதல்</string>
     <string name="wallpaper_preview_card_content_description">வால்பேப்பர் மாதிரிக்காட்சி</string>
     <string name="wallpaper_set_successfully_message">வால்பேப்பர் அமைக்கப்பட்டது</string>

@@ -95,7 +95,7 @@ import com.android.systemui.flags.FlagManager;
 /* JADX WARN: Init of enum SIZE can be incorrect */
 /* JADX WARN: Init of enum WIDTH can be incorrect */
 /* loaded from: classes.dex */
-public enum ImageUrlOptionsEnum {
+enum ImageUrlOptionsEnum {
     SIZE("s", "S", r8, 1),
     WIDTH("w", "W", r8, 12),
     /* JADX INFO: Fake field, exist only in values array */
@@ -217,7 +217,7 @@ public enum ImageUrlOptionsEnum {
     /* JADX INFO: Fake field, exist only in values array */
     MATCH_VERSION("mv", "Mv", r18, 66),
     /* JADX INFO: Fake field, exist only in values array */
-    IMAGE_DIGEST(FlagManager.FIELD_ID, "Id", r18, 70),
+    IMAGE_DIGEST(FlagManager.EXTRA_ID, "Id", r18, 70),
     /* JADX INFO: Fake field, exist only in values array */
     AUTOLOOP("al", "Al", r18, 74),
     /* JADX INFO: Fake field, exist only in values array */
@@ -299,15 +299,15 @@ public enum ImageUrlOptionsEnum {
         this.optionTag = optionTag;
     }
 
-    public String getOptionKey() {
+    public final String getOptionKey() {
         return this.optionKey;
     }
 
-    public ImageUrlOptionType getOptionType() {
+    public final ImageUrlOptionType getOptionType() {
         return this.optionType;
     }
 
-    public String getSignedOptionKey() {
+    public final String getSignedOptionKey() {
         return this.signedOptionKey;
     }
 }

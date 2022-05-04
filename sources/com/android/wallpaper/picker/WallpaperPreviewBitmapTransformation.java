@@ -7,14 +7,9 @@ import com.android.wallpaper.util.ScreenSizeCalculator;
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
 import java.security.MessageDigest;
 /* loaded from: classes.dex */
-public class WallpaperPreviewBitmapTransformation extends BitmapTransformation {
+public final class WallpaperPreviewBitmapTransformation extends BitmapTransformation {
     public final Context mContext;
     public Point mScreenSize;
-
-    public WallpaperPreviewBitmapTransformation(Context context, boolean z) {
-        this.mScreenSize = ScreenSizeCalculator.getInstance().getScreenSize(((WindowManager) context.getSystemService("window")).getDefaultDisplay());
-        this.mContext = context;
-    }
 
     /* JADX WARN: Removed duplicated region for block: B:44:0x015b  */
     /* JADX WARN: Removed duplicated region for block: B:46:0x0160  */
@@ -28,7 +23,7 @@ public class WallpaperPreviewBitmapTransformation extends BitmapTransformation {
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public android.graphics.Bitmap transform(com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool r7, android.graphics.Bitmap r8, int r9, int r10) {
+    public final android.graphics.Bitmap transform(com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool r7, android.graphics.Bitmap r8, int r9, int r10) {
         /*
             Method dump skipped, instructions count: 419
             To view this dump add '--comments-level debug' option
@@ -37,7 +32,12 @@ public class WallpaperPreviewBitmapTransformation extends BitmapTransformation {
     }
 
     @Override // com.bumptech.glide.load.Key
-    public void updateDiskCacheKey(MessageDigest messageDigest) {
+    public final void updateDiskCacheKey(MessageDigest messageDigest) {
         messageDigest.update("preview".getBytes());
+    }
+
+    public WallpaperPreviewBitmapTransformation(Context context, boolean z) {
+        this.mScreenSize = ScreenSizeCalculator.getInstance().getScreenSize(((WindowManager) context.getSystemService("window")).getDefaultDisplay());
+        this.mContext = context;
     }
 }

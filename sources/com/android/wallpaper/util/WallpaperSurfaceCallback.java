@@ -7,14 +7,13 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
+import androidx.cardview.R$style;
 import com.android.wallpaper.module.DefaultPackageStatusNotifier;
-import com.android.wallpaper.module.InjectorProvider;
 import com.android.wallpaper.module.PackageStatusNotifier;
-import com.android.wallpaper.widget.PreviewPager$$ExternalSyntheticLambda1;
 import java.util.concurrent.Future;
 /* loaded from: classes.dex */
-public class WallpaperSurfaceCallback implements SurfaceHolder.Callback {
-    public PackageStatusNotifier.Listener mAppStatusListener;
+public final class WallpaperSurfaceCallback implements SurfaceHolder.Callback {
+    public WallpaperSurfaceCallback$$ExternalSyntheticLambda0 mAppStatusListener;
     public final View mContainerView;
     public final Context mContext;
     public ImageView mHomeImageWallpaper;
@@ -31,20 +30,16 @@ public class WallpaperSurfaceCallback implements SurfaceHolder.Callback {
         void onSurfaceCreated();
     }
 
-    public WallpaperSurfaceCallback(Context context, View view, SurfaceView surfaceView, Future<Integer> future, SurfaceListener surfaceListener) {
-        this.mContext = context.getApplicationContext();
-        this.mContainerView = view;
-        this.mWallpaperSurface = surfaceView;
-        this.mListener = surfaceListener;
-        PackageStatusNotifier packageStatusNotifier = InjectorProvider.getInjector().getPackageStatusNotifier(context);
-        this.mPackageStatusNotifier = packageStatusNotifier;
-        PreviewPager$$ExternalSyntheticLambda1 previewPager$$ExternalSyntheticLambda1 = new PreviewPager$$ExternalSyntheticLambda1(this);
-        this.mAppStatusListener = previewPager$$ExternalSyntheticLambda1;
-        ((DefaultPackageStatusNotifier) packageStatusNotifier).addListener(previewPager$$ExternalSyntheticLambda1, "android.service.wallpaper.WallpaperService");
-        this.mPlaceholderColor = future;
+    @Override // android.view.SurfaceHolder.Callback
+    public final void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
     }
 
-    public void cleanUp() {
+    @Override // android.view.SurfaceHolder.Callback
+    public final void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+        this.mSurfaceCreated = false;
+    }
+
+    public final void cleanUp() {
         SurfaceControlViewHost surfaceControlViewHost = this.mHost;
         if (surfaceControlViewHost != null) {
             surfaceControlViewHost.release();
@@ -54,7 +49,7 @@ public class WallpaperSurfaceCallback implements SurfaceHolder.Callback {
         if (imageView != null) {
             imageView.setImageDrawable(null);
         }
-        ((DefaultPackageStatusNotifier) this.mPackageStatusNotifier).removeListener(this.mAppStatusListener);
+        ((DefaultPackageStatusNotifier) this.mPackageStatusNotifier).removeListenerAndMaybeUnregisterCallback(this.mAppStatusListener);
     }
 
     /* JADX WARN: Removed duplicated region for block: B:10:0x0022  */
@@ -90,7 +85,7 @@ public class WallpaperSurfaceCallback implements SurfaceHolder.Callback {
         L27:
             android.content.Context r0 = r5.mContext
             r3 = 16844080(0x1010530, float:2.369728E-38)
-            int r0 = androidx.transition.R$id.getColorAttr(r0, r3)
+            int r0 = androidx.appcompat.R$bool.getColorAttr(r0, r3)
         L30:
             r2.setBackgroundColor(r0)
             android.widget.ImageView r0 = r5.mHomeImageWallpaper
@@ -140,11 +135,7 @@ public class WallpaperSurfaceCallback implements SurfaceHolder.Callback {
     }
 
     @Override // android.view.SurfaceHolder.Callback
-    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
-    }
-
-    @Override // android.view.SurfaceHolder.Callback
-    public void surfaceCreated(SurfaceHolder surfaceHolder) {
+    public final void surfaceCreated(SurfaceHolder surfaceHolder) {
         if (this.mLastSurface != surfaceHolder.getSurface()) {
             this.mLastSurface = surfaceHolder.getSurface();
             setupSurfaceWallpaper(true);
@@ -156,8 +147,16 @@ public class WallpaperSurfaceCallback implements SurfaceHolder.Callback {
         this.mSurfaceCreated = true;
     }
 
-    @Override // android.view.SurfaceHolder.Callback
-    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        this.mSurfaceCreated = false;
+    public WallpaperSurfaceCallback(Context context, View view, SurfaceView surfaceView, Future<Integer> future, SurfaceListener surfaceListener) {
+        this.mContext = context.getApplicationContext();
+        this.mContainerView = view;
+        this.mWallpaperSurface = surfaceView;
+        this.mListener = surfaceListener;
+        PackageStatusNotifier packageStatusNotifier = R$style.getInjector().getPackageStatusNotifier(context);
+        this.mPackageStatusNotifier = packageStatusNotifier;
+        WallpaperSurfaceCallback$$ExternalSyntheticLambda0 wallpaperSurfaceCallback$$ExternalSyntheticLambda0 = new WallpaperSurfaceCallback$$ExternalSyntheticLambda0(this);
+        this.mAppStatusListener = wallpaperSurfaceCallback$$ExternalSyntheticLambda0;
+        ((DefaultPackageStatusNotifier) packageStatusNotifier).addListener(wallpaperSurfaceCallback$$ExternalSyntheticLambda0, "android.service.wallpaper.WallpaperService");
+        this.mPlaceholderColor = future;
     }
 }

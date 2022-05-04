@@ -4,13 +4,12 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.v4.app.FragmentTabHost$SavedState$$ExternalSyntheticOutline0;
 import android.text.TextUtils;
 import android.util.SparseIntArray;
 import androidx.collection.SimpleArrayMap;
 import java.lang.reflect.Method;
 /* loaded from: classes.dex */
-public class VersionedParcelParcel extends VersionedParcel {
+public final class VersionedParcelParcel extends VersionedParcel {
     public int mCurrentField;
     public final int mEnd;
     public int mFieldId;
@@ -24,8 +23,19 @@ public class VersionedParcelParcel extends VersionedParcel {
         this(parcel, parcel.dataPosition(), parcel.dataSize(), "", new SimpleArrayMap(), new SimpleArrayMap(), new SimpleArrayMap());
     }
 
-    @Override // androidx.versionedparcelable.VersionedParcel
-    public void closeField() {
+    public VersionedParcelParcel(Parcel parcel, int i, int i2, String str, SimpleArrayMap<String, Method> simpleArrayMap, SimpleArrayMap<String, Method> simpleArrayMap2, SimpleArrayMap<String, Class<?>> simpleArrayMap3) {
+        super(simpleArrayMap, simpleArrayMap2, simpleArrayMap3);
+        this.mPositionLookup = new SparseIntArray();
+        this.mCurrentField = -1;
+        this.mFieldId = -1;
+        this.mParcel = parcel;
+        this.mOffset = i;
+        this.mEnd = i2;
+        this.mNextRead = i;
+        this.mPrefix = str;
+    }
+
+    public final void closeField() {
         int i = this.mCurrentField;
         if (i >= 0) {
             int i2 = this.mPositionLookup.get(i);
@@ -37,28 +47,32 @@ public class VersionedParcelParcel extends VersionedParcel {
     }
 
     @Override // androidx.versionedparcelable.VersionedParcel
-    public VersionedParcel createSubParcel() {
+    public final VersionedParcelParcel createSubParcel() {
         Parcel parcel = this.mParcel;
         int dataPosition = parcel.dataPosition();
         int i = this.mNextRead;
         if (i == this.mOffset) {
             i = this.mEnd;
         }
-        return new VersionedParcelParcel(parcel, dataPosition, i, FragmentTabHost$SavedState$$ExternalSyntheticOutline0.m(new StringBuilder(), this.mPrefix, "  "), this.mReadCache, this.mWriteCache, this.mParcelizerCache);
+        int i2 = i;
+        return new VersionedParcelParcel(parcel, dataPosition, i2, this.mPrefix + "  ", this.mReadCache, this.mWriteCache, this.mParcelizerCache);
     }
 
     @Override // androidx.versionedparcelable.VersionedParcel
-    public boolean readBoolean() {
-        return this.mParcel.readInt() != 0;
+    public final boolean readBoolean() {
+        if (this.mParcel.readInt() != 0) {
+            return true;
+        }
+        return false;
     }
 
     @Override // androidx.versionedparcelable.VersionedParcel
-    public Bundle readBundle() {
+    public final Bundle readBundle() {
         return this.mParcel.readBundle(VersionedParcelParcel.class.getClassLoader());
     }
 
     @Override // androidx.versionedparcelable.VersionedParcel
-    public byte[] readByteArray() {
+    public final byte[] readByteArray() {
         int readInt = this.mParcel.readInt();
         if (readInt < 0) {
             return null;
@@ -69,12 +83,12 @@ public class VersionedParcelParcel extends VersionedParcel {
     }
 
     @Override // androidx.versionedparcelable.VersionedParcel
-    public CharSequence readCharSequence() {
+    public final CharSequence readCharSequence() {
         return (CharSequence) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(this.mParcel);
     }
 
     @Override // androidx.versionedparcelable.VersionedParcel
-    public boolean readField(int i) {
+    public final boolean readField(int i) {
         while (this.mNextRead < this.mEnd) {
             int i2 = this.mFieldId;
             if (i2 == i) {
@@ -88,55 +102,49 @@ public class VersionedParcelParcel extends VersionedParcel {
             this.mFieldId = this.mParcel.readInt();
             this.mNextRead += readInt;
         }
-        return this.mFieldId == i;
+        if (this.mFieldId == i) {
+            return true;
+        }
+        return false;
     }
 
     @Override // androidx.versionedparcelable.VersionedParcel
-    public int readInt() {
+    public final int readInt() {
         return this.mParcel.readInt();
     }
 
     @Override // androidx.versionedparcelable.VersionedParcel
-    public long readLong() {
+    public final long readLong() {
         return this.mParcel.readLong();
     }
 
     @Override // androidx.versionedparcelable.VersionedParcel
-    public <T extends Parcelable> T readParcelable() {
+    public final <T extends Parcelable> T readParcelable() {
         return (T) this.mParcel.readParcelable(VersionedParcelParcel.class.getClassLoader());
     }
 
     @Override // androidx.versionedparcelable.VersionedParcel
-    public String readString() {
+    public final String readString() {
         return this.mParcel.readString();
     }
 
     @Override // androidx.versionedparcelable.VersionedParcel
-    public IBinder readStrongBinder() {
+    public final IBinder readStrongBinder() {
         return this.mParcel.readStrongBinder();
     }
 
     @Override // androidx.versionedparcelable.VersionedParcel
-    public void setOutputField(int i) {
-        closeField();
-        this.mCurrentField = i;
-        this.mPositionLookup.put(i, this.mParcel.dataPosition());
-        this.mParcel.writeInt(0);
-        this.mParcel.writeInt(i);
-    }
-
-    @Override // androidx.versionedparcelable.VersionedParcel
-    public void writeBoolean(boolean z) {
+    public final void writeBoolean(boolean z) {
         this.mParcel.writeInt(z ? 1 : 0);
     }
 
     @Override // androidx.versionedparcelable.VersionedParcel
-    public void writeBundle(Bundle bundle) {
+    public final void writeBundle(Bundle bundle) {
         this.mParcel.writeBundle(bundle);
     }
 
     @Override // androidx.versionedparcelable.VersionedParcel
-    public void writeByteArray(byte[] bArr) {
+    public final void writeByteArray(byte[] bArr) {
         if (bArr != null) {
             this.mParcel.writeInt(bArr.length);
             this.mParcel.writeByteArray(bArr);
@@ -146,45 +154,41 @@ public class VersionedParcelParcel extends VersionedParcel {
     }
 
     @Override // androidx.versionedparcelable.VersionedParcel
-    public void writeCharSequence(CharSequence charSequence) {
+    public final void writeCharSequence(CharSequence charSequence) {
         TextUtils.writeToParcel(charSequence, this.mParcel, 0);
     }
 
     @Override // androidx.versionedparcelable.VersionedParcel
-    public void writeInt(int i) {
+    public final void writeInt(int i) {
         this.mParcel.writeInt(i);
     }
 
     @Override // androidx.versionedparcelable.VersionedParcel
-    public void writeLong(long j) {
+    public final void writeLong(long j) {
         this.mParcel.writeLong(j);
     }
 
     @Override // androidx.versionedparcelable.VersionedParcel
-    public void writeParcelable(Parcelable parcelable) {
+    public final void writeParcelable(Parcelable parcelable) {
         this.mParcel.writeParcelable(parcelable, 0);
     }
 
     @Override // androidx.versionedparcelable.VersionedParcel
-    public void writeString(String str) {
+    public final void writeString(String str) {
         this.mParcel.writeString(str);
     }
 
     @Override // androidx.versionedparcelable.VersionedParcel
-    public void writeStrongBinder(IBinder iBinder) {
+    public final void writeStrongBinder(IBinder iBinder) {
         this.mParcel.writeStrongBinder(iBinder);
     }
 
-    public VersionedParcelParcel(Parcel parcel, int i, int i2, String str, SimpleArrayMap<String, Method> simpleArrayMap, SimpleArrayMap<String, Method> simpleArrayMap2, SimpleArrayMap<String, Class<?>> simpleArrayMap3) {
-        super(simpleArrayMap, simpleArrayMap2, simpleArrayMap3);
-        this.mPositionLookup = new SparseIntArray();
-        this.mCurrentField = -1;
-        this.mNextRead = 0;
-        this.mFieldId = -1;
-        this.mParcel = parcel;
-        this.mOffset = i;
-        this.mEnd = i2;
-        this.mNextRead = i;
-        this.mPrefix = str;
+    @Override // androidx.versionedparcelable.VersionedParcel
+    public final void setOutputField(int i) {
+        closeField();
+        this.mCurrentField = i;
+        this.mPositionLookup.put(i, this.mParcel.dataPosition());
+        writeInt(0);
+        writeInt(i);
     }
 }

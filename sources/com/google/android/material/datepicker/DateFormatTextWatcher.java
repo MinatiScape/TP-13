@@ -5,53 +5,37 @@ import com.android.systemui.shared.R;
 import com.google.android.material.internal.TextWatcherAdapter;
 import com.google.android.material.textfield.TextInputLayout;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 /* loaded from: classes.dex */
 public abstract class DateFormatTextWatcher extends TextWatcherAdapter {
     public final CalendarConstraints constraints;
     public final DateFormat dateFormat;
     public final String outOfRange;
-    public final Runnable setErrorCallback;
-    public Runnable setRangeErrorCallback;
+    public final AnonymousClass1 setErrorCallback;
+    public AnonymousClass2 setRangeErrorCallback;
     public final TextInputLayout textInputLayout;
-
-    public DateFormatTextWatcher(final String str, DateFormat dateFormat, TextInputLayout textInputLayout, CalendarConstraints calendarConstraints) {
-        this.dateFormat = dateFormat;
-        this.textInputLayout = textInputLayout;
-        this.constraints = calendarConstraints;
-        this.outOfRange = textInputLayout.getContext().getString(R.string.mtrl_picker_out_of_range);
-        this.setErrorCallback = new Runnable() { // from class: com.google.android.material.datepicker.DateFormatTextWatcher.1
-            @Override // java.lang.Runnable
-            public void run() {
-                DateFormatTextWatcher dateFormatTextWatcher = DateFormatTextWatcher.this;
-                TextInputLayout textInputLayout2 = dateFormatTextWatcher.textInputLayout;
-                DateFormat dateFormat2 = dateFormatTextWatcher.dateFormat;
-                Context context = textInputLayout2.getContext();
-                String string = context.getString(R.string.mtrl_picker_invalid_format);
-                String format = String.format(context.getString(R.string.mtrl_picker_invalid_format_use), str);
-                String format2 = String.format(context.getString(R.string.mtrl_picker_invalid_format_example), dateFormat2.format(new Date(UtcDates.getTodayCalendar().getTimeInMillis())));
-                textInputLayout2.setError(string + "\n" + format + "\n" + format2);
-                DateFormatTextWatcher.this.onInvalidDate();
-            }
-        };
-    }
 
     public abstract void onInvalidDate();
 
+    public abstract void onValidDate(Long l);
+
+    /* JADX WARN: Multi-variable type inference failed */
     /* JADX WARN: Removed duplicated region for block: B:15:0x005a A[Catch: ParseException -> 0x0073, TryCatch #0 {ParseException -> 0x0073, blocks: (B:6:0x0020, B:8:0x003d, B:10:0x004a, B:15:0x005a, B:17:0x0066), top: B:20:0x0020 }] */
+    /* JADX WARN: Type inference failed for: r7v4, types: [com.google.android.material.datepicker.DateFormatTextWatcher$2, java.lang.Runnable] */
     @Override // com.google.android.material.internal.TextWatcherAdapter, android.text.TextWatcher
     /*
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public void onTextChanged(java.lang.CharSequence r7, int r8, int r9, int r10) {
+    public final void onTextChanged(java.lang.CharSequence r7, int r8, int r9, int r10) {
         /*
             r6 = this;
             com.google.android.material.textfield.TextInputLayout r8 = r6.textInputLayout
-            java.lang.Runnable r9 = r6.setErrorCallback
+            com.google.android.material.datepicker.DateFormatTextWatcher$1 r9 = r6.setErrorCallback
             r8.removeCallbacks(r9)
             com.google.android.material.textfield.TextInputLayout r8 = r6.textInputLayout
-            java.lang.Runnable r9 = r6.setRangeErrorCallback
+            com.google.android.material.datepicker.DateFormatTextWatcher$2 r9 = r6.setRangeErrorCallback
             r8.removeCallbacks(r9)
             com.google.android.material.textfield.TextInputLayout r8 = r6.textInputLayout
             r9 = 0
@@ -101,7 +85,7 @@ public abstract class DateFormatTextWatcher extends TextWatcherAdapter {
             goto L7a
         L73:
             com.google.android.material.textfield.TextInputLayout r7 = r6.textInputLayout
-            java.lang.Runnable r6 = r6.setErrorCallback
+            com.google.android.material.datepicker.DateFormatTextWatcher$1 r6 = r6.setErrorCallback
             r7.postDelayed(r6, r0)
         L7a:
             return
@@ -109,5 +93,25 @@ public abstract class DateFormatTextWatcher extends TextWatcherAdapter {
         throw new UnsupportedOperationException("Method not decompiled: com.google.android.material.datepicker.DateFormatTextWatcher.onTextChanged(java.lang.CharSequence, int, int, int):void");
     }
 
-    public abstract void onValidDate(Long l);
+    /* JADX WARN: Type inference failed for: r2v3, types: [com.google.android.material.datepicker.DateFormatTextWatcher$1] */
+    public DateFormatTextWatcher(final String str, SimpleDateFormat simpleDateFormat, TextInputLayout textInputLayout, CalendarConstraints calendarConstraints) {
+        this.dateFormat = simpleDateFormat;
+        this.textInputLayout = textInputLayout;
+        this.constraints = calendarConstraints;
+        this.outOfRange = textInputLayout.getContext().getString(R.string.mtrl_picker_out_of_range);
+        this.setErrorCallback = new Runnable() { // from class: com.google.android.material.datepicker.DateFormatTextWatcher.1
+            @Override // java.lang.Runnable
+            public final void run() {
+                DateFormatTextWatcher dateFormatTextWatcher = DateFormatTextWatcher.this;
+                TextInputLayout textInputLayout2 = dateFormatTextWatcher.textInputLayout;
+                DateFormat dateFormat = dateFormatTextWatcher.dateFormat;
+                Context context = textInputLayout2.getContext();
+                String string = context.getString(R.string.mtrl_picker_invalid_format);
+                String format = String.format(context.getString(R.string.mtrl_picker_invalid_format_use), str);
+                String format2 = String.format(context.getString(R.string.mtrl_picker_invalid_format_example), dateFormat.format(new Date(UtcDates.getTodayCalendar().getTimeInMillis())));
+                textInputLayout2.setError(string + "\n" + format + "\n" + format2);
+                DateFormatTextWatcher.this.onInvalidDate();
+            }
+        };
+    }
 }

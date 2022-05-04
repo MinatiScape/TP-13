@@ -7,38 +7,38 @@ import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 public abstract class SimpleItemAnimator extends RecyclerView.ItemAnimator {
     public boolean mSupportsChangeAnimations = true;
 
+    public abstract boolean animateMove(RecyclerView.ViewHolder viewHolder, int i, int i2, int i3, int i4);
+
     @Override // androidx.recyclerview.widget.RecyclerView.ItemAnimator
-    public boolean animateChange(RecyclerView.ViewHolder oldHolder, RecyclerView.ViewHolder newHolder, RecyclerView.ItemAnimator.ItemHolderInfo preInfo, RecyclerView.ItemAnimator.ItemHolderInfo postInfo) {
+    public final boolean animateChange(RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder viewHolder2, RecyclerView.ItemAnimator.ItemHolderInfo itemHolderInfo, RecyclerView.ItemAnimator.ItemHolderInfo itemHolderInfo2) {
         int i;
         int i2;
-        int i3 = preInfo.left;
-        int i4 = preInfo.top;
-        if (newHolder.shouldIgnore()) {
-            int i5 = preInfo.left;
-            i = preInfo.top;
+        int i3 = itemHolderInfo.left;
+        int i4 = itemHolderInfo.top;
+        if (viewHolder2.shouldIgnore()) {
+            int i5 = itemHolderInfo.left;
+            i = itemHolderInfo.top;
             i2 = i5;
         } else {
-            i2 = postInfo.left;
-            i = postInfo.top;
+            i2 = itemHolderInfo2.left;
+            i = itemHolderInfo2.top;
         }
         DefaultItemAnimator defaultItemAnimator = (DefaultItemAnimator) this;
-        if (oldHolder == newHolder) {
-            return defaultItemAnimator.animateMove(oldHolder, i3, i4, i2, i);
+        if (viewHolder == viewHolder2) {
+            return defaultItemAnimator.animateMove(viewHolder, i3, i4, i2, i);
         }
-        float translationX = oldHolder.itemView.getTranslationX();
-        float translationY = oldHolder.itemView.getTranslationY();
-        float alpha = oldHolder.itemView.getAlpha();
-        defaultItemAnimator.resetAnimation(oldHolder);
-        oldHolder.itemView.setTranslationX(translationX);
-        oldHolder.itemView.setTranslationY(translationY);
-        oldHolder.itemView.setAlpha(alpha);
-        defaultItemAnimator.resetAnimation(newHolder);
-        newHolder.itemView.setTranslationX(-((int) ((i2 - i3) - translationX)));
-        newHolder.itemView.setTranslationY(-((int) ((i - i4) - translationY)));
-        newHolder.itemView.setAlpha(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
-        defaultItemAnimator.mPendingChanges.add(new DefaultItemAnimator.ChangeInfo(oldHolder, newHolder, i3, i4, i2, i));
+        float translationX = viewHolder.itemView.getTranslationX();
+        float translationY = viewHolder.itemView.getTranslationY();
+        float alpha = viewHolder.itemView.getAlpha();
+        defaultItemAnimator.resetAnimation(viewHolder);
+        viewHolder.itemView.setTranslationX(translationX);
+        viewHolder.itemView.setTranslationY(translationY);
+        viewHolder.itemView.setAlpha(alpha);
+        defaultItemAnimator.resetAnimation(viewHolder2);
+        viewHolder2.itemView.setTranslationX(-((int) ((i2 - i3) - translationX)));
+        viewHolder2.itemView.setTranslationY(-((int) ((i - i4) - translationY)));
+        viewHolder2.itemView.setAlpha(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
+        defaultItemAnimator.mPendingChanges.add(new DefaultItemAnimator.ChangeInfo(viewHolder, viewHolder2, i3, i4, i2, i));
         return true;
     }
-
-    public abstract boolean animateMove(RecyclerView.ViewHolder holder, int fromX, int fromY, int toX, int toY);
 }

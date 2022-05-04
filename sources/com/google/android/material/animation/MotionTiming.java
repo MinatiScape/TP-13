@@ -4,24 +4,22 @@ import android.animation.Animator;
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 /* loaded from: classes.dex */
-public class MotionTiming {
+public final class MotionTiming {
     public long delay;
     public long duration;
     public TimeInterpolator interpolator;
     public int repeatCount;
     public int repeatMode;
 
-    public MotionTiming(long j, long j2) {
-        this.delay = 0L;
-        this.duration = 300L;
+    public MotionTiming(long j) {
         this.interpolator = null;
         this.repeatCount = 0;
         this.repeatMode = 1;
         this.delay = j;
-        this.duration = j2;
+        this.duration = 150L;
     }
 
-    public void apply(Animator animator) {
+    public final void apply(Animator animator) {
         animator.setStartDelay(this.delay);
         animator.setDuration(this.duration);
         animator.setInterpolator(getInterpolator());
@@ -32,7 +30,7 @@ public class MotionTiming {
         }
     }
 
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
@@ -46,25 +44,25 @@ public class MotionTiming {
         return false;
     }
 
-    public TimeInterpolator getInterpolator() {
+    public final TimeInterpolator getInterpolator() {
         TimeInterpolator timeInterpolator = this.interpolator;
-        return timeInterpolator != null ? timeInterpolator : AnimationUtils.FAST_OUT_SLOW_IN_INTERPOLATOR;
+        if (timeInterpolator != null) {
+            return timeInterpolator;
+        }
+        return AnimationUtils.FAST_OUT_SLOW_IN_INTERPOLATOR;
     }
 
-    public int hashCode() {
+    public final int hashCode() {
         long j = this.delay;
         long j2 = this.duration;
         return ((((getInterpolator().getClass().hashCode() + (((((int) (j ^ (j >>> 32))) * 31) + ((int) ((j2 >>> 32) ^ j2))) * 31)) * 31) + this.repeatCount) * 31) + this.repeatMode;
     }
 
-    public String toString() {
+    public final String toString() {
         return '\n' + MotionTiming.class.getName() + '{' + Integer.toHexString(System.identityHashCode(this)) + " delay: " + this.delay + " duration: " + this.duration + " interpolator: " + getInterpolator().getClass() + " repeatCount: " + this.repeatCount + " repeatMode: " + this.repeatMode + "}\n";
     }
 
     public MotionTiming(long j, long j2, TimeInterpolator timeInterpolator) {
-        this.delay = 0L;
-        this.duration = 300L;
-        this.interpolator = null;
         this.repeatCount = 0;
         this.repeatMode = 1;
         this.delay = j;

@@ -2,7 +2,7 @@ package com.google.android.gms.clearcut;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import androidx.slice.view.R$layout;
+import androidx.core.R$id;
 import com.google.android.gms.internal.zzbkv;
 import java.util.Arrays;
 /* loaded from: classes.dex */
@@ -12,13 +12,7 @@ public class CollectForDebugParcelable extends zzbkv {
     public final long collectForDebugStartTimeMillis;
     public final boolean skipPersistentStorage;
 
-    public CollectForDebugParcelable(boolean z, long j, long j2) {
-        this.skipPersistentStorage = z;
-        this.collectForDebugStartTimeMillis = j;
-        this.collectForDebugExpiryTimeMillis = j2;
-    }
-
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
@@ -31,26 +25,32 @@ public class CollectForDebugParcelable extends zzbkv {
         return false;
     }
 
-    public int hashCode() {
+    public final int hashCode() {
         return Arrays.hashCode(new Object[]{Boolean.valueOf(this.skipPersistentStorage), Long.valueOf(this.collectForDebugStartTimeMillis), Long.valueOf(this.collectForDebugExpiryTimeMillis)});
     }
 
-    public String toString() {
+    public final String toString() {
         return "CollectForDebugParcelable[skipPersistentStorage: " + this.skipPersistentStorage + ",collectForDebugStartTimeMillis: " + this.collectForDebugStartTimeMillis + ",collectForDebugExpiryTimeMillis: " + this.collectForDebugExpiryTimeMillis + "]";
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
-        int zzb = R$layout.zzb(parcel, 20293);
+    public final void writeToParcel(Parcel parcel, int i) {
+        int zzb = R$id.zzb(parcel, 20293);
         boolean z = this.skipPersistentStorage;
-        R$layout.zzb(parcel, 1, 4);
+        R$id.zzb(parcel, 1, 4);
         parcel.writeInt(z ? 1 : 0);
         long j = this.collectForDebugExpiryTimeMillis;
-        R$layout.zzb(parcel, 2, 8);
+        R$id.zzb(parcel, 2, 8);
         parcel.writeLong(j);
         long j2 = this.collectForDebugStartTimeMillis;
-        R$layout.zzb(parcel, 3, 8);
+        R$id.zzb(parcel, 3, 8);
         parcel.writeLong(j2);
-        R$layout.zzc(parcel, zzb);
+        R$id.zzc(parcel, zzb);
+    }
+
+    public CollectForDebugParcelable(boolean z, long j, long j2) {
+        this.skipPersistentStorage = z;
+        this.collectForDebugStartTimeMillis = j;
+        this.collectForDebugExpiryTimeMillis = j2;
     }
 }

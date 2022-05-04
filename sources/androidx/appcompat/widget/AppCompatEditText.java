@@ -1,219 +1,28 @@
 package androidx.appcompat.widget;
 
-import android.app.Activity;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
-import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 import android.text.Editable;
-import android.text.Selection;
-import android.text.Spannable;
+import android.text.method.KeyListener;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.DragEvent;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
-import android.view.inputmethod.InputConnectionWrapper;
-import android.view.inputmethod.InputContentInfo;
 import android.view.textclassifier.TextClassifier;
 import android.widget.EditText;
-import android.widget.TextView;
-import androidx.appcompat.widget.AppCompatEditText;
-import androidx.core.view.ContentInfoCompat;
-import androidx.core.view.OnReceiveContentViewBehavior;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.ViewPropertyAnimatorCompat;
-import androidx.core.view.inputmethod.InputConnectionCompat$OnCommitContentListener;
-import androidx.core.view.inputmethod.InputContentInfoCompat;
-import androidx.core.widget.TextViewOnReceiveContentListener;
-import androidx.slice.view.R$plurals;
+import androidx.core.R$attr;
+import androidx.core.widget.TextViewCompat;
 import com.android.systemui.shared.R;
-import java.util.Objects;
-import java.util.WeakHashMap;
+import com.android.wallpaper.util.DisplayMetricsRetriever;
 /* loaded from: classes.dex */
-public class AppCompatEditText extends EditText implements OnReceiveContentViewBehavior {
+public class AppCompatEditText extends EditText {
+    public final DisplayMetricsRetriever mAppCompatEmojiEditTextHelper;
     public final AppCompatBackgroundHelper mBackgroundTintHelper;
-    public final TextViewOnReceiveContentListener mDefaultOnReceiveContentListener;
-    public final AppCompatEditor mEditor;
     public final AppCompatTextHelper mTextHelper;
-
-    /* renamed from: androidx.appcompat.widget.AppCompatEditText$1  reason: invalid class name */
-    /* loaded from: classes.dex */
-    public class AnonymousClass1 implements InputConnectionCompat$OnCommitContentListener {
-        public final /* synthetic */ View val$view;
-
-        public AnonymousClass1(View view) {
-            this.val$view = view;
-        }
-
-        public boolean onCommitContent(InputContentInfoCompat inputContentInfoCompat, int i, Bundle bundle) {
-            if ((i & 1) != 0) {
-                try {
-                    ((InputContentInfoCompat.InputContentInfoCompatApi25Impl) inputContentInfoCompat.mImpl).requestPermission();
-                } catch (Exception e) {
-                    Log.w("AppCompatEditText", "Can't insert content from IME; requestPermission() failed", e);
-                    return false;
-                }
-            }
-            ContentInfoCompat.Builder builder = new ContentInfoCompat.Builder(new ClipData(((InputContentInfoCompat.InputContentInfoCompatApi25Impl) inputContentInfoCompat.mImpl).mObject.getDescription(), new ClipData.Item(((InputContentInfoCompat.InputContentInfoCompatApi25Impl) inputContentInfoCompat.mImpl).mObject.getContentUri())), 2);
-            builder.mLinkUri = ((InputContentInfoCompat.InputContentInfoCompatApi25Impl) inputContentInfoCompat.mImpl).mObject.getLinkUri();
-            builder.mExtras = bundle;
-            return ViewCompat.performReceiveContent(this.val$view, new ContentInfoCompat(builder)) == null;
-        }
-    }
 
     public AppCompatEditText(Context context) {
         this(context, null);
-    }
-
-    @Override // android.widget.TextView, android.view.View
-    public void drawableStateChanged() {
-        super.drawableStateChanged();
-        AppCompatBackgroundHelper appCompatBackgroundHelper = this.mBackgroundTintHelper;
-        if (appCompatBackgroundHelper != null) {
-            appCompatBackgroundHelper.applySupportBackgroundTint();
-        }
-        AppCompatTextHelper appCompatTextHelper = this.mTextHelper;
-        if (appCompatTextHelper != null) {
-            appCompatTextHelper.applyCompoundDrawablesTints();
-        }
-    }
-
-    @Override // android.widget.TextView
-    public TextClassifier getTextClassifier() {
-        return super.getTextClassifier();
-    }
-
-    @Override // android.widget.TextView, android.view.View
-    public InputConnection onCreateInputConnection(EditorInfo editorInfo) {
-        final InputConnection onCreateInputConnection = super.onCreateInputConnection(editorInfo);
-        Objects.requireNonNull(this.mTextHelper);
-        R$plurals.onCreateInputConnection(onCreateInputConnection, editorInfo, this);
-        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-        String[] strArr = (String[]) getTag(R.id.tag_on_receive_content_mime_types);
-        if (onCreateInputConnection == null || strArr == null) {
-            return onCreateInputConnection;
-        }
-        editorInfo.contentMimeTypes = strArr;
-        final AnonymousClass1 r3 = new AnonymousClass1(this);
-        return new InputConnectionWrapper(onCreateInputConnection, false) { // from class: androidx.core.view.inputmethod.InputConnectionCompat$1
-            @Override // android.view.inputmethod.InputConnectionWrapper, android.view.inputmethod.InputConnection
-            public boolean commitContent(InputContentInfo inputContentInfo, int flags, Bundle opts) {
-                if (((AppCompatEditText.AnonymousClass1) r3).onCommitContent(inputContentInfo == null ? null : new InputContentInfoCompat(new InputContentInfoCompat.InputContentInfoCompatApi25Impl(inputContentInfo)), flags, opts)) {
-                    return true;
-                }
-                return super.commitContent(inputContentInfo, flags, opts);
-            }
-        };
-    }
-
-    /* JADX WARN: Finally extract failed */
-    @Override // android.widget.TextView, android.view.View
-    public boolean onDragEvent(DragEvent dragEvent) {
-        Activity activity;
-        AppCompatEditor appCompatEditor = this.mEditor;
-        Objects.requireNonNull(appCompatEditor);
-        boolean z = false;
-        if (dragEvent.getAction() == 3 && dragEvent.getLocalState() == null && ViewCompat.getOnReceiveContentMimeTypes(appCompatEditor.mTextView) != null) {
-            Context context = appCompatEditor.mTextView.getContext();
-            while (true) {
-                if (!(context instanceof ContextWrapper)) {
-                    activity = null;
-                    break;
-                } else if (context instanceof Activity) {
-                    activity = (Activity) context;
-                    break;
-                } else {
-                    context = ((ContextWrapper) context).getBaseContext();
-                }
-            }
-            if (activity == null) {
-                StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("No activity so not calling performReceiveContent: ");
-                m.append(appCompatEditor.mTextView);
-                Log.i("AppCompatEditor", m.toString());
-            } else {
-                TextView textView = appCompatEditor.mTextView;
-                int offsetForPosition = textView.getOffsetForPosition(dragEvent.getX(), dragEvent.getY());
-                activity.requestDragAndDropPermissions(dragEvent);
-                textView.beginBatchEdit();
-                try {
-                    Selection.setSelection((Spannable) textView.getText(), offsetForPosition);
-                    ViewCompat.performReceiveContent(textView, new ContentInfoCompat(new ContentInfoCompat.Builder(dragEvent.getClipData(), 3)));
-                    textView.endBatchEdit();
-                    z = true;
-                } catch (Throwable th) {
-                    textView.endBatchEdit();
-                    throw th;
-                }
-            }
-        }
-        if (z) {
-            return true;
-        }
-        return super.onDragEvent(dragEvent);
-    }
-
-    @Override // androidx.core.view.OnReceiveContentViewBehavior
-    public ContentInfoCompat onReceiveContent(ContentInfoCompat contentInfoCompat) {
-        return this.mDefaultOnReceiveContentListener.onReceiveContent(this, contentInfoCompat);
-    }
-
-    @Override // android.widget.TextView
-    public boolean onTextContextMenuItem(int i) {
-        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-        if (((String[]) getTag(R.id.tag_on_receive_content_mime_types)) == null || (i != 16908322 && i != 16908337)) {
-            return super.onTextContextMenuItem(i);
-        }
-        ClipboardManager clipboardManager = (ClipboardManager) getContext().getSystemService("clipboard");
-        ClipData primaryClip = clipboardManager == null ? null : clipboardManager.getPrimaryClip();
-        if (primaryClip != null) {
-            ContentInfoCompat.Builder builder = new ContentInfoCompat.Builder(primaryClip, 1);
-            builder.mFlags = i == 16908322 ? 0 : 1;
-            ViewCompat.performReceiveContent(this, new ContentInfoCompat(builder));
-        }
-        return true;
-    }
-
-    @Override // android.view.View
-    public void setBackgroundDrawable(Drawable drawable) {
-        super.setBackgroundDrawable(drawable);
-        AppCompatBackgroundHelper appCompatBackgroundHelper = this.mBackgroundTintHelper;
-        if (appCompatBackgroundHelper != null) {
-            appCompatBackgroundHelper.onSetBackgroundDrawable();
-        }
-    }
-
-    @Override // android.view.View
-    public void setBackgroundResource(int i) {
-        super.setBackgroundResource(i);
-        AppCompatBackgroundHelper appCompatBackgroundHelper = this.mBackgroundTintHelper;
-        if (appCompatBackgroundHelper != null) {
-            appCompatBackgroundHelper.onSetBackgroundResource(i);
-        }
-    }
-
-    @Override // android.widget.TextView
-    public void setCustomSelectionActionModeCallback(ActionMode.Callback callback) {
-        super.setCustomSelectionActionModeCallback(callback);
-    }
-
-    @Override // android.widget.TextView
-    public void setTextAppearance(Context context, int i) {
-        super.setTextAppearance(context, i);
-        AppCompatTextHelper appCompatTextHelper = this.mTextHelper;
-        if (appCompatTextHelper != null) {
-            appCompatTextHelper.onSetTextAppearance(context, i);
-        }
-    }
-
-    @Override // android.widget.TextView
-    public void setTextClassifier(TextClassifier textClassifier) {
-        super.setTextClassifier(textClassifier);
     }
 
     public AppCompatEditText(Context context, AttributeSet attributeSet) {
@@ -221,8 +30,13 @@ public class AppCompatEditText extends EditText implements OnReceiveContentViewB
     }
 
     @Override // android.widget.EditText, android.widget.TextView
-    public Editable getText() {
+    public final Editable getText() {
         return super.getText();
+    }
+
+    @Override // android.widget.TextView
+    public final void setKeyListener(KeyListener keyListener) {
+        super.setKeyListener(this.mAppCompatEmojiEditTextHelper.getKeyListener(keyListener));
     }
 
     /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
@@ -237,7 +51,87 @@ public class AppCompatEditText extends EditText implements OnReceiveContentViewB
         this.mTextHelper = appCompatTextHelper;
         appCompatTextHelper.loadFromAttributes(attributeSet, i);
         appCompatTextHelper.applyCompoundDrawablesTints();
-        this.mDefaultOnReceiveContentListener = new TextViewOnReceiveContentListener();
-        this.mEditor = new AppCompatEditor(this);
+        DisplayMetricsRetriever displayMetricsRetriever = new DisplayMetricsRetriever(this);
+        this.mAppCompatEmojiEditTextHelper = displayMetricsRetriever;
+        displayMetricsRetriever.loadFromAttributes(attributeSet, i);
+        displayMetricsRetriever.initKeyListener();
+    }
+
+    @Override // android.widget.TextView, android.view.View
+    public final void drawableStateChanged() {
+        super.drawableStateChanged();
+        AppCompatBackgroundHelper appCompatBackgroundHelper = this.mBackgroundTintHelper;
+        if (appCompatBackgroundHelper != null) {
+            appCompatBackgroundHelper.applySupportBackgroundTint();
+        }
+        AppCompatTextHelper appCompatTextHelper = this.mTextHelper;
+        if (appCompatTextHelper != null) {
+            appCompatTextHelper.applyCompoundDrawablesTints();
+        }
+    }
+
+    @Override // android.widget.TextView
+    public final ActionMode.Callback getCustomSelectionActionModeCallback() {
+        return TextViewCompat.unwrapCustomSelectionActionModeCallback(super.getCustomSelectionActionModeCallback());
+    }
+
+    @Override // android.widget.TextView
+    public final TextClassifier getTextClassifier() {
+        return super.getTextClassifier();
+    }
+
+    @Override // android.widget.TextView, android.view.View
+    public InputConnection onCreateInputConnection(EditorInfo editorInfo) {
+        InputConnection onCreateInputConnection = super.onCreateInputConnection(editorInfo);
+        this.mTextHelper.getClass();
+        R$attr.onCreateInputConnection(onCreateInputConnection, editorInfo, this);
+        return this.mAppCompatEmojiEditTextHelper.onCreateInputConnection(onCreateInputConnection);
+    }
+
+    @Override // android.widget.TextView, android.view.View
+    public final boolean onDragEvent(DragEvent dragEvent) {
+        return super.onDragEvent(dragEvent);
+    }
+
+    @Override // android.widget.TextView
+    public final boolean onTextContextMenuItem(int i) {
+        return super.onTextContextMenuItem(i);
+    }
+
+    @Override // android.view.View
+    public final void setBackgroundDrawable(Drawable drawable) {
+        super.setBackgroundDrawable(drawable);
+        AppCompatBackgroundHelper appCompatBackgroundHelper = this.mBackgroundTintHelper;
+        if (appCompatBackgroundHelper != null) {
+            appCompatBackgroundHelper.onSetBackgroundDrawable();
+        }
+    }
+
+    @Override // android.view.View
+    public final void setBackgroundResource(int i) {
+        super.setBackgroundResource(i);
+        AppCompatBackgroundHelper appCompatBackgroundHelper = this.mBackgroundTintHelper;
+        if (appCompatBackgroundHelper != null) {
+            appCompatBackgroundHelper.onSetBackgroundResource(i);
+        }
+    }
+
+    @Override // android.widget.TextView
+    public final void setTextAppearance(Context context, int i) {
+        super.setTextAppearance(context, i);
+        AppCompatTextHelper appCompatTextHelper = this.mTextHelper;
+        if (appCompatTextHelper != null) {
+            appCompatTextHelper.onSetTextAppearance(context, i);
+        }
+    }
+
+    @Override // android.widget.TextView
+    public final void setCustomSelectionActionModeCallback(ActionMode.Callback callback) {
+        super.setCustomSelectionActionModeCallback(callback);
+    }
+
+    @Override // android.widget.TextView
+    public final void setTextClassifier(TextClassifier textClassifier) {
+        super.setTextClassifier(textClassifier);
     }
 }

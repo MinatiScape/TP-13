@@ -2,10 +2,10 @@ package com.android.customization.picker.themedicon;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import com.android.systemui.shared.R;
-import com.android.wallpaper.picker.AppbarFragment$$ExternalSyntheticLambda0;
 import com.android.wallpaper.picker.SectionView;
 /* loaded from: classes.dex */
 public class ThemedIconSectionView extends SectionView {
@@ -18,11 +18,16 @@ public class ThemedIconSectionView extends SectionView {
     }
 
     @Override // android.view.View
-    public void onFinishInflate() {
+    public final void onFinishInflate() {
         super.onFinishInflate();
         this.mSwitchView = (Switch) findViewById(R.id.themed_icon_toggle);
-        setOnClickListener(new AppbarFragment$$ExternalSyntheticLambda0(this));
-        this.mSwitchView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { // from class: com.android.customization.picker.themedicon.ThemedIconSectionView$$ExternalSyntheticLambda0
+        setOnClickListener(new View.OnClickListener() { // from class: com.android.customization.picker.themedicon.ThemedIconSectionView$$ExternalSyntheticLambda0
+            @Override // android.view.View.OnClickListener
+            public final void onClick(View view) {
+                ThemedIconSectionView.this.mSwitchView.toggle();
+            }
+        });
+        this.mSwitchView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { // from class: com.android.customization.picker.themedicon.ThemedIconSectionView$$ExternalSyntheticLambda1
             @Override // android.widget.CompoundButton.OnCheckedChangeListener
             public final void onCheckedChanged(CompoundButton compoundButton, boolean z) {
                 ThemedIconSectionView themedIconSectionView = ThemedIconSectionView.this;

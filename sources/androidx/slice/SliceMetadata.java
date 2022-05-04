@@ -2,34 +2,48 @@ package androidx.slice;
 
 import android.content.Context;
 import android.os.Bundle;
-import androidx.slice.core.SliceAction;
 import androidx.slice.core.SliceActionImpl;
 import androidx.slice.core.SliceQuery;
 import androidx.slice.widget.ListContent;
 import androidx.slice.widget.RowContent;
 import java.util.ArrayList;
-import java.util.List;
 /* loaded from: classes.dex */
-public class SliceMetadata {
+public final class SliceMetadata {
     public Context mContext;
     public long mExpiry;
     public RowContent mHeaderContent;
     public long mLastUpdated;
     public ListContent mListContent;
-    public SliceAction mPrimaryAction;
+    public SliceActionImpl mPrimaryAction;
     public Slice mSlice;
-    public List<SliceAction> mSliceActions;
+    public ArrayList mSliceActions;
+
+    public final int getLoadingState() {
+        boolean z;
+        if (SliceQuery.find(this.mSlice, (String) null, "partial") != null) {
+            z = true;
+        } else {
+            z = false;
+        }
+        if (!this.mListContent.isValid()) {
+            return 0;
+        }
+        if (z) {
+            return 1;
+        }
+        return 2;
+    }
 
     public SliceMetadata(Context context, Slice slice) {
-        List<SliceAction> list;
+        ArrayList arrayList;
         RowContent rowContent;
         this.mSlice = slice;
         this.mContext = context;
-        SliceItem find = SliceQuery.find(slice, "long", "ttl", (String) null);
+        SliceItem find = SliceQuery.find(slice, "long", "ttl");
         if (find != null) {
             this.mExpiry = find.getLong();
         }
-        SliceItem find2 = SliceQuery.find(slice, "long", "last_updated", (String) null);
+        SliceItem find2 = SliceQuery.find(slice, "long", "last_updated");
         if (find2 != null) {
             this.mLastUpdated = find2.getLong();
         }
@@ -43,19 +57,19 @@ public class SliceMetadata {
                 RowContent rowContent2 = listContent.mHeaderContent;
                 this.mHeaderContent = rowContent2;
                 ListContent.getRowType(rowContent2, true, listContent.mSliceActions);
-                this.mPrimaryAction = this.mListContent.getShortcut(this.mContext);
-                list = this.mListContent.mSliceActions;
-                this.mSliceActions = list;
-                if (list == null && (rowContent = this.mHeaderContent) != null && SliceQuery.hasHints(rowContent.mSliceItem, "list_item")) {
-                    ArrayList<SliceItem> arrayList = this.mHeaderContent.mEndItems;
-                    ArrayList arrayList2 = new ArrayList();
-                    for (int i = 0; i < arrayList.size(); i++) {
-                        if (SliceQuery.find(arrayList.get(i), "action") != null) {
-                            arrayList2.add(new SliceActionImpl(arrayList.get(i)));
+                this.mPrimaryAction = (SliceActionImpl) this.mListContent.getShortcut(this.mContext);
+                arrayList = this.mListContent.mSliceActions;
+                this.mSliceActions = arrayList;
+                if (arrayList == null && (rowContent = this.mHeaderContent) != null && SliceQuery.hasHints(rowContent.mSliceItem, "list_item")) {
+                    ArrayList<SliceItem> arrayList2 = this.mHeaderContent.mEndItems;
+                    ArrayList arrayList3 = new ArrayList();
+                    for (int i = 0; i < arrayList2.size(); i++) {
+                        if (SliceQuery.find(arrayList2.get(i), "action", (String[]) null, (String[]) null) != null) {
+                            arrayList3.add(new SliceActionImpl(arrayList2.get(i)));
                         }
                     }
-                    if (arrayList2.size() > 0) {
-                        this.mSliceActions = arrayList2;
+                    if (arrayList3.size() > 0) {
+                        this.mSliceActions = arrayList3;
                         return;
                     }
                     return;
@@ -69,24 +83,19 @@ public class SliceMetadata {
         RowContent rowContent22 = listContent2.mHeaderContent;
         this.mHeaderContent = rowContent22;
         ListContent.getRowType(rowContent22, true, listContent2.mSliceActions);
-        this.mPrimaryAction = this.mListContent.getShortcut(this.mContext);
-        list = this.mListContent.mSliceActions;
-        this.mSliceActions = list;
-        if (list == null) {
+        this.mPrimaryAction = (SliceActionImpl) this.mListContent.getShortcut(this.mContext);
+        arrayList = this.mListContent.mSliceActions;
+        this.mSliceActions = arrayList;
+        if (arrayList == null) {
         }
     }
 
-    public int getLoadingState() {
-        boolean z = SliceQuery.find(this.mSlice, (String) null, "partial", (String) null) != null;
-        if (!this.mListContent.isValid()) {
-            return 0;
-        }
-        return z ? 1 : 2;
-    }
-
-    public boolean isExpired() {
+    public final boolean isExpired() {
         long currentTimeMillis = System.currentTimeMillis();
         long j = this.mExpiry;
-        return (j == 0 || j == -1 || currentTimeMillis <= j) ? false : true;
+        if (j == 0 || j == -1 || currentTimeMillis <= j) {
+            return false;
+        }
+        return true;
     }
 }

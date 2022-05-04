@@ -6,13 +6,76 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Iterator;
 /* loaded from: classes.dex */
-public class MonthAdapter extends BaseAdapter {
-    public static final int MAXIMUM_WEEKS = UtcDates.getUtcCalendar().getMaximum(4);
+public final class MonthAdapter extends BaseAdapter {
+    public static final int MAXIMUM_WEEKS = UtcDates.getUtcCalendarOf(null).getMaximum(4);
     public final CalendarConstraints calendarConstraints;
     public CalendarStyle calendarStyle;
     public final DateSelector<?> dateSelector;
     public final Month month;
     public Collection<Long> previouslySelectedDates;
+
+    @Override // android.widget.BaseAdapter, android.widget.Adapter
+    public final boolean hasStableIds() {
+        return true;
+    }
+
+    public final int firstPositionInMonth() {
+        return this.month.daysFromStartOfWeekToFirstOfMonth();
+    }
+
+    @Override // android.widget.Adapter
+    public final int getCount() {
+        return firstPositionInMonth() + this.month.daysInMonth;
+    }
+
+    @Override // android.widget.Adapter
+    public final Long getItem(int i) {
+        if (i < this.month.daysFromStartOfWeekToFirstOfMonth() || i > lastPositionInMonth()) {
+            return null;
+        }
+        Month month = this.month;
+        return Long.valueOf(month.getDay((i - month.daysFromStartOfWeekToFirstOfMonth()) + 1));
+    }
+
+    @Override // android.widget.Adapter
+    public final long getItemId(int i) {
+        return i / this.month.daysInWeek;
+    }
+
+    public final int lastPositionInMonth() {
+        return (this.month.daysFromStartOfWeekToFirstOfMonth() + this.month.daysInMonth) - 1;
+    }
+
+    public final void updateSelectedState(TextView textView, long j) {
+        CalendarItemStyle calendarItemStyle;
+        if (textView != null) {
+            boolean z = false;
+            if (this.calendarConstraints.validator.isValid(j)) {
+                textView.setEnabled(true);
+                Iterator it = this.dateSelector.getSelectedDays().iterator();
+                while (true) {
+                    if (!it.hasNext()) {
+                        break;
+                    }
+                    if (UtcDates.canonicalYearMonthDay(j) == UtcDates.canonicalYearMonthDay(((Long) it.next()).longValue())) {
+                        z = true;
+                        break;
+                    }
+                }
+                if (z) {
+                    calendarItemStyle = this.calendarStyle.selectedDay;
+                } else if (UtcDates.getTodayCalendar().getTimeInMillis() == j) {
+                    calendarItemStyle = this.calendarStyle.todayDay;
+                } else {
+                    calendarItemStyle = this.calendarStyle.day;
+                }
+            } else {
+                textView.setEnabled(false);
+                calendarItemStyle = this.calendarStyle.invalidDay;
+            }
+            calendarItemStyle.styleItem(textView);
+        }
+    }
 
     public MonthAdapter(Month month, DateSelector<?> dateSelector, CalendarConstraints calendarConstraints) {
         this.month = month;
@@ -21,31 +84,13 @@ public class MonthAdapter extends BaseAdapter {
         this.previouslySelectedDates = dateSelector.getSelectedDays();
     }
 
-    public int dayToPosition(int i) {
-        return firstPositionInMonth() + (i - 1);
-    }
-
-    public int firstPositionInMonth() {
-        return this.month.daysFromStartOfWeekToFirstOfMonth();
-    }
-
-    @Override // android.widget.Adapter
-    public int getCount() {
-        return firstPositionInMonth() + this.month.daysInMonth;
-    }
-
-    @Override // android.widget.Adapter
-    public long getItemId(int i) {
-        return i / this.month.daysInWeek;
-    }
-
     /* JADX WARN: Removed duplicated region for block: B:20:0x00b0  */
     @Override // android.widget.Adapter
     /*
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public android.view.View getView(int r7, android.view.View r8, android.view.ViewGroup r9) {
+    public final android.view.View getView(int r7, android.view.View r8, android.view.ViewGroup r9) {
         /*
             r6 = this;
             android.content.Context r0 = r9.getContext()
@@ -61,7 +106,7 @@ public class MonthAdapter extends BaseAdapter {
             if (r8 != 0) goto L27
             android.content.Context r8 = r9.getContext()
             android.view.LayoutInflater r8 = android.view.LayoutInflater.from(r8)
-            r0 = 2131558539(0x7f0d008b, float:1.8742397E38)
+            r0 = 2131558548(0x7f0d0094, float:1.8742415E38)
             android.view.View r8 = r8.inflate(r0, r9, r1)
             r0 = r8
             android.widget.TextView r0 = (android.widget.TextView) r0
@@ -132,60 +177,12 @@ public class MonthAdapter extends BaseAdapter {
         throw new UnsupportedOperationException("Method not decompiled: com.google.android.material.datepicker.MonthAdapter.getView(int, android.view.View, android.view.ViewGroup):android.view.View");
     }
 
-    @Override // android.widget.BaseAdapter, android.widget.Adapter
-    public boolean hasStableIds() {
-        return true;
-    }
-
-    public int lastPositionInMonth() {
-        return (this.month.daysFromStartOfWeekToFirstOfMonth() + this.month.daysInMonth) - 1;
-    }
-
-    public final void updateSelectedState(TextView textView, long j) {
-        CalendarItemStyle calendarItemStyle;
-        if (textView != null) {
-            boolean z = false;
-            if (this.calendarConstraints.validator.isValid(j)) {
-                textView.setEnabled(true);
-                Iterator<Long> it = this.dateSelector.getSelectedDays().iterator();
-                while (true) {
-                    if (!it.hasNext()) {
-                        break;
-                    }
-                    if (UtcDates.canonicalYearMonthDay(j) == UtcDates.canonicalYearMonthDay(it.next().longValue())) {
-                        z = true;
-                        break;
-                    }
-                }
-                if (z) {
-                    calendarItemStyle = this.calendarStyle.selectedDay;
-                } else if (UtcDates.getTodayCalendar().getTimeInMillis() == j) {
-                    calendarItemStyle = this.calendarStyle.todayDay;
-                } else {
-                    calendarItemStyle = this.calendarStyle.day;
-                }
-            } else {
-                textView.setEnabled(false);
-                calendarItemStyle = this.calendarStyle.invalidDay;
-            }
-            calendarItemStyle.styleItem(textView);
-        }
-    }
-
     public final void updateSelectedStateForDate(MaterialCalendarGridView materialCalendarGridView, long j) {
         if (Month.create(j).equals(this.month)) {
             Calendar dayCopy = UtcDates.getDayCopy(this.month.firstOfMonth);
             dayCopy.setTimeInMillis(j);
-            updateSelectedState((TextView) materialCalendarGridView.getChildAt(materialCalendarGridView.getAdapter2().dayToPosition(dayCopy.get(5)) - materialCalendarGridView.getFirstVisiblePosition()), j);
+            int i = dayCopy.get(5);
+            updateSelectedState((TextView) materialCalendarGridView.getChildAt((materialCalendarGridView.getAdapter2().firstPositionInMonth() + (i - 1)) - materialCalendarGridView.getFirstVisiblePosition()), j);
         }
-    }
-
-    @Override // android.widget.Adapter
-    public Long getItem(int i) {
-        if (i < this.month.daysFromStartOfWeekToFirstOfMonth() || i > lastPositionInMonth()) {
-            return null;
-        }
-        Month month = this.month;
-        return Long.valueOf(month.getDay((i - month.daysFromStartOfWeekToFirstOfMonth()) + 1));
     }
 }

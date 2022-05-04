@@ -8,30 +8,20 @@ public abstract class IndexBasedArrayIterator<T> implements Iterator<T> {
     public int mIndex;
     public int mSize;
 
-    public IndexBasedArrayIterator(int i) {
-        this.mSize = i;
-    }
-
     public abstract T elementAt(int i);
+
+    public abstract void removeAt(int i);
 
     @Override // java.util.Iterator
     public final boolean hasNext() {
-        return this.mIndex < this.mSize;
-    }
-
-    @Override // java.util.Iterator
-    public T next() {
-        if (hasNext()) {
-            T elementAt = elementAt(this.mIndex);
-            this.mIndex++;
-            this.mCanRemove = true;
-            return elementAt;
+        if (this.mIndex < this.mSize) {
+            return true;
         }
-        throw new NoSuchElementException();
+        return false;
     }
 
     @Override // java.util.Iterator
-    public void remove() {
+    public final void remove() {
         if (this.mCanRemove) {
             int i = this.mIndex - 1;
             this.mIndex = i;
@@ -43,5 +33,18 @@ public abstract class IndexBasedArrayIterator<T> implements Iterator<T> {
         throw new IllegalStateException();
     }
 
-    public abstract void removeAt(int i);
+    public IndexBasedArrayIterator(int i) {
+        this.mSize = i;
+    }
+
+    @Override // java.util.Iterator
+    public final T next() {
+        if (hasNext()) {
+            T elementAt = elementAt(this.mIndex);
+            this.mIndex++;
+            this.mCanRemove = true;
+            return elementAt;
+        }
+        throw new NoSuchElementException();
+    }
 }

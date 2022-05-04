@@ -1,20 +1,19 @@
 package com.google.android.material.datepicker;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import androidx.core.util.Pair;
-import java.util.Collection;
+import com.google.android.material.datepicker.MaterialTextInputPicker;
+import java.util.ArrayList;
 /* loaded from: classes.dex */
 public interface DateSelector<S> extends Parcelable {
     int getDefaultThemeResId(Context context);
 
-    Collection<Long> getSelectedDays();
+    ArrayList getSelectedDays();
 
-    Collection<Pair<Long, Long>> getSelectedRanges();
+    ArrayList getSelectedRanges();
 
     S getSelection();
 
@@ -22,7 +21,7 @@ public interface DateSelector<S> extends Parcelable {
 
     boolean isSelectionComplete();
 
-    View onCreateTextInputView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle bundle, CalendarConstraints calendarConstraints, OnSelectionChangedListener<S> onSelectionChangedListener);
+    View onCreateTextInputView(LayoutInflater layoutInflater, ViewGroup viewGroup, CalendarConstraints calendarConstraints, MaterialTextInputPicker.AnonymousClass1 r4);
 
     void select(long j);
 }

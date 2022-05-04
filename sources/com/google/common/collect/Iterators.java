@@ -1,29 +1,27 @@
 package com.google.common.collect;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.FluentIterable;
 import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.Deque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public final class Iterators {
 
     /* loaded from: classes.dex */
     public static final class ArrayItr<T> extends AbstractIndexedListIterator<T> {
-        public static final AbstractIndexedListIterator<Object> EMPTY = new ArrayItr(new Object[0], 0, 0, 0);
+        public static final ArrayItr EMPTY = new ArrayItr(new Object[0]);
         public final T[] array;
-        public final int offset;
+        public final int offset = 0;
 
-        public ArrayItr(T[] array, int offset, int length, int index) {
-            super(length, index);
-            this.array = array;
-            this.offset = offset;
+        /* JADX WARN: Multi-variable type inference failed */
+        public ArrayItr(Object[] objArr) {
+            super(0, 0);
+            this.array = objArr;
         }
 
         @Override // com.google.common.collect.AbstractIndexedListIterator
-        public T get(int index) {
+        public final T get(int index) {
             return this.array[this.offset + index];
         }
     }
@@ -31,21 +29,16 @@ public final class Iterators {
     /* loaded from: classes.dex */
     public static class ConcatenatedIterator<T> implements Iterator<T> {
         public Iterator<? extends T> iterator = ArrayItr.EMPTY;
-        public Deque<Iterator<? extends Iterator<? extends T>>> metaIterators;
+        public ArrayDeque metaIterators;
         public Iterator<? extends T> toRemove;
         public Iterator<? extends Iterator<? extends T>> topMetaIterator;
 
-        public ConcatenatedIterator(Iterator<? extends Iterator<? extends T>> metaIterator) {
-            Objects.requireNonNull(metaIterator);
-            this.topMetaIterator = metaIterator;
-        }
-
         @Override // java.util.Iterator
-        public boolean hasNext() {
+        public final boolean hasNext() {
             Iterator<? extends Iterator<? extends T>> it;
             while (true) {
                 Iterator<? extends T> it2 = this.iterator;
-                Objects.requireNonNull(it2);
+                it2.getClass();
                 if (it2.hasNext()) {
                     return true;
                 }
@@ -55,11 +48,11 @@ public final class Iterators {
                         it = this.topMetaIterator;
                         break;
                     }
-                    Deque<Iterator<? extends Iterator<? extends T>>> deque = this.metaIterators;
-                    if (deque == null || deque.isEmpty()) {
+                    ArrayDeque arrayDeque = this.metaIterators;
+                    if (arrayDeque == null || arrayDeque.isEmpty()) {
                         break;
                     }
-                    this.topMetaIterator = this.metaIterators.removeFirst();
+                    this.topMetaIterator = (Iterator) this.metaIterators.removeFirst();
                 }
                 it = null;
                 this.topMetaIterator = it;
@@ -77,7 +70,7 @@ public final class Iterators {
                     this.metaIterators.addFirst(this.topMetaIterator);
                     if (concatenatedIterator.metaIterators != null) {
                         while (!concatenatedIterator.metaIterators.isEmpty()) {
-                            this.metaIterators.addFirst(concatenatedIterator.metaIterators.removeLast());
+                            this.metaIterators.addFirst((Iterator) concatenatedIterator.metaIterators.removeLast());
                         }
                     }
                     this.topMetaIterator = concatenatedIterator.topMetaIterator;
@@ -86,7 +79,24 @@ public final class Iterators {
         }
 
         @Override // java.util.Iterator
-        public T next() {
+        public final void remove() {
+            boolean z;
+            if (this.toRemove != null) {
+                z = true;
+            } else {
+                z = false;
+            }
+            CollectPreconditions.checkRemove(z);
+            this.toRemove.remove();
+            this.toRemove = null;
+        }
+
+        public ConcatenatedIterator(FluentIterable.AnonymousClass3.AnonymousClass1 metaIterator) {
+            this.topMetaIterator = metaIterator;
+        }
+
+        @Override // java.util.Iterator
+        public final T next() {
             if (hasNext()) {
                 Iterator<? extends T> it = this.iterator;
                 this.toRemove = it;
@@ -94,32 +104,41 @@ public final class Iterators {
             }
             throw new NoSuchElementException();
         }
-
-        @Override // java.util.Iterator
-        public void remove() {
-            Preconditions.checkState(this.toRemove != null, "no calls to next() since the last call to remove()");
-            this.toRemove.remove();
-            this.toRemove = null;
-        }
     }
 
+    /* JADX WARN: Failed to restore enum class, 'enum' modifier removed */
     /* loaded from: classes.dex */
-    public enum EmptyModifiableIterator implements Iterator<Object> {
-        INSTANCE;
+    public static final class EmptyModifiableIterator extends Enum<EmptyModifiableIterator> implements Iterator<Object> {
+        public static final /* synthetic */ EmptyModifiableIterator[] $VALUES;
+        public static final EmptyModifiableIterator INSTANCE;
 
         @Override // java.util.Iterator
-        public boolean hasNext() {
+        public final boolean hasNext() {
             return false;
         }
 
         @Override // java.util.Iterator
-        public Object next() {
-            throw new NoSuchElementException();
+        public final void remove() {
+            CollectPreconditions.checkRemove(false);
+        }
+
+        static {
+            EmptyModifiableIterator emptyModifiableIterator = new EmptyModifiableIterator();
+            INSTANCE = emptyModifiableIterator;
+            $VALUES = new EmptyModifiableIterator[]{emptyModifiableIterator};
+        }
+
+        public static EmptyModifiableIterator valueOf(String name) {
+            return (EmptyModifiableIterator) Enum.valueOf(EmptyModifiableIterator.class, name);
+        }
+
+        public static EmptyModifiableIterator[] values() {
+            return (EmptyModifiableIterator[]) $VALUES.clone();
         }
 
         @Override // java.util.Iterator
-        public void remove() {
-            Preconditions.checkState(false, "no calls to next() since the last call to remove()");
+        public final Object next() {
+            throw new NoSuchElementException();
         }
     }
 
@@ -129,18 +148,16 @@ public final class Iterators {
         public final Iterator<? extends E> iterator;
         public E peekedElement;
 
-        public PeekingImpl(Iterator<? extends E> iterator) {
-            Objects.requireNonNull(iterator);
-            this.iterator = iterator;
+        @Override // java.util.Iterator
+        public final boolean hasNext() {
+            if (this.hasPeeked || this.iterator.hasNext()) {
+                return true;
+            }
+            return false;
         }
 
         @Override // java.util.Iterator
-        public boolean hasNext() {
-            return this.hasPeeked || this.iterator.hasNext();
-        }
-
-        @Override // java.util.Iterator
-        public E next() {
+        public final E next() {
             if (!this.hasPeeked) {
                 return this.iterator.next();
             }
@@ -151,30 +168,30 @@ public final class Iterators {
         }
 
         @Override // java.util.Iterator
-        public void remove() {
+        public final void remove() {
             Preconditions.checkState(!this.hasPeeked, "Can't remove after you've peeked at next");
             this.iterator.remove();
         }
-    }
 
-    public static <T> boolean addAll(Collection<T> addTo, Iterator<? extends T> iterator) {
-        Objects.requireNonNull(iterator);
-        boolean z = false;
-        while (iterator.hasNext()) {
-            z |= addTo.add(iterator.next());
+        public PeekingImpl(Iterator<? extends E> iterator) {
+            iterator.getClass();
+            this.iterator = iterator;
         }
-        return z;
     }
 
     public static void clear(Iterator<?> iterator) {
+        iterator.getClass();
         while (iterator.hasNext()) {
             iterator.next();
             iterator.remove();
         }
     }
 
-    public static <T> T getNext(Iterator<? extends T> iterator, T defaultValue) {
-        return iterator.hasNext() ? iterator.next() : defaultValue;
+    public static Object getNext(Iterator it) {
+        if (it.hasNext()) {
+            return it.next();
+        }
+        return null;
     }
 
     public static <T> T pollNext(Iterator<T> iterator) {

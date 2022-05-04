@@ -2,7 +2,7 @@ package androidx.recyclerview.widget;
 
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 /* loaded from: classes.dex */
-public class LayoutState {
+public final class LayoutState {
     public int mAvailable;
     public int mCurrentPosition;
     public boolean mInfinite;
@@ -13,7 +13,7 @@ public class LayoutState {
     public int mStartLine = 0;
     public int mEndLine = 0;
 
-    public String toString() {
+    public final String toString() {
         StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("LayoutState{mAvailable=");
         m.append(this.mAvailable);
         m.append(", mCurrentPosition=");

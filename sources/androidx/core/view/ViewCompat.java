@@ -2,14 +2,21 @@ package androidx.core.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Display;
+import android.view.PointerIcon;
 import android.view.View;
 import android.view.ViewParent;
+import android.view.ViewTreeObserver;
 import android.view.WindowInsets;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
@@ -19,111 +26,459 @@ import androidx.core.view.accessibility.AccessibilityViewCommand;
 import com.android.systemui.shared.R;
 import com.android.systemui.shared.system.QuickStepContract;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 @SuppressLint({"PrivateConstructorForUtilityClass"})
 /* loaded from: classes.dex */
-public class ViewCompat {
+public final class ViewCompat {
     public static WeakHashMap<View, ViewPropertyAnimatorCompat> sViewPropertyAnimatorMap = null;
-    public static boolean sAccessibilityDelegateCheckFailed = false;
     public static final int[] ACCESSIBILITY_ACTIONS_RESOURCE_IDS = {R.id.accessibility_custom_action_0, R.id.accessibility_custom_action_1, R.id.accessibility_custom_action_2, R.id.accessibility_custom_action_3, R.id.accessibility_custom_action_4, R.id.accessibility_custom_action_5, R.id.accessibility_custom_action_6, R.id.accessibility_custom_action_7, R.id.accessibility_custom_action_8, R.id.accessibility_custom_action_9, R.id.accessibility_custom_action_10, R.id.accessibility_custom_action_11, R.id.accessibility_custom_action_12, R.id.accessibility_custom_action_13, R.id.accessibility_custom_action_14, R.id.accessibility_custom_action_15, R.id.accessibility_custom_action_16, R.id.accessibility_custom_action_17, R.id.accessibility_custom_action_18, R.id.accessibility_custom_action_19, R.id.accessibility_custom_action_20, R.id.accessibility_custom_action_21, R.id.accessibility_custom_action_22, R.id.accessibility_custom_action_23, R.id.accessibility_custom_action_24, R.id.accessibility_custom_action_25, R.id.accessibility_custom_action_26, R.id.accessibility_custom_action_27, R.id.accessibility_custom_action_28, R.id.accessibility_custom_action_29, R.id.accessibility_custom_action_30, R.id.accessibility_custom_action_31};
-    public static final OnReceiveContentViewBehavior NO_OP_ON_RECEIVE_CONTENT_VIEW_BEHAVIOR = new OnReceiveContentViewBehavior() { // from class: androidx.core.view.ViewCompat.1
-        @Override // androidx.core.view.OnReceiveContentViewBehavior
-        public ContentInfoCompat onReceiveContent(ContentInfoCompat payload) {
-            return payload;
-        }
-    };
+    public static final ViewCompat$$ExternalSyntheticLambda0 NO_OP_ON_RECEIVE_CONTENT_VIEW_BEHAVIOR = ViewCompat$$ExternalSyntheticLambda0.INSTANCE;
+    public static final AccessibilityPaneVisibilityManager sAccessibilityPaneVisibilityManager = new AccessibilityPaneVisibilityManager();
 
-    /* renamed from: androidx.core.view.ViewCompat$4  reason: invalid class name */
     /* loaded from: classes.dex */
-    public class AnonymousClass4 extends AccessibilityViewProperty<CharSequence> {
-        public AnonymousClass4(int tagKey, Class type, int contentChangeType, int frameworkMinimumSdk) {
-            super(tagKey, type, contentChangeType, frameworkMinimumSdk);
+    public static abstract class AccessibilityViewProperty<T> {
+        public final int mContentChangeType;
+        public final int mFrameworkMinimumSdk;
+        public final int mTagKey;
+        public final Class<T> mType;
+
+        public static boolean booleanNullToFalseEquals(Boolean bool, Boolean bool2) {
+            boolean z;
+            boolean z2;
+            if (bool == null || !bool.booleanValue()) {
+                z = false;
+            } else {
+                z = true;
+            }
+            if (bool2 == null || !bool2.booleanValue()) {
+                z2 = false;
+            } else {
+                z2 = true;
+            }
+            return z == z2;
         }
 
-        @Override // androidx.core.view.ViewCompat.AccessibilityViewProperty
-        public CharSequence frameworkGet(View view) {
-            return view.getStateDescription();
+        public abstract T frameworkGet(View view);
+
+        public abstract void frameworkSet(View view, T t);
+
+        public abstract boolean shouldUpdate(T t, T t2);
+
+        public final T get(View view) {
+            boolean z;
+            if (Build.VERSION.SDK_INT >= this.mFrameworkMinimumSdk) {
+                z = true;
+            } else {
+                z = false;
+            }
+            if (z) {
+                return frameworkGet(view);
+            }
+            T t = (T) view.getTag(this.mTagKey);
+            if (this.mType.isInstance(t)) {
+                return t;
+            }
+            return null;
         }
 
-        @Override // androidx.core.view.ViewCompat.AccessibilityViewProperty
-        public void frameworkSet(View view, CharSequence value) {
-            view.setStateDescription(value);
+        public final void set(View view, T t) {
+            boolean z;
+            AccessibilityDelegateCompat accessibilityDelegateCompat;
+            if (Build.VERSION.SDK_INT >= this.mFrameworkMinimumSdk) {
+                z = true;
+            } else {
+                z = false;
+            }
+            if (z) {
+                frameworkSet(view, t);
+            } else if (shouldUpdate(get(view), t)) {
+                WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
+                View.AccessibilityDelegate accessibilityDelegate = Api29Impl.getAccessibilityDelegate(view);
+                if (accessibilityDelegate == null) {
+                    accessibilityDelegateCompat = null;
+                } else if (accessibilityDelegate instanceof AccessibilityDelegateCompat.AccessibilityDelegateAdapter) {
+                    accessibilityDelegateCompat = ((AccessibilityDelegateCompat.AccessibilityDelegateAdapter) accessibilityDelegate).mCompat;
+                } else {
+                    accessibilityDelegateCompat = new AccessibilityDelegateCompat(accessibilityDelegate);
+                }
+                if (accessibilityDelegateCompat == null) {
+                    accessibilityDelegateCompat = new AccessibilityDelegateCompat();
+                }
+                ViewCompat.setAccessibilityDelegate(view, accessibilityDelegateCompat);
+                view.setTag(this.mTagKey, t);
+                ViewCompat.notifyViewAccessibilityStateChangedIfNeeded(view, this.mContentChangeType);
+            }
         }
 
-        @Override // androidx.core.view.ViewCompat.AccessibilityViewProperty
-        public boolean shouldUpdate(CharSequence oldValue, CharSequence newValue) {
-            return !TextUtils.equals(oldValue, newValue);
+        public AccessibilityViewProperty(int i, Class<T> cls, int i2, int i3) {
+            this.mTagKey = i;
+            this.mType = cls;
+            this.mContentChangeType = i2;
+            this.mFrameworkMinimumSdk = i3;
         }
     }
 
     /* loaded from: classes.dex */
     public static class Api21Impl {
-        public static WindowInsetsCompat computeSystemWindowInsets(View v, WindowInsetsCompat insets, Rect outLocalInsets) {
-            WindowInsets windowInsets = insets.toWindowInsets();
-            if (windowInsets != null) {
-                return WindowInsetsCompat.toWindowInsetsCompat(v.computeSystemWindowInsets(windowInsets, outLocalInsets), v);
-            }
-            outLocalInsets.setEmpty();
-            return insets;
-        }
-
-        public static void setOnApplyWindowInsetsListener(final View v, final OnApplyWindowInsetsListener listener) {
-            if (listener == null) {
-                v.setOnApplyWindowInsetsListener((View.OnApplyWindowInsetsListener) v.getTag(R.id.tag_window_insets_animation_callback));
+        public static void setOnApplyWindowInsetsListener(View view, OnApplyWindowInsetsListener onApplyWindowInsetsListener) {
+            if (onApplyWindowInsetsListener == null) {
+                view.setOnApplyWindowInsetsListener((View.OnApplyWindowInsetsListener) view.getTag(R.id.tag_window_insets_animation_callback));
             } else {
-                v.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener(v, listener) { // from class: androidx.core.view.ViewCompat.Api21Impl.1
+                view.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener(view, onApplyWindowInsetsListener) { // from class: androidx.core.view.ViewCompat.Api21Impl.1
                     public final /* synthetic */ OnApplyWindowInsetsListener val$listener;
 
                     {
-                        this.val$listener = listener;
+                        this.val$listener = onApplyWindowInsetsListener;
                     }
 
                     @Override // android.view.View.OnApplyWindowInsetsListener
-                    public WindowInsets onApplyWindowInsets(final View view, final WindowInsets insets) {
-                        return this.val$listener.onApplyWindowInsets(view, WindowInsetsCompat.toWindowInsetsCompat(insets, view)).toWindowInsets();
+                    public WindowInsets onApplyWindowInsets(View view2, WindowInsets windowInsets) {
+                        return this.val$listener.onApplyWindowInsets(view2, WindowInsetsCompat.toWindowInsetsCompat(windowInsets, view2)).toWindowInsets();
                     }
                 });
             }
+        }
+
+        public static WindowInsetsCompat computeSystemWindowInsets(View view, WindowInsetsCompat windowInsetsCompat, Rect rect) {
+            WindowInsets windowInsets = windowInsetsCompat.toWindowInsets();
+            if (windowInsets != null) {
+                return WindowInsetsCompat.toWindowInsetsCompat(view.computeSystemWindowInsets(windowInsets, rect), view);
+            }
+            rect.setEmpty();
+            return windowInsetsCompat;
+        }
+
+        public static ColorStateList getBackgroundTintList(View view) {
+            return view.getBackgroundTintList();
+        }
+
+        public static PorterDuff.Mode getBackgroundTintMode(View view) {
+            return view.getBackgroundTintMode();
+        }
+
+        public static float getElevation(View view) {
+            return view.getElevation();
+        }
+
+        public static String getTransitionName(View view) {
+            return view.getTransitionName();
+        }
+
+        public static float getTranslationZ(View view) {
+            return view.getTranslationZ();
+        }
+
+        public static float getZ(View view) {
+            return view.getZ();
+        }
+
+        public static boolean isNestedScrollingEnabled(View view) {
+            return view.isNestedScrollingEnabled();
+        }
+
+        public static void setBackgroundTintList(View view, ColorStateList colorStateList) {
+            view.setBackgroundTintList(colorStateList);
+        }
+
+        public static void setBackgroundTintMode(View view, PorterDuff.Mode mode) {
+            view.setBackgroundTintMode(mode);
+        }
+
+        public static void setElevation(View view, float f) {
+            view.setElevation(f);
+        }
+
+        public static void setTransitionName(View view, String str) {
+            view.setTransitionName(str);
+        }
+
+        public static void setTranslationZ(View view, float f) {
+            view.setTranslationZ(f);
+        }
+
+        public static void setZ(View view, float f) {
+            view.setZ(f);
+        }
+
+        public static void stopNestedScroll(View view) {
+            view.stopNestedScroll();
+        }
+    }
+
+    public static void replaceAccessibilityAction(View view, AccessibilityNodeInfoCompat.AccessibilityActionCompat accessibilityActionCompat, AccessibilityViewCommand accessibilityViewCommand) {
+        AccessibilityDelegateCompat accessibilityDelegateCompat;
+        if (accessibilityViewCommand == null) {
+            removeActionWithId(accessibilityActionCompat.getId(), view);
+            notifyViewAccessibilityStateChangedIfNeeded(view, 0);
+            return;
+        }
+        AccessibilityNodeInfoCompat.AccessibilityActionCompat accessibilityActionCompat2 = new AccessibilityNodeInfoCompat.AccessibilityActionCompat(null, accessibilityActionCompat.mId, null, accessibilityViewCommand, accessibilityActionCompat.mViewCommandArgumentClass);
+        View.AccessibilityDelegate accessibilityDelegate = Api29Impl.getAccessibilityDelegate(view);
+        if (accessibilityDelegate == null) {
+            accessibilityDelegateCompat = null;
+        } else if (accessibilityDelegate instanceof AccessibilityDelegateCompat.AccessibilityDelegateAdapter) {
+            accessibilityDelegateCompat = ((AccessibilityDelegateCompat.AccessibilityDelegateAdapter) accessibilityDelegate).mCompat;
+        } else {
+            accessibilityDelegateCompat = new AccessibilityDelegateCompat(accessibilityDelegate);
+        }
+        if (accessibilityDelegateCompat == null) {
+            accessibilityDelegateCompat = new AccessibilityDelegateCompat();
+        }
+        setAccessibilityDelegate(view, accessibilityDelegateCompat);
+        removeActionWithId(accessibilityActionCompat2.getId(), view);
+        getActionList(view).add(accessibilityActionCompat2);
+        notifyViewAccessibilityStateChangedIfNeeded(view, 0);
+    }
+
+    /* loaded from: classes.dex */
+    public static class AccessibilityPaneVisibilityManager implements ViewTreeObserver.OnGlobalLayoutListener, View.OnAttachStateChangeListener {
+        public final WeakHashMap<View, Boolean> mPanesToVisible = new WeakHashMap<>();
+
+        @Override // android.view.ViewTreeObserver.OnGlobalLayoutListener
+        public final void onGlobalLayout() {
+        }
+
+        @Override // android.view.View.OnAttachStateChangeListener
+        public final void onViewDetachedFromWindow(View view) {
+        }
+
+        @Override // android.view.View.OnAttachStateChangeListener
+        public final void onViewAttachedToWindow(View view) {
+            view.getViewTreeObserver().addOnGlobalLayoutListener(this);
+        }
+    }
+
+    /* loaded from: classes.dex */
+    public static class Api15Impl {
+        public static boolean hasOnClickListeners(View view) {
+            return view.hasOnClickListeners();
+        }
+    }
+
+    /* loaded from: classes.dex */
+    public static class Api16Impl {
+        public static boolean getFitsSystemWindows(View view) {
+            return view.getFitsSystemWindows();
+        }
+
+        public static int getImportantForAccessibility(View view) {
+            return view.getImportantForAccessibility();
+        }
+
+        public static int getMinimumHeight(View view) {
+            return view.getMinimumHeight();
+        }
+
+        public static int getMinimumWidth(View view) {
+            return view.getMinimumWidth();
+        }
+
+        public static int getWindowSystemUiVisibility(View view) {
+            return view.getWindowSystemUiVisibility();
+        }
+
+        public static boolean hasOverlappingRendering(View view) {
+            return view.hasOverlappingRendering();
+        }
+
+        public static boolean hasTransientState(View view) {
+            return view.hasTransientState();
+        }
+
+        public static boolean performAccessibilityAction(View view, int i, Bundle bundle) {
+            return view.performAccessibilityAction(i, bundle);
+        }
+
+        public static void postOnAnimationDelayed(View view, Runnable runnable, long j) {
+            view.postOnAnimationDelayed(runnable, j);
+        }
+
+        public static void postOnAnimation(View view, Runnable runnable) {
+            view.postOnAnimation(runnable);
+        }
+
+        public static void removeOnGlobalLayoutListener(ViewTreeObserver viewTreeObserver, ViewTreeObserver.OnGlobalLayoutListener onGlobalLayoutListener) {
+            viewTreeObserver.removeOnGlobalLayoutListener(onGlobalLayoutListener);
+        }
+
+        public static void setBackground(View view, Drawable drawable) {
+            view.setBackground(drawable);
+        }
+
+        public static void setHasTransientState(View view, boolean z) {
+            view.setHasTransientState(z);
+        }
+
+        public static void setImportantForAccessibility(View view, int i) {
+            view.setImportantForAccessibility(i);
+        }
+
+        public static void postInvalidateOnAnimation(View view) {
+            view.postInvalidateOnAnimation();
+        }
+    }
+
+    /* loaded from: classes.dex */
+    public static class Api17Impl {
+        public static int generateViewId() {
+            return View.generateViewId();
+        }
+
+        public static Display getDisplay(View view) {
+            return view.getDisplay();
+        }
+
+        public static int getLayoutDirection(View view) {
+            return view.getLayoutDirection();
+        }
+
+        public static int getPaddingEnd(View view) {
+            return view.getPaddingEnd();
+        }
+
+        public static int getPaddingStart(View view) {
+            return view.getPaddingStart();
+        }
+
+        public static boolean isPaddingRelative(View view) {
+            return view.isPaddingRelative();
+        }
+
+        public static void setPaddingRelative(View view, int i, int i2, int i3, int i4) {
+            view.setPaddingRelative(i, i2, i3, i4);
+        }
+    }
+
+    /* loaded from: classes.dex */
+    public static class Api18Impl {
+        public static Rect getClipBounds(View view) {
+            return view.getClipBounds();
+        }
+
+        public static void setClipBounds(View view, Rect rect) {
+            view.setClipBounds(rect);
+        }
+    }
+
+    /* loaded from: classes.dex */
+    public static class Api19Impl {
+        public static int getAccessibilityLiveRegion(View view) {
+            return view.getAccessibilityLiveRegion();
+        }
+
+        public static boolean isAttachedToWindow(View view) {
+            return view.isAttachedToWindow();
+        }
+
+        public static boolean isLaidOut(View view) {
+            return view.isLaidOut();
+        }
+
+        public static void notifySubtreeAccessibilityStateChanged(ViewParent viewParent, View view, View view2, int i) {
+            viewParent.notifySubtreeAccessibilityStateChanged(view, view2, i);
+        }
+
+        public static void setAccessibilityLiveRegion(View view, int i) {
+            view.setAccessibilityLiveRegion(i);
+        }
+
+        public static void setContentChangeTypes(AccessibilityEvent accessibilityEvent, int i) {
+            accessibilityEvent.setContentChangeTypes(i);
+        }
+    }
+
+    /* loaded from: classes.dex */
+    public static class Api20Impl {
+        public static WindowInsets dispatchApplyWindowInsets(View view, WindowInsets windowInsets) {
+            return view.dispatchApplyWindowInsets(windowInsets);
+        }
+
+        public static WindowInsets onApplyWindowInsets(View view, WindowInsets windowInsets) {
+            return view.onApplyWindowInsets(windowInsets);
+        }
+
+        public static void requestApplyInsets(View view) {
+            view.requestApplyInsets();
         }
     }
 
     /* loaded from: classes.dex */
     public static class Api23Impl {
-        public static WindowInsetsCompat getRootWindowInsets(View v) {
-            WindowInsets rootWindowInsets = v.getRootWindowInsets();
+        public static WindowInsetsCompat getRootWindowInsets(View view) {
+            WindowInsets rootWindowInsets = view.getRootWindowInsets();
             if (rootWindowInsets == null) {
                 return null;
             }
             WindowInsetsCompat windowInsetsCompat = WindowInsetsCompat.toWindowInsetsCompat(rootWindowInsets, null);
             windowInsetsCompat.mImpl.setRootWindowInsets(windowInsetsCompat);
-            windowInsetsCompat.mImpl.copyRootViewBounds(v.getRootView());
+            windowInsetsCompat.mImpl.copyRootViewBounds(view.getRootView());
             return windowInsetsCompat;
+        }
+
+        public static void setScrollIndicators(View view, int i, int i2) {
+            view.setScrollIndicators(i, i2);
+        }
+    }
+
+    /* loaded from: classes.dex */
+    public static class Api26Impl {
+        public static int getImportantForAutofill(View view) {
+            return view.getImportantForAutofill();
+        }
+
+        public static void setImportantForAutofill(View view, int i) {
+            view.setImportantForAutofill(i);
+        }
+    }
+
+    /* loaded from: classes.dex */
+    public static class Api28Impl {
+        public static CharSequence getAccessibilityPaneTitle(View view) {
+            return view.getAccessibilityPaneTitle();
+        }
+
+        public static boolean isAccessibilityHeading(View view) {
+            return view.isAccessibilityHeading();
+        }
+
+        public static boolean isScreenReaderFocusable(View view) {
+            return view.isScreenReaderFocusable();
+        }
+
+        public static void setAccessibilityHeading(View view, boolean z) {
+            view.setAccessibilityHeading(z);
+        }
+
+        public static void setAccessibilityPaneTitle(View view, CharSequence charSequence) {
+            view.setAccessibilityPaneTitle(charSequence);
         }
     }
 
     /* loaded from: classes.dex */
     public static class Api29Impl {
-        public static void saveAttributeDataForStyleable(View view, Context context, int[] styleable, AttributeSet attrs, TypedArray t, int defStyleAttr, int defStyleRes) {
-            view.saveAttributeDataForStyleable(context, styleable, attrs, t, defStyleAttr, defStyleRes);
+        public static View.AccessibilityDelegate getAccessibilityDelegate(View view) {
+            return view.getAccessibilityDelegate();
+        }
+
+        public static void saveAttributeDataForStyleable(View view, Context context, int[] iArr, AttributeSet attributeSet, TypedArray typedArray, int i, int i2) {
+            view.saveAttributeDataForStyleable(context, iArr, attributeSet, typedArray, i, i2);
+        }
+    }
+
+    /* loaded from: classes.dex */
+    public static class Api30Impl {
+        public static CharSequence getStateDescription(View view) {
+            return view.getStateDescription();
+        }
+
+        public static void setStateDescription(View view, CharSequence charSequence) {
+            view.setStateDescription(charSequence);
         }
     }
 
     static {
         new AtomicInteger(1);
-        new WeakHashMap();
-    }
-
-    public static void addAccessibilityAction(View view, AccessibilityNodeInfoCompat.AccessibilityActionCompat action) {
-        AccessibilityDelegateCompat accessibilityDelegate = getAccessibilityDelegate(view);
-        if (accessibilityDelegate == null) {
-            accessibilityDelegate = new AccessibilityDelegateCompat();
-        }
-        setAccessibilityDelegate(view, accessibilityDelegate);
-        removeActionWithId(action.getId(), view);
-        getActionList(view).add(action);
-        notifyViewAccessibilityStateChangedIfNeeded(view, 0);
     }
 
     public static ViewPropertyAnimatorCompat animate(View view) {
@@ -139,33 +494,71 @@ public class ViewCompat {
         return viewPropertyAnimatorCompat2;
     }
 
-    public static WindowInsetsCompat dispatchApplyWindowInsets(View view, WindowInsetsCompat insets) {
-        WindowInsets windowInsets = insets.toWindowInsets();
+    public static void setAccessibilityDelegate(View view, AccessibilityDelegateCompat accessibilityDelegateCompat) {
+        AccessibilityDelegateCompat.AccessibilityDelegateAdapter accessibilityDelegateAdapter;
+        if (accessibilityDelegateCompat == null && (Api29Impl.getAccessibilityDelegate(view) instanceof AccessibilityDelegateCompat.AccessibilityDelegateAdapter)) {
+            accessibilityDelegateCompat = new AccessibilityDelegateCompat();
+        }
+        if (accessibilityDelegateCompat == null) {
+            accessibilityDelegateAdapter = null;
+        } else {
+            accessibilityDelegateAdapter = accessibilityDelegateCompat.mBridge;
+        }
+        view.setAccessibilityDelegate(accessibilityDelegateAdapter);
+    }
+
+    public static void setAccessibilityPaneTitle(View view, CharSequence charSequence) {
+        boolean z;
+        new AccessibilityViewProperty<CharSequence>(CharSequence.class) { // from class: androidx.core.view.ViewCompat.2
+            @Override // androidx.core.view.ViewCompat.AccessibilityViewProperty
+            public final void frameworkSet(View view2, CharSequence charSequence2) {
+                Api28Impl.setAccessibilityPaneTitle(view2, charSequence2);
+            }
+
+            @Override // androidx.core.view.ViewCompat.AccessibilityViewProperty
+            public final boolean shouldUpdate(CharSequence charSequence2, CharSequence charSequence3) {
+                return !TextUtils.equals(charSequence2, charSequence3);
+            }
+
+            @Override // androidx.core.view.ViewCompat.AccessibilityViewProperty
+            public final CharSequence frameworkGet(View view2) {
+                return Api28Impl.getAccessibilityPaneTitle(view2);
+            }
+        }.set(view, charSequence);
+        if (charSequence != null) {
+            AccessibilityPaneVisibilityManager accessibilityPaneVisibilityManager = sAccessibilityPaneVisibilityManager;
+            WeakHashMap<View, Boolean> weakHashMap = accessibilityPaneVisibilityManager.mPanesToVisible;
+            if (view.getVisibility() == 0) {
+                z = true;
+            } else {
+                z = false;
+            }
+            weakHashMap.put(view, Boolean.valueOf(z));
+            view.addOnAttachStateChangeListener(accessibilityPaneVisibilityManager);
+            if (Api19Impl.isAttachedToWindow(view)) {
+                view.getViewTreeObserver().addOnGlobalLayoutListener(accessibilityPaneVisibilityManager);
+                return;
+            }
+            return;
+        }
+        AccessibilityPaneVisibilityManager accessibilityPaneVisibilityManager2 = sAccessibilityPaneVisibilityManager;
+        accessibilityPaneVisibilityManager2.mPanesToVisible.remove(view);
+        view.removeOnAttachStateChangeListener(accessibilityPaneVisibilityManager2);
+        Api16Impl.removeOnGlobalLayoutListener(view.getViewTreeObserver(), accessibilityPaneVisibilityManager2);
+    }
+
+    public static WindowInsetsCompat dispatchApplyWindowInsets(View view, WindowInsetsCompat windowInsetsCompat) {
+        WindowInsets windowInsets = windowInsetsCompat.toWindowInsets();
         if (windowInsets != null) {
-            WindowInsets dispatchApplyWindowInsets = view.dispatchApplyWindowInsets(windowInsets);
+            WindowInsets dispatchApplyWindowInsets = Api20Impl.dispatchApplyWindowInsets(view, windowInsets);
             if (!dispatchApplyWindowInsets.equals(windowInsets)) {
                 return WindowInsetsCompat.toWindowInsetsCompat(dispatchApplyWindowInsets, view);
             }
         }
-        return insets;
+        return windowInsetsCompat;
     }
 
-    public static AccessibilityDelegateCompat getAccessibilityDelegate(View view) {
-        View.AccessibilityDelegate accessibilityDelegate = view.getAccessibilityDelegate();
-        if (accessibilityDelegate == null) {
-            return null;
-        }
-        if (accessibilityDelegate instanceof AccessibilityDelegateCompat.AccessibilityDelegateAdapter) {
-            return ((AccessibilityDelegateCompat.AccessibilityDelegateAdapter) accessibilityDelegate).mCompat;
-        }
-        return new AccessibilityDelegateCompat(accessibilityDelegate);
-    }
-
-    public static CharSequence getAccessibilityPaneTitle(View view) {
-        return view.getAccessibilityPaneTitle();
-    }
-
-    public static List<AccessibilityNodeInfoCompat.AccessibilityActionCompat> getActionList(View view) {
+    public static ArrayList getActionList(View view) {
         ArrayList arrayList = (ArrayList) view.getTag(R.id.tag_accessibility_actions);
         if (arrayList != null) {
             return arrayList;
@@ -175,33 +568,34 @@ public class ViewCompat {
         return arrayList2;
     }
 
-    public static String[] getOnReceiveContentMimeTypes(View view) {
-        return (String[]) view.getTag(R.id.tag_on_receive_content_mime_types);
-    }
-
-    public static void notifyViewAccessibilityStateChangedIfNeeded(View view, int changeType) {
+    public static void notifyViewAccessibilityStateChangedIfNeeded(View view, int i) {
+        boolean z;
         AccessibilityManager accessibilityManager = (AccessibilityManager) view.getContext().getSystemService("accessibility");
         if (accessibilityManager.isEnabled()) {
-            boolean z = getAccessibilityPaneTitle(view) != null && view.getVisibility() == 0;
-            int i = 32;
-            if (view.getAccessibilityLiveRegion() != 0 || z) {
+            if (Api28Impl.getAccessibilityPaneTitle(view) == null || view.getVisibility() != 0) {
+                z = false;
+            } else {
+                z = true;
+            }
+            int i2 = 32;
+            if (Api19Impl.getAccessibilityLiveRegion(view) != 0 || z) {
                 AccessibilityEvent obtain = AccessibilityEvent.obtain();
                 if (!z) {
-                    i = QuickStepContract.SYSUI_STATE_QUICK_SETTINGS_EXPANDED;
+                    i2 = QuickStepContract.SYSUI_STATE_QUICK_SETTINGS_EXPANDED;
                 }
-                obtain.setEventType(i);
-                obtain.setContentChangeTypes(changeType);
+                obtain.setEventType(i2);
+                Api19Impl.setContentChangeTypes(obtain, i);
                 if (z) {
-                    obtain.getText().add(getAccessibilityPaneTitle(view));
-                    if (view.getImportantForAccessibility() == 0) {
-                        view.setImportantForAccessibility(1);
+                    obtain.getText().add(Api28Impl.getAccessibilityPaneTitle(view));
+                    if (Api16Impl.getImportantForAccessibility(view) == 0) {
+                        Api16Impl.setImportantForAccessibility(view, 1);
                     }
                     ViewParent parent = view.getParent();
                     while (true) {
                         if (!(parent instanceof View)) {
                             break;
-                        } else if (((View) parent).getImportantForAccessibility() == 4) {
-                            view.setImportantForAccessibility(2);
+                        } else if (Api16Impl.getImportantForAccessibility((View) parent) == 4) {
+                            Api16Impl.setImportantForAccessibility(view, 2);
                             break;
                         } else {
                             parent = parent.getParent();
@@ -209,18 +603,18 @@ public class ViewCompat {
                     }
                 }
                 view.sendAccessibilityEventUnchecked(obtain);
-            } else if (changeType == 32) {
+            } else if (i == 32) {
                 AccessibilityEvent obtain2 = AccessibilityEvent.obtain();
                 view.onInitializeAccessibilityEvent(obtain2);
                 obtain2.setEventType(32);
-                obtain2.setContentChangeTypes(changeType);
+                Api19Impl.setContentChangeTypes(obtain2, i);
                 obtain2.setSource(view);
                 view.onPopulateAccessibilityEvent(obtain2);
-                obtain2.getText().add(getAccessibilityPaneTitle(view));
+                obtain2.getText().add(Api28Impl.getAccessibilityPaneTitle(view));
                 accessibilityManager.sendAccessibilityEvent(obtain2);
             } else if (view.getParent() != null) {
                 try {
-                    view.getParent().notifySubtreeAccessibilityStateChanged(view, view, changeType);
+                    Api19Impl.notifySubtreeAccessibilityStateChanged(view.getParent(), view, view, i);
                 } catch (AbstractMethodError e) {
                     Log.e("ViewCompat", view.getParent().getClass().getSimpleName() + " does not fully implement ViewParent", e);
                 }
@@ -228,136 +622,31 @@ public class ViewCompat {
         }
     }
 
-    public static WindowInsetsCompat onApplyWindowInsets(View view, WindowInsetsCompat insets) {
-        WindowInsets windowInsets = insets.toWindowInsets();
+    public static WindowInsetsCompat onApplyWindowInsets(View view, WindowInsetsCompat windowInsetsCompat) {
+        WindowInsets windowInsets = windowInsetsCompat.toWindowInsets();
         if (windowInsets != null) {
-            WindowInsets onApplyWindowInsets = view.onApplyWindowInsets(windowInsets);
+            WindowInsets onApplyWindowInsets = Api20Impl.onApplyWindowInsets(view, windowInsets);
             if (!onApplyWindowInsets.equals(windowInsets)) {
                 return WindowInsetsCompat.toWindowInsetsCompat(onApplyWindowInsets, view);
             }
         }
-        return insets;
+        return windowInsetsCompat;
     }
 
-    public static ContentInfoCompat performReceiveContent(View view, ContentInfoCompat payload) {
-        OnReceiveContentViewBehavior onReceiveContentViewBehavior;
-        OnReceiveContentViewBehavior onReceiveContentViewBehavior2;
-        if (Log.isLoggable("ViewCompat", 3)) {
-            Log.d("ViewCompat", "performReceiveContent: " + payload + ", view=" + view.getClass().getSimpleName() + "[" + view.getId() + "]");
-        }
-        OnReceiveContentListener onReceiveContentListener = (OnReceiveContentListener) view.getTag(R.id.tag_on_receive_content_listener);
-        if (onReceiveContentListener != null) {
-            ContentInfoCompat onReceiveContent = onReceiveContentListener.onReceiveContent(view, payload);
-            if (onReceiveContent == null) {
-                return null;
-            }
-            if (view instanceof OnReceiveContentViewBehavior) {
-                onReceiveContentViewBehavior2 = (OnReceiveContentViewBehavior) view;
-            } else {
-                onReceiveContentViewBehavior2 = NO_OP_ON_RECEIVE_CONTENT_VIEW_BEHAVIOR;
-            }
-            return onReceiveContentViewBehavior2.onReceiveContent(onReceiveContent);
-        }
-        if (view instanceof OnReceiveContentViewBehavior) {
-            onReceiveContentViewBehavior = (OnReceiveContentViewBehavior) view;
-        } else {
-            onReceiveContentViewBehavior = NO_OP_ON_RECEIVE_CONTENT_VIEW_BEHAVIOR;
-        }
-        return onReceiveContentViewBehavior.onReceiveContent(payload);
-    }
-
-    public static void removeAccessibilityAction(View view, int actionId) {
-        removeActionWithId(actionId, view);
-        notifyViewAccessibilityStateChangedIfNeeded(view, 0);
-    }
-
-    public static void removeActionWithId(int actionId, View view) {
-        List<AccessibilityNodeInfoCompat.AccessibilityActionCompat> actionList = getActionList(view);
-        for (int i = 0; i < actionList.size(); i++) {
-            if (actionList.get(i).getId() == actionId) {
-                actionList.remove(i);
+    public static void removeActionWithId(int i, View view) {
+        ArrayList actionList = getActionList(view);
+        for (int i2 = 0; i2 < actionList.size(); i2++) {
+            if (((AccessibilityNodeInfoCompat.AccessibilityActionCompat) actionList.get(i2)).getId() == i) {
+                actionList.remove(i2);
                 return;
             }
         }
     }
 
-    public static void replaceAccessibilityAction(View view, AccessibilityNodeInfoCompat.AccessibilityActionCompat replacedAction, CharSequence label, AccessibilityViewCommand command) {
-        if (command == null) {
-            removeActionWithId(replacedAction.getId(), view);
-            notifyViewAccessibilityStateChangedIfNeeded(view, 0);
-            return;
-        }
-        addAccessibilityAction(view, new AccessibilityNodeInfoCompat.AccessibilityActionCompat(null, replacedAction.mId, null, command, replacedAction.mViewCommandArgumentClass));
-    }
-
-    public static void setAccessibilityDelegate(View v, AccessibilityDelegateCompat delegate) {
-        if (delegate == null && (v.getAccessibilityDelegate() instanceof AccessibilityDelegateCompat.AccessibilityDelegateAdapter)) {
-            delegate = new AccessibilityDelegateCompat();
-        }
-        v.setAccessibilityDelegate(delegate == null ? null : delegate.mBridge);
-    }
-
     /* loaded from: classes.dex */
-    public static abstract class AccessibilityViewProperty<T> {
-        public final int mContentChangeType;
-        public final int mFrameworkMinimumSdk;
-        public final int mTagKey;
-        public final Class<T> mType;
-
-        public AccessibilityViewProperty(int tagKey, Class<T> type, int frameworkMinimumSdk) {
-            this.mTagKey = tagKey;
-            this.mType = type;
-            this.mContentChangeType = 0;
-            this.mFrameworkMinimumSdk = frameworkMinimumSdk;
-        }
-
-        public boolean booleanNullToFalseEquals(Boolean a, Boolean b) {
-            boolean z;
-            boolean booleanValue = a == null ? false : a.booleanValue();
-            if (b == null) {
-                z = false;
-            } else {
-                z = b.booleanValue();
-            }
-            return booleanValue == z;
-        }
-
-        public abstract T frameworkGet(View view);
-
-        public abstract void frameworkSet(View view, T value);
-
-        public T get(View view) {
-            if (Build.VERSION.SDK_INT >= this.mFrameworkMinimumSdk) {
-                return frameworkGet(view);
-            }
-            T t = (T) view.getTag(this.mTagKey);
-            if (this.mType.isInstance(t)) {
-                return t;
-            }
-            return null;
-        }
-
-        public void set(View view, T value) {
-            if (Build.VERSION.SDK_INT >= this.mFrameworkMinimumSdk) {
-                frameworkSet(view, value);
-            } else if (shouldUpdate(get(view), value)) {
-                AccessibilityDelegateCompat accessibilityDelegate = ViewCompat.getAccessibilityDelegate(view);
-                if (accessibilityDelegate == null) {
-                    accessibilityDelegate = new AccessibilityDelegateCompat();
-                }
-                ViewCompat.setAccessibilityDelegate(view, accessibilityDelegate);
-                view.setTag(this.mTagKey, value);
-                ViewCompat.notifyViewAccessibilityStateChangedIfNeeded(view, this.mContentChangeType);
-            }
-        }
-
-        public abstract boolean shouldUpdate(T oldValue, T newValue);
-
-        public AccessibilityViewProperty(int tagKey, Class<T> type, int contentChangeType, int frameworkMinimumSdk) {
-            this.mTagKey = tagKey;
-            this.mType = type;
-            this.mContentChangeType = contentChangeType;
-            this.mFrameworkMinimumSdk = frameworkMinimumSdk;
+    public static class Api24Impl {
+        public static void setPointerIcon(View view, PointerIcon pointerIcon) {
+            view.setPointerIcon(pointerIcon);
         }
     }
 }

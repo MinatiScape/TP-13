@@ -1,36 +1,45 @@
 package com.google.common.collect;
 
-import androidx.constraintlayout.solver.SolverVariable$Type$r8$EnumUnboxingUtility;
 import java.util.NoSuchElementException;
 /* loaded from: classes.dex */
 public abstract class AbstractIterator<T> extends UnmodifiableIterator<T> {
     public T next;
-    public int state = 2;
+    public State state = State.NOT_READY;
+
+    /* loaded from: classes.dex */
+    public enum State {
+        READY,
+        NOT_READY,
+        DONE,
+        FAILED
+    }
 
     public abstract T computeNext();
 
-    public final T endOfData() {
-        this.state = 3;
-        return null;
-    }
-
     @Override // java.util.Iterator
     public final boolean hasNext() {
-        int i = this.state;
-        if (i != 4) {
-            int $enumboxing$ordinal = SolverVariable$Type$r8$EnumUnboxingUtility.$enumboxing$ordinal(i);
-            if ($enumboxing$ordinal == 0) {
+        boolean z;
+        State state = this.state;
+        State state2 = State.FAILED;
+        if (state != state2) {
+            z = true;
+        } else {
+            z = false;
+        }
+        if (z) {
+            int ordinal = state.ordinal();
+            if (ordinal == 0) {
                 return true;
             }
-            if ($enumboxing$ordinal == 2) {
+            if (ordinal == 2) {
                 return false;
             }
-            this.state = 4;
+            this.state = state2;
             this.next = computeNext();
-            if (this.state == 3) {
+            if (this.state == State.DONE) {
                 return false;
             }
-            this.state = 1;
+            this.state = State.READY;
             return true;
         }
         throw new IllegalStateException();
@@ -39,7 +48,7 @@ public abstract class AbstractIterator<T> extends UnmodifiableIterator<T> {
     @Override // java.util.Iterator
     public final T next() {
         if (hasNext()) {
-            this.state = 2;
+            this.state = State.NOT_READY;
             T t = this.next;
             this.next = null;
             return t;

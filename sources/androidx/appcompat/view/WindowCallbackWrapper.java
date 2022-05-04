@@ -16,16 +16,13 @@ import java.util.List;
 public class WindowCallbackWrapper implements Window.Callback {
     public final Window.Callback mWrapped;
 
-    public WindowCallbackWrapper(Window.Callback callback) {
-        if (callback != null) {
-            this.mWrapped = callback;
-            return;
-        }
-        throw new IllegalArgumentException("Window callback may not be null");
+    @Override // android.view.Window.Callback
+    public final boolean onSearchRequested(SearchEvent searchEvent) {
+        return this.mWrapped.onSearchRequested(searchEvent);
     }
 
     @Override // android.view.Window.Callback
-    public boolean dispatchGenericMotionEvent(MotionEvent motionEvent) {
+    public final boolean dispatchGenericMotionEvent(MotionEvent motionEvent) {
         return this.mWrapped.dispatchGenericMotionEvent(motionEvent);
     }
 
@@ -40,38 +37,33 @@ public class WindowCallbackWrapper implements Window.Callback {
     }
 
     @Override // android.view.Window.Callback
-    public boolean dispatchPopulateAccessibilityEvent(AccessibilityEvent accessibilityEvent) {
+    public final boolean dispatchPopulateAccessibilityEvent(AccessibilityEvent accessibilityEvent) {
         return this.mWrapped.dispatchPopulateAccessibilityEvent(accessibilityEvent);
     }
 
     @Override // android.view.Window.Callback
-    public boolean dispatchTouchEvent(MotionEvent motionEvent) {
+    public final boolean dispatchTouchEvent(MotionEvent motionEvent) {
         return this.mWrapped.dispatchTouchEvent(motionEvent);
     }
 
     @Override // android.view.Window.Callback
-    public boolean dispatchTrackballEvent(MotionEvent motionEvent) {
+    public final boolean dispatchTrackballEvent(MotionEvent motionEvent) {
         return this.mWrapped.dispatchTrackballEvent(motionEvent);
     }
 
     @Override // android.view.Window.Callback
-    public void onActionModeFinished(ActionMode actionMode) {
+    public final void onActionModeFinished(ActionMode actionMode) {
         this.mWrapped.onActionModeFinished(actionMode);
     }
 
     @Override // android.view.Window.Callback
-    public void onActionModeStarted(ActionMode actionMode) {
+    public final void onActionModeStarted(ActionMode actionMode) {
         this.mWrapped.onActionModeStarted(actionMode);
     }
 
     @Override // android.view.Window.Callback
-    public void onAttachedToWindow() {
+    public final void onAttachedToWindow() {
         this.mWrapped.onAttachedToWindow();
-    }
-
-    @Override // android.view.Window.Callback
-    public void onContentChanged() {
-        this.mWrapped.onContentChanged();
     }
 
     @Override // android.view.Window.Callback
@@ -85,12 +77,12 @@ public class WindowCallbackWrapper implements Window.Callback {
     }
 
     @Override // android.view.Window.Callback
-    public void onDetachedFromWindow() {
+    public final void onDetachedFromWindow() {
         this.mWrapped.onDetachedFromWindow();
     }
 
     @Override // android.view.Window.Callback
-    public boolean onMenuItemSelected(int i, MenuItem menuItem) {
+    public final boolean onMenuItemSelected(int i, MenuItem menuItem) {
         return this.mWrapped.onMenuItemSelected(i, menuItem);
     }
 
@@ -105,8 +97,13 @@ public class WindowCallbackWrapper implements Window.Callback {
     }
 
     @Override // android.view.Window.Callback
-    public void onPointerCaptureChanged(boolean z) {
+    public final void onPointerCaptureChanged(boolean z) {
         this.mWrapped.onPointerCaptureChanged(z);
+    }
+
+    @Override // android.view.Window.Callback
+    public boolean onPreparePanel(int i, View view, Menu menu) {
+        return this.mWrapped.onPreparePanel(i, view, menu);
     }
 
     @Override // android.view.Window.Callback
@@ -115,32 +112,30 @@ public class WindowCallbackWrapper implements Window.Callback {
     }
 
     @Override // android.view.Window.Callback
-    public boolean onSearchRequested(SearchEvent searchEvent) {
-        return this.mWrapped.onSearchRequested(searchEvent);
+    public final boolean onSearchRequested() {
+        return this.mWrapped.onSearchRequested();
     }
 
     @Override // android.view.Window.Callback
-    public void onWindowAttributesChanged(WindowManager.LayoutParams layoutParams) {
+    public final void onWindowAttributesChanged(WindowManager.LayoutParams layoutParams) {
         this.mWrapped.onWindowAttributesChanged(layoutParams);
     }
 
     @Override // android.view.Window.Callback
-    public void onWindowFocusChanged(boolean z) {
+    public final void onWindowFocusChanged(boolean z) {
         this.mWrapped.onWindowFocusChanged(z);
-    }
-
-    @Override // android.view.Window.Callback
-    public ActionMode onWindowStartingActionMode(ActionMode.Callback callback) {
-        return this.mWrapped.onWindowStartingActionMode(callback);
-    }
-
-    @Override // android.view.Window.Callback
-    public boolean onSearchRequested() {
-        return this.mWrapped.onSearchRequested();
     }
 
     @Override // android.view.Window.Callback
     public ActionMode onWindowStartingActionMode(ActionMode.Callback callback, int i) {
         return this.mWrapped.onWindowStartingActionMode(callback, i);
+    }
+
+    public WindowCallbackWrapper(Window.Callback callback) {
+        if (callback != null) {
+            this.mWrapped = callback;
+            return;
+        }
+        throw new IllegalArgumentException("Window callback may not be null");
     }
 }

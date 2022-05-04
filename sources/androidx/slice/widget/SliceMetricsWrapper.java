@@ -4,7 +4,7 @@ import android.app.slice.SliceMetrics;
 import android.content.Context;
 import android.net.Uri;
 /* loaded from: classes.dex */
-public class SliceMetricsWrapper extends SliceMetrics {
+public final class SliceMetricsWrapper extends SliceMetrics {
     public final SliceMetrics mSliceMetrics;
 
     public SliceMetricsWrapper(Context context, Uri uri) {

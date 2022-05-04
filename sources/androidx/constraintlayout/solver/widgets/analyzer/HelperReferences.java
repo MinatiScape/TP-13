@@ -3,10 +3,18 @@ package androidx.constraintlayout.solver.widgets.analyzer;
 import androidx.constraintlayout.solver.widgets.Barrier;
 import androidx.constraintlayout.solver.widgets.ConstraintWidget;
 import androidx.constraintlayout.solver.widgets.analyzer.DependencyNode;
+import java.util.Iterator;
 /* loaded from: classes.dex */
-public class HelperReferences extends WidgetRun {
-    public HelperReferences(ConstraintWidget constraintWidget) {
-        super(constraintWidget);
+public final class HelperReferences extends WidgetRun {
+    @Override // androidx.constraintlayout.solver.widgets.analyzer.WidgetRun
+    public final void clear() {
+        this.runGroup = null;
+        this.start.clear();
+    }
+
+    @Override // androidx.constraintlayout.solver.widgets.analyzer.WidgetRun
+    public final boolean supportsWrapComputation() {
+        return false;
     }
 
     public final void addDependency(DependencyNode dependencyNode) {
@@ -15,7 +23,7 @@ public class HelperReferences extends WidgetRun {
     }
 
     @Override // androidx.constraintlayout.solver.widgets.analyzer.WidgetRun
-    public void apply() {
+    public final void apply() {
         ConstraintWidget constraintWidget = this.widget;
         if (constraintWidget instanceof Barrier) {
             DependencyNode dependencyNode = this.start;
@@ -81,7 +89,7 @@ public class HelperReferences extends WidgetRun {
     }
 
     @Override // androidx.constraintlayout.solver.widgets.analyzer.WidgetRun
-    public void applyToWidget() {
+    public final void applyToWidget() {
         ConstraintWidget constraintWidget = this.widget;
         if (constraintWidget instanceof Barrier) {
             int i = ((Barrier) constraintWidget).mBarrierType;
@@ -93,25 +101,15 @@ public class HelperReferences extends WidgetRun {
         }
     }
 
-    @Override // androidx.constraintlayout.solver.widgets.analyzer.WidgetRun
-    public void clear() {
-        this.runGroup = null;
-        this.start.clear();
-    }
-
-    @Override // androidx.constraintlayout.solver.widgets.analyzer.WidgetRun
-    public boolean supportsWrapComputation() {
-        return false;
-    }
-
     @Override // androidx.constraintlayout.solver.widgets.analyzer.WidgetRun, androidx.constraintlayout.solver.widgets.analyzer.Dependency
-    public void update(Dependency dependency) {
+    public final void update(Dependency dependency) {
         Barrier barrier = (Barrier) this.widget;
         int i = barrier.mBarrierType;
+        Iterator it = this.start.targets.iterator();
         int i2 = 0;
         int i3 = -1;
-        for (DependencyNode dependencyNode : this.start.targets) {
-            int i4 = dependencyNode.value;
+        while (it.hasNext()) {
+            int i4 = ((DependencyNode) it.next()).value;
             if (i3 == -1 || i4 < i3) {
                 i3 = i4;
             }
@@ -124,5 +122,9 @@ public class HelperReferences extends WidgetRun {
         } else {
             this.start.resolve(i2 + barrier.mMargin);
         }
+    }
+
+    public HelperReferences(ConstraintWidget constraintWidget) {
+        super(constraintWidget);
     }
 }

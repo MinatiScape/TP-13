@@ -1,20 +1,25 @@
 package kotlinx.coroutines.scheduling;
 
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
-import kotlinx.coroutines.TimeSourceKt;
+import kotlin.jvm.internal.Intrinsics;
+import kotlinx.coroutines.DebugStringsKt;
 import org.jetbrains.annotations.NotNull;
+/* compiled from: Tasks.kt */
 /* loaded from: classes.dex */
 public final class TaskImpl extends Task {
     @NotNull
     public final Runnable block;
 
-    public TaskImpl(@NotNull Runnable runnable, long j, @NotNull TaskContext taskContext) {
+    /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+    public TaskImpl(@NotNull Runnable block, long j, @NotNull TaskContext taskContext) {
         super(j, taskContext);
-        this.block = runnable;
+        Intrinsics.checkNotNullParameter(block, "block");
+        Intrinsics.checkNotNullParameter(taskContext, "taskContext");
+        this.block = block;
     }
 
     @Override // java.lang.Runnable
-    public void run() {
+    public final void run() {
         try {
             this.block.run();
         } finally {
@@ -23,11 +28,11 @@ public final class TaskImpl extends Task {
     }
 
     @NotNull
-    public String toString() {
+    public final String toString() {
         StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Task[");
-        m.append(TimeSourceKt.getClassSimpleName(this.block));
+        m.append(DebugStringsKt.getClassSimpleName(this.block));
         m.append('@');
-        m.append(TimeSourceKt.getHexAddress(this.block));
+        m.append(DebugStringsKt.getHexAddress(this.block));
         m.append(", ");
         m.append(this.submissionTime);
         m.append(", ");

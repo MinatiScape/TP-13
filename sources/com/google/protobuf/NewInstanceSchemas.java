@@ -2,7 +2,7 @@ package com.google.protobuf;
 /* loaded from: classes.dex */
 public final class NewInstanceSchemas {
     public static final NewInstanceSchema FULL_SCHEMA;
-    public static final NewInstanceSchema LITE_SCHEMA;
+    public static final NewInstanceSchemaLite LITE_SCHEMA;
 
     static {
         NewInstanceSchema newInstanceSchema;

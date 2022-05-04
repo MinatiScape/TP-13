@@ -14,10 +14,6 @@ public interface RotationButton {
         }
     }
 
-    default boolean acceptRotationProposal() {
-        return getCurrentView() != null;
-    }
-
     default View getCurrentView() {
         return null;
     }
@@ -60,5 +56,12 @@ public interface RotationButton {
     }
 
     default void updateIcon(int i, int i2) {
+    }
+
+    default boolean acceptRotationProposal() {
+        if (getCurrentView() != null) {
+            return true;
+        }
+        return false;
     }
 }

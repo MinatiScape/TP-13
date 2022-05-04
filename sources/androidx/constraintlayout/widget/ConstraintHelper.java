@@ -9,9 +9,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import androidx.constraintlayout.solver.widgets.Barrier;
 import androidx.constraintlayout.solver.widgets.ConstraintWidget;
-import androidx.constraintlayout.solver.widgets.Helper;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.slice.compat.SliceProviderCompat$2;
 import com.android.systemui.flags.FlagManager;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 import java.util.Arrays;
@@ -19,7 +20,7 @@ import java.util.HashMap;
 /* loaded from: classes.dex */
 public abstract class ConstraintHelper extends View {
     public int mCount;
-    public Helper mHelperWidget;
+    public Barrier mHelperWidget;
     public int[] mIds;
     public HashMap<Integer, String> mMap;
     public String mReferenceIds;
@@ -33,23 +34,73 @@ public abstract class ConstraintHelper extends View {
         init(null);
     }
 
+    public final int findId(ConstraintLayout constraintLayout, String str) {
+        Resources resources;
+        if (str == null || constraintLayout == null || (resources = getResources()) == null) {
+            return 0;
+        }
+        int childCount = constraintLayout.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View childAt = constraintLayout.getChildAt(i);
+            if (childAt.getId() != -1) {
+                String str2 = null;
+                try {
+                    str2 = resources.getResourceEntryName(childAt.getId());
+                } catch (Resources.NotFoundException unused) {
+                }
+                if (str.equals(str2)) {
+                    return childAt.getId();
+                }
+            }
+        }
+        return 0;
+    }
+
+    @Override // android.view.View
+    public final void onDraw(Canvas canvas) {
+    }
+
+    @Override // android.view.View
+    public final void onMeasure(int i, int i2) {
+        setMeasuredDimension(0, 0);
+    }
+
+    public void resolveRtl(ConstraintWidget constraintWidget, boolean z) {
+    }
+
+    public final void setReferencedIds(int[] iArr) {
+        this.mReferenceIds = null;
+        this.mCount = 0;
+        for (int i : iArr) {
+            addRscID(i);
+        }
+    }
+
     public final void addID(String str) {
-        Object designInformation;
+        ConstraintLayout constraintLayout;
+        HashMap<String, Integer> hashMap;
         if (str != null && str.length() != 0 && this.myContext != null) {
             String trim = str.trim();
-            ConstraintLayout constraintLayout = null;
+            Integer num = null;
             if (getParent() instanceof ConstraintLayout) {
                 constraintLayout = (ConstraintLayout) getParent();
+            } else {
+                constraintLayout = null;
             }
             int i = 0;
-            if (isInEditMode() && constraintLayout != null && (designInformation = constraintLayout.getDesignInformation(0, trim)) != null && (designInformation instanceof Integer)) {
-                i = ((Integer) designInformation).intValue();
+            if (isInEditMode() && constraintLayout != null) {
+                if ((trim instanceof String) && (hashMap = constraintLayout.mDesignIds) != null && hashMap.containsKey(trim)) {
+                    num = constraintLayout.mDesignIds.get(trim);
+                }
+                if (num != null && (num instanceof Integer)) {
+                    i = num.intValue();
+                }
             }
             if (i == 0 && constraintLayout != null) {
                 i = findId(constraintLayout, trim);
             }
             if (i == 0) {
-                i = this.myContext.getResources().getIdentifier(trim, FlagManager.FIELD_ID, this.myContext.getPackageName());
+                i = this.myContext.getResources().getIdentifier(trim, FlagManager.EXTRA_ID, this.myContext.getPackageName());
             }
             if (i != 0) {
                 this.mMap.put(Integer.valueOf(i), trim);
@@ -72,53 +123,9 @@ public abstract class ConstraintHelper extends View {
         this.mCount = i3 + 1;
     }
 
-    public void applyLayoutFeatures() {
-        ViewParent parent = getParent();
-        if (parent != null && (parent instanceof ConstraintLayout)) {
-            ConstraintLayout constraintLayout = (ConstraintLayout) parent;
-            int visibility = getVisibility();
-            float elevation = getElevation();
-            String str = this.mReferenceIds;
-            if (str != null) {
-                setIds(str);
-            }
-            for (int i = 0; i < this.mCount; i++) {
-                View viewById = constraintLayout.getViewById(this.mIds[i]);
-                if (viewById != null) {
-                    viewById.setVisibility(visibility);
-                    if (elevation > HingeAngleProviderKt.FULLY_CLOSED_DEGREES) {
-                        viewById.setTranslationZ(viewById.getTranslationZ() + elevation);
-                    }
-                }
-            }
-        }
-    }
-
-    public final int findId(ConstraintLayout constraintLayout, String str) {
-        Resources resources;
-        if (str == null || (resources = getResources()) == null) {
-            return 0;
-        }
-        int childCount = constraintLayout.getChildCount();
-        for (int i = 0; i < childCount; i++) {
-            View childAt = constraintLayout.getChildAt(i);
-            if (childAt.getId() != -1) {
-                String str2 = null;
-                try {
-                    str2 = resources.getResourceEntryName(childAt.getId());
-                } catch (Resources.NotFoundException unused) {
-                }
-                if (str.equals(str2)) {
-                    return childAt.getId();
-                }
-            }
-        }
-        return 0;
-    }
-
     public void init(AttributeSet attributeSet) {
         if (attributeSet != null) {
-            TypedArray obtainStyledAttributes = getContext().obtainStyledAttributes(attributeSet, R$styleable.ConstraintLayout_Layout);
+            TypedArray obtainStyledAttributes = getContext().obtainStyledAttributes(attributeSet, SliceProviderCompat$2.ConstraintLayout_Layout);
             int indexCount = obtainStyledAttributes.getIndexCount();
             for (int i = 0; i < indexCount; i++) {
                 int index = obtainStyledAttributes.getIndex(i);
@@ -131,19 +138,7 @@ public abstract class ConstraintHelper extends View {
         }
     }
 
-    @Override // android.view.View
-    public void onDraw(Canvas canvas) {
-    }
-
-    @Override // android.view.View
-    public void onMeasure(int i, int i2) {
-        setMeasuredDimension(0, 0);
-    }
-
-    public void resolveRtl(ConstraintWidget constraintWidget, boolean z) {
-    }
-
-    public void setIds(String str) {
+    public final void setIds(String str) {
         this.mReferenceIds = str;
         if (str != null) {
             int i = 0;
@@ -161,19 +156,33 @@ public abstract class ConstraintHelper extends View {
         }
     }
 
-    public void setReferencedIds(int[] iArr) {
-        this.mReferenceIds = null;
-        this.mCount = 0;
-        for (int i : iArr) {
-            addRscID(i);
-        }
-    }
-
-    public void validateParams() {
+    public final void validateParams() {
         if (this.mHelperWidget != null) {
             ViewGroup.LayoutParams layoutParams = getLayoutParams();
             if (layoutParams instanceof ConstraintLayout.LayoutParams) {
-                ((ConstraintLayout.LayoutParams) layoutParams).widget = (ConstraintWidget) this.mHelperWidget;
+                ((ConstraintLayout.LayoutParams) layoutParams).widget = this.mHelperWidget;
+            }
+        }
+    }
+
+    public final void applyLayoutFeatures$1() {
+        ViewParent parent = getParent();
+        if (parent != null && (parent instanceof ConstraintLayout)) {
+            ConstraintLayout constraintLayout = (ConstraintLayout) parent;
+            int visibility = getVisibility();
+            float elevation = getElevation();
+            String str = this.mReferenceIds;
+            if (str != null) {
+                setIds(str);
+            }
+            for (int i = 0; i < this.mCount; i++) {
+                View view = constraintLayout.mChildrenByIds.get(this.mIds[i]);
+                if (view != null) {
+                    view.setVisibility(visibility);
+                    if (elevation > HingeAngleProviderKt.FULLY_CLOSED_DEGREES) {
+                        view.setTranslationZ(view.getTranslationZ() + elevation);
+                    }
+                }
             }
         }
     }

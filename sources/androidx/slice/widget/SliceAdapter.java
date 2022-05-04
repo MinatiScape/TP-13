@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.collection.ArrayMap;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.slice.ArrayUtils;
 import androidx.slice.SliceItem;
 import androidx.slice.core.SliceAction;
 import androidx.slice.core.SliceQuery;
@@ -16,11 +15,11 @@ import androidx.slice.widget.SliceView;
 import com.android.systemui.shared.R;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 /* loaded from: classes.dex */
-public class SliceAdapter extends RecyclerView.Adapter<SliceViewHolder> implements SliceActionView.SliceActionLoadingListener {
+public final class SliceAdapter extends RecyclerView.Adapter<SliceViewHolder> implements SliceActionView.SliceActionLoadingListener {
     public boolean mAllowTwoLines;
     public final Context mContext;
     public int mInsetBottom;
@@ -36,7 +35,7 @@ public class SliceAdapter extends RecyclerView.Adapter<SliceViewHolder> implemen
     public SliceStyle mSliceStyle;
     public TemplateView mTemplateView;
     public final IdGenerator mIdGen = new IdGenerator();
-    public List<SliceWrapper> mSlices = new ArrayList();
+    public ArrayList mSlices = new ArrayList();
     public Set<SliceItem> mLoadingActions = new HashSet();
 
     /* loaded from: classes.dex */
@@ -50,33 +49,45 @@ public class SliceAdapter extends RecyclerView.Adapter<SliceViewHolder> implemen
     public class SliceViewHolder extends RecyclerView.ViewHolder implements View.OnTouchListener, View.OnClickListener {
         public final SliceChildView mSliceChildView;
 
-        public SliceViewHolder(View itemView) {
-            super(itemView);
-            this.mSliceChildView = itemView instanceof SliceChildView ? (SliceChildView) itemView : null;
+        public SliceViewHolder(View view) {
+            super(view);
+            SliceChildView sliceChildView;
+            if (view instanceof SliceChildView) {
+                sliceChildView = (SliceChildView) view;
+            } else {
+                sliceChildView = null;
+            }
+            this.mSliceChildView = sliceChildView;
         }
 
         @Override // android.view.View.OnClickListener
-        public void onClick(View v) {
+        public final void onClick(View view) {
             if (SliceAdapter.this.mParent != null) {
-                int[] iArr = (int[]) v.getTag();
+                int[] iArr = (int[]) view.getTag();
                 SliceAdapter.this.mParent.performClick();
             }
         }
 
         @Override // android.view.View.OnTouchListener
-        public boolean onTouch(View v, MotionEvent event) {
+        public final boolean onTouch(View view, MotionEvent motionEvent) {
+            boolean z;
             ListContent listContent;
             TemplateView templateView = SliceAdapter.this.mTemplateView;
             if (templateView != null) {
                 SliceView sliceView = templateView.mParent;
                 if (sliceView != null) {
-                    if (!((sliceView.mOnClickListener == null && ((listContent = sliceView.mListContent) == null || listContent.getShortcut(sliceView.getContext()) == null)) ? false : true)) {
+                    if (sliceView.mOnClickListener == null && ((listContent = sliceView.mListContent) == null || listContent.getShortcut(sliceView.getContext()) == null)) {
+                        z = false;
+                    } else {
+                        z = true;
+                    }
+                    if (!z) {
                         templateView.mForeground.setPressed(false);
                     }
                 }
                 templateView.mForeground.getLocationOnScreen(templateView.mLoc);
-                templateView.mForeground.getBackground().setHotspot((int) (event.getRawX() - templateView.mLoc[0]), (int) (event.getRawY() - templateView.mLoc[1]));
-                int actionMasked = event.getActionMasked();
+                templateView.mForeground.getBackground().setHotspot((int) (motionEvent.getRawX() - templateView.mLoc[0]), (int) (motionEvent.getRawY() - templateView.mLoc[1]));
+                int actionMasked = motionEvent.getActionMasked();
                 if (actionMasked == 0) {
                     templateView.mForeground.setPressed(true);
                 } else if (actionMasked == 3 || actionMasked == 1 || actionMasked == 2) {
@@ -85,6 +96,27 @@ public class SliceAdapter extends RecyclerView.Adapter<SliceViewHolder> implemen
             }
             return false;
         }
+    }
+
+    @Override // androidx.recyclerview.widget.RecyclerView.Adapter
+    public final RecyclerView.ViewHolder onCreateViewHolder(RecyclerView recyclerView, int i) {
+        View view;
+        if (i == 3) {
+            View inflate = LayoutInflater.from(this.mContext).inflate(R.layout.abc_slice_grid, (ViewGroup) null);
+            if (inflate instanceof GridRowView) {
+                view = (GridRowView) inflate;
+            } else {
+                view = new GridRowView(this.mContext, null);
+            }
+        } else if (i == 4) {
+            view = LayoutInflater.from(this.mContext).inflate(R.layout.abc_slice_message, (ViewGroup) null);
+        } else if (i != 5) {
+            view = new RowView(this.mContext);
+        } else {
+            view = LayoutInflater.from(this.mContext).inflate(R.layout.abc_slice_message_local, (ViewGroup) null);
+        }
+        view.setLayoutParams(new ViewGroup.LayoutParams(-1, -2));
+        return new SliceViewHolder(view);
     }
 
     /* loaded from: classes.dex */
@@ -96,18 +128,25 @@ public class SliceAdapter extends RecyclerView.Adapter<SliceViewHolder> implemen
         public SliceWrapper(SliceContent sliceContent, IdGenerator idGenerator) {
             int i;
             String str;
+            int i2;
             this.mItem = sliceContent;
             SliceItem sliceItem = sliceContent.mSliceItem;
             if ("message".equals(sliceItem.mSubType)) {
-                i = SliceQuery.findSubtype(sliceItem, (String) null, "source") != null ? 4 : 5;
-            } else if (ArrayUtils.contains(sliceItem.mHints, "horizontal")) {
+                if (SliceQuery.findSubtype(sliceItem, (String) null, "source") != null) {
+                    i = 4;
+                } else {
+                    i = 5;
+                }
+            } else if (sliceItem.hasHint("horizontal")) {
                 i = 3;
+            } else if (!sliceItem.hasHint("list_item")) {
+                i = 2;
             } else {
-                i = !ArrayUtils.contains(sliceItem.mHints, "list_item") ? 2 : 1;
+                i = 1;
             }
             this.mType = i;
             SliceItem sliceItem2 = sliceContent.mSliceItem;
-            Objects.requireNonNull(idGenerator);
+            idGenerator.getClass();
             if ("slice".equals(sliceItem2.mFormat) || "action".equals(sliceItem2.mFormat)) {
                 str = String.valueOf(sliceItem2.getSlice().getItems().size());
             } else {
@@ -119,12 +158,131 @@ public class SliceAdapter extends RecyclerView.Adapter<SliceViewHolder> implemen
                 idGenerator.mNextLong = 1 + j;
                 arrayMap.put(str, Long.valueOf(j));
             }
-            long longValue = idGenerator.mCurrentIds.get(str).longValue();
-            Integer num = idGenerator.mUsedIds.get(str);
-            int intValue = num != null ? num.intValue() : 0;
-            idGenerator.mUsedIds.put(str, Integer.valueOf(intValue + 1));
-            this.mId = longValue + (intValue * 10000);
+            long longValue = idGenerator.mCurrentIds.getOrDefault(str, null).longValue();
+            Integer orDefault = idGenerator.mUsedIds.getOrDefault(str, null);
+            if (orDefault != null) {
+                i2 = orDefault.intValue();
+            } else {
+                i2 = 0;
+            }
+            idGenerator.mUsedIds.put(str, Integer.valueOf(i2 + 1));
+            this.mId = longValue + (i2 * 10000);
         }
+    }
+
+    @Override // androidx.recyclerview.widget.RecyclerView.Adapter
+    public final int getItemCount() {
+        return this.mSlices.size();
+    }
+
+    @Override // androidx.recyclerview.widget.RecyclerView.Adapter
+    public final long getItemId(int i) {
+        return ((SliceWrapper) this.mSlices.get(i)).mId;
+    }
+
+    @Override // androidx.recyclerview.widget.RecyclerView.Adapter
+    public final int getItemViewType(int i) {
+        return ((SliceWrapper) this.mSlices.get(i)).mType;
+    }
+
+    @Override // androidx.recyclerview.widget.RecyclerView.Adapter
+    public final void onBindViewHolder(SliceViewHolder sliceViewHolder, int i) {
+        boolean z;
+        int i2;
+        boolean z2;
+        long j;
+        int i3;
+        int i4;
+        List<SliceAction> list;
+        SliceViewHolder sliceViewHolder2 = sliceViewHolder;
+        SliceContent sliceContent = ((SliceWrapper) this.mSlices.get(i)).mItem;
+        if (sliceViewHolder2.mSliceChildView != null && sliceContent != null) {
+            RowStyle rowStyle = SliceAdapter.this.mSliceStyle.getRowStyle(sliceContent.mSliceItem);
+            sliceViewHolder2.mSliceChildView.setOnClickListener(sliceViewHolder2);
+            sliceViewHolder2.mSliceChildView.setOnTouchListener(sliceViewHolder2);
+            SliceChildView sliceChildView = sliceViewHolder2.mSliceChildView;
+            SliceAdapter sliceAdapter = SliceAdapter.this;
+            sliceChildView.mLoadingListener = sliceAdapter;
+            if (sliceContent instanceof RowContent) {
+                z = ((RowContent) sliceContent).mIsHeader;
+            } else if (i == 0) {
+                z = true;
+            } else {
+                z = false;
+            }
+            sliceChildView.setLoadingActions(sliceAdapter.mLoadingActions);
+            sliceViewHolder2.mSliceChildView.setPolicy(SliceAdapter.this.mPolicy);
+            SliceChildView sliceChildView2 = sliceViewHolder2.mSliceChildView;
+            Integer num = rowStyle.mTintColor;
+            if (num != null) {
+                i2 = num.intValue();
+            } else {
+                i2 = rowStyle.mSliceStyle.mTintColor;
+            }
+            sliceChildView2.setTint(i2);
+            sliceViewHolder2.mSliceChildView.setStyle(SliceAdapter.this.mSliceStyle, rowStyle);
+            SliceChildView sliceChildView3 = sliceViewHolder2.mSliceChildView;
+            if (!z || !SliceAdapter.this.mShowLastUpdated) {
+                z2 = false;
+            } else {
+                z2 = true;
+            }
+            sliceChildView3.setShowLastUpdated(z2);
+            SliceChildView sliceChildView4 = sliceViewHolder2.mSliceChildView;
+            if (z) {
+                j = SliceAdapter.this.mLastUpdated;
+            } else {
+                j = -1;
+            }
+            sliceChildView4.setLastUpdated(j);
+            if (i == 0) {
+                i3 = SliceAdapter.this.mInsetTop;
+            } else {
+                i3 = 0;
+            }
+            if (i == SliceAdapter.this.getItemCount() - 1) {
+                i4 = SliceAdapter.this.mInsetBottom;
+            } else {
+                i4 = 0;
+            }
+            SliceChildView sliceChildView5 = sliceViewHolder2.mSliceChildView;
+            SliceAdapter sliceAdapter2 = SliceAdapter.this;
+            sliceChildView5.setInsets(sliceAdapter2.mInsetStart, i3, sliceAdapter2.mInsetEnd, i4);
+            sliceViewHolder2.mSliceChildView.setAllowTwoLines(SliceAdapter.this.mAllowTwoLines);
+            SliceChildView sliceChildView6 = sliceViewHolder2.mSliceChildView;
+            if (z) {
+                list = SliceAdapter.this.mSliceActions;
+            } else {
+                list = null;
+            }
+            sliceChildView6.setSliceActions(list);
+            sliceViewHolder2.mSliceChildView.setSliceItem(sliceContent, z, i, SliceAdapter.this.getItemCount(), SliceAdapter.this.mSliceObserver);
+            sliceViewHolder2.mSliceChildView.setTag(new int[]{ListContent.getRowType(sliceContent, z, SliceAdapter.this.mSliceActions), i});
+        }
+    }
+
+    public final void onSliceActionLoading(SliceItem sliceItem, int i) {
+        this.mLoadingActions.add(sliceItem);
+        if (getItemCount() > i) {
+            notifyItemChanged(i);
+        } else {
+            notifyDataSetChanged();
+        }
+    }
+
+    public final void setSliceItems(List list, int i) {
+        if (list == null) {
+            this.mLoadingActions.clear();
+            this.mSlices.clear();
+        } else {
+            this.mIdGen.mUsedIds.clear();
+            this.mSlices = new ArrayList(list.size());
+            Iterator it = list.iterator();
+            while (it.hasNext()) {
+                this.mSlices.add(new SliceWrapper((SliceContent) it.next(), this.mIdGen));
+            }
+        }
+        notifyDataSetChanged();
     }
 
     public SliceAdapter(Context context) {
@@ -136,103 +294,9 @@ public class SliceAdapter extends RecyclerView.Adapter<SliceViewHolder> implemen
         throw new IllegalStateException("Cannot change whether this adapter has stable IDs while the adapter has registered observers.");
     }
 
-    @Override // androidx.recyclerview.widget.RecyclerView.Adapter
-    public int getItemCount() {
-        return this.mSlices.size();
-    }
-
-    @Override // androidx.recyclerview.widget.RecyclerView.Adapter
-    public long getItemId(int position) {
-        return this.mSlices.get(position).mId;
-    }
-
-    @Override // androidx.recyclerview.widget.RecyclerView.Adapter
-    public int getItemViewType(int position) {
-        return this.mSlices.get(position).mType;
-    }
-
-    public void notifyHeaderChanged() {
+    public final void notifyHeaderChanged() {
         if (getItemCount() > 0) {
             notifyItemChanged(0);
         }
-    }
-
-    @Override // androidx.recyclerview.widget.RecyclerView.Adapter
-    public void onBindViewHolder(SliceViewHolder holder, int position) {
-        boolean z;
-        SliceViewHolder sliceViewHolder = holder;
-        SliceContent sliceContent = this.mSlices.get(position).mItem;
-        if (sliceViewHolder.mSliceChildView != null && sliceContent != null) {
-            RowStyle rowStyle = SliceAdapter.this.mSliceStyle.getRowStyle(sliceContent.mSliceItem);
-            sliceViewHolder.mSliceChildView.setOnClickListener(sliceViewHolder);
-            sliceViewHolder.mSliceChildView.setOnTouchListener(sliceViewHolder);
-            SliceChildView sliceChildView = sliceViewHolder.mSliceChildView;
-            SliceAdapter sliceAdapter = SliceAdapter.this;
-            sliceChildView.mLoadingListener = sliceAdapter;
-            if (sliceContent instanceof RowContent) {
-                z = ((RowContent) sliceContent).mIsHeader;
-            } else {
-                z = position == 0;
-            }
-            sliceChildView.setLoadingActions(sliceAdapter.mLoadingActions);
-            sliceViewHolder.mSliceChildView.setPolicy(SliceAdapter.this.mPolicy);
-            sliceViewHolder.mSliceChildView.setTint(rowStyle.getTintColor());
-            sliceViewHolder.mSliceChildView.setStyle(SliceAdapter.this.mSliceStyle, rowStyle);
-            sliceViewHolder.mSliceChildView.setShowLastUpdated(z && SliceAdapter.this.mShowLastUpdated);
-            sliceViewHolder.mSliceChildView.setLastUpdated(z ? SliceAdapter.this.mLastUpdated : -1L);
-            int i = position == 0 ? SliceAdapter.this.mInsetTop : 0;
-            int i2 = position == SliceAdapter.this.getItemCount() - 1 ? SliceAdapter.this.mInsetBottom : 0;
-            SliceChildView sliceChildView2 = sliceViewHolder.mSliceChildView;
-            SliceAdapter sliceAdapter2 = SliceAdapter.this;
-            sliceChildView2.setInsets(sliceAdapter2.mInsetStart, i, sliceAdapter2.mInsetEnd, i2);
-            sliceViewHolder.mSliceChildView.setAllowTwoLines(SliceAdapter.this.mAllowTwoLines);
-            sliceViewHolder.mSliceChildView.setSliceActions(z ? SliceAdapter.this.mSliceActions : null);
-            sliceViewHolder.mSliceChildView.setSliceItem(sliceContent, z, position, SliceAdapter.this.getItemCount(), SliceAdapter.this.mSliceObserver);
-            sliceViewHolder.mSliceChildView.setTag(new int[]{ListContent.getRowType(sliceContent, z, SliceAdapter.this.mSliceActions), position});
-        }
-    }
-
-    @Override // androidx.recyclerview.widget.RecyclerView.Adapter
-    public SliceViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view;
-        if (viewType == 3) {
-            View inflate = LayoutInflater.from(this.mContext).inflate(R.layout.abc_slice_grid, (ViewGroup) null);
-            if (inflate instanceof GridRowView) {
-                view = (GridRowView) inflate;
-            } else {
-                view = new GridRowView(this.mContext, null);
-            }
-        } else if (viewType == 4) {
-            view = LayoutInflater.from(this.mContext).inflate(R.layout.abc_slice_message, (ViewGroup) null);
-        } else if (viewType != 5) {
-            view = new RowView(this.mContext);
-        } else {
-            view = LayoutInflater.from(this.mContext).inflate(R.layout.abc_slice_message_local, (ViewGroup) null);
-        }
-        view.setLayoutParams(new ViewGroup.LayoutParams(-1, -2));
-        return new SliceViewHolder(view);
-    }
-
-    public void onSliceActionLoading(SliceItem actionItem, int position) {
-        this.mLoadingActions.add(actionItem);
-        if (getItemCount() > position) {
-            this.mObservable.notifyItemRangeChanged(position, 1);
-        } else {
-            this.mObservable.notifyChanged();
-        }
-    }
-
-    public void setSliceItems(List<SliceContent> slices, int color, int mode) {
-        if (slices == null) {
-            this.mLoadingActions.clear();
-            this.mSlices.clear();
-        } else {
-            this.mIdGen.mUsedIds.clear();
-            this.mSlices = new ArrayList(slices.size());
-            for (SliceContent sliceContent : slices) {
-                this.mSlices.add(new SliceWrapper(sliceContent, this.mIdGen));
-            }
-        }
-        this.mObservable.notifyChanged();
     }
 }

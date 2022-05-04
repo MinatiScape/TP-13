@@ -61,6 +61,7 @@ public class SysUiStatsLog {
     public static final int KEYGUARD_STATE_CHANGED__STATE__SHOWN = 2;
     public static final int KEYGUARD_STATE_CHANGED__STATE__UNKNOWN = 0;
     public static final int LAUNCHER_EVENT = 19;
+    public static final int LAUNCHER_LATENCY = 426;
     public static final int LAUNCHER_LAYOUT_SNAPSHOT = 10108;
     public static final int LAUNCHER_SNAPSHOT = 262;
     public static final int LAUNCHER_UICHANGED__ACTION__DEFAULT_ACTION = 0;
@@ -206,7 +207,8 @@ public class SysUiStatsLog {
     public static final int STYLE_UI_CHANGED = 179;
     public static final int UI_EVENT_REPORTED = 90;
 
-    public static StatsEvent buildStatsEvent(int i, int i2, int i3, int i4, int i5, String str, String str2, int i6, int i7, int i8, int i9, int i10, int i11, int i12, boolean z, int i13, int i14, int i15, int i16) {
+    public static StatsEvent buildStatsEvent(int i, int i2, int i3, int i4, int i5, String str, String str2, int i6, int i7, int i8, int i9, int i10, int i11, int i12, boolean z, int i13, int i14, int i15, int i16, byte[] bArr) {
+        byte[] bArr2;
         StatsEvent.Builder newBuilder = StatsEvent.newBuilder();
         newBuilder.setAtomId(i);
         newBuilder.writeInt(i2);
@@ -230,6 +232,12 @@ public class SysUiStatsLog {
         newBuilder.writeInt(i14);
         newBuilder.writeInt(i15);
         newBuilder.writeInt(i16);
+        if (bArr == null) {
+            bArr2 = new byte[0];
+        } else {
+            bArr2 = bArr;
+        }
+        newBuilder.writeByteArray(bArr2);
         return newBuilder.build();
     }
 
@@ -263,7 +271,7 @@ public class SysUiStatsLog {
         StatsLog.write(newBuilder.build());
     }
 
-    public static void write(int i, int i2, int i3, int i4, byte[] bArr, boolean z, int i5, int i6, int i7, int i8, String str, String str2, int i9, int i10, int i11, int i12, int i13, int i14, int i15, boolean z2, int i16, int i17, int i18, String str3, int i19, int i20) {
+    public static void write(int i, int i2, int i3, int i4, byte[] bArr, boolean z, int i5, int i6, int i7, int i8, String str, String str2, int i9, int i10, int i11, int i12, int i13, int i14, int i15, boolean z2, int i16, int i17, int i18, String str3, int i19, int i20, int i21, byte[] bArr2) {
         StatsEvent.Builder newBuilder = StatsEvent.newBuilder();
         newBuilder.setAtomId(i);
         newBuilder.writeInt(i2);
@@ -294,6 +302,8 @@ public class SysUiStatsLog {
         newBuilder.writeString(str3);
         newBuilder.writeInt(i19);
         newBuilder.writeInt(i20);
+        newBuilder.writeInt(i21);
+        newBuilder.writeByteArray(bArr2 == null ? new byte[0] : bArr2);
         newBuilder.usePooledBuffer();
         StatsLog.write(newBuilder.build());
     }
@@ -387,7 +397,7 @@ public class SysUiStatsLog {
         StatsLog.write(newBuilder.build());
     }
 
-    public static void write(int i, int i2, int i3, int i4, int i5, String str, String str2, int i6, int i7, int i8, int i9, int i10, int i11, int i12, boolean z, int i13, int i14, int i15, int i16, int i17) {
+    public static void write(int i, int i2, int i3, int i4, int i5, String str, String str2, int i6, int i7, int i8, int i9, int i10, int i11, int i12, boolean z, int i13, int i14, int i15, int i16, int i17, byte[] bArr) {
         StatsEvent.Builder newBuilder = StatsEvent.newBuilder();
         newBuilder.setAtomId(i);
         newBuilder.writeInt(i2);
@@ -412,6 +422,19 @@ public class SysUiStatsLog {
         newBuilder.writeInt(i15);
         newBuilder.writeInt(i16);
         newBuilder.writeInt(i17);
+        newBuilder.writeByteArray(bArr == null ? new byte[0] : bArr);
+        newBuilder.usePooledBuffer();
+        StatsLog.write(newBuilder.build());
+    }
+
+    public static void write(int i, int i2, int i3, int i4, long j, int i5) {
+        StatsEvent.Builder newBuilder = StatsEvent.newBuilder();
+        newBuilder.setAtomId(i);
+        newBuilder.writeInt(i2);
+        newBuilder.writeInt(i3);
+        newBuilder.writeInt(i4);
+        newBuilder.writeLong(j);
+        newBuilder.writeInt(i5);
         newBuilder.usePooledBuffer();
         StatsLog.write(newBuilder.build());
     }

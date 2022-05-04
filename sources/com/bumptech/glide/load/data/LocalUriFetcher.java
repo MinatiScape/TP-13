@@ -14,17 +14,16 @@ public abstract class LocalUriFetcher<T> implements DataFetcher<T> {
     public T data;
     public final Uri uri;
 
-    public LocalUriFetcher(ContentResolver contentResolver, Uri uri) {
-        this.contentResolver = contentResolver;
-        this.uri = uri;
+    @Override // com.bumptech.glide.load.data.DataFetcher
+    public final void cancel() {
     }
 
-    @Override // com.bumptech.glide.load.data.DataFetcher
-    public void cancel() {
-    }
+    public abstract void close(T t) throws IOException;
+
+    public abstract T loadResource(Uri uri, ContentResolver contentResolver) throws FileNotFoundException;
 
     @Override // com.bumptech.glide.load.data.DataFetcher
-    public void cleanup() {
+    public final void cleanup() {
         T t = this.data;
         if (t != null) {
             try {
@@ -34,26 +33,27 @@ public abstract class LocalUriFetcher<T> implements DataFetcher<T> {
         }
     }
 
-    public abstract void close(T data) throws IOException;
-
     @Override // com.bumptech.glide.load.data.DataFetcher
-    public DataSource getDataSource() {
-        return DataSource.LOCAL;
-    }
-
-    @Override // com.bumptech.glide.load.data.DataFetcher
-    public final void loadData(Priority priority, DataFetcher.DataCallback<? super T> callback) {
+    public final void loadData(Priority priority, DataFetcher.DataCallback<? super T> dataCallback) {
         try {
             T loadResource = loadResource(this.uri, this.contentResolver);
             this.data = loadResource;
-            callback.onDataReady(loadResource);
+            dataCallback.onDataReady(loadResource);
         } catch (FileNotFoundException e) {
             if (Log.isLoggable("LocalUriFetcher", 3)) {
                 Log.d("LocalUriFetcher", "Failed to open Uri", e);
             }
-            callback.onLoadFailed(e);
+            dataCallback.onLoadFailed(e);
         }
     }
 
-    public abstract T loadResource(Uri uri, ContentResolver contentResolver) throws FileNotFoundException;
+    public LocalUriFetcher(ContentResolver contentResolver, Uri uri) {
+        this.contentResolver = contentResolver;
+        this.uri = uri;
+    }
+
+    @Override // com.bumptech.glide.load.data.DataFetcher
+    public final DataSource getDataSource() {
+        return DataSource.LOCAL;
+    }
 }

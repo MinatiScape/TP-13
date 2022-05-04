@@ -1,8 +1,8 @@
 package com.google.android.gms.common.api.internal;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.internal.IAccountAccessor;
 import java.util.Collections;
+/* compiled from: GoogleApiManager.java */
 /* loaded from: classes.dex */
 public final class zzbw implements Runnable {
     public final /* synthetic */ ConnectionResult zza;
@@ -15,22 +15,23 @@ public final class zzbw implements Runnable {
 
     @Override // java.lang.Runnable
     public final void run() {
-        IAccountAccessor iAccountAccessor;
-        if (this.zza.isSuccess()) {
+        boolean z;
+        if (this.zza.zzc == 0) {
+            z = true;
+        } else {
+            z = false;
+        }
+        if (z) {
             zzbv zzbvVar = this.zzb;
             zzbvVar.zzf = true;
             if (zzbvVar.zzb.requiresSignIn()) {
-                zzbv zzbvVar2 = this.zzb;
-                if (zzbvVar2.zzf && (iAccountAccessor = zzbvVar2.zzd) != null) {
-                    zzbvVar2.zzb.getRemoteService(iAccountAccessor, zzbvVar2.zze);
-                    return;
-                }
-                return;
+                this.zzb.zza$1();
+            } else {
+                this.zzb.zzb.getRemoteService(null, Collections.emptySet());
             }
-            this.zzb.zzb.getRemoteService(null, Collections.emptySet());
-            return;
+        } else {
+            zzbv zzbvVar2 = this.zzb;
+            ((zzbp) zzbvVar2.zza.zzm.get(zzbvVar2.zzc)).onConnectionFailed(this.zza);
         }
-        zzbv zzbvVar3 = this.zzb;
-        zzbvVar3.zza.zzm.get(zzbvVar3.zzc).onConnectionFailed(this.zza);
     }
 }

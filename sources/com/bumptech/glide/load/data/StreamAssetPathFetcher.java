@@ -4,23 +4,23 @@ import android.content.res.AssetManager;
 import java.io.IOException;
 import java.io.InputStream;
 /* loaded from: classes.dex */
-public class StreamAssetPathFetcher extends AssetPathFetcher<InputStream> {
-    public StreamAssetPathFetcher(AssetManager assetManager, String assetPath) {
-        super(assetManager, assetPath);
+public final class StreamAssetPathFetcher extends AssetPathFetcher<InputStream> {
+    @Override // com.bumptech.glide.load.data.AssetPathFetcher
+    public final void close(InputStream inputStream) throws IOException {
+        inputStream.close();
     }
 
     @Override // com.bumptech.glide.load.data.AssetPathFetcher
-    public void close(InputStream data) throws IOException {
-        data.close();
+    public final InputStream loadResource(AssetManager assetManager, String str) throws IOException {
+        return assetManager.open(str);
+    }
+
+    public StreamAssetPathFetcher(AssetManager assetManager, String str) {
+        super(assetManager, str);
     }
 
     @Override // com.bumptech.glide.load.data.DataFetcher
-    public Class<InputStream> getDataClass() {
+    public final Class<InputStream> getDataClass() {
         return InputStream.class;
-    }
-
-    @Override // com.bumptech.glide.load.data.AssetPathFetcher
-    public InputStream loadResource(AssetManager assetManager, String path) throws IOException {
-        return assetManager.open(path);
     }
 }

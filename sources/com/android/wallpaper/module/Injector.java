@@ -3,20 +3,26 @@ package com.android.wallpaper.module;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.MethodCallsLogger;
-import com.android.wallpaper.compat.WallpaperManagerCompatV16;
+import com.android.customization.picker.WallpaperPreviewer$$ExternalSyntheticLambda0;
+import com.android.wallpaper.compat.WallpaperManagerCompat;
 import com.android.wallpaper.model.CategoryProvider;
 import com.android.wallpaper.model.WallpaperInfo;
-import com.android.wallpaper.picker.individual.IndividualPickerFragment;
+import com.android.wallpaper.network.WallpaperRequester;
+import com.android.wallpaper.picker.PreviewFragment;
+import com.android.wallpaper.picker.individual.IndividualPickerUnlockableFragment;
 import com.android.wallpaper.util.DisplayUtils;
-import com.android.wallpaper.util.DownloadableUtils;
-import com.google.android.gms.common.internal.zzam;
-import com.google.android.material.shape.CornerTreatment;
-import com.google.android.material.shape.EdgeTreatment;
+import com.android.wallpaper.util.LaunchUtils;
+import com.google.android.apps.wallpaper.effects.CinematicEffectsController;
+import com.google.android.apps.wallpaper.module.CompositeUserEventLogger;
+import com.google.android.apps.wallpaper.module.GooglePartnerProvider;
+import com.google.android.apps.wallpaper.module.GoogleWallpaperPreferences;
+import com.google.android.gms.common.util.zzh;
+import kotlin.jvm.internal.Intrinsics;
 /* loaded from: classes.dex */
 public interface Injector {
-    MethodCallsLogger getAlarmManagerWrapper(Context context);
+    CinematicEffectsController createEffectsController(Context context, WallpaperPreviewer$$ExternalSyntheticLambda0 wallpaperPreviewer$$ExternalSyntheticLambda0);
+
+    DefaultAlarmManagerWrapper getAlarmManagerWrapper(Context context);
 
     BitmapCropper getBitmapCropper();
 
@@ -30,43 +36,39 @@ public interface Injector {
 
     DisplayUtils getDisplayUtils(Context context);
 
-    String getDownloadableIntentAction();
+    void getDownloadableIntentAction();
 
     DrawableLayerResolver getDrawableLayerResolver();
 
     ExploreIntentChecker getExploreIntentChecker(Context context);
 
-    DownloadableUtils getFormFactorChecker(Context context);
+    IndividualPickerUnlockableFragment getIndividualPickerFragment(String str);
 
-    IndividualPickerFragment getIndividualPickerFragment(String str);
+    Intrinsics getLiveWallpaperInfoFactory();
 
-    CornerTreatment getLiveWallpaperInfoFactory(Context context);
-
-    LoggingOptInStatusProvider getLoggingOptInStatusProvider(Context context);
+    LoggingOptInStatusProvider getLoggingOptInStatusProvider();
 
     NetworkStatusNotifier getNetworkStatusNotifier(Context context);
 
     PackageStatusNotifier getPackageStatusNotifier(Context context);
 
-    PartnerProvider getPartnerProvider(Context context);
+    GooglePartnerProvider getPartnerProvider(Context context);
 
-    WallpaperPreferences getPreferences(Context context);
+    GoogleWallpaperPreferences getPreferences(Context context);
 
-    Fragment getPreviewFragment(Context context, WallpaperInfo wallpaperInfo, int i, boolean z, boolean z2, boolean z3);
+    PreviewFragment getPreviewFragment(Context context, WallpaperInfo wallpaperInfo, int i, boolean z, boolean z2, boolean z3);
 
-    zzam getRequester(Context context);
+    WallpaperRequester getRequester(Context context);
 
-    CornerTreatment getSystemFeatureChecker();
+    LaunchUtils getSystemFeatureChecker();
 
-    UserEventLogger getUserEventLogger(Context context);
+    CompositeUserEventLogger getUserEventLogger(Context context);
 
-    WallpaperManagerCompatV16 getWallpaperManagerCompat(Context context);
+    WallpaperManagerCompat getWallpaperManagerCompat(Context context);
 
     WallpaperPersister getWallpaperPersister(Context context);
 
     WallpaperRefresher getWallpaperRefresher(Context context);
 
-    WallpaperRotationRefresher getWallpaperRotationRefresher();
-
-    EdgeTreatment getWallpaperStatusChecker();
+    zzh getWallpaperStatusChecker();
 }

@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 /* loaded from: classes.dex */
 public final class GapWorker implements Runnable {
     public static final ThreadLocal<GapWorker> sGapWorker = new ThreadLocal<>();
-    public static Comparator<Task> sTaskComparator = new Comparator<Task>() { // from class: androidx.recyclerview.widget.GapWorker.1
+    public static AnonymousClass1 sTaskComparator = new Comparator<Task>() { // from class: androidx.recyclerview.widget.GapWorker.1
         /* JADX WARN: Code restructure failed: missing block: B:12:0x0017, code lost:
             if (r5 == null) goto L13;
          */
@@ -29,7 +29,7 @@ public final class GapWorker implements Runnable {
             Code decompiled incorrectly, please refer to instructions dump.
             To view partially-correct add '--show-bad-code' argument
         */
-        public int compare(androidx.recyclerview.widget.GapWorker.Task r6, androidx.recyclerview.widget.GapWorker.Task r7) {
+        public final int compare(androidx.recyclerview.widget.GapWorker.Task r6, androidx.recyclerview.widget.GapWorker.Task r7) {
             /*
                 r5 = this;
                 androidx.recyclerview.widget.GapWorker$Task r6 = (androidx.recyclerview.widget.GapWorker.Task) r6
@@ -98,64 +98,52 @@ public final class GapWorker implements Runnable {
         public int mPrefetchDx;
         public int mPrefetchDy;
 
-        public void addPosition(int layoutPosition, int pixelDistance) {
-            if (layoutPosition < 0) {
-                throw new IllegalArgumentException("Layout positions must be non-negative");
-            } else if (pixelDistance >= 0) {
-                int i = this.mCount * 2;
-                int[] iArr = this.mPrefetchArray;
-                if (iArr == null) {
-                    int[] iArr2 = new int[4];
-                    this.mPrefetchArray = iArr2;
-                    Arrays.fill(iArr2, -1);
-                } else if (i >= iArr.length) {
-                    int[] iArr3 = new int[i * 2];
-                    this.mPrefetchArray = iArr3;
-                    System.arraycopy(iArr, 0, iArr3, 0, iArr.length);
-                }
-                int[] iArr4 = this.mPrefetchArray;
-                iArr4[i] = layoutPosition;
-                iArr4[i + 1] = pixelDistance;
-                this.mCount++;
-            } else {
-                throw new IllegalArgumentException("Pixel distance must be non-negative");
-            }
-        }
-
-        public void collectPrefetchPositionsFromView(RecyclerView view, boolean nested) {
+        public final void collectPrefetchPositionsFromView(RecyclerView recyclerView, boolean z) {
             this.mCount = 0;
             int[] iArr = this.mPrefetchArray;
             if (iArr != null) {
                 Arrays.fill(iArr, -1);
             }
-            RecyclerView.LayoutManager layoutManager = view.mLayout;
-            if (view.mAdapter != null && layoutManager != null && layoutManager.mItemPrefetchEnabled) {
-                if (nested) {
-                    if (!view.mAdapterHelper.hasPendingUpdates()) {
-                        layoutManager.collectInitialPrefetchPositions(view.mAdapter.getItemCount(), this);
+            RecyclerView.LayoutManager layoutManager = recyclerView.mLayout;
+            if (recyclerView.mAdapter != null && layoutManager != null && layoutManager.mItemPrefetchEnabled) {
+                if (z) {
+                    if (!recyclerView.mAdapterHelper.hasPendingUpdates()) {
+                        layoutManager.collectInitialPrefetchPositions(recyclerView.mAdapter.getItemCount(), this);
                     }
-                } else if (!view.hasPendingAdapterUpdates()) {
-                    layoutManager.collectAdjacentPrefetchPositions(this.mPrefetchDx, this.mPrefetchDy, view.mState, this);
+                } else if (!recyclerView.hasPendingAdapterUpdates()) {
+                    layoutManager.collectAdjacentPrefetchPositions(this.mPrefetchDx, this.mPrefetchDy, recyclerView.mState, this);
                 }
                 int i = this.mCount;
                 if (i > layoutManager.mPrefetchMaxCountObserved) {
                     layoutManager.mPrefetchMaxCountObserved = i;
-                    layoutManager.mPrefetchMaxObservedInInitialPrefetch = nested;
-                    view.mRecycler.updateViewCacheSize();
+                    layoutManager.mPrefetchMaxObservedInInitialPrefetch = z;
+                    recyclerView.mRecycler.updateViewCacheSize();
                 }
             }
         }
 
-        public boolean lastPrefetchIncludedPosition(int position) {
-            if (this.mPrefetchArray != null) {
-                int i = this.mCount * 2;
-                for (int i2 = 0; i2 < i; i2 += 2) {
-                    if (this.mPrefetchArray[i2] == position) {
-                        return true;
-                    }
+        public final void addPosition(int i, int i2) {
+            if (i < 0) {
+                throw new IllegalArgumentException("Layout positions must be non-negative");
+            } else if (i2 >= 0) {
+                int i3 = this.mCount * 2;
+                int[] iArr = this.mPrefetchArray;
+                if (iArr == null) {
+                    int[] iArr2 = new int[4];
+                    this.mPrefetchArray = iArr2;
+                    Arrays.fill(iArr2, -1);
+                } else if (i3 >= iArr.length) {
+                    int[] iArr3 = new int[i3 * 2];
+                    this.mPrefetchArray = iArr3;
+                    System.arraycopy(iArr, 0, iArr3, 0, iArr.length);
                 }
+                int[] iArr4 = this.mPrefetchArray;
+                iArr4[i3] = i;
+                iArr4[i3 + 1] = i2;
+                this.mCount++;
+            } else {
+                throw new IllegalArgumentException("Pixel distance must be non-negative");
             }
-            return false;
         }
     }
 
@@ -168,21 +156,49 @@ public final class GapWorker implements Runnable {
         public int viewVelocity;
     }
 
-    public void postFromTraversal(RecyclerView recyclerView, int prefetchDx, int prefetchDy) {
-        if (recyclerView.isAttachedToWindow() && this.mPostTimeNs == 0) {
-            this.mPostTimeNs = recyclerView.getNanoTime();
-            recyclerView.post(this);
+    public static RecyclerView.ViewHolder prefetchPositionWithDeadline(RecyclerView recyclerView, int i, long j) {
+        boolean z;
+        int unfilteredChildCount = recyclerView.mChildHelper.getUnfilteredChildCount();
+        int i2 = 0;
+        while (true) {
+            if (i2 >= unfilteredChildCount) {
+                z = false;
+                break;
+            }
+            RecyclerView.ViewHolder childViewHolderInt = RecyclerView.getChildViewHolderInt(recyclerView.mChildHelper.getUnfilteredChildAt(i2));
+            if (childViewHolderInt.mPosition == i && !childViewHolderInt.isInvalid()) {
+                z = true;
+                break;
+            }
+            i2++;
         }
-        LayoutPrefetchRegistryImpl layoutPrefetchRegistryImpl = recyclerView.mPrefetchRegistry;
-        layoutPrefetchRegistryImpl.mPrefetchDx = prefetchDx;
-        layoutPrefetchRegistryImpl.mPrefetchDy = prefetchDy;
+        if (z) {
+            return null;
+        }
+        RecyclerView.Recycler recycler = recyclerView.mRecycler;
+        try {
+            recyclerView.onEnterLayoutOrScroll();
+            RecyclerView.ViewHolder tryGetViewHolderForPositionByDeadline = recycler.tryGetViewHolderForPositionByDeadline(i, j);
+            if (tryGetViewHolderForPositionByDeadline != null) {
+                if (!tryGetViewHolderForPositionByDeadline.isBound() || tryGetViewHolderForPositionByDeadline.isInvalid()) {
+                    recycler.addViewHolderToRecycledViewPool(tryGetViewHolderForPositionByDeadline, false);
+                } else {
+                    recycler.recycleView(tryGetViewHolderForPositionByDeadline.itemView);
+                }
+            }
+            return tryGetViewHolderForPositionByDeadline;
+        } finally {
+            recyclerView.onExitLayoutOrScroll(false);
+        }
     }
 
-    public void prefetch(long deadlineNs) {
+    public final void prefetch(long j) {
         Task task;
         RecyclerView recyclerView;
+        long j2;
         RecyclerView recyclerView2;
         Task task2;
+        boolean z;
         int size = this.mRecyclerViews.size();
         int i = 0;
         for (int i2 = 0; i2 < size; i2++) {
@@ -208,7 +224,12 @@ public final class GapWorker implements Runnable {
                     }
                     int[] iArr = layoutPrefetchRegistryImpl.mPrefetchArray;
                     int i6 = iArr[i5 + 1];
-                    task2.immediate = i6 <= abs;
+                    if (i6 <= abs) {
+                        z = true;
+                    } else {
+                        z = false;
+                    }
+                    task2.immediate = z;
                     task2.viewVelocity = abs;
                     task2.distanceToItem = i6;
                     task2.view = recyclerView4;
@@ -219,7 +240,12 @@ public final class GapWorker implements Runnable {
         }
         Collections.sort(this.mTasks, sTaskComparator);
         for (int i7 = 0; i7 < this.mTasks.size() && (recyclerView = (task = this.mTasks.get(i7)).view) != null; i7++) {
-            RecyclerView.ViewHolder prefetchPositionWithDeadline = prefetchPositionWithDeadline(recyclerView, task.position, task.immediate ? RecyclerView.FOREVER_NS : deadlineNs);
+            if (task.immediate) {
+                j2 = RecyclerView.FOREVER_NS;
+            } else {
+                j2 = j;
+            }
+            RecyclerView.ViewHolder prefetchPositionWithDeadline = prefetchPositionWithDeadline(recyclerView, task.position, j2);
             if (!(prefetchPositionWithDeadline == null || prefetchPositionWithDeadline.mNestedRecyclerView == null || !prefetchPositionWithDeadline.isBound() || prefetchPositionWithDeadline.isInvalid() || (recyclerView2 = prefetchPositionWithDeadline.mNestedRecyclerView.get()) == null)) {
                 if (recyclerView2.mDataSetHasChangedAfterLayout && recyclerView2.mChildHelper.getUnfilteredChildCount() != 0) {
                     recyclerView2.removeAndRecycleViews();
@@ -237,7 +263,7 @@ public final class GapWorker implements Runnable {
                         state.mTrackOldChangeHolders = false;
                         state.mIsMeasuring = false;
                         for (int i8 = 0; i8 < layoutPrefetchRegistryImpl2.mCount * 2; i8 += 2) {
-                            prefetchPositionWithDeadline(recyclerView2, layoutPrefetchRegistryImpl2.mPrefetchArray[i8], deadlineNs);
+                            prefetchPositionWithDeadline(recyclerView2, layoutPrefetchRegistryImpl2.mPrefetchArray[i8], j);
                         }
                     } finally {
                         Trace.endSection();
@@ -254,44 +280,8 @@ public final class GapWorker implements Runnable {
         }
     }
 
-    public final RecyclerView.ViewHolder prefetchPositionWithDeadline(RecyclerView view, int position, long deadlineNs) {
-        boolean z;
-        int unfilteredChildCount = view.mChildHelper.getUnfilteredChildCount();
-        int i = 0;
-        while (true) {
-            if (i >= unfilteredChildCount) {
-                z = false;
-                break;
-            }
-            RecyclerView.ViewHolder childViewHolderInt = RecyclerView.getChildViewHolderInt(view.mChildHelper.getUnfilteredChildAt(i));
-            if (childViewHolderInt.mPosition == position && !childViewHolderInt.isInvalid()) {
-                z = true;
-                break;
-            }
-            i++;
-        }
-        if (z) {
-            return null;
-        }
-        RecyclerView.Recycler recycler = view.mRecycler;
-        try {
-            view.onEnterLayoutOrScroll();
-            RecyclerView.ViewHolder tryGetViewHolderForPositionByDeadline = recycler.tryGetViewHolderForPositionByDeadline(position, false, deadlineNs);
-            if (tryGetViewHolderForPositionByDeadline != null) {
-                if (!tryGetViewHolderForPositionByDeadline.isBound() || tryGetViewHolderForPositionByDeadline.isInvalid()) {
-                    recycler.addViewHolderToRecycledViewPool(tryGetViewHolderForPositionByDeadline, false);
-                } else {
-                    recycler.recycleView(tryGetViewHolderForPositionByDeadline.itemView);
-                }
-            }
-            return tryGetViewHolderForPositionByDeadline;
-        } finally {
-            view.onExitLayoutOrScroll(false);
-        }
-    }
-
     @Override // java.lang.Runnable
-    public void run() {
+    public final void run() {
         try {
             Trace.beginSection(RecyclerView.TRACE_PREFETCH_TAG);
             if (!this.mRecyclerViews.isEmpty()) {
@@ -311,5 +301,15 @@ public final class GapWorker implements Runnable {
             this.mPostTimeNs = 0L;
             Trace.endSection();
         }
+    }
+
+    public final void postFromTraversal(RecyclerView recyclerView, int i, int i2) {
+        if (recyclerView.isAttachedToWindow() && this.mPostTimeNs == 0) {
+            this.mPostTimeNs = recyclerView.getNanoTime();
+            recyclerView.post(this);
+        }
+        LayoutPrefetchRegistryImpl layoutPrefetchRegistryImpl = recyclerView.mPrefetchRegistry;
+        layoutPrefetchRegistryImpl.mPrefetchDx = i;
+        layoutPrefetchRegistryImpl.mPrefetchDy = i2;
     }
 }

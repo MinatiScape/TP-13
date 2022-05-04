@@ -1,7 +1,10 @@
 package androidx.core.math;
 /* loaded from: classes.dex */
-public class MathUtils {
-    public static int clamp(int value, int min, int max) {
-        return value < min ? min : value > max ? max : value;
+public final class MathUtils {
+    public static final int[] zza = new int[0];
+    public static final byte[] zzh = new byte[0];
+
+    public static int clamp(int i, int i2, int i3) {
+        return i < i2 ? i2 : i > i3 ? i3 : i;
     }
 }

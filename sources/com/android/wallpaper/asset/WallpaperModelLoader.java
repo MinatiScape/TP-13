@@ -12,7 +12,7 @@ import com.bumptech.glide.load.model.ModelLoaderFactory;
 import com.bumptech.glide.load.model.MultiModelLoaderFactory;
 import com.bumptech.glide.signature.ObjectKey;
 /* loaded from: classes.dex */
-public class WallpaperModelLoader implements ModelLoader<WallpaperModel, Drawable> {
+public final class WallpaperModelLoader implements ModelLoader<WallpaperModel, Drawable> {
 
     /* loaded from: classes.dex */
     public static class WallpaperFetcher implements DataFetcher<Drawable> {
@@ -20,32 +20,16 @@ public class WallpaperModelLoader implements ModelLoader<WallpaperModel, Drawabl
         public WallpaperModel mWallpaperModel;
         public int mWidth;
 
-        public WallpaperFetcher(WallpaperModel wallpaperModel, int i, int i2) {
-            this.mWallpaperModel = wallpaperModel;
-            this.mWidth = i;
-            this.mHeight = i2;
+        @Override // com.bumptech.glide.load.data.DataFetcher
+        public final void cancel() {
         }
 
         @Override // com.bumptech.glide.load.data.DataFetcher
-        public void cancel() {
+        public final void cleanup() {
         }
 
         @Override // com.bumptech.glide.load.data.DataFetcher
-        public void cleanup() {
-        }
-
-        @Override // com.bumptech.glide.load.data.DataFetcher
-        public Class<Drawable> getDataClass() {
-            return Drawable.class;
-        }
-
-        @Override // com.bumptech.glide.load.data.DataFetcher
-        public DataSource getDataSource() {
-            return DataSource.LOCAL;
-        }
-
-        @Override // com.bumptech.glide.load.data.DataFetcher
-        public void loadData(Priority priority, DataFetcher.DataCallback<? super Drawable> dataCallback) {
+        public final void loadData(Priority priority, DataFetcher.DataCallback<? super Drawable> dataCallback) {
             Drawable drawable;
             WallpaperModel wallpaperModel = this.mWallpaperModel;
             int i = this.mWidth;
@@ -60,18 +44,34 @@ public class WallpaperModelLoader implements ModelLoader<WallpaperModel, Drawabl
             }
             dataCallback.onDataReady(drawable);
         }
+
+        public WallpaperFetcher(WallpaperModel wallpaperModel, int i, int i2) {
+            this.mWallpaperModel = wallpaperModel;
+            this.mWidth = i;
+            this.mHeight = i2;
+        }
+
+        @Override // com.bumptech.glide.load.data.DataFetcher
+        public final Class<Drawable> getDataClass() {
+            return Drawable.class;
+        }
+
+        @Override // com.bumptech.glide.load.data.DataFetcher
+        public final DataSource getDataSource() {
+            return DataSource.LOCAL;
+        }
     }
 
     /* loaded from: classes.dex */
     public static class WallpaperModelLoaderFactory implements ModelLoaderFactory<WallpaperModel, Drawable> {
         @Override // com.bumptech.glide.load.model.ModelLoaderFactory
-        public ModelLoader<WallpaperModel, Drawable> build(MultiModelLoaderFactory multiModelLoaderFactory) {
+        public final ModelLoader<WallpaperModel, Drawable> build(MultiModelLoaderFactory multiModelLoaderFactory) {
             return new WallpaperModelLoader();
         }
     }
 
     @Override // com.bumptech.glide.load.model.ModelLoader
-    public ModelLoader.LoadData<Drawable> buildLoadData(WallpaperModel wallpaperModel, int i, int i2, Options options) {
+    public final ModelLoader.LoadData<Drawable> buildLoadData(WallpaperModel wallpaperModel, int i, int i2, Options options) {
         WallpaperModel wallpaperModel2 = wallpaperModel;
         if (wallpaperModel2.mWallpaperSource != 0) {
             StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Invalid wallpaper data source: ");
@@ -82,7 +82,7 @@ public class WallpaperModelLoader implements ModelLoader<WallpaperModel, Drawabl
     }
 
     @Override // com.bumptech.glide.load.model.ModelLoader
-    public /* bridge */ /* synthetic */ boolean handles(WallpaperModel wallpaperModel) {
+    public final /* bridge */ /* synthetic */ boolean handles(WallpaperModel wallpaperModel) {
         return true;
     }
 }

@@ -1,20 +1,21 @@
 package kotlinx.coroutines.internal;
 
-import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
-import kotlin.TypeCastException;
 import kotlin.jvm.internal.Intrinsics;
-import kotlinx.coroutines.DebugKt;
+import kotlinx.atomicfu.AtomicFU;
+import kotlinx.atomicfu.AtomicRef;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: LockFreeLinkedList.kt */
 /* loaded from: classes.dex */
 public class LockFreeLinkedListNode {
-    public static final AtomicReferenceFieldUpdater _next$FU = AtomicReferenceFieldUpdater.newUpdater(LockFreeLinkedListNode.class, Object.class, "_next");
-    public static final AtomicReferenceFieldUpdater _prev$FU = AtomicReferenceFieldUpdater.newUpdater(LockFreeLinkedListNode.class, Object.class, "_prev");
-    public static final AtomicReferenceFieldUpdater _removedRef$FU = AtomicReferenceFieldUpdater.newUpdater(LockFreeLinkedListNode.class, Object.class, "_removedRef");
-    public volatile Object _next = this;
-    public volatile Object _prev = this;
-    public volatile Object _removedRef = null;
+    @NotNull
+    public final AtomicRef<Object> _next = AtomicFU.atomic(this);
+    @NotNull
+    public final AtomicRef<LockFreeLinkedListNode> _prev = AtomicFU.atomic(this);
+    @NotNull
+    public final AtomicRef<Removed> _removedRef = AtomicFU.atomic(null);
 
+    /* compiled from: LockFreeLinkedList.kt */
     /* loaded from: classes.dex */
     public static abstract class CondAddOp extends AtomicOp<LockFreeLinkedListNode> {
         @NotNull
@@ -22,94 +23,103 @@ public class LockFreeLinkedListNode {
         @Nullable
         public LockFreeLinkedListNode oldNext;
 
-        public CondAddOp(@NotNull LockFreeLinkedListNode newNode) {
-            Intrinsics.checkParameterIsNotNull(newNode, "newNode");
-            this.newNode = newNode;
-        }
-
-        @Override // kotlinx.coroutines.internal.AtomicOp
-        public void complete(LockFreeLinkedListNode lockFreeLinkedListNode, Object obj) {
-            LockFreeLinkedListNode affected = lockFreeLinkedListNode;
-            Intrinsics.checkParameterIsNotNull(affected, "affected");
-            boolean z = obj == null;
-            LockFreeLinkedListNode lockFreeLinkedListNode2 = z ? this.newNode : this.oldNext;
-            if (lockFreeLinkedListNode2 != null && LockFreeLinkedListNode._next$FU.compareAndSet(affected, this, lockFreeLinkedListNode2) && z) {
-                LockFreeLinkedListNode lockFreeLinkedListNode3 = this.newNode;
-                LockFreeLinkedListNode lockFreeLinkedListNode4 = this.oldNext;
-                if (lockFreeLinkedListNode4 != null) {
-                    lockFreeLinkedListNode3.finishAdd(lockFreeLinkedListNode4);
-                } else {
-                    Intrinsics.throwNpe();
-                    throw null;
-                }
-            }
+        public CondAddOp(@NotNull LockFreeLinkedListNode lockFreeLinkedListNode) {
+            this.newNode = lockFreeLinkedListNode;
         }
     }
 
-    public final LockFreeLinkedListNode correctPrev(LockFreeLinkedListNode lockFreeLinkedListNode, OpDescriptor opDescriptor) {
-        Object obj;
-        while (true) {
-            LockFreeLinkedListNode lockFreeLinkedListNode2 = null;
-            while (true) {
-                obj = lockFreeLinkedListNode._next;
-                if (obj == null) {
-                    return lockFreeLinkedListNode;
-                }
-                if (obj instanceof OpDescriptor) {
-                    ((OpDescriptor) obj).perform(lockFreeLinkedListNode);
-                } else if (!(obj instanceof Removed)) {
-                    Object obj2 = this._prev;
-                    if (obj2 instanceof Removed) {
-                        return null;
-                    }
-                    if (obj != this) {
-                        if (obj != null) {
-                            lockFreeLinkedListNode2 = lockFreeLinkedListNode;
-                            lockFreeLinkedListNode = (LockFreeLinkedListNode) obj;
-                        } else {
-                            throw new TypeCastException("null cannot be cast to non-null type kotlinx.coroutines.internal.Node /* = kotlinx.coroutines.internal.LockFreeLinkedListNode */");
-                        }
-                    } else if (obj2 == lockFreeLinkedListNode) {
-                        return null;
-                    } else {
-                        if (_prev$FU.compareAndSet(this, obj2, lockFreeLinkedListNode) && !(lockFreeLinkedListNode._prev instanceof Removed)) {
-                            return null;
-                        }
-                    }
-                } else if (lockFreeLinkedListNode2 != null) {
-                    break;
-                } else {
-                    lockFreeLinkedListNode = LockFreeLinkedListKt.unwrap(lockFreeLinkedListNode._prev);
-                }
-            }
-            lockFreeLinkedListNode.markPrev();
-            _next$FU.compareAndSet(lockFreeLinkedListNode2, lockFreeLinkedListNode, ((Removed) obj).ref);
-            lockFreeLinkedListNode = lockFreeLinkedListNode2;
-        }
+    /* JADX WARN: Code restructure failed: missing block: B:23:0x0040, code lost:
+        if (r3._next.compareAndSet(r2, ((kotlinx.coroutines.internal.Removed) r4).ref) != false) goto L24;
+     */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+        To view partially-correct add '--show-bad-code' argument
+    */
+    public final kotlinx.coroutines.internal.LockFreeLinkedListNode correctPrev() {
+        /*
+            r7 = this;
+        L0:
+            kotlinx.atomicfu.AtomicRef<kotlinx.coroutines.internal.LockFreeLinkedListNode> r0 = r7._prev
+            T r0 = r0.value
+            kotlinx.coroutines.internal.LockFreeLinkedListNode r0 = (kotlinx.coroutines.internal.LockFreeLinkedListNode) r0
+            r1 = 0
+            r2 = r0
+        L8:
+            r3 = r1
+        L9:
+            kotlinx.atomicfu.AtomicRef<java.lang.Object> r4 = r2._next
+            T r4 = r4.value
+            if (r4 != r7) goto L1c
+            if (r0 != r2) goto L12
+            return r2
+        L12:
+            kotlinx.atomicfu.AtomicRef<kotlinx.coroutines.internal.LockFreeLinkedListNode> r1 = r7._prev
+            boolean r0 = r1.compareAndSet(r0, r2)
+            if (r0 != 0) goto L1b
+            goto L0
+        L1b:
+            return r2
+        L1c:
+            boolean r5 = r7.isRemoved()
+            if (r5 == 0) goto L23
+            return r1
+        L23:
+            if (r4 != 0) goto L26
+            return r2
+        L26:
+            boolean r5 = r4 instanceof kotlinx.coroutines.internal.OpDescriptor
+            if (r5 == 0) goto L30
+            kotlinx.coroutines.internal.OpDescriptor r4 = (kotlinx.coroutines.internal.OpDescriptor) r4
+            r4.perform(r2)
+            goto L0
+        L30:
+            boolean r5 = r4 instanceof kotlinx.coroutines.internal.Removed
+            if (r5 == 0) goto L4c
+            if (r3 == 0) goto L45
+            kotlinx.atomicfu.AtomicRef<java.lang.Object> r5 = r3._next
+            kotlinx.coroutines.internal.Removed r4 = (kotlinx.coroutines.internal.Removed) r4
+            kotlinx.coroutines.internal.LockFreeLinkedListNode r4 = r4.ref
+            boolean r2 = r5.compareAndSet(r2, r4)
+            if (r2 != 0) goto L43
+            goto L0
+        L43:
+            r2 = r3
+            goto L8
+        L45:
+            kotlinx.atomicfu.AtomicRef<kotlinx.coroutines.internal.LockFreeLinkedListNode> r2 = r2._prev
+            T r2 = r2.value
+            kotlinx.coroutines.internal.LockFreeLinkedListNode r2 = (kotlinx.coroutines.internal.LockFreeLinkedListNode) r2
+            goto L9
+        L4c:
+            r3 = r4
+            kotlinx.coroutines.internal.LockFreeLinkedListNode r3 = (kotlinx.coroutines.internal.LockFreeLinkedListNode) r3
+            r6 = r3
+            r3 = r2
+            r2 = r6
+            goto L9
+        */
+        throw new UnsupportedOperationException("Method not decompiled: kotlinx.coroutines.internal.LockFreeLinkedListNode.correctPrev():kotlinx.coroutines.internal.LockFreeLinkedListNode");
     }
 
     public final void finishAdd(LockFreeLinkedListNode lockFreeLinkedListNode) {
-        Object obj;
+        LockFreeLinkedListNode lockFreeLinkedListNode2;
+        AtomicRef<LockFreeLinkedListNode> atomicRef = lockFreeLinkedListNode._prev;
         do {
-            obj = lockFreeLinkedListNode._prev;
-            if ((obj instanceof Removed) || getNext() != lockFreeLinkedListNode) {
+            lockFreeLinkedListNode2 = atomicRef.value;
+            if (getNext() != lockFreeLinkedListNode) {
                 return;
             }
-        } while (!_prev$FU.compareAndSet(lockFreeLinkedListNode, obj, this));
-        if (!(getNext() instanceof Removed)) {
-            return;
+        } while (!lockFreeLinkedListNode._prev.compareAndSet(lockFreeLinkedListNode2, this));
+        if (isRemoved()) {
+            lockFreeLinkedListNode.correctPrev();
         }
-        if (obj != null) {
-            lockFreeLinkedListNode.correctPrev((LockFreeLinkedListNode) obj, null);
-            return;
-        }
-        throw new TypeCastException("null cannot be cast to non-null type kotlinx.coroutines.internal.Node /* = kotlinx.coroutines.internal.LockFreeLinkedListNode */");
     }
 
     @NotNull
     public final Object getNext() {
+        AtomicRef<Object> atomicRef = this._next;
         while (true) {
-            Object obj = this._next;
+            Object obj = atomicRef.value;
             if (!(obj instanceof OpDescriptor)) {
                 return obj;
             }
@@ -118,60 +128,48 @@ public class LockFreeLinkedListNode {
     }
 
     @NotNull
-    public final LockFreeLinkedListNode getNextNode() {
-        return LockFreeLinkedListKt.unwrap(getNext());
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append((Object) getClass().getSimpleName());
+        sb.append('@');
+        sb.append((Object) Integer.toHexString(System.identityHashCode(this)));
+        return sb.toString();
     }
 
     @NotNull
-    public final Object getPrev() {
-        while (true) {
-            Object obj = this._prev;
-            if (obj instanceof Removed) {
-                return obj;
-            }
-            if (obj != null) {
-                LockFreeLinkedListNode lockFreeLinkedListNode = (LockFreeLinkedListNode) obj;
-                if (lockFreeLinkedListNode.getNext() == this) {
-                    return obj;
-                }
-                correctPrev(lockFreeLinkedListNode, null);
-            } else {
-                throw new TypeCastException("null cannot be cast to non-null type kotlinx.coroutines.internal.Node /* = kotlinx.coroutines.internal.LockFreeLinkedListNode */");
+    public final LockFreeLinkedListNode getNextNode() {
+        Removed removed;
+        Object next = getNext();
+        Symbol symbol = LockFreeLinkedListKt.CONDITION_FALSE;
+        Intrinsics.checkNotNullParameter(next, "<this>");
+        LockFreeLinkedListNode lockFreeLinkedListNode = null;
+        if (next instanceof Removed) {
+            removed = (Removed) next;
+        } else {
+            removed = null;
+        }
+        if (removed != null) {
+            lockFreeLinkedListNode = removed.ref;
+        }
+        if (lockFreeLinkedListNode == null) {
+            return (LockFreeLinkedListNode) next;
+        }
+        return lockFreeLinkedListNode;
+    }
+
+    @NotNull
+    public final LockFreeLinkedListNode getPrevNode() {
+        LockFreeLinkedListNode correctPrev = correctPrev();
+        if (correctPrev == null) {
+            correctPrev = this._prev.value;
+            while (correctPrev.isRemoved()) {
+                correctPrev = correctPrev._prev.value;
             }
         }
+        return correctPrev;
     }
 
-    public final LockFreeLinkedListNode markPrev() {
-        Object obj;
-        LockFreeLinkedListNode lockFreeLinkedListNode;
-        Removed removed;
-        do {
-            obj = this._prev;
-            if (obj instanceof Removed) {
-                return ((Removed) obj).ref;
-            }
-            if (obj == this) {
-                lockFreeLinkedListNode = this;
-                while (!(lockFreeLinkedListNode instanceof LockFreeLinkedListHead)) {
-                    lockFreeLinkedListNode = lockFreeLinkedListNode.getNextNode();
-                    boolean z = DebugKt.DEBUG;
-                }
-            } else if (obj != null) {
-                lockFreeLinkedListNode = (LockFreeLinkedListNode) obj;
-            } else {
-                throw new TypeCastException("null cannot be cast to non-null type kotlinx.coroutines.internal.Node /* = kotlinx.coroutines.internal.LockFreeLinkedListNode */");
-            }
-            removed = (Removed) lockFreeLinkedListNode._removedRef;
-            if (removed == null) {
-                removed = new Removed(lockFreeLinkedListNode);
-                _removedRef$FU.lazySet(lockFreeLinkedListNode, removed);
-            }
-        } while (!_prev$FU.compareAndSet(this, obj, removed));
-        return (LockFreeLinkedListNode) obj;
-    }
-
-    @NotNull
-    public String toString() {
-        return getClass().getSimpleName() + '@' + Integer.toHexString(System.identityHashCode(this));
+    public boolean isRemoved() {
+        return getNext() instanceof Removed;
     }
 }

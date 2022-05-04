@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.internal.zzbkw;
+/* compiled from: ResolveAccountRequestCreator.java */
 /* loaded from: classes.dex */
 public final class zzaw implements Parcelable.Creator<zzav> {
     @Override // android.os.Parcelable.Creator

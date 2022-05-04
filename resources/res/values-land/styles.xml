@@ -10,4 +10,7 @@
         <item name="android:ellipsize">end</item>
         <item name="android:maxLines">@integer/mtrl_calendar_selection_text_lines</item>
     </style>
+    <style name="Widget_MaterialComponents_MaterialCalendar_HeaderToggleButton" parent="@style/Base_Widget_MaterialComponents_MaterialCalendar_HeaderToggleButton">
+        <item name="android:layout_gravity">0x800053</item>
+    </style>
 </resources>

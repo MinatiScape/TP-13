@@ -1,6 +1,7 @@
 package androidx.fragment.app;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -9,20 +10,16 @@ import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
-import android.support.v4.app.FragmentTabHost$SavedState$$ExternalSyntheticOutline0;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.activity.Cancellable;
+import androidx.activity.ComponentActivity;
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.OnBackPressedDispatcher;
 import androidx.activity.OnBackPressedDispatcherOwner;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.ActivityResultRegistry;
 import androidx.activity.result.ActivityResultRegistryOwner;
 import androidx.activity.result.IntentSenderRequest;
@@ -31,18 +28,17 @@ import androidx.appcompat.view.SupportMenuInflater$$ExternalSyntheticOutline0;
 import androidx.collection.ArrayMap;
 import androidx.concurrent.futures.AbstractResolvableFuture$$ExternalSyntheticOutline0;
 import androidx.core.content.ContextCompat;
-import androidx.core.os.CancellationSignal;
+import androidx.exifinterface.media.ExifInterface$$ExternalSyntheticOutline0;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManagerViewModel;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.fragment.app.FragmentTransition;
+import androidx.fragment.app.strictmode.FragmentStrictMode;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStore;
 import androidx.lifecycle.ViewModelStoreOwner;
+import androidx.savedstate.SavedStateRegistry;
+import androidx.savedstate.SavedStateRegistryOwner;
 import com.android.systemui.shared.R;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -54,8 +50,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 /* loaded from: classes.dex */
@@ -71,11 +65,10 @@ public abstract class FragmentManager {
     public FragmentManagerViewModel mNonConfig;
     public OnBackPressedDispatcher mOnBackPressedDispatcher;
     public Fragment mParent;
-    public ArrayList<StartEnterTransitionListener> mPostponedTransactions;
     public Fragment mPrimaryNav;
-    public ActivityResultLauncher<String[]> mRequestPermissions;
-    public ActivityResultLauncher<Intent> mStartActivityForResult;
-    public ActivityResultLauncher<IntentSenderRequest> mStartIntentSenderForResult;
+    public ActivityResultRegistry.AnonymousClass3 mRequestPermissions;
+    public ActivityResultRegistry.AnonymousClass3 mStartActivityForResult;
+    public ActivityResultRegistry.AnonymousClass3 mStartIntentSenderForResult;
     public boolean mStateSaved;
     public boolean mStopped;
     public ArrayList<Fragment> mTmpAddedFragments;
@@ -84,32 +77,29 @@ public abstract class FragmentManager {
     public final ArrayList<OpGenerator> mPendingActions = new ArrayList<>();
     public final FragmentStore mFragmentStore = new FragmentStore();
     public final FragmentLayoutInflaterFactory mLayoutInflaterFactory = new FragmentLayoutInflaterFactory(this);
-    public final OnBackPressedCallback mOnBackPressedCallback = new OnBackPressedCallback(false) { // from class: androidx.fragment.app.FragmentManager.1
+    public final AnonymousClass1 mOnBackPressedCallback = new OnBackPressedCallback() { // from class: androidx.fragment.app.FragmentManager.1
         @Override // androidx.activity.OnBackPressedCallback
-        public void handleOnBackPressed() {
+        public final void handleOnBackPressed() {
             FragmentManager fragmentManager = FragmentManager.this;
             fragmentManager.execPendingActions(true);
             if (fragmentManager.mOnBackPressedCallback.mEnabled) {
-                fragmentManager.popBackStackImmediate();
+                fragmentManager.popBackStackImmediate$1();
             } else {
                 fragmentManager.mOnBackPressedDispatcher.onBackPressed();
             }
         }
     };
     public final AtomicInteger mBackStackIndex = new AtomicInteger();
+    public final Map<String, BackStackState> mBackStackStates = Collections.synchronizedMap(new HashMap());
     public final Map<String, Bundle> mResults = Collections.synchronizedMap(new HashMap());
-    public final Map<String, ?> mResultListeners = Collections.synchronizedMap(new HashMap());
-    public Map<Fragment, HashSet<CancellationSignal>> mExitAnimationCancellationSignals = Collections.synchronizedMap(new HashMap());
-    public final FragmentTransition.Callback mFragmentTransitionCallback = new AnonymousClass2();
+    public final Map<String, Object> mResultListeners = Collections.synchronizedMap(new HashMap());
     public final FragmentLifecycleCallbacksDispatcher mLifecycleCallbacksDispatcher = new FragmentLifecycleCallbacksDispatcher(this);
     public final CopyOnWriteArrayList<FragmentOnAttachListener> mOnAttachListeners = new CopyOnWriteArrayList<>();
     public int mCurState = -1;
-    public FragmentFactory mHostFragmentFactory = new FragmentFactory() { // from class: androidx.fragment.app.FragmentManager.3
+    public AnonymousClass2 mHostFragmentFactory = new FragmentFactory() { // from class: androidx.fragment.app.FragmentManager.2
         @Override // androidx.fragment.app.FragmentFactory
-        public Fragment instantiate(ClassLoader classLoader, String str) {
-            FragmentHostCallback<?> fragmentHostCallback = FragmentManager.this.mHost;
-            Context context = fragmentHostCallback.mContext;
-            Objects.requireNonNull(fragmentHostCallback);
+        public final Fragment instantiate(String str) {
+            Context context = FragmentManager.this.mHost.mContext;
             Object obj = Fragment.USE_DEFAULT_TRANSITION;
             try {
                 return FragmentFactory.loadFragmentClass(context.getClassLoader(), str).getConstructor(new Class[0]).newInstance(new Object[0]);
@@ -124,54 +114,21 @@ public abstract class FragmentManager {
             }
         }
     };
-    public SpecialEffectsControllerFactory mDefaultSpecialEffectsControllerFactory = new SpecialEffectsControllerFactory(this) { // from class: androidx.fragment.app.FragmentManager.4
+    public AnonymousClass3 mDefaultSpecialEffectsControllerFactory = new SpecialEffectsControllerFactory() { // from class: androidx.fragment.app.FragmentManager.3
     };
     public ArrayDeque<LaunchedFragmentInfo> mLaunchedFragments = new ArrayDeque<>();
-    public Runnable mExecCommit = new Runnable() { // from class: androidx.fragment.app.FragmentManager.5
+    public AnonymousClass4 mExecCommit = new Runnable() { // from class: androidx.fragment.app.FragmentManager.4
         @Override // java.lang.Runnable
-        public void run() {
+        public final void run() {
             FragmentManager.this.execPendingActions(true);
         }
     };
 
-    /* renamed from: androidx.fragment.app.FragmentManager$2  reason: invalid class name */
+    /* renamed from: androidx.fragment.app.FragmentManager$5  reason: invalid class name */
     /* loaded from: classes.dex */
-    public class AnonymousClass2 implements FragmentTransition.Callback {
-        public AnonymousClass2() {
-        }
-
-        public void onComplete(Fragment fragment, CancellationSignal cancellationSignal) {
-            boolean z;
-            synchronized (cancellationSignal) {
-                z = cancellationSignal.mIsCanceled;
-            }
-            if (!z) {
-                FragmentManager fragmentManager = FragmentManager.this;
-                HashSet<CancellationSignal> hashSet = fragmentManager.mExitAnimationCancellationSignals.get(fragment);
-                if (hashSet != null && hashSet.remove(cancellationSignal) && hashSet.isEmpty()) {
-                    fragmentManager.mExitAnimationCancellationSignals.remove(fragment);
-                    if (fragment.mState < 5) {
-                        fragmentManager.destroyFragmentView(fragment);
-                        fragmentManager.moveToState(fragment, fragmentManager.mCurState);
-                    }
-                }
-            }
-        }
-
-        public void onStart(Fragment fragment, CancellationSignal cancellationSignal) {
-            FragmentManager fragmentManager = FragmentManager.this;
-            if (fragmentManager.mExitAnimationCancellationSignals.get(fragment) == null) {
-                fragmentManager.mExitAnimationCancellationSignals.put(fragment, new HashSet<>());
-            }
-            fragmentManager.mExitAnimationCancellationSignals.get(fragment).add(cancellationSignal);
-        }
-    }
-
-    /* renamed from: androidx.fragment.app.FragmentManager$6  reason: invalid class name */
-    /* loaded from: classes.dex */
-    public class AnonymousClass6 implements LifecycleEventObserver {
+    class AnonymousClass5 implements LifecycleEventObserver {
         @Override // androidx.lifecycle.LifecycleEventObserver
-        public void onStateChanged(LifecycleOwner lifecycleOwner, Lifecycle.Event event) {
+        public final void onStateChanged(LifecycleOwner lifecycleOwner, Lifecycle.Event event) {
             if (event == Lifecycle.Event.ON_START) {
                 throw null;
             } else if (event == Lifecycle.Event.ON_DESTROY) {
@@ -183,19 +140,19 @@ public abstract class FragmentManager {
     /* loaded from: classes.dex */
     public static class FragmentIntentSenderContract extends ActivityResultContract<IntentSenderRequest, ActivityResult> {
         @Override // androidx.activity.result.contract.ActivityResultContract
-        public Intent createIntent(Context context, IntentSenderRequest intentSenderRequest) {
+        public final Intent createIntent(Parcelable parcelable) {
             Bundle bundleExtra;
-            IntentSenderRequest intentSenderRequest2 = intentSenderRequest;
+            IntentSenderRequest intentSenderRequest = (IntentSenderRequest) parcelable;
             Intent intent = new Intent("androidx.activity.result.contract.action.INTENT_SENDER_REQUEST");
-            Intent intent2 = intentSenderRequest2.mFillInIntent;
+            Intent intent2 = intentSenderRequest.mFillInIntent;
             if (!(intent2 == null || (bundleExtra = intent2.getBundleExtra("androidx.activity.result.contract.extra.ACTIVITY_OPTIONS_BUNDLE")) == null)) {
                 intent.putExtra("androidx.activity.result.contract.extra.ACTIVITY_OPTIONS_BUNDLE", bundleExtra);
                 intent2.removeExtra("androidx.activity.result.contract.extra.ACTIVITY_OPTIONS_BUNDLE");
                 if (intent2.getBooleanExtra("androidx.fragment.extra.ACTIVITY_OPTIONS_BUNDLE", false)) {
-                    intentSenderRequest2 = new IntentSenderRequest(intentSenderRequest2.mIntentSender, null, intentSenderRequest2.mFlagsMask, intentSenderRequest2.mFlagsValues);
+                    intentSenderRequest = new IntentSenderRequest(intentSenderRequest.mIntentSender, null, intentSenderRequest.mFlagsMask, intentSenderRequest.mFlagsValues);
                 }
             }
-            intent.putExtra("androidx.activity.result.contract.extra.INTENT_SENDER_REQUEST", intentSenderRequest2);
+            intent.putExtra("androidx.activity.result.contract.extra.INTENT_SENDER_REQUEST", intentSenderRequest);
             if (FragmentManager.isLoggingEnabled(2)) {
                 Log.v("FragmentManager", "CreateIntent created the following intent: " + intent);
             }
@@ -203,8 +160,47 @@ public abstract class FragmentManager {
         }
 
         @Override // androidx.activity.result.contract.ActivityResultContract
-        public ActivityResult parseResult(int i, Intent intent) {
+        public final ActivityResult parseResult(int i, Intent intent) {
             return new ActivityResult(i, intent);
+        }
+    }
+
+    @SuppressLint({"BanParcelableUsage"})
+    /* loaded from: classes.dex */
+    public static class LaunchedFragmentInfo implements Parcelable {
+        public static final Parcelable.Creator<LaunchedFragmentInfo> CREATOR = new Parcelable.Creator<LaunchedFragmentInfo>() { // from class: androidx.fragment.app.FragmentManager.LaunchedFragmentInfo.1
+            @Override // android.os.Parcelable.Creator
+            public final LaunchedFragmentInfo createFromParcel(Parcel parcel) {
+                return new LaunchedFragmentInfo(parcel);
+            }
+
+            @Override // android.os.Parcelable.Creator
+            public final LaunchedFragmentInfo[] newArray(int i) {
+                return new LaunchedFragmentInfo[i];
+            }
+        };
+        public int mRequestCode;
+        public String mWho;
+
+        public LaunchedFragmentInfo(String str) {
+            this.mWho = str;
+            this.mRequestCode = 1;
+        }
+
+        @Override // android.os.Parcelable
+        public final int describeContents() {
+            return 0;
+        }
+
+        @Override // android.os.Parcelable
+        public final void writeToParcel(Parcel parcel, int i) {
+            parcel.writeString(this.mWho);
+            parcel.writeInt(this.mRequestCode);
+        }
+
+        public LaunchedFragmentInfo(Parcel parcel) {
+            this.mWho = parcel.readString();
+            this.mRequestCode = parcel.readInt();
         }
     }
 
@@ -218,42 +214,310 @@ public abstract class FragmentManager {
         public final int mFlags;
         public final int mId;
 
-        public PopBackStackState(String str, int i, int i2) {
+        public PopBackStackState(int i, int i2) {
             this.mId = i;
             this.mFlags = i2;
         }
 
         @Override // androidx.fragment.app.FragmentManager.OpGenerator
-        public boolean generateOps(ArrayList<BackStackRecord> arrayList, ArrayList<Boolean> arrayList2) {
+        public final boolean generateOps(ArrayList<BackStackRecord> arrayList, ArrayList<Boolean> arrayList2) {
             Fragment fragment = FragmentManager.this.mPrimaryNav;
-            if (fragment == null || this.mId >= 0 || !fragment.getChildFragmentManager().popBackStackImmediate()) {
-                return FragmentManager.this.popBackStackState(arrayList, arrayList2, null, this.mId, this.mFlags);
+            if (fragment == null || this.mId >= 0 || !fragment.getChildFragmentManager().popBackStackImmediate$1()) {
+                return FragmentManager.this.popBackStackState(arrayList, arrayList2, this.mId, this.mFlags);
             }
             return false;
         }
     }
 
-    /* loaded from: classes.dex */
-    public static class StartEnterTransitionListener implements Fragment.OnStartEnterTransitionListener {
-        public final boolean mIsBack;
-        public int mNumPostponed;
-        public final BackStackRecord mRecord;
+    public static boolean isParentMenuVisible(Fragment fragment) {
+        if (fragment == null) {
+            return true;
+        }
+        return fragment.mMenuVisible && (fragment.mFragmentManager == null || isParentMenuVisible(fragment.mParentFragment));
+    }
 
-        public void completeTransaction() {
-            boolean z = this.mNumPostponed > 0;
-            for (Fragment fragment : this.mRecord.mManager.mFragmentStore.getFragments()) {
-                fragment.setOnStartEnterTransitionListener(null);
+    public static boolean isPrimaryNavigation(Fragment fragment) {
+        if (fragment == null) {
+            return true;
+        }
+        FragmentManager fragmentManager = fragment.mFragmentManager;
+        return fragment.equals(fragmentManager.mPrimaryNav) && isPrimaryNavigation(fragmentManager.mParent);
+    }
+
+    public static void showFragment(Fragment fragment) {
+        if (isLoggingEnabled(2)) {
+            Log.v("FragmentManager", "show: " + fragment);
+        }
+        if (fragment.mHidden) {
+            fragment.mHidden = false;
+            fragment.mHiddenChanged = !fragment.mHiddenChanged;
+        }
+    }
+
+    public final void attachFragment(Fragment fragment) {
+        if (isLoggingEnabled(2)) {
+            Log.v("FragmentManager", "attach: " + fragment);
+        }
+        if (fragment.mDetached) {
+            fragment.mDetached = false;
+            if (!fragment.mAdded) {
+                this.mFragmentStore.addFragment(fragment);
+                if (isLoggingEnabled(2)) {
+                    Log.v("FragmentManager", "add from attach: " + fragment);
+                }
+                if (isMenuAvailable(fragment)) {
+                    this.mNeedMenuInvalidate = true;
+                }
             }
-            BackStackRecord backStackRecord = this.mRecord;
-            backStackRecord.mManager.completeExecute(backStackRecord, this.mIsBack, !z, true);
+        }
+    }
+
+    public final void cleanupExec() {
+        this.mExecutingActions = false;
+        this.mTmpIsPop.clear();
+        this.mTmpRecords.clear();
+    }
+
+    public final void detachFragment(Fragment fragment) {
+        if (isLoggingEnabled(2)) {
+            Log.v("FragmentManager", "detach: " + fragment);
+        }
+        if (!fragment.mDetached) {
+            fragment.mDetached = true;
+            if (fragment.mAdded) {
+                if (isLoggingEnabled(2)) {
+                    Log.v("FragmentManager", "remove from detach: " + fragment);
+                }
+                FragmentStore fragmentStore = this.mFragmentStore;
+                synchronized (fragmentStore.mAdded) {
+                    fragmentStore.mAdded.remove(fragment);
+                }
+                fragment.mAdded = false;
+                if (isMenuAvailable(fragment)) {
+                    this.mNeedMenuInvalidate = true;
+                }
+                setVisibleRemovingFragment(fragment);
+            }
+        }
+    }
+
+    public final void dispatchDestroy() {
+        boolean z = true;
+        this.mDestroyed = true;
+        execPendingActions(true);
+        Iterator it = collectAllSpecialEffectsController().iterator();
+        while (it.hasNext()) {
+            ((SpecialEffectsController) it.next()).forceCompleteAllOperations();
+        }
+        FragmentHostCallback<?> fragmentHostCallback = this.mHost;
+        if (fragmentHostCallback instanceof ViewModelStoreOwner) {
+            z = this.mFragmentStore.mNonConfig.mHasBeenCleared;
+        } else {
+            Context context = fragmentHostCallback.mContext;
+            if (context instanceof Activity) {
+                z = true ^ ((Activity) context).isChangingConfigurations();
+            }
+        }
+        if (z) {
+            for (BackStackState backStackState : this.mBackStackStates.values()) {
+                for (String str : backStackState.mFragments) {
+                    FragmentManagerViewModel fragmentManagerViewModel = this.mFragmentStore.mNonConfig;
+                    fragmentManagerViewModel.getClass();
+                    if (isLoggingEnabled(3)) {
+                        Log.d("FragmentManager", "Clearing non-config state for saved state of Fragment " + str);
+                    }
+                    fragmentManagerViewModel.clearNonConfigStateInternal(str);
+                }
+            }
+        }
+        dispatchStateChange(-1);
+        this.mHost = null;
+        this.mContainer = null;
+        this.mParent = null;
+        if (this.mOnBackPressedDispatcher != null) {
+            Iterator<Cancellable> it2 = this.mOnBackPressedCallback.mCancellables.iterator();
+            while (it2.hasNext()) {
+                it2.next().cancel();
+            }
+            this.mOnBackPressedDispatcher = null;
+        }
+        ActivityResultRegistry.AnonymousClass3 r0 = this.mStartActivityForResult;
+        if (r0 != null) {
+            r0.unregister();
+            this.mStartIntentSenderForResult.unregister();
+            this.mRequestPermissions.unregister();
+        }
+    }
+
+    /* JADX WARN: Finally extract failed */
+    public final void dispatchStateChange(int i) {
+        try {
+            this.mExecutingActions = true;
+            for (FragmentStateManager fragmentStateManager : this.mFragmentStore.mActive.values()) {
+                if (fragmentStateManager != null) {
+                    fragmentStateManager.mFragmentManagerState = i;
+                }
+            }
+            moveToState(i, false);
+            Iterator it = collectAllSpecialEffectsController().iterator();
+            while (it.hasNext()) {
+                ((SpecialEffectsController) it.next()).forceCompleteAllOperations();
+            }
+            this.mExecutingActions = false;
+            execPendingActions(true);
+        } catch (Throwable th) {
+            this.mExecutingActions = false;
+            throw th;
+        }
+    }
+
+    public final void hideFragment(Fragment fragment) {
+        if (isLoggingEnabled(2)) {
+            Log.v("FragmentManager", "hide: " + fragment);
+        }
+        if (!fragment.mHidden) {
+            fragment.mHidden = true;
+            fragment.mHiddenChanged = true ^ fragment.mHiddenChanged;
+            setVisibleRemovingFragment(fragment);
+        }
+    }
+
+    public final boolean popBackStackImmediate$1() {
+        execPendingActions(false);
+        ensureExecReady(true);
+        Fragment fragment = this.mPrimaryNav;
+        if (fragment != null && fragment.getChildFragmentManager().popBackStackImmediate$1()) {
+            return true;
+        }
+        boolean popBackStackState = popBackStackState(this.mTmpRecords, this.mTmpIsPop, -1, 0);
+        if (popBackStackState) {
+            this.mExecutingActions = true;
+            try {
+                removeRedundantOperationsAndExecute(this.mTmpRecords, this.mTmpIsPop);
+            } finally {
+                cleanupExec();
+            }
+        }
+        updateOnBackPressedCallbackEnabled();
+        if (this.mHavePendingDeferredStart) {
+            this.mHavePendingDeferredStart = false;
+            startPendingDeferredFragments();
+        }
+        this.mFragmentStore.mActive.values().removeAll(Collections.singleton(null));
+        return popBackStackState;
+    }
+
+    public final boolean popBackStackState(ArrayList arrayList, ArrayList arrayList2, int i, int i2) {
+        boolean z;
+        if ((i2 & 1) != 0) {
+            z = true;
+        } else {
+            z = false;
+        }
+        ArrayList<BackStackRecord> arrayList3 = this.mBackStack;
+        int i3 = -1;
+        if (arrayList3 != null && !arrayList3.isEmpty()) {
+            if (i < 0) {
+                i3 = z ? 0 : (-1) + this.mBackStack.size();
+            } else {
+                int size = this.mBackStack.size() - 1;
+                while (size >= 0) {
+                    BackStackRecord backStackRecord = this.mBackStack.get(size);
+                    if (i >= 0 && i == backStackRecord.mIndex) {
+                        break;
+                    }
+                    size--;
+                }
+                if (size >= 0) {
+                    if (z) {
+                        while (size > 0) {
+                            int i4 = size - 1;
+                            BackStackRecord backStackRecord2 = this.mBackStack.get(i4);
+                            if (i < 0 || i != backStackRecord2.mIndex) {
+                                break;
+                            }
+                            size = i4;
+                        }
+                    } else if (size != this.mBackStack.size() - 1) {
+                        size++;
+                    }
+                }
+                i3 = size;
+            }
+        }
+        if (i3 < 0) {
+            return false;
+        }
+        for (int size2 = this.mBackStack.size() - 1; size2 >= i3; size2--) {
+            arrayList.add(this.mBackStack.remove(size2));
+            arrayList2.add(Boolean.TRUE);
+        }
+        return true;
+    }
+
+    public final void removeFragment(Fragment fragment) {
+        boolean z;
+        if (isLoggingEnabled(2)) {
+            Log.v("FragmentManager", "remove: " + fragment + " nesting=" + fragment.mBackStackNesting);
+        }
+        if (fragment.mBackStackNesting > 0) {
+            z = true;
+        } else {
+            z = false;
+        }
+        boolean z2 = !z;
+        if (!fragment.mDetached || z2) {
+            FragmentStore fragmentStore = this.mFragmentStore;
+            synchronized (fragmentStore.mAdded) {
+                fragmentStore.mAdded.remove(fragment);
+            }
+            fragment.mAdded = false;
+            if (isMenuAvailable(fragment)) {
+                this.mNeedMenuInvalidate = true;
+            }
+            fragment.mRemoving = true;
+            setVisibleRemovingFragment(fragment);
         }
     }
 
     public static boolean isLoggingEnabled(int i) {
-        return Log.isLoggable("FragmentManager", i);
+        if (Log.isLoggable("FragmentManager", i)) {
+            return true;
+        }
+        return false;
     }
 
-    public FragmentStateManager addFragment(Fragment fragment) {
+    public static boolean isMenuAvailable(Fragment fragment) {
+        FragmentStore fragmentStore = fragment.mChildFragmentManager.mFragmentStore;
+        fragmentStore.getClass();
+        ArrayList arrayList = new ArrayList();
+        for (FragmentStateManager fragmentStateManager : fragmentStore.mActive.values()) {
+            if (fragmentStateManager != null) {
+                arrayList.add(fragmentStateManager.mFragment);
+            } else {
+                arrayList.add(null);
+            }
+        }
+        Iterator it = arrayList.iterator();
+        boolean z = false;
+        while (it.hasNext()) {
+            Fragment fragment2 = (Fragment) it.next();
+            if (fragment2 != null) {
+                z = isMenuAvailable(fragment2);
+                continue;
+            }
+            if (z) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public final FragmentStateManager addFragment(Fragment fragment) {
+        String str = fragment.mPreviousWho;
+        if (str != null) {
+            FragmentStrictMode.onFragmentReuse(fragment, str);
+        }
         if (isLoggingEnabled(2)) {
             Log.v("FragmentManager", "add: " + fragment);
         }
@@ -274,16 +538,17 @@ public abstract class FragmentManager {
     }
 
     @SuppressLint({"SyntheticAccessor"})
-    public void attachController(FragmentHostCallback<?> fragmentHostCallback, FragmentContainer fragmentContainer, final Fragment fragment) {
+    public final void attachController(FragmentHostCallback<?> fragmentHostCallback, FragmentContainer fragmentContainer, final Fragment fragment) {
+        String str;
         if (this.mHost == null) {
             this.mHost = fragmentHostCallback;
             this.mContainer = fragmentContainer;
             this.mParent = fragment;
             if (fragment != null) {
-                this.mOnAttachListeners.add(new FragmentOnAttachListener(this) { // from class: androidx.fragment.app.FragmentManager.8
+                this.mOnAttachListeners.add(new FragmentOnAttachListener() { // from class: androidx.fragment.app.FragmentManager.6
                     @Override // androidx.fragment.app.FragmentOnAttachListener
-                    public void onAttachFragment(FragmentManager fragmentManager, Fragment fragment2) {
-                        Objects.requireNonNull(fragment);
+                    public final void onAttachFragment$1() {
+                        Fragment.this.getClass();
                     }
                 });
             } else if (fragmentHostCallback instanceof FragmentOnAttachListener) {
@@ -302,6 +567,7 @@ public abstract class FragmentManager {
                 }
                 onBackPressedDispatcher.addCallback(lifecycleOwner, this.mOnBackPressedCallback);
             }
+            boolean z = false;
             if (fragment != null) {
                 FragmentManagerViewModel fragmentManagerViewModel = fragment.mFragmentManager.mNonConfig;
                 FragmentManagerViewModel fragmentManagerViewModel2 = fragmentManagerViewModel.mChildNonConfigs.get(fragment.mWho);
@@ -311,111 +577,100 @@ public abstract class FragmentManager {
                 }
                 this.mNonConfig = fragmentManagerViewModel2;
             } else if (fragmentHostCallback instanceof ViewModelStoreOwner) {
-                ViewModelStore viewModelStore = ((ViewModelStoreOwner) fragmentHostCallback).getViewModelStore();
-                ViewModelProvider.Factory factory = FragmentManagerViewModel.FACTORY;
-                String canonicalName = FragmentManagerViewModel.class.getCanonicalName();
-                if (canonicalName != null) {
-                    String m = SupportMenuInflater$$ExternalSyntheticOutline0.m("androidx.lifecycle.ViewModelProvider.DefaultKey:", canonicalName);
-                    ViewModel viewModel = viewModelStore.mMap.get(m);
-                    if (!FragmentManagerViewModel.class.isInstance(viewModel)) {
-                        viewModel = factory instanceof ViewModelProvider.KeyedFactory ? ((ViewModelProvider.KeyedFactory) factory).create(m, FragmentManagerViewModel.class) : ((FragmentManagerViewModel.AnonymousClass1) factory).create(FragmentManagerViewModel.class);
-                        ViewModel put = viewModelStore.mMap.put(m, viewModel);
-                        if (put != null) {
-                            put.onCleared();
-                        }
-                    } else if (factory instanceof ViewModelProvider.OnRequeryFactory) {
-                        ((ViewModelProvider.OnRequeryFactory) factory).onRequery(viewModel);
-                    }
-                    this.mNonConfig = (FragmentManagerViewModel) viewModel;
-                } else {
-                    throw new IllegalArgumentException("Local and anonymous classes can not be ViewModels");
-                }
+                this.mNonConfig = (FragmentManagerViewModel) new ViewModelProvider(((ViewModelStoreOwner) fragmentHostCallback).getViewModelStore(), FragmentManagerViewModel.FACTORY).get(FragmentManagerViewModel.class);
             } else {
                 this.mNonConfig = new FragmentManagerViewModel(false);
             }
-            this.mNonConfig.mIsStateSaved = isStateSaved();
-            this.mFragmentStore.mNonConfig = this.mNonConfig;
+            FragmentManagerViewModel fragmentManagerViewModel3 = this.mNonConfig;
+            if (this.mStateSaved || this.mStopped) {
+                z = true;
+            }
+            fragmentManagerViewModel3.mIsStateSaved = z;
+            this.mFragmentStore.mNonConfig = fragmentManagerViewModel3;
             FragmentHostCallback<?> fragmentHostCallback2 = this.mHost;
-            if (fragmentHostCallback2 instanceof ActivityResultRegistryOwner) {
-                ActivityResultRegistry activityResultRegistry = ((ActivityResultRegistryOwner) fragmentHostCallback2).getActivityResultRegistry();
-                String m2 = SupportMenuInflater$$ExternalSyntheticOutline0.m("FragmentManager:", fragment != null ? FragmentTabHost$SavedState$$ExternalSyntheticOutline0.m(new StringBuilder(), fragment.mWho, ":") : "");
-                this.mStartActivityForResult = activityResultRegistry.register(SupportMenuInflater$$ExternalSyntheticOutline0.m(m2, "StartActivityForResult"), new ActivityResultContract<Intent, ActivityResult>() { // from class: androidx.activity.result.contract.ActivityResultContracts$StartActivityForResult
+            if ((fragmentHostCallback2 instanceof SavedStateRegistryOwner) && fragment == null) {
+                SavedStateRegistry savedStateRegistry = ((SavedStateRegistryOwner) fragmentHostCallback2).getSavedStateRegistry();
+                final FragmentManagerImpl fragmentManagerImpl = (FragmentManagerImpl) this;
+                savedStateRegistry.registerSavedStateProvider("android:support:fragments", new SavedStateRegistry.SavedStateProvider() { // from class: androidx.fragment.app.FragmentManager$$ExternalSyntheticLambda0
+                    @Override // androidx.savedstate.SavedStateRegistry.SavedStateProvider
+                    public final Bundle saveState() {
+                        FragmentManager fragmentManager = fragmentManagerImpl;
+                        fragmentManager.getClass();
+                        Bundle bundle = new Bundle();
+                        Parcelable saveAllStateInternal = fragmentManager.saveAllStateInternal();
+                        if (saveAllStateInternal != null) {
+                            bundle.putParcelable("android:support:fragments", saveAllStateInternal);
+                        }
+                        return bundle;
+                    }
+                });
+                Bundle consumeRestoredStateForKey = savedStateRegistry.consumeRestoredStateForKey("android:support:fragments");
+                if (consumeRestoredStateForKey != null) {
+                    restoreSaveStateInternal(consumeRestoredStateForKey.getParcelable("android:support:fragments"));
+                }
+            }
+            FragmentHostCallback<?> fragmentHostCallback3 = this.mHost;
+            if (fragmentHostCallback3 instanceof ActivityResultRegistryOwner) {
+                ActivityResultRegistry activityResultRegistry = ((ActivityResultRegistryOwner) fragmentHostCallback3).getActivityResultRegistry();
+                if (fragment != null) {
+                    str = fragment.mWho + ":";
+                } else {
+                    str = "";
+                }
+                String m = SupportMenuInflater$$ExternalSyntheticOutline0.m("FragmentManager:", str);
+                final FragmentManagerImpl fragmentManagerImpl2 = (FragmentManagerImpl) this;
+                this.mStartActivityForResult = activityResultRegistry.register(SupportMenuInflater$$ExternalSyntheticOutline0.m(m, "StartActivityForResult"), new ActivityResultContract<Intent, ActivityResult>() { // from class: androidx.activity.result.contract.ActivityResultContracts$StartActivityForResult
                     @Override // androidx.activity.result.contract.ActivityResultContract
-                    public Intent createIntent(Context context, Intent intent) {
-                        return intent;
+                    public final ActivityResult parseResult(int i, Intent intent) {
+                        return new ActivityResult(i, intent);
                     }
 
                     @Override // androidx.activity.result.contract.ActivityResultContract
-                    public ActivityResult parseResult(int i, Intent intent) {
-                        return new ActivityResult(i, intent);
+                    public final Intent createIntent(Parcelable parcelable) {
+                        return (Intent) parcelable;
                     }
-                }, new ActivityResultCallback<ActivityResult>() { // from class: androidx.fragment.app.FragmentManager.9
+                }, new ActivityResultCallback<ActivityResult>() { // from class: androidx.fragment.app.FragmentManager.7
                     @Override // androidx.activity.result.ActivityResultCallback
-                    public void onActivityResult(ActivityResult activityResult) {
+                    public final void onActivityResult(ActivityResult activityResult) {
                         ActivityResult activityResult2 = activityResult;
-                        LaunchedFragmentInfo pollFirst = FragmentManager.this.mLaunchedFragments.pollFirst();
+                        LaunchedFragmentInfo pollFirst = fragmentManagerImpl2.mLaunchedFragments.pollFirst();
                         if (pollFirst == null) {
                             Log.w("FragmentManager", "No Activities were started for result for " + this);
                             return;
                         }
-                        String str = pollFirst.mWho;
+                        String str2 = pollFirst.mWho;
                         int i = pollFirst.mRequestCode;
-                        Fragment findFragmentByWho = FragmentManager.this.mFragmentStore.findFragmentByWho(str);
+                        Fragment findFragmentByWho = fragmentManagerImpl2.mFragmentStore.findFragmentByWho(str2);
                         if (findFragmentByWho == null) {
-                            Log.w("FragmentManager", "Activity result delivered for unknown Fragment " + str);
+                            Log.w("FragmentManager", "Activity result delivered for unknown Fragment " + str2);
                             return;
                         }
                         findFragmentByWho.onActivityResult(i, activityResult2.mResultCode, activityResult2.mData);
                     }
                 });
-                this.mStartIntentSenderForResult = activityResultRegistry.register(SupportMenuInflater$$ExternalSyntheticOutline0.m(m2, "StartIntentSenderForResult"), new FragmentIntentSenderContract(), new ActivityResultCallback<ActivityResult>() { // from class: androidx.fragment.app.FragmentManager.10
+                this.mStartIntentSenderForResult = activityResultRegistry.register(SupportMenuInflater$$ExternalSyntheticOutline0.m(m, "StartIntentSenderForResult"), new FragmentIntentSenderContract(), new ActivityResultCallback<ActivityResult>() { // from class: androidx.fragment.app.FragmentManager.8
                     @Override // androidx.activity.result.ActivityResultCallback
-                    public void onActivityResult(ActivityResult activityResult) {
+                    public final void onActivityResult(ActivityResult activityResult) {
                         ActivityResult activityResult2 = activityResult;
-                        LaunchedFragmentInfo pollFirst = FragmentManager.this.mLaunchedFragments.pollFirst();
+                        LaunchedFragmentInfo pollFirst = fragmentManagerImpl2.mLaunchedFragments.pollFirst();
                         if (pollFirst == null) {
                             Log.w("FragmentManager", "No IntentSenders were started for " + this);
                             return;
                         }
-                        String str = pollFirst.mWho;
+                        String str2 = pollFirst.mWho;
                         int i = pollFirst.mRequestCode;
-                        Fragment findFragmentByWho = FragmentManager.this.mFragmentStore.findFragmentByWho(str);
+                        Fragment findFragmentByWho = fragmentManagerImpl2.mFragmentStore.findFragmentByWho(str2);
                         if (findFragmentByWho == null) {
-                            Log.w("FragmentManager", "Intent Sender result delivered for unknown Fragment " + str);
+                            Log.w("FragmentManager", "Intent Sender result delivered for unknown Fragment " + str2);
                             return;
                         }
                         findFragmentByWho.onActivityResult(i, activityResult2.mResultCode, activityResult2.mData);
                     }
                 });
-                this.mRequestPermissions = activityResultRegistry.register(SupportMenuInflater$$ExternalSyntheticOutline0.m(m2, "RequestPermissions"), new ActivityResultContract<String[], Map<String, Boolean>>() { // from class: androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions
+                this.mRequestPermissions = activityResultRegistry.register(SupportMenuInflater$$ExternalSyntheticOutline0.m(m, "RequestPermissions"), new ActivityResultContract<String[], Map<String, Boolean>>() { // from class: androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions
                     @Override // androidx.activity.result.contract.ActivityResultContract
-                    public Intent createIntent(Context context, String[] strArr) {
-                        return new Intent("androidx.activity.result.contract.action.REQUEST_PERMISSIONS").putExtra("androidx.activity.result.contract.extra.PERMISSIONS", strArr);
-                    }
-
-                    @Override // androidx.activity.result.contract.ActivityResultContract
-                    public ActivityResultContract.SynchronousResult<Map<String, Boolean>> getSynchronousResult(Context context, String[] strArr) {
-                        String[] strArr2 = strArr;
-                        if (strArr2 == null || strArr2.length == 0) {
-                            return new ActivityResultContract.SynchronousResult<>(Collections.emptyMap());
-                        }
-                        ArrayMap arrayMap = new ArrayMap();
-                        boolean z = true;
-                        for (String str : strArr2) {
-                            boolean z2 = ContextCompat.checkSelfPermission(context, str) == 0;
-                            arrayMap.put(str, Boolean.valueOf(z2));
-                            if (!z2) {
-                                z = false;
-                            }
-                        }
-                        if (z) {
-                            return new ActivityResultContract.SynchronousResult<>(arrayMap);
-                        }
-                        return null;
-                    }
-
-                    @Override // androidx.activity.result.contract.ActivityResultContract
-                    public Map<String, Boolean> parseResult(int i, Intent intent) {
+                    public final Map<String, Boolean> parseResult(int i, Intent intent) {
+                        boolean z2;
                         if (i != -1) {
                             return Collections.emptyMap();
                         }
@@ -430,29 +685,72 @@ public abstract class FragmentManager {
                         HashMap hashMap = new HashMap();
                         int length = stringArrayExtra.length;
                         for (int i2 = 0; i2 < length; i2++) {
-                            hashMap.put(stringArrayExtra[i2], Boolean.valueOf(intArrayExtra[i2] == 0));
+                            String str2 = stringArrayExtra[i2];
+                            if (intArrayExtra[i2] == 0) {
+                                z2 = true;
+                            } else {
+                                z2 = false;
+                            }
+                            hashMap.put(str2, Boolean.valueOf(z2));
                         }
                         return hashMap;
                     }
-                }, new ActivityResultCallback<Map<String, Boolean>>() { // from class: androidx.fragment.app.FragmentManager.11
+
+                    @Override // androidx.activity.result.contract.ActivityResultContract
+                    public final Intent createIntent(Parcelable parcelable) {
+                        return new Intent("androidx.activity.result.contract.action.REQUEST_PERMISSIONS").putExtra("androidx.activity.result.contract.extra.PERMISSIONS", (String[]) parcelable);
+                    }
+
+                    @Override // androidx.activity.result.contract.ActivityResultContract
+                    public final ActivityResultContract.SynchronousResult getSynchronousResult(ComponentActivity componentActivity, Parcelable parcelable) {
+                        boolean z2;
+                        String[] strArr = (String[]) parcelable;
+                        if (strArr.length == 0) {
+                            return new ActivityResultContract.SynchronousResult(Collections.emptyMap());
+                        }
+                        ArrayMap arrayMap = new ArrayMap();
+                        boolean z3 = true;
+                        for (String str2 : strArr) {
+                            if (ContextCompat.checkSelfPermission(componentActivity, str2) == 0) {
+                                z2 = true;
+                            } else {
+                                z2 = false;
+                            }
+                            arrayMap.put(str2, Boolean.valueOf(z2));
+                            if (!z2) {
+                                z3 = false;
+                            }
+                        }
+                        if (z3) {
+                            return new ActivityResultContract.SynchronousResult(arrayMap);
+                        }
+                        return null;
+                    }
+                }, new ActivityResultCallback<Map<String, Boolean>>() { // from class: androidx.fragment.app.FragmentManager.9
                     @Override // androidx.activity.result.ActivityResultCallback
                     @SuppressLint({"SyntheticAccessor"})
-                    public void onActivityResult(Map<String, Boolean> map) {
+                    public final void onActivityResult(Map<String, Boolean> map) {
+                        int i;
                         Map<String, Boolean> map2 = map;
                         String[] strArr = (String[]) map2.keySet().toArray(new String[0]);
                         ArrayList arrayList = new ArrayList(map2.values());
                         int[] iArr = new int[arrayList.size()];
-                        for (int i = 0; i < arrayList.size(); i++) {
-                            iArr[i] = ((Boolean) arrayList.get(i)).booleanValue() ? 0 : -1;
+                        for (int i2 = 0; i2 < arrayList.size(); i2++) {
+                            if (((Boolean) arrayList.get(i2)).booleanValue()) {
+                                i = 0;
+                            } else {
+                                i = -1;
+                            }
+                            iArr[i2] = i;
                         }
-                        LaunchedFragmentInfo pollFirst = FragmentManager.this.mLaunchedFragments.pollFirst();
+                        LaunchedFragmentInfo pollFirst = fragmentManagerImpl2.mLaunchedFragments.pollFirst();
                         if (pollFirst == null) {
                             Log.w("FragmentManager", "No permissions were requested for " + this);
                             return;
                         }
-                        String str = pollFirst.mWho;
-                        if (FragmentManager.this.mFragmentStore.findFragmentByWho(str) == null) {
-                            Log.w("FragmentManager", "Permission request result delivered for unknown Fragment " + str);
+                        String str2 = pollFirst.mWho;
+                        if (fragmentManagerImpl2.mFragmentStore.findFragmentByWho(str2) == null) {
+                            Log.w("FragmentManager", "Permission request result delivered for unknown Fragment " + str2);
                         }
                     }
                 });
@@ -463,46 +761,9 @@ public abstract class FragmentManager {
         throw new IllegalStateException("Already attached");
     }
 
-    public void attachFragment(Fragment fragment) {
-        if (isLoggingEnabled(2)) {
-            Log.v("FragmentManager", "attach: " + fragment);
-        }
-        if (fragment.mDetached) {
-            fragment.mDetached = false;
-            if (!fragment.mAdded) {
-                this.mFragmentStore.addFragment(fragment);
-                if (isLoggingEnabled(2)) {
-                    Log.v("FragmentManager", "add from attach: " + fragment);
-                }
-                if (isMenuAvailable(fragment)) {
-                    this.mNeedMenuInvalidate = true;
-                }
-            }
-        }
-    }
-
-    public final void cancelExitAnimation(Fragment fragment) {
-        HashSet<CancellationSignal> hashSet = this.mExitAnimationCancellationSignals.get(fragment);
-        if (hashSet != null) {
-            Iterator<CancellationSignal> it = hashSet.iterator();
-            while (it.hasNext()) {
-                it.next().cancel();
-            }
-            hashSet.clear();
-            destroyFragmentView(fragment);
-            this.mExitAnimationCancellationSignals.remove(fragment);
-        }
-    }
-
-    public final void cleanupExec() {
-        this.mExecutingActions = false;
-        this.mTmpIsPop.clear();
-        this.mTmpRecords.clear();
-    }
-
-    public final Set<SpecialEffectsController> collectAllSpecialEffectsController() {
+    public final HashSet collectAllSpecialEffectsController() {
         HashSet hashSet = new HashSet();
-        Iterator it = ((ArrayList) this.mFragmentStore.getActiveFragmentStateManagers()).iterator();
+        Iterator it = this.mFragmentStore.getActiveFragmentStateManagers().iterator();
         while (it.hasNext()) {
             ViewGroup viewGroup = ((FragmentStateManager) it.next()).mFragment.mContainer;
             if (viewGroup != null) {
@@ -512,33 +773,9 @@ public abstract class FragmentManager {
         return hashSet;
     }
 
-    public void completeExecute(BackStackRecord backStackRecord, boolean z, boolean z2, boolean z3) {
-        if (z) {
-            backStackRecord.executePopOps(z3);
-        } else {
-            backStackRecord.executeOps();
-        }
-        ArrayList arrayList = new ArrayList(1);
-        ArrayList arrayList2 = new ArrayList(1);
-        arrayList.add(backStackRecord);
-        arrayList2.add(Boolean.valueOf(z));
-        if (z2 && this.mCurState >= 1) {
-            FragmentTransition.startTransitions(this.mHost.mContext, this.mContainer, arrayList, arrayList2, 0, 1, true, this.mFragmentTransitionCallback);
-        }
-        if (z3) {
-            moveToState(this.mCurState, true);
-        }
-        Iterator it = ((ArrayList) this.mFragmentStore.getActiveFragments()).iterator();
-        while (it.hasNext()) {
-            Fragment fragment = (Fragment) it.next();
-            if (fragment != null) {
-                View view = fragment.mView;
-            }
-        }
-    }
-
-    public FragmentStateManager createOrGetFragmentStateManager(Fragment fragment) {
-        FragmentStateManager fragmentStateManager = this.mFragmentStore.getFragmentStateManager(fragment.mWho);
+    public final FragmentStateManager createOrGetFragmentStateManager(Fragment fragment) {
+        FragmentStore fragmentStore = this.mFragmentStore;
+        FragmentStateManager fragmentStateManager = fragmentStore.mActive.get(fragment.mWho);
         if (fragmentStateManager != null) {
             return fragmentStateManager;
         }
@@ -548,36 +785,7 @@ public abstract class FragmentManager {
         return fragmentStateManager2;
     }
 
-    public final void destroyFragmentView(Fragment fragment) {
-        fragment.performDestroyView();
-        this.mLifecycleCallbacksDispatcher.dispatchOnFragmentViewDestroyed(fragment, false);
-        fragment.mContainer = null;
-        fragment.mView = null;
-        fragment.mViewLifecycleOwner = null;
-        fragment.mViewLifecycleOwnerLiveData.setValue(null);
-        fragment.mInLayout = false;
-    }
-
-    public void detachFragment(Fragment fragment) {
-        if (isLoggingEnabled(2)) {
-            Log.v("FragmentManager", "detach: " + fragment);
-        }
-        if (!fragment.mDetached) {
-            fragment.mDetached = true;
-            if (fragment.mAdded) {
-                if (isLoggingEnabled(2)) {
-                    Log.v("FragmentManager", "remove from detach: " + fragment);
-                }
-                this.mFragmentStore.removeFragment(fragment);
-                if (isMenuAvailable(fragment)) {
-                    this.mNeedMenuInvalidate = true;
-                }
-                setVisibleRemovingFragment(fragment);
-            }
-        }
-    }
-
-    public void dispatchConfigurationChanged(Configuration configuration) {
+    public final void dispatchConfigurationChanged(Configuration configuration) {
         for (Fragment fragment : this.mFragmentStore.getFragments()) {
             if (fragment != null) {
                 fragment.onConfigurationChanged(configuration);
@@ -586,13 +794,19 @@ public abstract class FragmentManager {
         }
     }
 
-    public boolean dispatchContextItemSelected(MenuItem menuItem) {
+    public final boolean dispatchContextItemSelected() {
+        boolean z;
         if (this.mCurState < 1) {
             return false;
         }
         for (Fragment fragment : this.mFragmentStore.getFragments()) {
             if (fragment != null) {
-                if (!fragment.mHidden ? fragment.mChildFragmentManager.dispatchContextItemSelected(menuItem) : false) {
+                if (!fragment.mHidden) {
+                    z = fragment.mChildFragmentManager.dispatchContextItemSelected();
+                } else {
+                    z = false;
+                }
+                if (z) {
                     return true;
                 }
             }
@@ -600,27 +814,26 @@ public abstract class FragmentManager {
         return false;
     }
 
-    public void dispatchCreate() {
-        this.mStateSaved = false;
-        this.mStopped = false;
-        this.mNonConfig.mIsStateSaved = false;
-        dispatchStateChange(1);
-    }
-
-    public boolean dispatchCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
+    public final boolean dispatchCreateOptionsMenu() {
+        boolean z;
         if (this.mCurState < 1) {
             return false;
         }
         ArrayList<Fragment> arrayList = null;
-        boolean z = false;
+        boolean z2 = false;
         for (Fragment fragment : this.mFragmentStore.getFragments()) {
             if (fragment != null && isParentMenuVisible(fragment)) {
-                if (!fragment.mHidden ? fragment.mChildFragmentManager.dispatchCreateOptionsMenu(menu, menuInflater) | false : false) {
+                if (!fragment.mHidden) {
+                    z = fragment.mChildFragmentManager.dispatchCreateOptionsMenu() | false;
+                } else {
+                    z = false;
+                }
+                if (z) {
                     if (arrayList == null) {
                         arrayList = new ArrayList<>();
                     }
                     arrayList.add(fragment);
-                    z = true;
+                    z2 = true;
                 }
             }
         }
@@ -628,38 +841,15 @@ public abstract class FragmentManager {
             for (int i = 0; i < this.mCreatedMenus.size(); i++) {
                 Fragment fragment2 = this.mCreatedMenus.get(i);
                 if (arrayList == null || !arrayList.contains(fragment2)) {
-                    Objects.requireNonNull(fragment2);
+                    fragment2.getClass();
                 }
             }
         }
         this.mCreatedMenus = arrayList;
-        return z;
+        return z2;
     }
 
-    public void dispatchDestroy() {
-        this.mDestroyed = true;
-        execPendingActions(true);
-        endAnimatingAwayFragments();
-        dispatchStateChange(-1);
-        this.mHost = null;
-        this.mContainer = null;
-        this.mParent = null;
-        if (this.mOnBackPressedDispatcher != null) {
-            Iterator<Cancellable> it = this.mOnBackPressedCallback.mCancellables.iterator();
-            while (it.hasNext()) {
-                it.next().cancel();
-            }
-            this.mOnBackPressedDispatcher = null;
-        }
-        ActivityResultLauncher<Intent> activityResultLauncher = this.mStartActivityForResult;
-        if (activityResultLauncher != null) {
-            activityResultLauncher.unregister();
-            this.mStartIntentSenderForResult.unregister();
-            this.mRequestPermissions.unregister();
-        }
-    }
-
-    public void dispatchLowMemory() {
+    public final void dispatchLowMemory() {
         for (Fragment fragment : this.mFragmentStore.getFragments()) {
             if (fragment != null) {
                 fragment.performLowMemory();
@@ -667,21 +857,27 @@ public abstract class FragmentManager {
         }
     }
 
-    public void dispatchMultiWindowModeChanged(boolean z) {
+    public final void dispatchMultiWindowModeChanged(boolean z) {
         for (Fragment fragment : this.mFragmentStore.getFragments()) {
             if (fragment != null) {
-                fragment.mChildFragmentManager.dispatchMultiWindowModeChanged(z);
+                fragment.performMultiWindowModeChanged(z);
             }
         }
     }
 
-    public boolean dispatchOptionsItemSelected(MenuItem menuItem) {
+    public final boolean dispatchOptionsItemSelected() {
+        boolean z;
         if (this.mCurState < 1) {
             return false;
         }
         for (Fragment fragment : this.mFragmentStore.getFragments()) {
             if (fragment != null) {
-                if (!fragment.mHidden ? fragment.mChildFragmentManager.dispatchOptionsItemSelected(menuItem) : false) {
+                if (!fragment.mHidden) {
+                    z = fragment.mChildFragmentManager.dispatchOptionsItemSelected();
+                } else {
+                    z = false;
+                }
+                if (z) {
                     return true;
                 }
             }
@@ -689,11 +885,11 @@ public abstract class FragmentManager {
         return false;
     }
 
-    public void dispatchOptionsMenuClosed(Menu menu) {
+    public final void dispatchOptionsMenuClosed() {
         if (this.mCurState >= 1) {
             for (Fragment fragment : this.mFragmentStore.getFragments()) {
                 if (fragment != null && !fragment.mHidden) {
-                    fragment.mChildFragmentManager.dispatchOptionsMenuClosed(menu);
+                    fragment.mChildFragmentManager.dispatchOptionsMenuClosed();
                 }
             }
         }
@@ -701,77 +897,49 @@ public abstract class FragmentManager {
 
     public final void dispatchParentPrimaryNavigationFragmentChanged(Fragment fragment) {
         if (fragment != null && fragment.equals(findActiveFragment(fragment.mWho))) {
-            boolean isPrimaryNavigation = fragment.mFragmentManager.isPrimaryNavigation(fragment);
+            fragment.mFragmentManager.getClass();
+            boolean isPrimaryNavigation = isPrimaryNavigation(fragment);
             Boolean bool = fragment.mIsPrimaryNavigationFragment;
             if (bool == null || bool.booleanValue() != isPrimaryNavigation) {
                 fragment.mIsPrimaryNavigationFragment = Boolean.valueOf(isPrimaryNavigation);
-                FragmentManager fragmentManager = fragment.mChildFragmentManager;
-                fragmentManager.updateOnBackPressedCallbackEnabled();
-                fragmentManager.dispatchParentPrimaryNavigationFragmentChanged(fragmentManager.mPrimaryNav);
+                FragmentManagerImpl fragmentManagerImpl = fragment.mChildFragmentManager;
+                fragmentManagerImpl.updateOnBackPressedCallbackEnabled();
+                fragmentManagerImpl.dispatchParentPrimaryNavigationFragmentChanged(fragmentManagerImpl.mPrimaryNav);
             }
         }
     }
 
-    public void dispatchPictureInPictureModeChanged(boolean z) {
+    public final void dispatchPictureInPictureModeChanged(boolean z) {
         for (Fragment fragment : this.mFragmentStore.getFragments()) {
             if (fragment != null) {
-                fragment.mChildFragmentManager.dispatchPictureInPictureModeChanged(z);
+                fragment.performPictureInPictureModeChanged(z);
             }
         }
     }
 
-    public boolean dispatchPrepareOptionsMenu(Menu menu) {
+    public final boolean dispatchPrepareOptionsMenu() {
         boolean z = false;
         if (this.mCurState < 1) {
             return false;
         }
         for (Fragment fragment : this.mFragmentStore.getFragments()) {
-            if (fragment != null && isParentMenuVisible(fragment) && fragment.performPrepareOptionsMenu(menu)) {
+            if (fragment != null && isParentMenuVisible(fragment) && fragment.performPrepareOptionsMenu()) {
                 z = true;
             }
         }
         return z;
     }
 
-    /* JADX WARN: Finally extract failed */
-    public final void dispatchStateChange(int i) {
-        try {
-            this.mExecutingActions = true;
-            for (FragmentStateManager fragmentStateManager : this.mFragmentStore.mActive.values()) {
-                if (fragmentStateManager != null) {
-                    fragmentStateManager.mFragmentManagerState = i;
-                }
-            }
-            moveToState(i, false);
-            Iterator it = ((HashSet) collectAllSpecialEffectsController()).iterator();
-            while (it.hasNext()) {
-                ((SpecialEffectsController) it.next()).forceCompleteAllOperations();
-            }
-            this.mExecutingActions = false;
-            execPendingActions(true);
-        } catch (Throwable th) {
-            this.mExecutingActions = false;
-            throw th;
-        }
-    }
-
-    public final void doPendingDeferredStart() {
-        if (this.mHavePendingDeferredStart) {
-            this.mHavePendingDeferredStart = false;
-            startPendingDeferredFragments();
-        }
-    }
-
-    public void dump(String str, FileDescriptor fileDescriptor, PrintWriter printWriter, String[] strArr) {
+    public final void dump(String str, FileDescriptor fileDescriptor, PrintWriter printWriter, String[] strArr) {
         int size;
         int size2;
         String m = SupportMenuInflater$$ExternalSyntheticOutline0.m(str, "    ");
         FragmentStore fragmentStore = this.mFragmentStore;
-        Objects.requireNonNull(fragmentStore);
+        fragmentStore.getClass();
         String str2 = str + "    ";
         if (!fragmentStore.mActive.isEmpty()) {
             printWriter.print(str);
-            printWriter.print("Active Fragments:");
+            printWriter.println("Active Fragments:");
             for (FragmentStateManager fragmentStateManager : fragmentStore.mActive.values()) {
                 printWriter.print(str);
                 if (fragmentStateManager != null) {
@@ -866,22 +1034,22 @@ public abstract class FragmentManager {
         }
     }
 
-    public final void endAnimatingAwayFragments() {
-        Iterator it = ((HashSet) collectAllSpecialEffectsController()).iterator();
-        while (it.hasNext()) {
-            ((SpecialEffectsController) it.next()).forceCompleteAllOperations();
-        }
-    }
-
-    public void enqueueAction(OpGenerator opGenerator, boolean z) {
+    public final void enqueueAction(OpGenerator opGenerator, boolean z) {
+        boolean z2;
         if (!z) {
-            if (this.mHost == null) {
-                if (this.mDestroyed) {
-                    throw new IllegalStateException("FragmentManager has been destroyed");
+            if (this.mHost != null) {
+                if (this.mStateSaved || this.mStopped) {
+                    z2 = true;
+                } else {
+                    z2 = false;
                 }
+                if (z2) {
+                    throw new IllegalStateException("Can not perform this action after onSaveInstanceState");
+                }
+            } else if (this.mDestroyed) {
+                throw new IllegalStateException("FragmentManager has been destroyed");
+            } else {
                 throw new IllegalStateException("FragmentManager has not been attached to a host.");
-            } else if (isStateSaved()) {
-                throw new IllegalStateException("Can not perform this action after onSaveInstanceState");
             }
         }
         synchronized (this.mPendingActions) {
@@ -895,6 +1063,7 @@ public abstract class FragmentManager {
     }
 
     public final void ensureExecReady(boolean z) {
+        boolean z2;
         if (this.mExecutingActions) {
             throw new IllegalStateException("FragmentManager is already executing transactions");
         } else if (this.mHost == null) {
@@ -902,282 +1071,403 @@ public abstract class FragmentManager {
                 throw new IllegalStateException("FragmentManager has been destroyed");
             }
             throw new IllegalStateException("FragmentManager has not been attached to a host.");
-        } else if (Looper.myLooper() != this.mHost.mHandler.getLooper()) {
-            throw new IllegalStateException("Must be called from main thread of fragment host");
-        } else if (z || !isStateSaved()) {
+        } else if (Looper.myLooper() == this.mHost.mHandler.getLooper()) {
+            if (!z) {
+                if (this.mStateSaved || this.mStopped) {
+                    z2 = true;
+                } else {
+                    z2 = false;
+                }
+                if (z2) {
+                    throw new IllegalStateException("Can not perform this action after onSaveInstanceState");
+                }
+            }
             if (this.mTmpRecords == null) {
                 this.mTmpRecords = new ArrayList<>();
                 this.mTmpIsPop = new ArrayList<>();
             }
-            this.mExecutingActions = true;
-            try {
-                executePostponedTransaction(null, null);
-            } finally {
-                this.mExecutingActions = false;
-            }
         } else {
-            throw new IllegalStateException("Can not perform this action after onSaveInstanceState");
+            throw new IllegalStateException("Must be called from main thread of fragment host");
         }
     }
 
-    /* JADX WARN: Finally extract failed */
-    public boolean execPendingActions(boolean z) {
-        boolean z2;
-        ensureExecReady(z);
-        boolean z3 = false;
-        while (true) {
-            ArrayList<BackStackRecord> arrayList = this.mTmpRecords;
-            ArrayList<Boolean> arrayList2 = this.mTmpIsPop;
-            synchronized (this.mPendingActions) {
-                if (this.mPendingActions.isEmpty()) {
-                    z2 = false;
-                } else {
-                    int size = this.mPendingActions.size();
-                    z2 = false;
-                    for (int i = 0; i < size; i++) {
-                        z2 |= this.mPendingActions.get(i).generateOps(arrayList, arrayList2);
-                    }
-                    this.mPendingActions.clear();
-                    this.mHost.mHandler.removeCallbacks(this.mExecCommit);
-                }
-            }
-            if (z2) {
+    public final void execSingleAction(OpGenerator opGenerator, boolean z) {
+        if (!z || (this.mHost != null && !this.mDestroyed)) {
+            ensureExecReady(z);
+            if (opGenerator.generateOps(this.mTmpRecords, this.mTmpIsPop)) {
                 this.mExecutingActions = true;
                 try {
                     removeRedundantOperationsAndExecute(this.mTmpRecords, this.mTmpIsPop);
+                } finally {
                     cleanupExec();
-                    z3 = true;
-                } catch (Throwable th) {
-                    cleanupExec();
-                    throw th;
                 }
-            } else {
-                updateOnBackPressedCallbackEnabled();
-                doPendingDeferredStart();
-                this.mFragmentStore.burpActive();
-                return z3;
             }
-        }
-    }
-
-    /* JADX WARN: Finally extract failed */
-    public void execSingleAction(OpGenerator opGenerator, boolean z) {
-        if (!z || (this.mHost != null && !this.mDestroyed)) {
-            ensureExecReady(z);
-            ((BackStackRecord) opGenerator).generateOps(this.mTmpRecords, this.mTmpIsPop);
-            this.mExecutingActions = true;
-            try {
-                removeRedundantOperationsAndExecute(this.mTmpRecords, this.mTmpIsPop);
-                cleanupExec();
-                updateOnBackPressedCallbackEnabled();
-                doPendingDeferredStart();
-                this.mFragmentStore.burpActive();
-            } catch (Throwable th) {
-                cleanupExec();
-                throw th;
+            updateOnBackPressedCallbackEnabled();
+            if (this.mHavePendingDeferredStart) {
+                this.mHavePendingDeferredStart = false;
+                startPendingDeferredFragments();
             }
+            this.mFragmentStore.mActive.values().removeAll(Collections.singleton(null));
         }
     }
 
     public final void executeOpsTogether(ArrayList<BackStackRecord> arrayList, ArrayList<Boolean> arrayList2, int i, int i2) {
-        ViewGroup viewGroup;
+        ArrayList<BackStackRecord> arrayList3;
         int i3;
-        int i4;
+        ViewGroup viewGroup;
         boolean z;
-        ArrayList<BackStackRecord> arrayList3 = arrayList;
-        ArrayList<Boolean> arrayList4 = arrayList2;
-        boolean z2 = arrayList3.get(i).mReorderingAllowed;
-        ArrayList<Fragment> arrayList5 = this.mTmpAddedFragments;
-        if (arrayList5 == null) {
+        Fragment fragment;
+        int i4;
+        int i5;
+        int i6;
+        ArrayList<BackStackRecord> arrayList4 = arrayList;
+        ArrayList<Boolean> arrayList5 = arrayList2;
+        int i7 = i2;
+        boolean z2 = arrayList4.get(i).mReorderingAllowed;
+        ArrayList<Fragment> arrayList6 = this.mTmpAddedFragments;
+        if (arrayList6 == null) {
             this.mTmpAddedFragments = new ArrayList<>();
         } else {
-            arrayList5.clear();
+            arrayList6.clear();
         }
         this.mTmpAddedFragments.addAll(this.mFragmentStore.getFragments());
-        Fragment fragment = this.mPrimaryNav;
-        int i5 = i;
+        Fragment fragment2 = this.mPrimaryNav;
         boolean z3 = false;
+        int i8 = i;
         while (true) {
-            int i6 = 1;
-            if (i5 < i2) {
-                BackStackRecord backStackRecord = arrayList3.get(i5);
-                int i7 = 3;
-                if (!arrayList4.get(i5).booleanValue()) {
-                    ArrayList<Fragment> arrayList6 = this.mTmpAddedFragments;
-                    int i8 = 0;
-                    while (i8 < backStackRecord.mOps.size()) {
-                        FragmentTransaction.Op op = backStackRecord.mOps.get(i8);
-                        int i9 = op.mCmd;
-                        if (i9 == i6) {
-                            i3 = i6;
-                        } else if (i9 != 2) {
-                            if (i9 == i7 || i9 == 6) {
-                                arrayList6.remove(op.mFragment);
-                                Fragment fragment2 = op.mFragment;
-                                if (fragment2 == fragment) {
-                                    backStackRecord.mOps.add(i8, new FragmentTransaction.Op(9, fragment2));
-                                    i8++;
-                                    i3 = 1;
-                                    fragment = null;
-                                    i8 += i3;
-                                    i6 = i3;
-                                    i7 = 3;
-                                }
-                            } else if (i9 == 7) {
-                                i3 = 1;
-                            } else if (i9 == 8) {
-                                backStackRecord.mOps.add(i8, new FragmentTransaction.Op(9, fragment));
-                                i8++;
-                                fragment = op.mFragment;
-                            }
-                            i3 = 1;
-                            i8 += i3;
-                            i6 = i3;
-                            i7 = 3;
-                        } else {
-                            Fragment fragment3 = op.mFragment;
-                            int i10 = fragment3.mContainerId;
-                            int size = arrayList6.size() - 1;
-                            boolean z4 = false;
-                            while (size >= 0) {
-                                Fragment fragment4 = arrayList6.get(size);
-                                if (fragment4.mContainerId != i10) {
-                                    i4 = i10;
-                                } else if (fragment4 == fragment3) {
-                                    i4 = i10;
-                                    z4 = true;
-                                } else {
-                                    if (fragment4 == fragment) {
-                                        i4 = i10;
-                                        z = true;
-                                        backStackRecord.mOps.add(i8, new FragmentTransaction.Op(9, fragment4, true));
-                                        i8++;
-                                        fragment = null;
-                                    } else {
-                                        i4 = i10;
-                                        z = true;
+            int i9 = 1;
+            if (i8 < i7) {
+                BackStackRecord backStackRecord = arrayList4.get(i8);
+                int i10 = 3;
+                if (!arrayList5.get(i8).booleanValue()) {
+                    ArrayList<Fragment> arrayList7 = this.mTmpAddedFragments;
+                    int i11 = 0;
+                    while (i11 < backStackRecord.mOps.size()) {
+                        FragmentTransaction.Op op = backStackRecord.mOps.get(i11);
+                        int i12 = op.mCmd;
+                        if (i12 != i9) {
+                            if (i12 == 2) {
+                                Fragment fragment3 = op.mFragment;
+                                int i13 = fragment3.mContainerId;
+                                int size = arrayList7.size() - 1;
+                                boolean z4 = false;
+                                while (size >= 0) {
+                                    Fragment fragment4 = arrayList7.get(size);
+                                    if (fragment4.mContainerId == i13) {
+                                        if (fragment4 == fragment3) {
+                                            z4 = true;
+                                        } else {
+                                            if (fragment4 == fragment2) {
+                                                i5 = i13;
+                                                i6 = 0;
+                                                backStackRecord.mOps.add(i11, new FragmentTransaction.Op(9, fragment4, 0));
+                                                i11++;
+                                                fragment2 = null;
+                                            } else {
+                                                i5 = i13;
+                                                i6 = 0;
+                                            }
+                                            FragmentTransaction.Op op2 = new FragmentTransaction.Op(3, fragment4, i6);
+                                            op2.mEnterAnim = op.mEnterAnim;
+                                            op2.mPopEnterAnim = op.mPopEnterAnim;
+                                            op2.mExitAnim = op.mExitAnim;
+                                            op2.mPopExitAnim = op.mPopExitAnim;
+                                            backStackRecord.mOps.add(i11, op2);
+                                            arrayList7.remove(fragment4);
+                                            i11++;
+                                            size--;
+                                            i13 = i5;
+                                        }
                                     }
-                                    FragmentTransaction.Op op2 = new FragmentTransaction.Op(3, fragment4, z);
-                                    op2.mEnterAnim = op.mEnterAnim;
-                                    op2.mPopEnterAnim = op.mPopEnterAnim;
-                                    op2.mExitAnim = op.mExitAnim;
-                                    op2.mPopExitAnim = op.mPopExitAnim;
-                                    backStackRecord.mOps.add(i8, op2);
-                                    arrayList6.remove(fragment4);
-                                    i8++;
+                                    i5 = i13;
+                                    size--;
+                                    i13 = i5;
                                 }
-                                size--;
-                                i10 = i4;
+                                if (z4) {
+                                    backStackRecord.mOps.remove(i11);
+                                    i11--;
+                                } else {
+                                    i4 = 1;
+                                    op.mCmd = 1;
+                                    op.mFromExpandedOp = true;
+                                    arrayList7.add(fragment3);
+                                    i9 = i4;
+                                    i11 += i9;
+                                    i10 = 3;
+                                }
+                            } else if (i12 == i10 || i12 == 6) {
+                                arrayList7.remove(op.mFragment);
+                                Fragment fragment5 = op.mFragment;
+                                if (fragment5 == fragment2) {
+                                    backStackRecord.mOps.add(i11, new FragmentTransaction.Op(9, fragment5));
+                                    i11++;
+                                    fragment2 = null;
+                                    i9 = 1;
+                                    i11 += i9;
+                                    i10 = 3;
+                                }
+                            } else if (i12 == 7) {
+                                i9 = 1;
+                            } else if (i12 == 8) {
+                                backStackRecord.mOps.add(i11, new FragmentTransaction.Op(9, fragment2, 0));
+                                op.mFromExpandedOp = true;
+                                i11++;
+                                fragment2 = op.mFragment;
                             }
-                            if (z4) {
-                                backStackRecord.mOps.remove(i8);
-                                i8--;
-                                i3 = 1;
-                                i8 += i3;
-                                i6 = i3;
-                                i7 = 3;
-                            } else {
-                                i3 = 1;
-                                op.mCmd = 1;
-                                arrayList6.add(fragment3);
-                                i8 += i3;
-                                i6 = i3;
-                                i7 = 3;
-                            }
+                            i4 = 1;
+                            i9 = i4;
+                            i11 += i9;
+                            i10 = 3;
                         }
-                        arrayList6.add(op.mFragment);
-                        i8 += i3;
-                        i6 = i3;
-                        i7 = 3;
+                        arrayList7.add(op.mFragment);
+                        i11 += i9;
+                        i10 = 3;
                     }
                 } else {
-                    int i11 = 1;
-                    ArrayList<Fragment> arrayList7 = this.mTmpAddedFragments;
+                    ArrayList<Fragment> arrayList8 = this.mTmpAddedFragments;
                     int size2 = backStackRecord.mOps.size() - 1;
                     while (size2 >= 0) {
                         FragmentTransaction.Op op3 = backStackRecord.mOps.get(size2);
-                        int i12 = op3.mCmd;
-                        if (i12 != i11) {
-                            if (i12 != 3) {
-                                switch (i12) {
+                        int i14 = op3.mCmd;
+                        if (i14 != i9) {
+                            if (i14 != 3) {
+                                switch (i14) {
                                     case 8:
                                         fragment = null;
+                                        fragment2 = fragment;
                                         break;
                                     case 9:
                                         fragment = op3.mFragment;
+                                        fragment2 = fragment;
                                         break;
                                     case 10:
                                         op3.mCurrentMaxState = op3.mOldMaxState;
                                         break;
                                 }
                                 size2--;
-                                i11 = 1;
+                                i9 = 1;
                             }
-                            arrayList7.add(op3.mFragment);
+                            arrayList8.add(op3.mFragment);
                             size2--;
-                            i11 = 1;
+                            i9 = 1;
                         }
-                        arrayList7.remove(op3.mFragment);
+                        arrayList8.remove(op3.mFragment);
                         size2--;
-                        i11 = 1;
+                        i9 = 1;
                     }
                 }
-                z3 = z3 || backStackRecord.mAddToBackStack;
-                i5++;
-                arrayList3 = arrayList;
-                arrayList4 = arrayList2;
+                if (z3 || backStackRecord.mAddToBackStack) {
+                    z = true;
+                } else {
+                    z = false;
+                }
+                z3 = z;
+                i8++;
+                arrayList4 = arrayList;
+                arrayList5 = arrayList2;
+                i7 = i2;
             } else {
                 this.mTmpAddedFragments.clear();
-                if (!z2 && this.mCurState >= 1) {
-                    for (int i13 = i; i13 < i2; i13++) {
-                        Iterator<FragmentTransaction.Op> it = arrayList.get(i13).mOps.iterator();
-                        while (it.hasNext()) {
-                            Fragment fragment5 = it.next().mFragment;
-                            if (!(fragment5 == null || fragment5.mFragmentManager == null)) {
-                                this.mFragmentStore.makeActive(createOrGetFragmentStateManager(fragment5));
+                if (z2 || this.mCurState < 1) {
+                    arrayList3 = arrayList;
+                    i3 = i2;
+                } else {
+                    int i15 = i;
+                    i3 = i2;
+                    while (true) {
+                        arrayList3 = arrayList;
+                        if (i15 < i3) {
+                            Iterator<FragmentTransaction.Op> it = arrayList3.get(i15).mOps.iterator();
+                            while (it.hasNext()) {
+                                Fragment fragment6 = it.next().mFragment;
+                                if (!(fragment6 == null || fragment6.mFragmentManager == null)) {
+                                    this.mFragmentStore.makeActive(createOrGetFragmentStateManager(fragment6));
+                                }
                             }
+                            i15++;
                         }
                     }
                 }
-                int i14 = i;
-                while (i14 < i2) {
-                    BackStackRecord backStackRecord2 = arrayList.get(i14);
-                    if (arrayList2.get(i14).booleanValue()) {
+                for (int i16 = i; i16 < i3; i16++) {
+                    BackStackRecord backStackRecord2 = arrayList3.get(i16);
+                    if (arrayList2.get(i16).booleanValue()) {
                         backStackRecord2.bumpBackStackNesting(-1);
-                        backStackRecord2.executePopOps(i14 == i2 + (-1));
+                        for (int size3 = backStackRecord2.mOps.size() - 1; size3 >= 0; size3--) {
+                            FragmentTransaction.Op op4 = backStackRecord2.mOps.get(size3);
+                            Fragment fragment7 = op4.mFragment;
+                            if (fragment7 != null) {
+                                if (fragment7.mAnimationInfo != null) {
+                                    fragment7.ensureAnimationInfo().mIsPop = true;
+                                }
+                                int i17 = backStackRecord2.mTransition;
+                                int i18 = 4100;
+                                if (i17 == 4097) {
+                                    i18 = 8194;
+                                } else if (i17 == 8194) {
+                                    i18 = 4097;
+                                } else if (i17 != 8197) {
+                                    if (i17 == 4099) {
+                                        i18 = 4099;
+                                    } else if (i17 != 4100) {
+                                        i18 = 0;
+                                    } else {
+                                        i18 = 8197;
+                                    }
+                                }
+                                if (!(fragment7.mAnimationInfo == null && i18 == 0)) {
+                                    fragment7.ensureAnimationInfo();
+                                    fragment7.mAnimationInfo.mNextTransition = i18;
+                                }
+                                ArrayList<String> arrayList9 = backStackRecord2.mSharedElementTargetNames;
+                                ArrayList<String> arrayList10 = backStackRecord2.mSharedElementSourceNames;
+                                fragment7.ensureAnimationInfo();
+                                Fragment.AnimationInfo animationInfo = fragment7.mAnimationInfo;
+                                animationInfo.mSharedElementSourceNames = arrayList9;
+                                animationInfo.mSharedElementTargetNames = arrayList10;
+                            }
+                            switch (op4.mCmd) {
+                                case 1:
+                                    fragment7.setAnimations(op4.mEnterAnim, op4.mExitAnim, op4.mPopEnterAnim, op4.mPopExitAnim);
+                                    backStackRecord2.mManager.setExitAnimationOrder(fragment7, true);
+                                    backStackRecord2.mManager.removeFragment(fragment7);
+                                    break;
+                                case 2:
+                                default:
+                                    StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Unknown cmd: ");
+                                    m.append(op4.mCmd);
+                                    throw new IllegalArgumentException(m.toString());
+                                case 3:
+                                    fragment7.setAnimations(op4.mEnterAnim, op4.mExitAnim, op4.mPopEnterAnim, op4.mPopExitAnim);
+                                    backStackRecord2.mManager.addFragment(fragment7);
+                                    break;
+                                case 4:
+                                    fragment7.setAnimations(op4.mEnterAnim, op4.mExitAnim, op4.mPopEnterAnim, op4.mPopExitAnim);
+                                    backStackRecord2.mManager.getClass();
+                                    showFragment(fragment7);
+                                    break;
+                                case 5:
+                                    fragment7.setAnimations(op4.mEnterAnim, op4.mExitAnim, op4.mPopEnterAnim, op4.mPopExitAnim);
+                                    backStackRecord2.mManager.setExitAnimationOrder(fragment7, true);
+                                    backStackRecord2.mManager.hideFragment(fragment7);
+                                    break;
+                                case 6:
+                                    fragment7.setAnimations(op4.mEnterAnim, op4.mExitAnim, op4.mPopEnterAnim, op4.mPopExitAnim);
+                                    backStackRecord2.mManager.attachFragment(fragment7);
+                                    break;
+                                case 7:
+                                    fragment7.setAnimations(op4.mEnterAnim, op4.mExitAnim, op4.mPopEnterAnim, op4.mPopExitAnim);
+                                    backStackRecord2.mManager.setExitAnimationOrder(fragment7, true);
+                                    backStackRecord2.mManager.detachFragment(fragment7);
+                                    break;
+                                case 8:
+                                    backStackRecord2.mManager.setPrimaryNavigationFragment(null);
+                                    break;
+                                case 9:
+                                    backStackRecord2.mManager.setPrimaryNavigationFragment(fragment7);
+                                    break;
+                                case 10:
+                                    backStackRecord2.mManager.setMaxLifecycle(fragment7, op4.mOldMaxState);
+                                    break;
+                            }
+                        }
+                        continue;
                     } else {
                         backStackRecord2.bumpBackStackNesting(1);
-                        backStackRecord2.executeOps();
+                        int size4 = backStackRecord2.mOps.size();
+                        for (int i19 = 0; i19 < size4; i19++) {
+                            FragmentTransaction.Op op5 = backStackRecord2.mOps.get(i19);
+                            Fragment fragment8 = op5.mFragment;
+                            if (fragment8 != null) {
+                                if (fragment8.mAnimationInfo != null) {
+                                    fragment8.ensureAnimationInfo().mIsPop = false;
+                                }
+                                int i20 = backStackRecord2.mTransition;
+                                if (!(fragment8.mAnimationInfo == null && i20 == 0)) {
+                                    fragment8.ensureAnimationInfo();
+                                    fragment8.mAnimationInfo.mNextTransition = i20;
+                                }
+                                ArrayList<String> arrayList11 = backStackRecord2.mSharedElementSourceNames;
+                                ArrayList<String> arrayList12 = backStackRecord2.mSharedElementTargetNames;
+                                fragment8.ensureAnimationInfo();
+                                Fragment.AnimationInfo animationInfo2 = fragment8.mAnimationInfo;
+                                animationInfo2.mSharedElementSourceNames = arrayList11;
+                                animationInfo2.mSharedElementTargetNames = arrayList12;
+                            }
+                            switch (op5.mCmd) {
+                                case 1:
+                                    fragment8.setAnimations(op5.mEnterAnim, op5.mExitAnim, op5.mPopEnterAnim, op5.mPopExitAnim);
+                                    backStackRecord2.mManager.setExitAnimationOrder(fragment8, false);
+                                    backStackRecord2.mManager.addFragment(fragment8);
+                                    break;
+                                case 2:
+                                default:
+                                    StringBuilder m2 = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Unknown cmd: ");
+                                    m2.append(op5.mCmd);
+                                    throw new IllegalArgumentException(m2.toString());
+                                case 3:
+                                    fragment8.setAnimations(op5.mEnterAnim, op5.mExitAnim, op5.mPopEnterAnim, op5.mPopExitAnim);
+                                    backStackRecord2.mManager.removeFragment(fragment8);
+                                    break;
+                                case 4:
+                                    fragment8.setAnimations(op5.mEnterAnim, op5.mExitAnim, op5.mPopEnterAnim, op5.mPopExitAnim);
+                                    backStackRecord2.mManager.hideFragment(fragment8);
+                                    break;
+                                case 5:
+                                    fragment8.setAnimations(op5.mEnterAnim, op5.mExitAnim, op5.mPopEnterAnim, op5.mPopExitAnim);
+                                    backStackRecord2.mManager.setExitAnimationOrder(fragment8, false);
+                                    backStackRecord2.mManager.getClass();
+                                    showFragment(fragment8);
+                                    break;
+                                case 6:
+                                    fragment8.setAnimations(op5.mEnterAnim, op5.mExitAnim, op5.mPopEnterAnim, op5.mPopExitAnim);
+                                    backStackRecord2.mManager.detachFragment(fragment8);
+                                    break;
+                                case 7:
+                                    fragment8.setAnimations(op5.mEnterAnim, op5.mExitAnim, op5.mPopEnterAnim, op5.mPopExitAnim);
+                                    backStackRecord2.mManager.setExitAnimationOrder(fragment8, false);
+                                    backStackRecord2.mManager.attachFragment(fragment8);
+                                    break;
+                                case 8:
+                                    backStackRecord2.mManager.setPrimaryNavigationFragment(fragment8);
+                                    break;
+                                case 9:
+                                    backStackRecord2.mManager.setPrimaryNavigationFragment(null);
+                                    break;
+                                case 10:
+                                    backStackRecord2.mManager.setMaxLifecycle(fragment8, op5.mCurrentMaxState);
+                                    break;
+                            }
+                        }
+                        continue;
                     }
-                    i14++;
                 }
-                boolean booleanValue = arrayList2.get(i2 - 1).booleanValue();
-                for (int i15 = i; i15 < i2; i15++) {
-                    BackStackRecord backStackRecord3 = arrayList.get(i15);
+                boolean booleanValue = arrayList2.get(i3 - 1).booleanValue();
+                for (int i21 = i; i21 < i3; i21++) {
+                    BackStackRecord backStackRecord3 = arrayList3.get(i21);
                     if (booleanValue) {
-                        for (int size3 = backStackRecord3.mOps.size() - 1; size3 >= 0; size3--) {
-                            Fragment fragment6 = backStackRecord3.mOps.get(size3).mFragment;
-                            if (fragment6 != null) {
-                                createOrGetFragmentStateManager(fragment6).moveToExpectedState();
+                        for (int size5 = backStackRecord3.mOps.size() - 1; size5 >= 0; size5--) {
+                            Fragment fragment9 = backStackRecord3.mOps.get(size5).mFragment;
+                            if (fragment9 != null) {
+                                createOrGetFragmentStateManager(fragment9).moveToExpectedState();
                             }
                         }
                     } else {
                         Iterator<FragmentTransaction.Op> it2 = backStackRecord3.mOps.iterator();
                         while (it2.hasNext()) {
-                            Fragment fragment7 = it2.next().mFragment;
-                            if (fragment7 != null) {
-                                createOrGetFragmentStateManager(fragment7).moveToExpectedState();
+                            Fragment fragment10 = it2.next().mFragment;
+                            if (fragment10 != null) {
+                                createOrGetFragmentStateManager(fragment10).moveToExpectedState();
                             }
                         }
                     }
                 }
                 moveToState(this.mCurState, true);
                 HashSet hashSet = new HashSet();
-                for (int i16 = i; i16 < i2; i16++) {
-                    Iterator<FragmentTransaction.Op> it3 = arrayList.get(i16).mOps.iterator();
+                for (int i22 = i; i22 < i3; i22++) {
+                    Iterator<FragmentTransaction.Op> it3 = arrayList3.get(i22).mOps.iterator();
                     while (it3.hasNext()) {
-                        Fragment fragment8 = it3.next().mFragment;
-                        if (!(fragment8 == null || (viewGroup = fragment8.mContainer) == null)) {
+                        Fragment fragment11 = it3.next().mFragment;
+                        if (!(fragment11 == null || (viewGroup = fragment11.mContainer) == null)) {
                             hashSet.add(SpecialEffectsController.getOrCreateController(viewGroup, getSpecialEffectsControllerFactory()));
                         }
                     }
@@ -1189,60 +1479,23 @@ public abstract class FragmentManager {
                     specialEffectsController.markPostponedState();
                     specialEffectsController.executePendingOperations();
                 }
-                for (int i17 = i; i17 < i2; i17++) {
-                    BackStackRecord backStackRecord4 = arrayList.get(i17);
-                    if (arrayList2.get(i17).booleanValue() && backStackRecord4.mIndex >= 0) {
+                for (int i23 = i; i23 < i3; i23++) {
+                    BackStackRecord backStackRecord4 = arrayList3.get(i23);
+                    if (arrayList2.get(i23).booleanValue() && backStackRecord4.mIndex >= 0) {
                         backStackRecord4.mIndex = -1;
                     }
-                    Objects.requireNonNull(backStackRecord4);
+                    backStackRecord4.getClass();
                 }
                 return;
             }
         }
     }
 
-    public boolean executePendingTransactions() {
-        boolean execPendingActions = execPendingActions(true);
-        forcePostponedTransactions();
-        return execPendingActions;
-    }
-
-    public final void executePostponedTransaction(ArrayList<BackStackRecord> arrayList, ArrayList<Boolean> arrayList2) {
-        int indexOf;
-        int indexOf2;
-        ArrayList<StartEnterTransitionListener> arrayList3 = this.mPostponedTransactions;
-        int size = arrayList3 == null ? 0 : arrayList3.size();
-        int i = 0;
-        while (i < size) {
-            StartEnterTransitionListener startEnterTransitionListener = this.mPostponedTransactions.get(i);
-            if (arrayList == null || startEnterTransitionListener.mIsBack || (indexOf2 = arrayList.indexOf(startEnterTransitionListener.mRecord)) == -1 || arrayList2 == null || !arrayList2.get(indexOf2).booleanValue()) {
-                if ((startEnterTransitionListener.mNumPostponed == 0) || (arrayList != null && startEnterTransitionListener.mRecord.interactsWith(arrayList, 0, arrayList.size()))) {
-                    this.mPostponedTransactions.remove(i);
-                    i--;
-                    size--;
-                    if (arrayList == null || startEnterTransitionListener.mIsBack || (indexOf = arrayList.indexOf(startEnterTransitionListener.mRecord)) == -1 || arrayList2 == null || !arrayList2.get(indexOf).booleanValue()) {
-                        startEnterTransitionListener.completeTransaction();
-                    } else {
-                        BackStackRecord backStackRecord = startEnterTransitionListener.mRecord;
-                        backStackRecord.mManager.completeExecute(backStackRecord, startEnterTransitionListener.mIsBack, false, false);
-                    }
-                }
-            } else {
-                this.mPostponedTransactions.remove(i);
-                i--;
-                size--;
-                BackStackRecord backStackRecord2 = startEnterTransitionListener.mRecord;
-                backStackRecord2.mManager.completeExecute(backStackRecord2, startEnterTransitionListener.mIsBack, false, false);
-            }
-            i++;
-        }
-    }
-
-    public Fragment findActiveFragment(String str) {
+    public final Fragment findActiveFragment(String str) {
         return this.mFragmentStore.findActiveFragment(str);
     }
 
-    public Fragment findFragmentById(int i) {
+    public final Fragment findFragmentById(int i) {
         FragmentStore fragmentStore = this.mFragmentStore;
         int size = fragmentStore.mAdded.size();
         while (true) {
@@ -1266,9 +1519,8 @@ public abstract class FragmentManager {
         }
     }
 
-    public Fragment findFragmentByTag(String str) {
+    public final Fragment findFragmentByTag(String str) {
         FragmentStore fragmentStore = this.mFragmentStore;
-        Objects.requireNonNull(fragmentStore);
         int size = fragmentStore.mAdded.size();
         while (true) {
             size--;
@@ -1291,17 +1543,6 @@ public abstract class FragmentManager {
         }
     }
 
-    public final void forcePostponedTransactions() {
-        Iterator it = ((HashSet) collectAllSpecialEffectsController()).iterator();
-        while (it.hasNext()) {
-            SpecialEffectsController specialEffectsController = (SpecialEffectsController) it.next();
-            if (specialEffectsController.mIsContainerPostponed) {
-                specialEffectsController.mIsContainerPostponed = false;
-                specialEffectsController.executePendingOperations();
-            }
-        }
-    }
-
     public final ViewGroup getFragmentContainer(Fragment fragment) {
         ViewGroup viewGroup = fragment.mContainer;
         if (viewGroup != null) {
@@ -1316,7 +1557,7 @@ public abstract class FragmentManager {
         return null;
     }
 
-    public FragmentFactory getFragmentFactory() {
+    public final FragmentFactory getFragmentFactory() {
         Fragment fragment = this.mParent;
         if (fragment != null) {
             return fragment.mFragmentManager.getFragmentFactory();
@@ -1324,7 +1565,7 @@ public abstract class FragmentManager {
         return this.mHostFragmentFactory;
     }
 
-    public SpecialEffectsControllerFactory getSpecialEffectsControllerFactory() {
+    public final SpecialEffectsControllerFactory getSpecialEffectsControllerFactory() {
         Fragment fragment = this.mParent;
         if (fragment != null) {
             return fragment.mFragmentManager.getSpecialEffectsControllerFactory();
@@ -1332,77 +1573,55 @@ public abstract class FragmentManager {
         return this.mDefaultSpecialEffectsControllerFactory;
     }
 
-    public void hideFragment(Fragment fragment) {
-        if (isLoggingEnabled(2)) {
-            Log.v("FragmentManager", "hide: " + fragment);
-        }
-        if (!fragment.mHidden) {
-            fragment.mHidden = true;
-            fragment.mHiddenChanged = true ^ fragment.mHiddenChanged;
-            setVisibleRemovingFragment(fragment);
-        }
-    }
-
-    public final boolean isMenuAvailable(Fragment fragment) {
-        FragmentManager fragmentManager = fragment.mChildFragmentManager;
-        Iterator it = ((ArrayList) fragmentManager.mFragmentStore.getActiveFragments()).iterator();
-        boolean z = false;
-        while (it.hasNext()) {
-            Fragment fragment2 = (Fragment) it.next();
-            if (fragment2 != null) {
-                z = fragmentManager.isMenuAvailable(fragment2);
-                continue;
+    public final void moveToState(int i, boolean z) {
+        FragmentHostCallback<?> fragmentHostCallback;
+        boolean z2;
+        if (this.mHost == null && i != -1) {
+            throw new IllegalStateException("No activity");
+        } else if (z || i != this.mCurState) {
+            this.mCurState = i;
+            FragmentStore fragmentStore = this.mFragmentStore;
+            Iterator<Fragment> it = fragmentStore.mAdded.iterator();
+            while (it.hasNext()) {
+                FragmentStateManager fragmentStateManager = fragmentStore.mActive.get(it.next().mWho);
+                if (fragmentStateManager != null) {
+                    fragmentStateManager.moveToExpectedState();
+                }
             }
-            if (z) {
-                return true;
+            Iterator<FragmentStateManager> it2 = fragmentStore.mActive.values().iterator();
+            while (true) {
+                boolean z3 = false;
+                if (!it2.hasNext()) {
+                    break;
+                }
+                FragmentStateManager next = it2.next();
+                if (next != null) {
+                    next.moveToExpectedState();
+                    Fragment fragment = next.mFragment;
+                    if (fragment.mRemoving) {
+                        if (fragment.mBackStackNesting > 0) {
+                            z2 = true;
+                        } else {
+                            z2 = false;
+                        }
+                        if (!z2) {
+                            z3 = true;
+                        }
+                    }
+                    if (z3) {
+                        fragmentStore.makeInactive(next);
+                    }
+                }
+            }
+            startPendingDeferredFragments();
+            if (this.mNeedMenuInvalidate && (fragmentHostCallback = this.mHost) != null && this.mCurState == 7) {
+                fragmentHostCallback.onSupportInvalidateOptionsMenu();
+                this.mNeedMenuInvalidate = false;
             }
         }
-        return false;
     }
 
-    public boolean isParentMenuVisible(Fragment fragment) {
-        FragmentManager fragmentManager;
-        if (fragment == null) {
-            return true;
-        }
-        return fragment.mMenuVisible && ((fragmentManager = fragment.mFragmentManager) == null || fragmentManager.isParentMenuVisible(fragment.mParentFragment));
-    }
-
-    public boolean isPrimaryNavigation(Fragment fragment) {
-        if (fragment == null) {
-            return true;
-        }
-        FragmentManager fragmentManager = fragment.mFragmentManager;
-        return fragment.equals(fragmentManager.mPrimaryNav) && isPrimaryNavigation(fragmentManager.mParent);
-    }
-
-    public boolean isStateSaved() {
-        return this.mStateSaved || this.mStopped;
-    }
-
-    /* JADX WARN: Code restructure failed: missing block: B:25:0x005c, code lost:
-        if (r0 != 5) goto L105;
-     */
-    /* JADX WARN: Removed duplicated region for block: B:103:0x01b4  */
-    /* JADX WARN: Removed duplicated region for block: B:31:0x006c  */
-    /* JADX WARN: Removed duplicated region for block: B:33:0x0071  */
-    /* JADX WARN: Removed duplicated region for block: B:35:0x0076  */
-    /* JADX WARN: Removed duplicated region for block: B:37:0x007b  */
-    /* JADX WARN: Removed duplicated region for block: B:39:0x0080  */
-    /* JADX WARN: Removed duplicated region for block: B:97:0x01a4  */
-    /*
-        Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
-    */
-    public void moveToState(final androidx.fragment.app.Fragment r17, int r18) {
-        /*
-            Method dump skipped, instructions count: 492
-            To view this dump add '--comments-level debug' option
-        */
-        throw new UnsupportedOperationException("Method not decompiled: androidx.fragment.app.FragmentManager.moveToState(androidx.fragment.app.Fragment, int):void");
-    }
-
-    public void noteStateNotSaved() {
+    public final void noteStateNotSaved() {
         if (this.mHost != null) {
             this.mStateSaved = false;
             this.mStopped = false;
@@ -1415,94 +1634,355 @@ public abstract class FragmentManager {
         }
     }
 
-    public void popBackStack() {
-        enqueueAction(new PopBackStackState(null, -1, 0), false);
+    public final void restoreSaveStateInternal(Parcelable parcelable) {
+        FragmentManagerState fragmentManagerState;
+        ArrayList<FragmentState> arrayList;
+        int i;
+        boolean z;
+        FragmentStateManager fragmentStateManager;
+        if (!(parcelable == null || (arrayList = (fragmentManagerState = (FragmentManagerState) parcelable).mSavedState) == null)) {
+            FragmentStore fragmentStore = this.mFragmentStore;
+            fragmentStore.mSavedState.clear();
+            Iterator<FragmentState> it = arrayList.iterator();
+            while (it.hasNext()) {
+                FragmentState next = it.next();
+                fragmentStore.mSavedState.put(next.mWho, next);
+            }
+            this.mFragmentStore.mActive.clear();
+            Iterator<String> it2 = fragmentManagerState.mActive.iterator();
+            while (it2.hasNext()) {
+                FragmentState savedState = this.mFragmentStore.setSavedState(it2.next(), null);
+                if (savedState != null) {
+                    Fragment fragment = this.mNonConfig.mRetainedFragments.get(savedState.mWho);
+                    if (fragment != null) {
+                        if (isLoggingEnabled(2)) {
+                            Log.v("FragmentManager", "restoreSaveState: re-attaching retained " + fragment);
+                        }
+                        fragmentStateManager = new FragmentStateManager(this.mLifecycleCallbacksDispatcher, this.mFragmentStore, fragment, savedState);
+                    } else {
+                        fragmentStateManager = new FragmentStateManager(this.mLifecycleCallbacksDispatcher, this.mFragmentStore, this.mHost.mContext.getClassLoader(), getFragmentFactory(), savedState);
+                    }
+                    Fragment fragment2 = fragmentStateManager.mFragment;
+                    fragment2.mFragmentManager = this;
+                    if (isLoggingEnabled(2)) {
+                        StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("restoreSaveState: active (");
+                        m.append(fragment2.mWho);
+                        m.append("): ");
+                        m.append(fragment2);
+                        Log.v("FragmentManager", m.toString());
+                    }
+                    fragmentStateManager.restoreState(this.mHost.mContext.getClassLoader());
+                    this.mFragmentStore.makeActive(fragmentStateManager);
+                    fragmentStateManager.mFragmentManagerState = this.mCurState;
+                }
+            }
+            FragmentManagerViewModel fragmentManagerViewModel = this.mNonConfig;
+            fragmentManagerViewModel.getClass();
+            Iterator it3 = new ArrayList(fragmentManagerViewModel.mRetainedFragments.values()).iterator();
+            while (true) {
+                i = 0;
+                if (!it3.hasNext()) {
+                    break;
+                }
+                Fragment fragment3 = (Fragment) it3.next();
+                if (this.mFragmentStore.mActive.get(fragment3.mWho) != null) {
+                    i = 1;
+                }
+                if (i == 0) {
+                    if (isLoggingEnabled(2)) {
+                        Log.v("FragmentManager", "Discarding retained Fragment " + fragment3 + " that was not found in the set of active Fragments " + fragmentManagerState.mActive);
+                    }
+                    this.mNonConfig.removeRetainedFragment(fragment3);
+                    fragment3.mFragmentManager = this;
+                    FragmentStateManager fragmentStateManager2 = new FragmentStateManager(this.mLifecycleCallbacksDispatcher, this.mFragmentStore, fragment3);
+                    fragmentStateManager2.mFragmentManagerState = 1;
+                    fragmentStateManager2.moveToExpectedState();
+                    fragment3.mRemoving = true;
+                    fragmentStateManager2.moveToExpectedState();
+                }
+            }
+            FragmentStore fragmentStore2 = this.mFragmentStore;
+            ArrayList<String> arrayList2 = fragmentManagerState.mAdded;
+            fragmentStore2.mAdded.clear();
+            if (arrayList2 != null) {
+                for (String str : arrayList2) {
+                    Fragment findActiveFragment = fragmentStore2.findActiveFragment(str);
+                    if (findActiveFragment != null) {
+                        if (isLoggingEnabled(2)) {
+                            Log.v("FragmentManager", "restoreSaveState: added (" + str + "): " + findActiveFragment);
+                        }
+                        fragmentStore2.addFragment(findActiveFragment);
+                    } else {
+                        throw new IllegalStateException(AbstractResolvableFuture$$ExternalSyntheticOutline0.m("No instantiated fragment for (", str, ")"));
+                    }
+                }
+            }
+            if (fragmentManagerState.mBackStack != null) {
+                this.mBackStack = new ArrayList<>(fragmentManagerState.mBackStack.length);
+                int i2 = 0;
+                while (true) {
+                    BackStackRecordState[] backStackRecordStateArr = fragmentManagerState.mBackStack;
+                    if (i2 >= backStackRecordStateArr.length) {
+                        break;
+                    }
+                    BackStackRecordState backStackRecordState = backStackRecordStateArr[i2];
+                    backStackRecordState.getClass();
+                    BackStackRecord backStackRecord = new BackStackRecord(this);
+                    int i3 = 0;
+                    int i4 = 0;
+                    while (true) {
+                        int[] iArr = backStackRecordState.mOps;
+                        if (i3 >= iArr.length) {
+                            break;
+                        }
+                        FragmentTransaction.Op op = new FragmentTransaction.Op();
+                        int i5 = i3 + 1;
+                        op.mCmd = iArr[i3];
+                        if (isLoggingEnabled(2)) {
+                            Log.v("FragmentManager", "Instantiate " + backStackRecord + " op #" + i4 + " base fragment #" + backStackRecordState.mOps[i5]);
+                        }
+                        op.mOldMaxState = Lifecycle.State.values()[backStackRecordState.mOldMaxLifecycleStates[i4]];
+                        op.mCurrentMaxState = Lifecycle.State.values()[backStackRecordState.mCurrentMaxLifecycleStates[i4]];
+                        int[] iArr2 = backStackRecordState.mOps;
+                        int i6 = i5 + 1;
+                        if (iArr2[i5] != 0) {
+                            z = true;
+                        } else {
+                            z = false;
+                        }
+                        op.mFromExpandedOp = z;
+                        int i7 = i6 + 1;
+                        int i8 = iArr2[i6];
+                        op.mEnterAnim = i8;
+                        int i9 = i7 + 1;
+                        int i10 = iArr2[i7];
+                        op.mExitAnim = i10;
+                        int i11 = i9 + 1;
+                        int i12 = iArr2[i9];
+                        op.mPopEnterAnim = i12;
+                        int i13 = iArr2[i11];
+                        op.mPopExitAnim = i13;
+                        backStackRecord.mEnterAnim = i8;
+                        backStackRecord.mExitAnim = i10;
+                        backStackRecord.mPopEnterAnim = i12;
+                        backStackRecord.mPopExitAnim = i13;
+                        backStackRecord.addOp(op);
+                        i4++;
+                        i3 = i11 + 1;
+                    }
+                    backStackRecord.mTransition = backStackRecordState.mTransition;
+                    backStackRecord.mName = backStackRecordState.mName;
+                    backStackRecord.mAddToBackStack = true;
+                    backStackRecord.mBreadCrumbTitleRes = backStackRecordState.mBreadCrumbTitleRes;
+                    backStackRecord.mBreadCrumbTitleText = backStackRecordState.mBreadCrumbTitleText;
+                    backStackRecord.mBreadCrumbShortTitleRes = backStackRecordState.mBreadCrumbShortTitleRes;
+                    backStackRecord.mBreadCrumbShortTitleText = backStackRecordState.mBreadCrumbShortTitleText;
+                    backStackRecord.mSharedElementSourceNames = backStackRecordState.mSharedElementSourceNames;
+                    backStackRecord.mSharedElementTargetNames = backStackRecordState.mSharedElementTargetNames;
+                    backStackRecord.mReorderingAllowed = backStackRecordState.mReorderingAllowed;
+                    backStackRecord.mIndex = backStackRecordState.mIndex;
+                    for (int i14 = 0; i14 < backStackRecordState.mFragmentWhos.size(); i14++) {
+                        String str2 = backStackRecordState.mFragmentWhos.get(i14);
+                        if (str2 != null) {
+                            backStackRecord.mOps.get(i14).mFragment = findActiveFragment(str2);
+                        }
+                    }
+                    backStackRecord.bumpBackStackNesting(1);
+                    if (isLoggingEnabled(2)) {
+                        StringBuilder m2 = ExifInterface$$ExternalSyntheticOutline0.m("restoreAllState: back stack #", i2, " (index ");
+                        m2.append(backStackRecord.mIndex);
+                        m2.append("): ");
+                        m2.append(backStackRecord);
+                        Log.v("FragmentManager", m2.toString());
+                        PrintWriter printWriter = new PrintWriter(new LogWriter());
+                        backStackRecord.dump("  ", printWriter, false);
+                        printWriter.close();
+                    }
+                    this.mBackStack.add(backStackRecord);
+                    i2++;
+                }
+            } else {
+                this.mBackStack = null;
+            }
+            this.mBackStackIndex.set(fragmentManagerState.mBackStackIndex);
+            String str3 = fragmentManagerState.mPrimaryNavActiveWho;
+            if (str3 != null) {
+                Fragment findActiveFragment2 = findActiveFragment(str3);
+                this.mPrimaryNav = findActiveFragment2;
+                dispatchParentPrimaryNavigationFragmentChanged(findActiveFragment2);
+            }
+            ArrayList<String> arrayList3 = fragmentManagerState.mBackStackStateKeys;
+            if (arrayList3 != null) {
+                for (int i15 = 0; i15 < arrayList3.size(); i15++) {
+                    this.mBackStackStates.put(arrayList3.get(i15), fragmentManagerState.mBackStackStates.get(i15));
+                }
+            }
+            ArrayList<String> arrayList4 = fragmentManagerState.mResultKeys;
+            if (arrayList4 != null) {
+                while (i < arrayList4.size()) {
+                    Bundle bundle = fragmentManagerState.mResults.get(i);
+                    bundle.setClassLoader(this.mHost.mContext.getClassLoader());
+                    this.mResults.put(arrayList4.get(i), bundle);
+                    i++;
+                }
+            }
+            this.mLaunchedFragments = new ArrayDeque<>(fragmentManagerState.mLaunchedFragments);
+        }
     }
 
-    public boolean popBackStackImmediate() {
-        execPendingActions(false);
-        ensureExecReady(true);
-        Fragment fragment = this.mPrimaryNav;
-        if (fragment != null && fragment.getChildFragmentManager().popBackStackImmediate()) {
-            return true;
+    public final void scheduleCommit() {
+        synchronized (this.mPendingActions) {
+            boolean z = true;
+            if (this.mPendingActions.size() != 1) {
+                z = false;
+            }
+            if (z) {
+                this.mHost.mHandler.removeCallbacks(this.mExecCommit);
+                this.mHost.mHandler.post(this.mExecCommit);
+                updateOnBackPressedCallbackEnabled();
+            }
         }
-        boolean popBackStackState = popBackStackState(this.mTmpRecords, this.mTmpIsPop, null, -1, 0);
-        if (popBackStackState) {
+    }
+
+    public final void setMaxLifecycle(Fragment fragment, Lifecycle.State state) {
+        if (!fragment.equals(findActiveFragment(fragment.mWho)) || !(fragment.mHost == null || fragment.mFragmentManager == this)) {
+            throw new IllegalArgumentException("Fragment " + fragment + " is not an active fragment of FragmentManager " + this);
+        }
+        fragment.mMaxState = state;
+    }
+
+    public final void setPrimaryNavigationFragment(Fragment fragment) {
+        if (fragment == null || (fragment.equals(findActiveFragment(fragment.mWho)) && (fragment.mHost == null || fragment.mFragmentManager == this))) {
+            Fragment fragment2 = this.mPrimaryNav;
+            this.mPrimaryNav = fragment;
+            dispatchParentPrimaryNavigationFragmentChanged(fragment2);
+            dispatchParentPrimaryNavigationFragmentChanged(this.mPrimaryNav);
+            return;
+        }
+        throw new IllegalArgumentException("Fragment " + fragment + " is not an active fragment of FragmentManager " + this);
+    }
+
+    public final void startPendingDeferredFragments() {
+        Iterator it = this.mFragmentStore.getActiveFragmentStateManagers().iterator();
+        while (it.hasNext()) {
+            FragmentStateManager fragmentStateManager = (FragmentStateManager) it.next();
+            Fragment fragment = fragmentStateManager.mFragment;
+            if (fragment.mDeferStart) {
+                if (this.mExecutingActions) {
+                    this.mHavePendingDeferredStart = true;
+                } else {
+                    fragment.mDeferStart = false;
+                    fragmentStateManager.moveToExpectedState();
+                }
+            }
+        }
+    }
+
+    public final String toString() {
+        StringBuilder sb = new StringBuilder(128);
+        sb.append("FragmentManager{");
+        sb.append(Integer.toHexString(System.identityHashCode(this)));
+        sb.append(" in ");
+        Fragment fragment = this.mParent;
+        if (fragment != null) {
+            sb.append(fragment.getClass().getSimpleName());
+            sb.append("{");
+            sb.append(Integer.toHexString(System.identityHashCode(this.mParent)));
+            sb.append("}");
+        } else {
+            FragmentHostCallback<?> fragmentHostCallback = this.mHost;
+            if (fragmentHostCallback != null) {
+                sb.append(fragmentHostCallback.getClass().getSimpleName());
+                sb.append("{");
+                sb.append(Integer.toHexString(System.identityHashCode(this.mHost)));
+                sb.append("}");
+            } else {
+                sb.append("null");
+            }
+        }
+        sb.append("}}");
+        return sb.toString();
+    }
+
+    public final void updateOnBackPressedCallbackEnabled() {
+        int i;
+        synchronized (this.mPendingActions) {
+            boolean z = true;
+            if (!this.mPendingActions.isEmpty()) {
+                this.mOnBackPressedCallback.mEnabled = true;
+                return;
+            }
+            AnonymousClass1 r0 = this.mOnBackPressedCallback;
+            ArrayList<BackStackRecord> arrayList = this.mBackStack;
+            if (arrayList != null) {
+                i = arrayList.size();
+            } else {
+                i = 0;
+            }
+            if (i <= 0 || !isPrimaryNavigation(this.mParent)) {
+                z = false;
+            }
+            r0.mEnabled = z;
+        }
+    }
+
+    /* JADX WARN: Finally extract failed */
+    public final boolean execPendingActions(boolean z) {
+        boolean z2;
+        ensureExecReady(z);
+        boolean z3 = false;
+        while (true) {
+            ArrayList<BackStackRecord> arrayList = this.mTmpRecords;
+            ArrayList<Boolean> arrayList2 = this.mTmpIsPop;
+            synchronized (this.mPendingActions) {
+                if (this.mPendingActions.isEmpty()) {
+                    z2 = false;
+                } else {
+                    int size = this.mPendingActions.size();
+                    z2 = false;
+                    for (int i = 0; i < size; i++) {
+                        z2 |= this.mPendingActions.get(i).generateOps(arrayList, arrayList2);
+                    }
+                    this.mPendingActions.clear();
+                    this.mHost.mHandler.removeCallbacks(this.mExecCommit);
+                }
+            }
+            if (!z2) {
+                break;
+            }
             this.mExecutingActions = true;
             try {
                 removeRedundantOperationsAndExecute(this.mTmpRecords, this.mTmpIsPop);
-            } finally {
                 cleanupExec();
+                z3 = true;
+            } catch (Throwable th) {
+                cleanupExec();
+                throw th;
             }
         }
         updateOnBackPressedCallbackEnabled();
-        doPendingDeferredStart();
-        this.mFragmentStore.burpActive();
-        return popBackStackState;
+        if (this.mHavePendingDeferredStart) {
+            this.mHavePendingDeferredStart = false;
+            startPendingDeferredFragments();
+        }
+        this.mFragmentStore.mActive.values().removeAll(Collections.singleton(null));
+        return z3;
     }
 
-    public boolean popBackStackState(ArrayList<BackStackRecord> arrayList, ArrayList<Boolean> arrayList2, String str, int i, int i2) {
-        boolean z = (i2 & 1) != 0;
-        ArrayList<BackStackRecord> arrayList3 = this.mBackStack;
-        int i3 = -1;
-        if (arrayList3 != null && !arrayList3.isEmpty()) {
-            if (str != null || i >= 0) {
-                int size = this.mBackStack.size() - 1;
-                while (size >= 0) {
-                    BackStackRecord backStackRecord = this.mBackStack.get(size);
-                    if ((str != null && str.equals(backStackRecord.mName)) || (i >= 0 && i == backStackRecord.mIndex)) {
-                        break;
-                    }
-                    size--;
-                }
-                if (size >= 0) {
-                    if (z) {
-                        while (size > 0) {
-                            int i4 = size - 1;
-                            BackStackRecord backStackRecord2 = this.mBackStack.get(i4);
-                            if ((str == null || !str.equals(backStackRecord2.mName)) && (i < 0 || i != backStackRecord2.mIndex)) {
-                                break;
-                            }
-                            size = i4;
-                        }
-                    } else if (size != this.mBackStack.size() - 1) {
-                        size++;
-                    }
-                }
-                i3 = size;
-            } else {
-                i3 = z ? 0 : (-1) + this.mBackStack.size();
+    public final void forcePostponedTransactions() {
+        Iterator it = collectAllSpecialEffectsController().iterator();
+        while (it.hasNext()) {
+            SpecialEffectsController specialEffectsController = (SpecialEffectsController) it.next();
+            if (specialEffectsController.mIsContainerPostponed) {
+                specialEffectsController.mIsContainerPostponed = false;
+                specialEffectsController.executePendingOperations();
             }
-        }
-        if (i3 < 0) {
-            return false;
-        }
-        for (int size2 = this.mBackStack.size() - 1; size2 >= i3; size2--) {
-            arrayList.add(this.mBackStack.remove(size2));
-            arrayList2.add(Boolean.TRUE);
-        }
-        return true;
-    }
-
-    public void removeFragment(Fragment fragment) {
-        if (isLoggingEnabled(2)) {
-            Log.v("FragmentManager", "remove: " + fragment + " nesting=" + fragment.mBackStackNesting);
-        }
-        boolean z = !fragment.isInBackStack();
-        if (!fragment.mDetached || z) {
-            this.mFragmentStore.removeFragment(fragment);
-            if (isMenuAvailable(fragment)) {
-                this.mNeedMenuInvalidate = true;
-            }
-            fragment.mRemoving = true;
-            setVisibleRemovingFragment(fragment);
         }
     }
 
     public final void removeRedundantOperationsAndExecute(ArrayList<BackStackRecord> arrayList, ArrayList<Boolean> arrayList2) {
         if (!arrayList.isEmpty()) {
             if (arrayList.size() == arrayList2.size()) {
-                executePostponedTransaction(arrayList, arrayList2);
                 int size = arrayList.size();
                 int i = 0;
                 int i2 = 0;
@@ -1532,490 +2012,136 @@ public abstract class FragmentManager {
         }
     }
 
-    public void restoreSaveState(Parcelable parcelable) {
-        FragmentStateManager fragmentStateManager;
-        if (parcelable != null) {
-            FragmentManagerState fragmentManagerState = (FragmentManagerState) parcelable;
-            if (fragmentManagerState.mActive != null) {
-                this.mFragmentStore.mActive.clear();
-                Iterator<FragmentState> it = fragmentManagerState.mActive.iterator();
-                while (it.hasNext()) {
-                    FragmentState next = it.next();
-                    if (next != null) {
-                        Fragment fragment = this.mNonConfig.mRetainedFragments.get(next.mWho);
-                        if (fragment != null) {
-                            if (isLoggingEnabled(2)) {
-                                Log.v("FragmentManager", "restoreSaveState: re-attaching retained " + fragment);
-                            }
-                            fragmentStateManager = new FragmentStateManager(this.mLifecycleCallbacksDispatcher, this.mFragmentStore, fragment, next);
-                        } else {
-                            fragmentStateManager = new FragmentStateManager(this.mLifecycleCallbacksDispatcher, this.mFragmentStore, this.mHost.mContext.getClassLoader(), getFragmentFactory(), next);
-                        }
-                        Fragment fragment2 = fragmentStateManager.mFragment;
-                        fragment2.mFragmentManager = this;
-                        if (isLoggingEnabled(2)) {
-                            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("restoreSaveState: active (");
-                            m.append(fragment2.mWho);
-                            m.append("): ");
-                            m.append(fragment2);
-                            Log.v("FragmentManager", m.toString());
-                        }
-                        fragmentStateManager.restoreState(this.mHost.mContext.getClassLoader());
-                        this.mFragmentStore.makeActive(fragmentStateManager);
-                        fragmentStateManager.mFragmentManagerState = this.mCurState;
-                    }
-                }
-                FragmentManagerViewModel fragmentManagerViewModel = this.mNonConfig;
-                Objects.requireNonNull(fragmentManagerViewModel);
-                Iterator it2 = new ArrayList(fragmentManagerViewModel.mRetainedFragments.values()).iterator();
-                while (it2.hasNext()) {
-                    Fragment fragment3 = (Fragment) it2.next();
-                    if (!this.mFragmentStore.containsActiveFragment(fragment3.mWho)) {
-                        if (isLoggingEnabled(2)) {
-                            Log.v("FragmentManager", "Discarding retained Fragment " + fragment3 + " that was not found in the set of active Fragments " + fragmentManagerState.mActive);
-                        }
-                        this.mNonConfig.removeRetainedFragment(fragment3);
-                        fragment3.mFragmentManager = this;
-                        FragmentStateManager fragmentStateManager2 = new FragmentStateManager(this.mLifecycleCallbacksDispatcher, this.mFragmentStore, fragment3);
-                        fragmentStateManager2.mFragmentManagerState = 1;
-                        fragmentStateManager2.moveToExpectedState();
-                        fragment3.mRemoving = true;
-                        fragmentStateManager2.moveToExpectedState();
-                    }
-                }
-                FragmentStore fragmentStore = this.mFragmentStore;
-                ArrayList<String> arrayList = fragmentManagerState.mAdded;
-                fragmentStore.mAdded.clear();
-                if (arrayList != null) {
-                    for (String str : arrayList) {
-                        Fragment findActiveFragment = fragmentStore.findActiveFragment(str);
-                        if (findActiveFragment != null) {
-                            if (isLoggingEnabled(2)) {
-                                Log.v("FragmentManager", "restoreSaveState: added (" + str + "): " + findActiveFragment);
-                            }
-                            fragmentStore.addFragment(findActiveFragment);
-                        } else {
-                            throw new IllegalStateException(AbstractResolvableFuture$$ExternalSyntheticOutline0.m("No instantiated fragment for (", str, ")"));
-                        }
-                    }
-                }
-                if (fragmentManagerState.mBackStack != null) {
-                    this.mBackStack = new ArrayList<>(fragmentManagerState.mBackStack.length);
-                    int i = 0;
-                    while (true) {
-                        BackStackRecordState[] backStackRecordStateArr = fragmentManagerState.mBackStack;
-                        if (i >= backStackRecordStateArr.length) {
-                            break;
-                        }
-                        BackStackRecordState backStackRecordState = backStackRecordStateArr[i];
-                        Objects.requireNonNull(backStackRecordState);
-                        BackStackRecord backStackRecord = new BackStackRecord(this);
-                        int i2 = 0;
-                        int i3 = 0;
-                        while (true) {
-                            int[] iArr = backStackRecordState.mOps;
-                            if (i2 >= iArr.length) {
-                                break;
-                            }
-                            FragmentTransaction.Op op = new FragmentTransaction.Op();
-                            int i4 = i2 + 1;
-                            op.mCmd = iArr[i2];
-                            if (isLoggingEnabled(2)) {
-                                Log.v("FragmentManager", "Instantiate " + backStackRecord + " op #" + i3 + " base fragment #" + backStackRecordState.mOps[i4]);
-                            }
-                            op.mOldMaxState = Lifecycle.State.values()[backStackRecordState.mOldMaxLifecycleStates[i3]];
-                            op.mCurrentMaxState = Lifecycle.State.values()[backStackRecordState.mCurrentMaxLifecycleStates[i3]];
-                            int[] iArr2 = backStackRecordState.mOps;
-                            int i5 = i4 + 1;
-                            op.mTopmostFragment = iArr2[i4] != 0;
-                            int i6 = i5 + 1;
-                            int i7 = iArr2[i5];
-                            op.mEnterAnim = i7;
-                            int i8 = i6 + 1;
-                            int i9 = iArr2[i6];
-                            op.mExitAnim = i9;
-                            int i10 = i8 + 1;
-                            int i11 = iArr2[i8];
-                            op.mPopEnterAnim = i11;
-                            i2 = i10 + 1;
-                            int i12 = iArr2[i10];
-                            op.mPopExitAnim = i12;
-                            backStackRecord.mEnterAnim = i7;
-                            backStackRecord.mExitAnim = i9;
-                            backStackRecord.mPopEnterAnim = i11;
-                            backStackRecord.mPopExitAnim = i12;
-                            backStackRecord.addOp(op);
-                            i3++;
-                        }
-                        backStackRecord.mTransition = backStackRecordState.mTransition;
-                        backStackRecord.mName = backStackRecordState.mName;
-                        backStackRecord.mAddToBackStack = true;
-                        backStackRecord.mBreadCrumbTitleRes = backStackRecordState.mBreadCrumbTitleRes;
-                        backStackRecord.mBreadCrumbTitleText = backStackRecordState.mBreadCrumbTitleText;
-                        backStackRecord.mBreadCrumbShortTitleRes = backStackRecordState.mBreadCrumbShortTitleRes;
-                        backStackRecord.mBreadCrumbShortTitleText = backStackRecordState.mBreadCrumbShortTitleText;
-                        backStackRecord.mSharedElementSourceNames = backStackRecordState.mSharedElementSourceNames;
-                        backStackRecord.mSharedElementTargetNames = backStackRecordState.mSharedElementTargetNames;
-                        backStackRecord.mReorderingAllowed = backStackRecordState.mReorderingAllowed;
-                        backStackRecord.mIndex = backStackRecordState.mIndex;
-                        for (int i13 = 0; i13 < backStackRecordState.mFragmentWhos.size(); i13++) {
-                            String str2 = backStackRecordState.mFragmentWhos.get(i13);
-                            if (str2 != null) {
-                                backStackRecord.mOps.get(i13).mFragment = this.mFragmentStore.findActiveFragment(str2);
-                            }
-                        }
-                        backStackRecord.bumpBackStackNesting(1);
-                        if (isLoggingEnabled(2)) {
-                            Log.v("FragmentManager", "restoreAllState: back stack #" + i + " (index " + backStackRecord.mIndex + "): " + backStackRecord);
-                            PrintWriter printWriter = new PrintWriter(new LogWriter("FragmentManager"));
-                            backStackRecord.dump("  ", printWriter, false);
-                            printWriter.close();
-                        }
-                        this.mBackStack.add(backStackRecord);
-                        i++;
-                    }
-                } else {
-                    this.mBackStack = null;
-                }
-                this.mBackStackIndex.set(fragmentManagerState.mBackStackIndex);
-                String str3 = fragmentManagerState.mPrimaryNavActiveWho;
-                if (str3 != null) {
-                    Fragment findActiveFragment2 = findActiveFragment(str3);
-                    this.mPrimaryNav = findActiveFragment2;
-                    dispatchParentPrimaryNavigationFragmentChanged(findActiveFragment2);
-                }
-                ArrayList<String> arrayList2 = fragmentManagerState.mResultKeys;
-                if (arrayList2 != null) {
-                    for (int i14 = 0; i14 < arrayList2.size(); i14++) {
-                        this.mResults.put(arrayList2.get(i14), fragmentManagerState.mResults.get(i14));
-                    }
-                }
-                this.mLaunchedFragments = new ArrayDeque<>(fragmentManagerState.mLaunchedFragments);
-            }
-        }
-    }
-
-    public Parcelable saveAllState() {
-        int i;
-        BackStackRecordState[] backStackRecordStateArr;
+    public final Parcelable saveAllStateInternal() {
         ArrayList<String> arrayList;
         int size;
         forcePostponedTransactions();
-        endAnimatingAwayFragments();
+        Iterator it = collectAllSpecialEffectsController().iterator();
+        while (it.hasNext()) {
+            ((SpecialEffectsController) it.next()).forceCompleteAllOperations();
+        }
         execPendingActions(true);
         this.mStateSaved = true;
         this.mNonConfig.mIsStateSaved = true;
         FragmentStore fragmentStore = this.mFragmentStore;
-        Objects.requireNonNull(fragmentStore);
-        ArrayList<FragmentState> arrayList2 = new ArrayList<>(fragmentStore.mActive.size());
-        Iterator<FragmentStateManager> it = fragmentStore.mActive.values().iterator();
-        while (true) {
-            backStackRecordStateArr = null;
-            Bundle bundle = null;
-            backStackRecordStateArr = null;
-            if (!it.hasNext()) {
-                break;
-            }
-            FragmentStateManager next = it.next();
-            if (next != null) {
-                Fragment fragment = next.mFragment;
-                FragmentState fragmentState = new FragmentState(fragment);
-                Fragment fragment2 = next.mFragment;
-                if (fragment2.mState <= -1 || fragmentState.mSavedFragmentState != null) {
-                    fragmentState.mSavedFragmentState = fragment2.mSavedFragmentState;
-                } else {
-                    Bundle bundle2 = new Bundle();
-                    Fragment fragment3 = next.mFragment;
-                    fragment3.onSaveInstanceState(bundle2);
-                    fragment3.mSavedStateRegistryController.performSave(bundle2);
-                    Parcelable saveAllState = fragment3.mChildFragmentManager.saveAllState();
-                    if (saveAllState != null) {
-                        bundle2.putParcelable("android:support:fragments", saveAllState);
-                    }
-                    next.mDispatcher.dispatchOnFragmentSaveInstanceState(next.mFragment, bundle2, false);
-                    if (!bundle2.isEmpty()) {
-                        bundle = bundle2;
-                    }
-                    if (next.mFragment.mView != null) {
-                        next.saveViewState();
-                    }
-                    if (next.mFragment.mSavedViewState != null) {
-                        if (bundle == null) {
-                            bundle = new Bundle();
-                        }
-                        bundle.putSparseParcelableArray("android:view_state", next.mFragment.mSavedViewState);
-                    }
-                    if (next.mFragment.mSavedViewRegistryState != null) {
-                        if (bundle == null) {
-                            bundle = new Bundle();
-                        }
-                        bundle.putBundle("android:view_registry_state", next.mFragment.mSavedViewRegistryState);
-                    }
-                    if (!next.mFragment.mUserVisibleHint) {
-                        if (bundle == null) {
-                            bundle = new Bundle();
-                        }
-                        bundle.putBoolean("android:user_visible_hint", next.mFragment.mUserVisibleHint);
-                    }
-                    fragmentState.mSavedFragmentState = bundle;
-                    if (next.mFragment.mTargetWho != null) {
-                        if (bundle == null) {
-                            fragmentState.mSavedFragmentState = new Bundle();
-                        }
-                        fragmentState.mSavedFragmentState.putString("android:target_state", next.mFragment.mTargetWho);
-                        int i2 = next.mFragment.mTargetRequestCode;
-                        if (i2 != 0) {
-                            fragmentState.mSavedFragmentState.putInt("android:target_req_state", i2);
-                        }
-                    }
-                }
-                arrayList2.add(fragmentState);
+        fragmentStore.getClass();
+        ArrayList<String> arrayList2 = new ArrayList<>(fragmentStore.mActive.size());
+        for (FragmentStateManager fragmentStateManager : fragmentStore.mActive.values()) {
+            if (fragmentStateManager != null) {
+                Fragment fragment = fragmentStateManager.mFragment;
+                fragmentStateManager.saveState();
+                arrayList2.add(fragment.mWho);
                 if (isLoggingEnabled(2)) {
-                    Log.v("FragmentManager", "Saved state of " + fragment + ": " + fragmentState.mSavedFragmentState);
+                    Log.v("FragmentManager", "Saved state of " + fragment + ": " + fragment.mSavedFragmentState);
                 }
             }
         }
-        if (arrayList2.isEmpty()) {
+        FragmentStore fragmentStore2 = this.mFragmentStore;
+        fragmentStore2.getClass();
+        ArrayList<FragmentState> arrayList3 = new ArrayList<>(fragmentStore2.mSavedState.values());
+        BackStackRecordState[] backStackRecordStateArr = null;
+        if (arrayList3.isEmpty()) {
             if (isLoggingEnabled(2)) {
                 Log.v("FragmentManager", "saveAllState: no fragments!");
             }
             return null;
         }
-        FragmentStore fragmentStore2 = this.mFragmentStore;
-        synchronized (fragmentStore2.mAdded) {
-            if (fragmentStore2.mAdded.isEmpty()) {
+        FragmentStore fragmentStore3 = this.mFragmentStore;
+        synchronized (fragmentStore3.mAdded) {
+            if (fragmentStore3.mAdded.isEmpty()) {
                 arrayList = null;
             } else {
-                arrayList = new ArrayList<>(fragmentStore2.mAdded.size());
-                Iterator<Fragment> it2 = fragmentStore2.mAdded.iterator();
+                arrayList = new ArrayList<>(fragmentStore3.mAdded.size());
+                Iterator<Fragment> it2 = fragmentStore3.mAdded.iterator();
                 while (it2.hasNext()) {
-                    Fragment next2 = it2.next();
-                    arrayList.add(next2.mWho);
+                    Fragment next = it2.next();
+                    arrayList.add(next.mWho);
                     if (isLoggingEnabled(2)) {
-                        Log.v("FragmentManager", "saveAllState: adding fragment (" + next2.mWho + "): " + next2);
+                        Log.v("FragmentManager", "saveAllState: adding fragment (" + next.mWho + "): " + next);
                     }
                 }
             }
         }
-        ArrayList<BackStackRecord> arrayList3 = this.mBackStack;
-        if (arrayList3 != null && (size = arrayList3.size()) > 0) {
+        ArrayList<BackStackRecord> arrayList4 = this.mBackStack;
+        if (arrayList4 != null && (size = arrayList4.size()) > 0) {
             backStackRecordStateArr = new BackStackRecordState[size];
-            for (i = 0; i < size; i++) {
+            for (int i = 0; i < size; i++) {
                 backStackRecordStateArr[i] = new BackStackRecordState(this.mBackStack.get(i));
                 if (isLoggingEnabled(2)) {
-                    Log.v("FragmentManager", "saveAllState: adding back stack #" + i + ": " + this.mBackStack.get(i));
+                    StringBuilder m = ExifInterface$$ExternalSyntheticOutline0.m("saveAllState: adding back stack #", i, ": ");
+                    m.append(this.mBackStack.get(i));
+                    Log.v("FragmentManager", m.toString());
                 }
             }
         }
         FragmentManagerState fragmentManagerState = new FragmentManagerState();
+        fragmentManagerState.mSavedState = arrayList3;
         fragmentManagerState.mActive = arrayList2;
         fragmentManagerState.mAdded = arrayList;
         fragmentManagerState.mBackStack = backStackRecordStateArr;
         fragmentManagerState.mBackStackIndex = this.mBackStackIndex.get();
-        Fragment fragment4 = this.mPrimaryNav;
-        if (fragment4 != null) {
-            fragmentManagerState.mPrimaryNavActiveWho = fragment4.mWho;
+        Fragment fragment2 = this.mPrimaryNav;
+        if (fragment2 != null) {
+            fragmentManagerState.mPrimaryNavActiveWho = fragment2.mWho;
         }
+        fragmentManagerState.mBackStackStateKeys.addAll(this.mBackStackStates.keySet());
+        fragmentManagerState.mBackStackStates.addAll(this.mBackStackStates.values());
         fragmentManagerState.mResultKeys.addAll(this.mResults.keySet());
         fragmentManagerState.mResults.addAll(this.mResults.values());
         fragmentManagerState.mLaunchedFragments = new ArrayList<>(this.mLaunchedFragments);
         return fragmentManagerState;
     }
 
-    public void scheduleCommit() {
-        synchronized (this.mPendingActions) {
-            ArrayList<StartEnterTransitionListener> arrayList = this.mPostponedTransactions;
-            boolean z = false;
-            boolean z2 = arrayList != null && !arrayList.isEmpty();
-            if (this.mPendingActions.size() == 1) {
-                z = true;
-            }
-            if (z2 || z) {
-                this.mHost.mHandler.removeCallbacks(this.mExecCommit);
-                this.mHost.mHandler.post(this.mExecCommit);
-                updateOnBackPressedCallbackEnabled();
-            }
-        }
-    }
-
-    public void setExitAnimationOrder(Fragment fragment, boolean z) {
+    public final void setExitAnimationOrder(Fragment fragment, boolean z) {
         ViewGroup fragmentContainer = getFragmentContainer(fragment);
         if (fragmentContainer != null && (fragmentContainer instanceof FragmentContainerView)) {
             ((FragmentContainerView) fragmentContainer).mDrawDisappearingViewsFirst = !z;
         }
     }
 
-    public void setMaxLifecycle(Fragment fragment, Lifecycle.State state) {
-        if (!fragment.equals(findActiveFragment(fragment.mWho)) || !(fragment.mHost == null || fragment.mFragmentManager == this)) {
-            throw new IllegalArgumentException("Fragment " + fragment + " is not an active fragment of FragmentManager " + this);
-        }
-        fragment.mMaxState = state;
-    }
-
-    public void setPrimaryNavigationFragment(Fragment fragment) {
-        if (fragment == null || (fragment.equals(findActiveFragment(fragment.mWho)) && (fragment.mHost == null || fragment.mFragmentManager == this))) {
-            Fragment fragment2 = this.mPrimaryNav;
-            this.mPrimaryNav = fragment;
-            dispatchParentPrimaryNavigationFragmentChanged(fragment2);
-            dispatchParentPrimaryNavigationFragmentChanged(this.mPrimaryNav);
-            return;
-        }
-        throw new IllegalArgumentException("Fragment " + fragment + " is not an active fragment of FragmentManager " + this);
-    }
-
     public final void setVisibleRemovingFragment(Fragment fragment) {
+        int i;
+        int i2;
+        int i3;
+        int i4;
         ViewGroup fragmentContainer = getFragmentContainer(fragment);
-        if (fragmentContainer != null && fragment.getNextAnim() > 0) {
-            if (fragmentContainer.getTag(R.id.visible_removing_fragment_view_tag) == null) {
-                fragmentContainer.setTag(R.id.visible_removing_fragment_view_tag, fragment);
-            }
-            ((Fragment) fragmentContainer.getTag(R.id.visible_removing_fragment_view_tag)).setNextAnim(fragment.getNextAnim());
-        }
-    }
-
-    public void showFragment(Fragment fragment) {
-        if (isLoggingEnabled(2)) {
-            Log.v("FragmentManager", "show: " + fragment);
-        }
-        if (fragment.mHidden) {
-            fragment.mHidden = false;
-            fragment.mHiddenChanged = !fragment.mHiddenChanged;
-        }
-    }
-
-    public final void startPendingDeferredFragments() {
-        Iterator it = ((ArrayList) this.mFragmentStore.getActiveFragmentStateManagers()).iterator();
-        while (it.hasNext()) {
-            FragmentStateManager fragmentStateManager = (FragmentStateManager) it.next();
-            Fragment fragment = fragmentStateManager.mFragment;
-            if (fragment.mDeferStart) {
-                if (this.mExecutingActions) {
-                    this.mHavePendingDeferredStart = true;
-                } else {
-                    fragment.mDeferStart = false;
-                    fragmentStateManager.moveToExpectedState();
-                }
-            }
-        }
-    }
-
-    public String toString() {
-        StringBuilder sb = new StringBuilder(128);
-        sb.append("FragmentManager{");
-        sb.append(Integer.toHexString(System.identityHashCode(this)));
-        sb.append(" in ");
-        Fragment fragment = this.mParent;
-        if (fragment != null) {
-            sb.append(fragment.getClass().getSimpleName());
-            sb.append("{");
-            sb.append(Integer.toHexString(System.identityHashCode(this.mParent)));
-            sb.append("}");
-        } else {
-            FragmentHostCallback<?> fragmentHostCallback = this.mHost;
-            if (fragmentHostCallback != null) {
-                sb.append(fragmentHostCallback.getClass().getSimpleName());
-                sb.append("{");
-                sb.append(Integer.toHexString(System.identityHashCode(this.mHost)));
-                sb.append("}");
+        if (fragmentContainer != null) {
+            Fragment.AnimationInfo animationInfo = fragment.mAnimationInfo;
+            boolean z = false;
+            if (animationInfo == null) {
+                i = 0;
             } else {
-                sb.append("null");
+                i = animationInfo.mEnterAnim;
             }
-        }
-        sb.append("}}");
-        return sb.toString();
-    }
-
-    public final void updateOnBackPressedCallbackEnabled() {
-        synchronized (this.mPendingActions) {
-            boolean z = true;
-            if (!this.mPendingActions.isEmpty()) {
-                this.mOnBackPressedCallback.mEnabled = true;
-                return;
+            if (animationInfo == null) {
+                i2 = 0;
+            } else {
+                i2 = animationInfo.mExitAnim;
             }
-            OnBackPressedCallback onBackPressedCallback = this.mOnBackPressedCallback;
-            ArrayList<BackStackRecord> arrayList = this.mBackStack;
-            if ((arrayList != null ? arrayList.size() : 0) <= 0 || !isPrimaryNavigation(this.mParent)) {
-                z = false;
+            int i5 = i2 + i;
+            if (animationInfo == null) {
+                i3 = 0;
+            } else {
+                i3 = animationInfo.mPopEnterAnim;
             }
-            onBackPressedCallback.mEnabled = z;
-        }
-    }
-
-    @SuppressLint({"BanParcelableUsage"})
-    /* loaded from: classes.dex */
-    public static class LaunchedFragmentInfo implements Parcelable {
-        public static final Parcelable.Creator<LaunchedFragmentInfo> CREATOR = new Parcelable.Creator<LaunchedFragmentInfo>() { // from class: androidx.fragment.app.FragmentManager.LaunchedFragmentInfo.1
-            @Override // android.os.Parcelable.Creator
-            public LaunchedFragmentInfo createFromParcel(Parcel parcel) {
-                return new LaunchedFragmentInfo(parcel);
+            int i6 = i3 + i5;
+            if (animationInfo == null) {
+                i4 = 0;
+            } else {
+                i4 = animationInfo.mPopExitAnim;
             }
-
-            @Override // android.os.Parcelable.Creator
-            public LaunchedFragmentInfo[] newArray(int i) {
-                return new LaunchedFragmentInfo[i];
-            }
-        };
-        public int mRequestCode;
-        public String mWho;
-
-        public LaunchedFragmentInfo(String str, int i) {
-            this.mWho = str;
-            this.mRequestCode = i;
-        }
-
-        @Override // android.os.Parcelable
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override // android.os.Parcelable
-        public void writeToParcel(Parcel parcel, int i) {
-            parcel.writeString(this.mWho);
-            parcel.writeInt(this.mRequestCode);
-        }
-
-        public LaunchedFragmentInfo(Parcel parcel) {
-            this.mWho = parcel.readString();
-            this.mRequestCode = parcel.readInt();
-        }
-    }
-
-    public void moveToState(int i, boolean z) {
-        FragmentHostCallback<?> fragmentHostCallback;
-        if (this.mHost == null && i != -1) {
-            throw new IllegalStateException("No activity");
-        } else if (z || i != this.mCurState) {
-            this.mCurState = i;
-            FragmentStore fragmentStore = this.mFragmentStore;
-            Iterator<Fragment> it = fragmentStore.mAdded.iterator();
-            while (it.hasNext()) {
-                FragmentStateManager fragmentStateManager = fragmentStore.mActive.get(it.next().mWho);
-                if (fragmentStateManager != null) {
-                    fragmentStateManager.moveToExpectedState();
+            if (i4 + i6 > 0) {
+                if (fragmentContainer.getTag(R.id.visible_removing_fragment_view_tag) == null) {
+                    fragmentContainer.setTag(R.id.visible_removing_fragment_view_tag, fragment);
                 }
-            }
-            Iterator<FragmentStateManager> it2 = fragmentStore.mActive.values().iterator();
-            while (true) {
-                boolean z2 = false;
-                if (!it2.hasNext()) {
-                    break;
+                Fragment fragment2 = (Fragment) fragmentContainer.getTag(R.id.visible_removing_fragment_view_tag);
+                Fragment.AnimationInfo animationInfo2 = fragment.mAnimationInfo;
+                if (animationInfo2 != null) {
+                    z = animationInfo2.mIsPop;
                 }
-                FragmentStateManager next = it2.next();
-                if (next != null) {
-                    next.moveToExpectedState();
-                    Fragment fragment = next.mFragment;
-                    if (fragment.mRemoving && !fragment.isInBackStack()) {
-                        z2 = true;
-                    }
-                    if (z2) {
-                        fragmentStore.makeInactive(next);
-                    }
+                if (fragment2.mAnimationInfo != null) {
+                    fragment2.ensureAnimationInfo().mIsPop = z;
                 }
-            }
-            startPendingDeferredFragments();
-            if (this.mNeedMenuInvalidate && (fragmentHostCallback = this.mHost) != null && this.mCurState == 7) {
-                fragmentHostCallback.onSupportInvalidateOptionsMenu();
-                this.mNeedMenuInvalidate = false;
             }
         }
     }

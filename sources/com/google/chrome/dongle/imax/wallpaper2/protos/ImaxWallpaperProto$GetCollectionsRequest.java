@@ -7,7 +7,7 @@ import com.google.protobuf.MessageLiteOrBuilder;
 import com.google.protobuf.Parser;
 import com.google.protobuf.ProtobufArrayList;
 import com.google.protobuf.RawMessageInfo;
-import java.util.Objects;
+import java.util.ArrayList;
 /* loaded from: classes.dex */
 public final class ImaxWallpaperProto$GetCollectionsRequest extends GeneratedMessageLite<ImaxWallpaperProto$GetCollectionsRequest, Builder> implements MessageLiteOrBuilder {
     private static final ImaxWallpaperProto$GetCollectionsRequest DEFAULT_INSTANCE;
@@ -25,10 +25,14 @@ public final class ImaxWallpaperProto$GetCollectionsRequest extends GeneratedMes
         public Builder() {
             super(ImaxWallpaperProto$GetCollectionsRequest.DEFAULT_INSTANCE);
         }
+    }
 
-        public Builder(ImaxWallpaperProto$1 imaxWallpaperProto$1) {
-            super(ImaxWallpaperProto$GetCollectionsRequest.DEFAULT_INSTANCE);
+    /* renamed from: -$$Nest$maddAllFilteringLabel  reason: not valid java name */
+    public static void m42$$Nest$maddAllFilteringLabel(ImaxWallpaperProto$GetCollectionsRequest imaxWallpaperProto$GetCollectionsRequest, ArrayList arrayList) {
+        if (!imaxWallpaperProto$GetCollectionsRequest.filteringLabel_.isModifiable()) {
+            imaxWallpaperProto$GetCollectionsRequest.filteringLabel_ = GeneratedMessageLite.mutableCopy(imaxWallpaperProto$GetCollectionsRequest.filteringLabel_);
         }
+        AbstractMessageLite.addAll(arrayList, imaxWallpaperProto$GetCollectionsRequest.filteringLabel_);
     }
 
     static {
@@ -37,26 +41,20 @@ public final class ImaxWallpaperProto$GetCollectionsRequest extends GeneratedMes
         GeneratedMessageLite.registerDefaultInstance(ImaxWallpaperProto$GetCollectionsRequest.class, imaxWallpaperProto$GetCollectionsRequest);
     }
 
-    public static void access$4400(ImaxWallpaperProto$GetCollectionsRequest imaxWallpaperProto$GetCollectionsRequest, String str) {
-        Objects.requireNonNull(imaxWallpaperProto$GetCollectionsRequest);
-        Objects.requireNonNull(str);
+    public static Builder newBuilder() {
+        return (Builder) ((GeneratedMessageLite.Builder) DEFAULT_INSTANCE.dynamicMethod(GeneratedMessageLite.MethodToInvoke.NEW_BUILDER));
+    }
+
+    /* renamed from: -$$Nest$msetLanguage  reason: not valid java name */
+    public static void m43$$Nest$msetLanguage(ImaxWallpaperProto$GetCollectionsRequest imaxWallpaperProto$GetCollectionsRequest, String str) {
+        imaxWallpaperProto$GetCollectionsRequest.getClass();
+        str.getClass();
         imaxWallpaperProto$GetCollectionsRequest.bitField0_ |= 1;
         imaxWallpaperProto$GetCollectionsRequest.language_ = str;
     }
 
-    public static void access$5200(ImaxWallpaperProto$GetCollectionsRequest imaxWallpaperProto$GetCollectionsRequest, Iterable iterable) {
-        if (!imaxWallpaperProto$GetCollectionsRequest.filteringLabel_.isModifiable()) {
-            imaxWallpaperProto$GetCollectionsRequest.filteringLabel_ = GeneratedMessageLite.mutableCopy(imaxWallpaperProto$GetCollectionsRequest.filteringLabel_);
-        }
-        AbstractMessageLite.addAll(iterable, imaxWallpaperProto$GetCollectionsRequest.filteringLabel_);
-    }
-
-    public static Builder newBuilder() {
-        return DEFAULT_INSTANCE.createBuilder();
-    }
-
     @Override // com.google.protobuf.GeneratedMessageLite
-    public final Object dynamicMethod(GeneratedMessageLite.MethodToInvoke methodToInvoke, Object obj, Object obj2) {
+    public final Object dynamicMethod(GeneratedMessageLite.MethodToInvoke methodToInvoke) {
         switch (methodToInvoke.ordinal()) {
             case 0:
                 return (byte) 1;
@@ -67,7 +65,7 @@ public final class ImaxWallpaperProto$GetCollectionsRequest extends GeneratedMes
             case 3:
                 return new ImaxWallpaperProto$GetCollectionsRequest();
             case 4:
-                return new Builder(null);
+                return new Builder();
             case 5:
                 return DEFAULT_INSTANCE;
             case 6:

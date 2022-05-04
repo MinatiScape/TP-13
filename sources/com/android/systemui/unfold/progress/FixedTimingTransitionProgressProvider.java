@@ -11,6 +11,7 @@ import java.util.List;
 import kotlin.jvm.internal.DefaultConstructorMarker;
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
+/* compiled from: FixedTimingTransitionProgressProvider.kt */
 /* loaded from: classes.dex */
 public final class FixedTimingTransitionProgressProvider implements UnfoldTransitionProgressProvider, FoldStateProvider.FoldUpdatesListener {
     @NotNull
@@ -26,6 +27,7 @@ public final class FixedTimingTransitionProgressProvider implements UnfoldTransi
     private final List<UnfoldTransitionProgressProvider.TransitionProgressListener> listeners = new ArrayList();
     private float transitionProgress;
 
+    /* compiled from: FixedTimingTransitionProgressProvider.kt */
     /* loaded from: classes.dex */
     public static final class AnimationProgressProperty extends FloatProperty<FixedTimingTransitionProgressProvider> {
         @NotNull
@@ -47,18 +49,24 @@ public final class FixedTimingTransitionProgressProvider implements UnfoldTransi
         }
     }
 
+    /* compiled from: FixedTimingTransitionProgressProvider.kt */
     /* loaded from: classes.dex */
     public final class AnimatorListener implements Animator.AnimatorListener {
         public final /* synthetic */ FixedTimingTransitionProgressProvider this$0;
 
-        public AnimatorListener(FixedTimingTransitionProgressProvider this$0) {
-            Intrinsics.checkNotNullParameter(this$0, "this$0");
-            this.this$0 = this$0;
-        }
-
         @Override // android.animation.Animator.AnimatorListener
         public void onAnimationCancel(@NotNull Animator animator) {
             Intrinsics.checkNotNullParameter(animator, "animator");
+        }
+
+        @Override // android.animation.Animator.AnimatorListener
+        public void onAnimationRepeat(@NotNull Animator animator) {
+            Intrinsics.checkNotNullParameter(animator, "animator");
+        }
+
+        public AnimatorListener(FixedTimingTransitionProgressProvider this$0) {
+            Intrinsics.checkNotNullParameter(this$0, "this$0");
+            this.this$0 = this$0;
         }
 
         @Override // android.animation.Animator.AnimatorListener
@@ -70,11 +78,6 @@ public final class FixedTimingTransitionProgressProvider implements UnfoldTransi
         }
 
         @Override // android.animation.Animator.AnimatorListener
-        public void onAnimationRepeat(@NotNull Animator animator) {
-            Intrinsics.checkNotNullParameter(animator, "animator");
-        }
-
-        @Override // android.animation.Animator.AnimatorListener
         public void onAnimationStart(@NotNull Animator animator) {
             Intrinsics.checkNotNullParameter(animator, "animator");
             for (UnfoldTransitionProgressProvider.TransitionProgressListener transitionProgressListener : this.this$0.listeners) {
@@ -83,14 +86,17 @@ public final class FixedTimingTransitionProgressProvider implements UnfoldTransi
         }
     }
 
-    /* loaded from: classes.dex */
-    public static final class Companion {
-        private Companion() {
+    @Override // com.android.systemui.unfold.updates.FoldStateProvider.FoldUpdatesListener
+    public void onFoldUpdate(int i) {
+        if (i == 2) {
+            this.animator.start();
+        } else if (i == 5) {
+            this.animator.cancel();
         }
+    }
 
-        public /* synthetic */ Companion(DefaultConstructorMarker defaultConstructorMarker) {
-            this();
-        }
+    @Override // com.android.systemui.unfold.updates.FoldStateProvider.FoldUpdatesListener
+    public void onHingeAngleUpdate(float f) {
     }
 
     public FixedTimingTransitionProgressProvider(@NotNull FoldStateProvider foldStateProvider) {
@@ -114,6 +120,11 @@ public final class FixedTimingTransitionProgressProvider implements UnfoldTransi
         this.transitionProgress = f;
     }
 
+    public void addCallback(@NotNull UnfoldTransitionProgressProvider.TransitionProgressListener listener) {
+        Intrinsics.checkNotNullParameter(listener, "listener");
+        this.listeners.add(listener);
+    }
+
     @Override // com.android.systemui.unfold.UnfoldTransitionProgressProvider
     public void destroy() {
         this.animator.cancel();
@@ -121,26 +132,19 @@ public final class FixedTimingTransitionProgressProvider implements UnfoldTransi
         this.foldStateProvider.stop();
     }
 
-    @Override // com.android.systemui.unfold.updates.FoldStateProvider.FoldUpdatesListener
-    public void onFoldUpdate(int i) {
-        if (i == 4) {
-            this.animator.start();
-        } else if (i == 7) {
-            this.animator.cancel();
-        }
-    }
-
-    @Override // com.android.systemui.unfold.updates.FoldStateProvider.FoldUpdatesListener
-    public void onHingeAngleUpdate(float f) {
-    }
-
-    public void addCallback(@NotNull UnfoldTransitionProgressProvider.TransitionProgressListener listener) {
-        Intrinsics.checkNotNullParameter(listener, "listener");
-        this.listeners.add(listener);
-    }
-
     public void removeCallback(@NotNull UnfoldTransitionProgressProvider.TransitionProgressListener listener) {
         Intrinsics.checkNotNullParameter(listener, "listener");
         this.listeners.remove(listener);
+    }
+
+    /* compiled from: FixedTimingTransitionProgressProvider.kt */
+    /* loaded from: classes.dex */
+    public static final class Companion {
+        public /* synthetic */ Companion(DefaultConstructorMarker defaultConstructorMarker) {
+            this();
+        }
+
+        private Companion() {
+        }
     }
 }

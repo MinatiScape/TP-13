@@ -1,17 +1,14 @@
 package com.google.android.material.shape;
 
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
+import com.bumptech.glide.manager.ApplicationLifecycle;
 /* loaded from: classes.dex */
-public class CutCornerTreatment extends CornerTreatment {
-    public CutCornerTreatment() {
-        super(0);
-    }
-
-    @Override // com.google.android.material.shape.CornerTreatment
-    public void getCornerPath(ShapePath shapePath, float f, float f2, float f3) {
-        shapePath.reset(HingeAngleProviderKt.FULLY_CLOSED_DEGREES, f3 * f2, 180.0f, 180.0f - f);
-        double d = f3;
-        double d2 = f2;
-        shapePath.lineTo((float) (Math.sin(Math.toRadians(f)) * d * d2), (float) (Math.sin(Math.toRadians(90.0f - f)) * d * d2));
+public final class CutCornerTreatment extends ApplicationLifecycle {
+    @Override // com.bumptech.glide.manager.ApplicationLifecycle
+    public final void getCornerPath(ShapePath shapePath, float f, float f2) {
+        shapePath.reset(f2 * f, 180.0f, 90.0f);
+        double d = f2;
+        double d2 = f;
+        shapePath.lineTo((float) (Math.sin(Math.toRadians(90.0f)) * d * d2), (float) (Math.sin(Math.toRadians((double) HingeAngleProviderKt.FULLY_CLOSED_DEGREES)) * d * d2));
     }
 }

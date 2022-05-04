@@ -1,71 +1,20 @@
 package com.google.android.gms.internal;
 
-import androidx.fragment.R$id$$ExternalSyntheticOutline0;
+import androidx.cardview.R$style$$ExternalSyntheticOutline0;
 import java.io.IOException;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ReadOnlyBufferException;
+/* compiled from: CodedOutputByteBufferNano.java */
 /* loaded from: classes.dex */
 public final class zzgrr {
     public final ByteBuffer zza;
 
-    public zzgrr(byte[] bArr, int i, int i2) {
-        ByteBuffer wrap = ByteBuffer.wrap(bArr, i, i2);
+    public zzgrr(byte[] bArr, int i) {
+        ByteBuffer wrap = ByteBuffer.wrap(bArr, 0, i);
         this.zza = wrap;
         wrap.order(ByteOrder.LITTLE_ENDIAN);
-    }
-
-    public static int zza(CharSequence charSequence) {
-        int length = charSequence.length();
-        int i = 0;
-        int i2 = 0;
-        while (i2 < length && charSequence.charAt(i2) < 128) {
-            i2++;
-        }
-        int i3 = length;
-        while (true) {
-            if (i2 >= length) {
-                break;
-            }
-            char charAt = charSequence.charAt(i2);
-            if (charAt < 2048) {
-                i3 += (127 - charAt) >>> 31;
-                i2++;
-            } else {
-                int length2 = charSequence.length();
-                while (i2 < length2) {
-                    char charAt2 = charSequence.charAt(i2);
-                    if (charAt2 < 2048) {
-                        i += (127 - charAt2) >>> 31;
-                    } else {
-                        i += 2;
-                        if (55296 <= charAt2 && charAt2 <= 57343) {
-                            if (Character.codePointAt(charSequence, i2) >= 65536) {
-                                i2++;
-                            } else {
-                                throw new IllegalArgumentException(R$id$$ExternalSyntheticOutline0.m(39, "Unpaired surrogate at index ", i2));
-                            }
-                        }
-                    }
-                    i2++;
-                }
-                i3 += i;
-            }
-        }
-        if (i3 >= length) {
-            return i3;
-        }
-        StringBuilder sb = new StringBuilder(54);
-        sb.append("UTF-8 length does not fit in int: ");
-        sb.append(i3 + 4294967296L);
-        throw new IllegalArgumentException(sb.toString());
-    }
-
-    public static int zzb(int i, String str) {
-        int zzb = zzb(i);
-        int zza = zza(str);
-        return zzb + zzd(zza) + zza;
     }
 
     public static int zzb(long j) {
@@ -109,16 +58,39 @@ public final class zzgrr {
         return (i & (-268435456)) == 0 ? 4 : 5;
     }
 
-    public static int zzf(int i, long j) {
-        return zzb(j) + zzb(i);
+    public final void zza(int i, String str) throws IOException {
+        zzc(i, 2);
+        try {
+            int zzd = zzd(str.length());
+            if (zzd == zzd(str.length() * 3)) {
+                int position = this.zza.position();
+                if (this.zza.remaining() >= zzd) {
+                    this.zza.position(position + zzd);
+                    zza(str, this.zza);
+                    int position2 = this.zza.position();
+                    this.zza.position(position);
+                    zzc((position2 - position) - zzd);
+                    this.zza.position(position2);
+                    return;
+                }
+                throw new zzgrs(position + zzd, this.zza.limit());
+            }
+            zzc(zza(str));
+            zza(str, this.zza);
+        } catch (BufferOverflowException e) {
+            zzgrs zzgrsVar = new zzgrs(this.zza.position(), this.zza.limit());
+            zzgrsVar.initCause(e);
+            throw zzgrsVar;
+        }
     }
 
-    public final void zzc(int i) throws IOException {
-        while ((i & (-128)) != 0) {
-            zzf((i & 127) | 128);
-            i >>>= 7;
-        }
-        zzf(i);
+    public final void zzb(int i, long j) throws IOException {
+        zzc(i, 0);
+        zza(j);
+    }
+
+    public final void zzc(int i, int i2) throws IOException {
+        zzc((i << 3) | i2);
     }
 
     public final void zzd(byte[] bArr) throws IOException {
@@ -139,14 +111,93 @@ public final class zzgrr {
         throw new zzgrs(this.zza.position(), this.zza.limit());
     }
 
-    public static int zzb(int i, zzgrz zzgrzVar) {
+    public final void zzc(int i) throws IOException {
+        while ((i & (-128)) != 0) {
+            zzf((i & 127) | 128);
+            i >>>= 7;
+        }
+        zzf(i);
+    }
+
+    public static int zzb(int i, String str) {
         int zzb = zzb(i);
-        int serializedSize = zzgrzVar.getSerializedSize();
+        int zza = zza(str);
+        return zzd(zza) + zza + zzb;
+    }
+
+    public static int zzb(int i, zzgrt zzgrtVar) {
+        int zzb = zzb(i);
+        int serializedSize = zzgrtVar.getSerializedSize();
         return zzd(serializedSize) + serializedSize + zzb;
     }
 
     public static int zzb(int i, byte[] bArr) {
-        return zzb(i) + zzd(bArr.length) + bArr.length;
+        return zzd(bArr.length) + bArr.length + zzb(i);
+    }
+
+    public static int zzb(int i) {
+        return zzd(i << 3);
+    }
+
+    public final void zza(int i, zzgrt zzgrtVar) throws IOException {
+        zzc(i, 2);
+        if (zzgrtVar.zzaz < 0) {
+            zzgrtVar.getSerializedSize();
+        }
+        zzc(zzgrtVar.zzaz);
+        zzgrtVar.writeTo(this);
+    }
+
+    public final void zza(int i, byte[] bArr) throws IOException {
+        zzc(i, 2);
+        zzc(bArr.length);
+        zzd(bArr);
+    }
+
+    public static int zza(CharSequence charSequence) {
+        int length = charSequence.length();
+        int i = 0;
+        int i2 = 0;
+        while (i2 < length && charSequence.charAt(i2) < 128) {
+            i2++;
+        }
+        int i3 = length;
+        while (true) {
+            if (i2 >= length) {
+                break;
+            }
+            char charAt = charSequence.charAt(i2);
+            if (charAt < 2048) {
+                i3 += (127 - charAt) >>> 31;
+                i2++;
+            } else {
+                int length2 = charSequence.length();
+                while (i2 < length2) {
+                    char charAt2 = charSequence.charAt(i2);
+                    if (charAt2 < 2048) {
+                        i += (127 - charAt2) >>> 31;
+                    } else {
+                        i += 2;
+                        if (55296 <= charAt2 && charAt2 <= 57343) {
+                            if (Character.codePointAt(charSequence, i2) >= 65536) {
+                                i2++;
+                            } else {
+                                throw new IllegalArgumentException(R$style$$ExternalSyntheticOutline0.m(39, "Unpaired surrogate at index ", i2));
+                            }
+                        }
+                    }
+                    i2++;
+                }
+                i3 += i;
+            }
+        }
+        if (i3 >= length) {
+            return i3;
+        }
+        StringBuilder sb = new StringBuilder(54);
+        sb.append("UTF-8 length does not fit in int: ");
+        sb.append(i3 + 4294967296L);
+        throw new IllegalArgumentException(sb.toString());
     }
 
     public static void zza(CharSequence charSequence, ByteBuffer byteBuffer) {
@@ -263,7 +314,7 @@ public final class zzgrr {
                                 i3 = i13;
                             }
                         }
-                        throw new IllegalArgumentException(R$id$$ExternalSyntheticOutline0.m(39, "Unpaired surrogate at index ", i3 - 1));
+                        throw new IllegalArgumentException(R$style$$ExternalSyntheticOutline0.m(39, "Unpaired surrogate at index ", i3 - 1));
                     }
                     i3++;
                 }
@@ -271,72 +322,6 @@ public final class zzgrr {
         } else {
             throw new ReadOnlyBufferException();
         }
-    }
-
-    public final void zzb(int i, long j) throws IOException {
-        zzc((i << 3) | 0);
-        zza(j);
-    }
-
-    public static int zzb(int i) {
-        return zzd(i << 3);
-    }
-
-    public static int zza(int i) {
-        if (i >= 0) {
-            return zzd(i);
-        }
-        return 10;
-    }
-
-    public final void zza(int i, int i2) throws IOException {
-        zzc((i << 3) | 0);
-        if (i2 >= 0) {
-            zzc(i2);
-        } else {
-            zza(i2);
-        }
-    }
-
-    public final void zza(int i, zzgrz zzgrzVar) throws IOException {
-        zzc((i << 3) | 2);
-        if (zzgrzVar.zzaz < 0) {
-            zzgrzVar.getSerializedSize();
-        }
-        zzc(zzgrzVar.zzaz);
-        zzgrzVar.writeTo(this);
-    }
-
-    public final void zza(int i, String str) throws IOException {
-        zzc((i << 3) | 2);
-        try {
-            int zzd = zzd(str.length());
-            if (zzd == zzd(str.length() * 3)) {
-                int position = this.zza.position();
-                if (this.zza.remaining() >= zzd) {
-                    this.zza.position(position + zzd);
-                    zza(str, this.zza);
-                    int position2 = this.zza.position();
-                    this.zza.position(position);
-                    zzc((position2 - position) - zzd);
-                    this.zza.position(position2);
-                    return;
-                }
-                throw new zzgrs(position + zzd, this.zza.limit());
-            }
-            zzc(zza(str));
-            zza(str, this.zza);
-        } catch (BufferOverflowException e) {
-            zzgrs zzgrsVar = new zzgrs(this.zza.position(), this.zza.limit());
-            zzgrsVar.initCause(e);
-            throw zzgrsVar;
-        }
-    }
-
-    public final void zza(int i, byte[] bArr) throws IOException {
-        zzc((i << 3) | 2);
-        zzc(bArr.length);
-        zzd(bArr);
     }
 
     public final void zza(long j) throws IOException {

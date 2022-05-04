@@ -9,17 +9,17 @@ public class PendingCallback implements Parcelable, ReflectedParcelable {
     public static final Parcelable.Creator<PendingCallback> CREATOR = new zze();
     public final IBinder zza;
 
-    public PendingCallback(Parcel parcel) {
-        this.zza = parcel.readStrongBinder();
-    }
-
     @Override // android.os.Parcelable
-    public int describeContents() {
+    public final int describeContents() {
         return 0;
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
+    public final void writeToParcel(Parcel parcel, int i) {
         parcel.writeStrongBinder(this.zza);
+    }
+
+    public PendingCallback(Parcel parcel) {
+        this.zza = parcel.readStrongBinder();
     }
 }

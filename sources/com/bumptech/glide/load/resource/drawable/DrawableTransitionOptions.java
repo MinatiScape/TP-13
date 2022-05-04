@@ -7,7 +7,7 @@ import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 public final class DrawableTransitionOptions extends TransitionOptions<DrawableTransitionOptions, Drawable> {
     public static DrawableTransitionOptions withCrossFade() {
         DrawableTransitionOptions drawableTransitionOptions = new DrawableTransitionOptions();
-        drawableTransitionOptions.transitionFactory = new DrawableCrossFadeFactory(300, false);
+        drawableTransitionOptions.transitionFactory = new DrawableCrossFadeFactory(300);
         return drawableTransitionOptions;
     }
 }

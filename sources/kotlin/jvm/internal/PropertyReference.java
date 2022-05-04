@@ -22,6 +22,19 @@ public abstract class PropertyReference extends CallableReference implements KPr
         }
     }
 
+    public PropertyReference(Object obj) {
+        super(obj);
+    }
+
+    @Override // kotlin.jvm.internal.CallableReference
+    public KProperty getReflected() {
+        return (KProperty) super.getReflected();
+    }
+
+    public PropertyReference(Object obj, Class cls, String str, String str2, int i) {
+        super(obj, cls, str, str2, (i & 1) != 1 ? false : true);
+    }
+
     public int hashCode() {
         int hashCode = getName().hashCode();
         return getSignature().hashCode() + ((hashCode + (getOwner().hashCode() * 31)) * 31);
@@ -46,18 +59,5 @@ public abstract class PropertyReference extends CallableReference implements KPr
         m.append(getName());
         m.append(" (Kotlin reflection is not available)");
         return m.toString();
-    }
-
-    public PropertyReference(Object obj) {
-        super(obj);
-    }
-
-    @Override // kotlin.jvm.internal.CallableReference
-    public KProperty getReflected() {
-        return (KProperty) super.getReflected();
-    }
-
-    public PropertyReference(Object obj, Class cls, String str, String str2, int i) {
-        super(obj, cls, str, str2, (i & 1) != 1 ? false : true);
     }
 }

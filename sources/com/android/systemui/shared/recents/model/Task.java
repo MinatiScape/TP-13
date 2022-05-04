@@ -39,94 +39,6 @@ public class Task {
     @ViewDebug.ExportedProperty(category = "recents")
     public ComponentName topActivity;
 
-    public Task() {
-        this.lastSnapshotData = new ActivityManager.RecentTaskInfo.PersistedTaskSnapshotData();
-    }
-
-    public static Task from(TaskKey taskKey, TaskInfo taskInfo, boolean z) {
-        ActivityManager.TaskDescription taskDescription = taskInfo.taskDescription;
-        int i = 0;
-        int primaryColor = taskDescription != null ? taskDescription.getPrimaryColor() : 0;
-        if (taskDescription != null) {
-            i = taskDescription.getBackgroundColor();
-        }
-        return new Task(taskKey, primaryColor, i, taskInfo.supportsSplitScreenMultiWindow, z, taskDescription, taskInfo.topActivity);
-    }
-
-    public void dump(String str, PrintWriter printWriter) {
-        printWriter.print(str);
-        printWriter.print(this.key);
-        if (!this.isDockable) {
-            printWriter.print(" dockable=N");
-        }
-        if (this.isLocked) {
-            printWriter.print(" locked=Y");
-        }
-        printWriter.print(" ");
-        printWriter.print(this.title);
-        printWriter.println();
-    }
-
-    public boolean equals(Object obj) {
-        return this.key.equals(((Task) obj).key);
-    }
-
-    public ComponentName getTopComponent() {
-        ComponentName componentName = this.topActivity;
-        return componentName != null ? componentName : this.key.baseIntent.getComponent();
-    }
-
-    public float getVisibleThumbnailRatio(boolean z) {
-        Rect rect;
-        ActivityManager.RecentTaskInfo.PersistedTaskSnapshotData persistedTaskSnapshotData = this.lastSnapshotData;
-        Point point = persistedTaskSnapshotData.taskSize;
-        if (point == null || (rect = persistedTaskSnapshotData.contentInsets) == null) {
-            return HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
-        }
-        float f = point.x;
-        float f2 = point.y;
-        if (z) {
-            f -= rect.left + rect.right;
-            f2 -= rect.top + rect.bottom;
-        }
-        return f / f2;
-    }
-
-    public void setLastSnapshotData(ActivityManager.RecentTaskInfo recentTaskInfo) {
-        this.lastSnapshotData.set(recentTaskInfo.lastSnapshotData);
-    }
-
-    public String toString() {
-        StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("[");
-        m.append(this.key.toString());
-        m.append("] ");
-        m.append(this.title);
-        return m.toString();
-    }
-
-    public Task(TaskKey taskKey) {
-        this.lastSnapshotData = new ActivityManager.RecentTaskInfo.PersistedTaskSnapshotData();
-        this.key = taskKey;
-        this.taskDescription = new ActivityManager.TaskDescription();
-    }
-
-    public Task(Task task) {
-        this(task.key, task.colorPrimary, task.colorBackground, task.isDockable, task.isLocked, task.taskDescription, task.topActivity);
-        this.lastSnapshotData.set(task.lastSnapshotData);
-    }
-
-    @Deprecated
-    public Task(TaskKey taskKey, int i, int i2, boolean z, boolean z2, ActivityManager.TaskDescription taskDescription, ComponentName componentName) {
-        this.lastSnapshotData = new ActivityManager.RecentTaskInfo.PersistedTaskSnapshotData();
-        this.key = taskKey;
-        this.colorPrimary = i;
-        this.colorBackground = i2;
-        this.taskDescription = taskDescription;
-        this.isDockable = z;
-        this.isLocked = z2;
-        this.topActivity = componentName;
-    }
-
     /* loaded from: classes.dex */
     public static class TaskKey implements Parcelable {
         public static final Parcelable.Creator<TaskKey> CREATOR = new Parcelable.Creator<TaskKey>() { // from class: com.android.systemui.shared.recents.model.Task.TaskKey.1
@@ -170,11 +82,6 @@ public class Task {
             updateHashCode();
         }
 
-        /* JADX INFO: Access modifiers changed from: private */
-        public static TaskKey readFromParcel(Parcel parcel) {
-            return new TaskKey(parcel.readInt(), parcel.readInt(), (Intent) parcel.readTypedObject(Intent.CREATOR), (ComponentName) parcel.readTypedObject(ComponentName.CREATOR), parcel.readInt(), parcel.readLong(), parcel.readInt());
-        }
-
         private void updateHashCode() {
             this.mHashCode = Objects.hash(Integer.valueOf(this.id), Integer.valueOf(this.windowingMode), Integer.valueOf(this.userId));
         }
@@ -189,7 +96,10 @@ public class Task {
                 return false;
             }
             TaskKey taskKey = (TaskKey) obj;
-            return this.id == taskKey.id && this.windowingMode == taskKey.windowingMode && this.userId == taskKey.userId;
+            if (this.id == taskKey.id && this.windowingMode == taskKey.windowingMode && this.userId == taskKey.userId) {
+                return true;
+            }
+            return false;
         }
 
         public ComponentName getComponent() {
@@ -201,10 +111,6 @@ public class Task {
                 return this.baseIntent.getComponent().getPackageName();
             }
             return this.baseIntent.getPackage();
-        }
-
-        public int hashCode() {
-            return this.mHashCode;
         }
 
         public void setWindowingMode(int i) {
@@ -235,6 +141,11 @@ public class Task {
             parcel.writeTypedObject(this.sourceComponent, i);
         }
 
+        /* JADX INFO: Access modifiers changed from: private */
+        public static TaskKey readFromParcel(Parcel parcel) {
+            return new TaskKey(parcel.readInt(), parcel.readInt(), (Intent) parcel.readTypedObject(Intent.CREATOR), (ComponentName) parcel.readTypedObject(ComponentName.CREATOR), parcel.readInt(), parcel.readLong(), parcel.readInt());
+        }
+
         public TaskKey(int i, int i2, Intent intent, ComponentName componentName, int i3, long j) {
             this.id = i;
             this.windowingMode = i2;
@@ -256,5 +167,105 @@ public class Task {
             this.displayId = i4;
             updateHashCode();
         }
+
+        public int hashCode() {
+            return this.mHashCode;
+        }
+    }
+
+    public Task() {
+        this.lastSnapshotData = new ActivityManager.RecentTaskInfo.PersistedTaskSnapshotData();
+    }
+
+    public static Task from(TaskKey taskKey, TaskInfo taskInfo, boolean z) {
+        int i;
+        ActivityManager.TaskDescription taskDescription = taskInfo.taskDescription;
+        int i2 = 0;
+        if (taskDescription != null) {
+            i = taskDescription.getPrimaryColor();
+        } else {
+            i = 0;
+        }
+        if (taskDescription != null) {
+            i2 = taskDescription.getBackgroundColor();
+        }
+        return new Task(taskKey, i, i2, taskInfo.supportsSplitScreenMultiWindow, z, taskDescription, taskInfo.topActivity);
+    }
+
+    public boolean equals(Object obj) {
+        return this.key.equals(((Task) obj).key);
+    }
+
+    public ComponentName getTopComponent() {
+        ComponentName componentName = this.topActivity;
+        if (componentName != null) {
+            return componentName;
+        }
+        return this.key.baseIntent.getComponent();
+    }
+
+    public float getVisibleThumbnailRatio(boolean z) {
+        Rect rect;
+        ActivityManager.RecentTaskInfo.PersistedTaskSnapshotData persistedTaskSnapshotData = this.lastSnapshotData;
+        Point point = persistedTaskSnapshotData.taskSize;
+        if (point == null || (rect = persistedTaskSnapshotData.contentInsets) == null) {
+            return HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
+        }
+        float f = point.x;
+        float f2 = point.y;
+        if (z) {
+            f -= rect.left + rect.right;
+            f2 -= rect.top + rect.bottom;
+        }
+        return f / f2;
+    }
+
+    public void setLastSnapshotData(ActivityManager.RecentTaskInfo recentTaskInfo) {
+        this.lastSnapshotData.set(recentTaskInfo.lastSnapshotData);
+    }
+
+    public String toString() {
+        StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("[");
+        m.append(this.key.toString());
+        m.append("] ");
+        m.append(this.title);
+        return m.toString();
+    }
+
+    public Task(TaskKey taskKey) {
+        this.lastSnapshotData = new ActivityManager.RecentTaskInfo.PersistedTaskSnapshotData();
+        this.key = taskKey;
+        this.taskDescription = new ActivityManager.TaskDescription();
+    }
+
+    public void dump(String str, PrintWriter printWriter) {
+        printWriter.print(str);
+        printWriter.print(this.key);
+        if (!this.isDockable) {
+            printWriter.print(" dockable=N");
+        }
+        if (this.isLocked) {
+            printWriter.print(" locked=Y");
+        }
+        printWriter.print(" ");
+        printWriter.print(this.title);
+        printWriter.println();
+    }
+
+    public Task(Task task) {
+        this(task.key, task.colorPrimary, task.colorBackground, task.isDockable, task.isLocked, task.taskDescription, task.topActivity);
+        this.lastSnapshotData.set(task.lastSnapshotData);
+    }
+
+    @Deprecated
+    public Task(TaskKey taskKey, int i, int i2, boolean z, boolean z2, ActivityManager.TaskDescription taskDescription, ComponentName componentName) {
+        this.lastSnapshotData = new ActivityManager.RecentTaskInfo.PersistedTaskSnapshotData();
+        this.key = taskKey;
+        this.colorPrimary = i;
+        this.colorBackground = i2;
+        this.taskDescription = taskDescription;
+        this.isDockable = z;
+        this.isLocked = z2;
+        this.topActivity = componentName;
     }
 }

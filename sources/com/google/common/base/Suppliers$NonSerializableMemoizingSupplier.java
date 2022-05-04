@@ -1,13 +1,13 @@
 package com.google.common.base;
 
-import androidx.viewpager2.widget.FakeDrag$$ExternalSyntheticOutline0;
+import com.adobe.xmp.impl.XMPNode$$ExternalSyntheticOutline0;
 /* loaded from: classes.dex */
-public class Suppliers$NonSerializableMemoizingSupplier<T> implements Supplier<T> {
+class Suppliers$NonSerializableMemoizingSupplier<T> implements Supplier<T> {
     public volatile boolean initialized;
     public T value;
 
     @Override // com.google.common.base.Supplier
-    public T get() {
+    public final T get() {
         if (!this.initialized) {
             synchronized (this) {
                 if (!this.initialized) {
@@ -18,13 +18,13 @@ public class Suppliers$NonSerializableMemoizingSupplier<T> implements Supplier<T
         return this.value;
     }
 
-    public String toString() {
+    public final String toString() {
         String valueOf = String.valueOf(this.value);
         StringBuilder sb = new StringBuilder(valueOf.length() + 25);
         sb.append("<supplier that returned ");
         sb.append(valueOf);
         sb.append(">");
         String valueOf2 = String.valueOf(sb.toString());
-        return FakeDrag$$ExternalSyntheticOutline0.m(valueOf2.length() + 19, "Suppliers.memoize(", valueOf2, ")");
+        return XMPNode$$ExternalSyntheticOutline0.m(valueOf2.length() + 19, "Suppliers.memoize(", valueOf2, ")");
     }
 }

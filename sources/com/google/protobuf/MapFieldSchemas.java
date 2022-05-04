@@ -2,7 +2,7 @@ package com.google.protobuf;
 /* loaded from: classes.dex */
 public final class MapFieldSchemas {
     public static final MapFieldSchema FULL_SCHEMA;
-    public static final MapFieldSchema LITE_SCHEMA;
+    public static final MapFieldSchemaLite LITE_SCHEMA;
 
     static {
         MapFieldSchema mapFieldSchema;

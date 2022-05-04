@@ -207,13 +207,10 @@ public enum FieldType {
         } else {
             this.elementType = javaType.getBoxedType();
         }
-        z = false;
-        if (collection != Collection.SCALAR || (ordinal = javaType.ordinal()) == 6 || ordinal == 7 || ordinal == 9) {
-        }
-        this.primitiveScalar = z;
+        this.primitiveScalar = (collection != Collection.SCALAR || (ordinal = javaType.ordinal()) == 6 || ordinal == 7 || ordinal == 9) ? false : z;
     }
 
-    public int id() {
+    public final int id() {
         return this.id;
     }
 }

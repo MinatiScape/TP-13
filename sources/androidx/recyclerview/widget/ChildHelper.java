@@ -6,43 +6,41 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.ViewPropertyAnimatorCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import java.util.WeakHashMap;
 /* loaded from: classes.dex */
-public class ChildHelper {
+public final class ChildHelper {
     public final Callback mCallback;
     public final Bucket mBucket = new Bucket();
-    public final List<View> mHiddenViews = new ArrayList();
+    public final ArrayList mHiddenViews = new ArrayList();
 
     /* loaded from: classes.dex */
     public static class Bucket {
         public long mData = 0;
         public Bucket mNext;
 
-        public void clear(int index) {
-            if (index >= 64) {
+        public final void clear(int i) {
+            if (i >= 64) {
                 Bucket bucket = this.mNext;
                 if (bucket != null) {
-                    bucket.clear(index - 64);
+                    bucket.clear(i - 64);
                     return;
                 }
                 return;
             }
-            this.mData &= ~(1 << index);
+            this.mData &= ~(1 << i);
         }
 
-        public int countOnesBefore(int index) {
+        public final int countOnesBefore(int i) {
             Bucket bucket = this.mNext;
             if (bucket == null) {
-                if (index >= 64) {
+                if (i >= 64) {
                     return Long.bitCount(this.mData);
                 }
-                return Long.bitCount(((1 << index) - 1) & this.mData);
-            } else if (index < 64) {
-                return Long.bitCount(((1 << index) - 1) & this.mData);
+                return Long.bitCount(((1 << i) - 1) & this.mData);
+            } else if (i < 64) {
+                return Long.bitCount(((1 << i) - 1) & this.mData);
             } else {
-                return Long.bitCount(this.mData) + bucket.countOnesBefore(index - 64);
+                return Long.bitCount(this.mData) + bucket.countOnesBefore(i - 64);
             }
         }
 
@@ -52,43 +50,56 @@ public class ChildHelper {
             }
         }
 
-        public boolean get(int index) {
-            if (index >= 64) {
+        public final boolean get(int i) {
+            if (i >= 64) {
                 ensureNext();
-                return this.mNext.get(index - 64);
+                return this.mNext.get(i - 64);
             }
-            return ((1 << index) & this.mData) != 0;
+            if (((1 << i) & this.mData) != 0) {
+                return true;
+            }
+            return false;
         }
 
-        public void insert(int index, boolean value) {
-            if (index >= 64) {
+        public final void insert(int i, boolean z) {
+            boolean z2;
+            if (i >= 64) {
                 ensureNext();
-                this.mNext.insert(index - 64, value);
+                this.mNext.insert(i - 64, z);
                 return;
             }
             long j = this.mData;
-            boolean z = (Long.MIN_VALUE & j) != 0;
-            long j2 = (1 << index) - 1;
-            this.mData = ((j & (~j2)) << 1) | (j & j2);
-            if (value) {
-                set(index);
+            if ((Long.MIN_VALUE & j) != 0) {
+                z2 = true;
             } else {
-                clear(index);
+                z2 = false;
             }
-            if (z || this.mNext != null) {
+            long j2 = (1 << i) - 1;
+            this.mData = ((j & (~j2)) << 1) | (j & j2);
+            if (z) {
+                set(i);
+            } else {
+                clear(i);
+            }
+            if (z2 || this.mNext != null) {
                 ensureNext();
-                this.mNext.insert(0, z);
+                this.mNext.insert(0, z2);
             }
         }
 
-        public boolean remove(int index) {
-            if (index >= 64) {
+        public final boolean remove(int i) {
+            boolean z;
+            if (i >= 64) {
                 ensureNext();
-                return this.mNext.remove(index - 64);
+                return this.mNext.remove(i - 64);
             }
-            long j = 1 << index;
+            long j = 1 << i;
             long j2 = this.mData;
-            boolean z = (j2 & j) != 0;
+            if ((j2 & j) != 0) {
+                z = true;
+            } else {
+                z = false;
+            }
             long j3 = j2 & (~j);
             this.mData = j3;
             long j4 = j - 1;
@@ -103,7 +114,7 @@ public class ChildHelper {
             return z;
         }
 
-        public void reset() {
+        public final void reset() {
             this.mData = 0L;
             Bucket bucket = this.mNext;
             if (bucket != null) {
@@ -111,16 +122,16 @@ public class ChildHelper {
             }
         }
 
-        public void set(int index) {
-            if (index >= 64) {
+        public final void set(int i) {
+            if (i >= 64) {
                 ensureNext();
-                this.mNext.set(index - 64);
+                this.mNext.set(i - 64);
                 return;
             }
-            this.mData |= 1 << index;
+            this.mData |= 1 << i;
         }
 
-        public String toString() {
+        public final String toString() {
             if (this.mNext == null) {
                 return Long.toBinaryString(this.mData);
             }
@@ -130,80 +141,6 @@ public class ChildHelper {
 
     /* loaded from: classes.dex */
     public interface Callback {
-    }
-
-    public ChildHelper(Callback callback) {
-        this.mCallback = callback;
-    }
-
-    public void addView(View child, int index, boolean hidden) {
-        int i;
-        if (index < 0) {
-            i = ((RecyclerView.AnonymousClass5) this.mCallback).getChildCount();
-        } else {
-            i = getOffset(index);
-        }
-        this.mBucket.insert(i, hidden);
-        if (hidden) {
-            hideViewInternal(child);
-        }
-        RecyclerView.AnonymousClass5 r1 = (RecyclerView.AnonymousClass5) this.mCallback;
-        RecyclerView.this.addView(child, i);
-        RecyclerView.this.dispatchChildAttached(child);
-    }
-
-    public void attachViewToParent(View child, int index, ViewGroup.LayoutParams layoutParams, boolean hidden) {
-        int i;
-        if (index < 0) {
-            i = ((RecyclerView.AnonymousClass5) this.mCallback).getChildCount();
-        } else {
-            i = getOffset(index);
-        }
-        this.mBucket.insert(i, hidden);
-        if (hidden) {
-            hideViewInternal(child);
-        }
-        RecyclerView.AnonymousClass5 r1 = (RecyclerView.AnonymousClass5) this.mCallback;
-        Objects.requireNonNull(r1);
-        RecyclerView.ViewHolder childViewHolderInt = RecyclerView.getChildViewHolderInt(child);
-        if (childViewHolderInt != null) {
-            if (childViewHolderInt.isTmpDetached() || childViewHolderInt.shouldIgnore()) {
-                childViewHolderInt.mFlags &= -257;
-            } else {
-                StringBuilder sb = new StringBuilder();
-                sb.append("Called attach on a child which is not detached: ");
-                sb.append(childViewHolderInt);
-                throw new IllegalArgumentException(ChildHelper$$ExternalSyntheticOutline0.m(RecyclerView.this, sb));
-            }
-        }
-        RecyclerView.this.attachViewToParent(child, i, layoutParams);
-    }
-
-    public void detachViewFromParent(int index) {
-        RecyclerView.ViewHolder childViewHolderInt;
-        int offset = getOffset(index);
-        this.mBucket.remove(offset);
-        RecyclerView.AnonymousClass5 r3 = (RecyclerView.AnonymousClass5) this.mCallback;
-        View childAt = RecyclerView.this.getChildAt(offset);
-        if (!(childAt == null || (childViewHolderInt = RecyclerView.getChildViewHolderInt(childAt)) == null)) {
-            if (!childViewHolderInt.isTmpDetached() || childViewHolderInt.shouldIgnore()) {
-                childViewHolderInt.addFlags(256);
-            } else {
-                StringBuilder sb = new StringBuilder();
-                sb.append("called detach on an already detached child ");
-                sb.append(childViewHolderInt);
-                throw new IllegalArgumentException(ChildHelper$$ExternalSyntheticOutline0.m(RecyclerView.this, sb));
-            }
-        }
-        RecyclerView.this.detachViewFromParent(offset);
-    }
-
-    public View getChildAt(int index) {
-        return ((RecyclerView.AnonymousClass5) this.mCallback).getChildAt(getOffset(index));
-    }
-
-    public int getChildCount() {
-        return ((RecyclerView.AnonymousClass5) this.mCallback).getChildCount() - this.mHiddenViews.size();
     }
 
     /* JADX WARN: Code restructure failed: missing block: B:10:0x0021, code lost:
@@ -254,61 +191,132 @@ public class ChildHelper {
         throw new UnsupportedOperationException("Method not decompiled: androidx.recyclerview.widget.ChildHelper.getOffset(int):int");
     }
 
-    public View getUnfilteredChildAt(int index) {
-        return RecyclerView.this.getChildAt(index);
+    public final void addView(View view, int i, boolean z) {
+        int i2;
+        if (i < 0) {
+            i2 = ((RecyclerView.AnonymousClass5) this.mCallback).getChildCount();
+        } else {
+            i2 = getOffset(i);
+        }
+        this.mBucket.insert(i2, z);
+        if (z) {
+            hideViewInternal(view);
+        }
+        RecyclerView.AnonymousClass5 r1 = (RecyclerView.AnonymousClass5) this.mCallback;
+        RecyclerView.this.addView(view, i2);
+        RecyclerView.this.dispatchChildAttached(view);
     }
 
-    public int getUnfilteredChildCount() {
+    public final void attachViewToParent(View view, int i, ViewGroup.LayoutParams layoutParams, boolean z) {
+        int i2;
+        if (i < 0) {
+            i2 = ((RecyclerView.AnonymousClass5) this.mCallback).getChildCount();
+        } else {
+            i2 = getOffset(i);
+        }
+        this.mBucket.insert(i2, z);
+        if (z) {
+            hideViewInternal(view);
+        }
+        RecyclerView.AnonymousClass5 r1 = (RecyclerView.AnonymousClass5) this.mCallback;
+        r1.getClass();
+        RecyclerView.ViewHolder childViewHolderInt = RecyclerView.getChildViewHolderInt(view);
+        if (childViewHolderInt != null) {
+            if (childViewHolderInt.isTmpDetached() || childViewHolderInt.shouldIgnore()) {
+                childViewHolderInt.mFlags &= -257;
+            } else {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Called attach on a child which is not detached: ");
+                sb.append(childViewHolderInt);
+                throw new IllegalArgumentException(ChildHelper$$ExternalSyntheticOutline0.m(RecyclerView.this, sb));
+            }
+        }
+        RecyclerView.this.attachViewToParent(view, i2, layoutParams);
+    }
+
+    public final int getChildCount() {
+        return ((RecyclerView.AnonymousClass5) this.mCallback).getChildCount() - this.mHiddenViews.size();
+    }
+
+    public final View getUnfilteredChildAt(int i) {
+        return RecyclerView.this.getChildAt(i);
+    }
+
+    public final int getUnfilteredChildCount() {
         return ((RecyclerView.AnonymousClass5) this.mCallback).getChildCount();
     }
 
-    public final void hideViewInternal(View child) {
-        this.mHiddenViews.add(child);
+    public final void hideViewInternal(View view) {
+        this.mHiddenViews.add(view);
         RecyclerView.AnonymousClass5 r2 = (RecyclerView.AnonymousClass5) this.mCallback;
-        Objects.requireNonNull(r2);
-        RecyclerView.ViewHolder childViewHolderInt = RecyclerView.getChildViewHolderInt(child);
+        r2.getClass();
+        RecyclerView.ViewHolder childViewHolderInt = RecyclerView.getChildViewHolderInt(view);
         if (childViewHolderInt != null) {
             RecyclerView recyclerView = RecyclerView.this;
             int i = childViewHolderInt.mPendingAccessibilityState;
             if (i != -1) {
                 childViewHolderInt.mWasImportantForAccessibilityBeforeHidden = i;
             } else {
-                View view = childViewHolderInt.itemView;
+                View view2 = childViewHolderInt.itemView;
                 WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-                childViewHolderInt.mWasImportantForAccessibilityBeforeHidden = view.getImportantForAccessibility();
+                childViewHolderInt.mWasImportantForAccessibilityBeforeHidden = ViewCompat.Api16Impl.getImportantForAccessibility(view2);
             }
             recyclerView.setChildImportantForAccessibilityInternal(childViewHolderInt, 4);
         }
     }
 
-    public int indexOfChild(View child) {
-        int indexOfChild = RecyclerView.this.indexOfChild(child);
+    public final int indexOfChild(View view) {
+        int indexOfChild = RecyclerView.this.indexOfChild(view);
         if (indexOfChild != -1 && !this.mBucket.get(indexOfChild)) {
             return indexOfChild - this.mBucket.countOnesBefore(indexOfChild);
         }
         return -1;
     }
 
-    public boolean isHidden(View view) {
+    public final boolean isHidden(View view) {
         return this.mHiddenViews.contains(view);
     }
 
-    public String toString() {
+    public final String toString() {
         return this.mBucket.toString() + ", hidden list:" + this.mHiddenViews.size();
     }
 
-    public final boolean unhideViewInternal(View child) {
-        if (!this.mHiddenViews.remove(child)) {
-            return false;
+    public final void unhideViewInternal(View view) {
+        if (this.mHiddenViews.remove(view)) {
+            RecyclerView.AnonymousClass5 r1 = (RecyclerView.AnonymousClass5) this.mCallback;
+            r1.getClass();
+            RecyclerView.ViewHolder childViewHolderInt = RecyclerView.getChildViewHolderInt(view);
+            if (childViewHolderInt != null) {
+                RecyclerView.this.setChildImportantForAccessibilityInternal(childViewHolderInt, childViewHolderInt.mWasImportantForAccessibilityBeforeHidden);
+                childViewHolderInt.mWasImportantForAccessibilityBeforeHidden = 0;
+            }
         }
-        RecyclerView.AnonymousClass5 r2 = (RecyclerView.AnonymousClass5) this.mCallback;
-        Objects.requireNonNull(r2);
-        RecyclerView.ViewHolder childViewHolderInt = RecyclerView.getChildViewHolderInt(child);
-        if (childViewHolderInt == null) {
-            return true;
+    }
+
+    public ChildHelper(RecyclerView.AnonymousClass5 r1) {
+        this.mCallback = r1;
+    }
+
+    public final void detachViewFromParent(int i) {
+        RecyclerView.ViewHolder childViewHolderInt;
+        int offset = getOffset(i);
+        this.mBucket.remove(offset);
+        RecyclerView.AnonymousClass5 r3 = (RecyclerView.AnonymousClass5) this.mCallback;
+        View childAt = RecyclerView.this.getChildAt(offset);
+        if (!(childAt == null || (childViewHolderInt = RecyclerView.getChildViewHolderInt(childAt)) == null)) {
+            if (!childViewHolderInt.isTmpDetached() || childViewHolderInt.shouldIgnore()) {
+                childViewHolderInt.addFlags(256);
+            } else {
+                StringBuilder sb = new StringBuilder();
+                sb.append("called detach on an already detached child ");
+                sb.append(childViewHolderInt);
+                throw new IllegalArgumentException(ChildHelper$$ExternalSyntheticOutline0.m(RecyclerView.this, sb));
+            }
         }
-        RecyclerView.this.setChildImportantForAccessibilityInternal(childViewHolderInt, childViewHolderInt.mWasImportantForAccessibilityBeforeHidden);
-        childViewHolderInt.mWasImportantForAccessibilityBeforeHidden = 0;
-        return true;
+        RecyclerView.this.detachViewFromParent(offset);
+    }
+
+    public final View getChildAt(int i) {
+        return RecyclerView.this.getChildAt(getOffset(i));
     }
 }

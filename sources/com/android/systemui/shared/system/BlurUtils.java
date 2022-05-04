@@ -6,6 +6,9 @@ import android.view.CrossWindowBlurListeners;
 /* loaded from: classes.dex */
 public abstract class BlurUtils {
     public static boolean supportsBlursOnWindows() {
-        return CrossWindowBlurListeners.CROSS_WINDOW_BLUR_SUPPORTED && ActivityManager.isHighEndGfx() && !SystemProperties.getBoolean("persist.sysui.disableBlur", false);
+        if (!CrossWindowBlurListeners.CROSS_WINDOW_BLUR_SUPPORTED || !ActivityManager.isHighEndGfx() || SystemProperties.getBoolean("persist.sysui.disableBlur", false)) {
+            return false;
+        }
+        return true;
     }
 }

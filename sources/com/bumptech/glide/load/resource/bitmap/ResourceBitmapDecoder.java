@@ -10,26 +10,26 @@ import com.bumptech.glide.load.resource.drawable.DrawableResource;
 import com.bumptech.glide.load.resource.drawable.ResourceDrawableDecoder;
 import java.io.IOException;
 /* loaded from: classes.dex */
-public class ResourceBitmapDecoder implements ResourceDecoder<Uri, Bitmap> {
+public final class ResourceBitmapDecoder implements ResourceDecoder<Uri, Bitmap> {
     public final BitmapPool bitmapPool;
     public final ResourceDrawableDecoder drawableDecoder;
 
-    public ResourceBitmapDecoder(ResourceDrawableDecoder drawableDecoder, BitmapPool bitmapPool) {
-        this.drawableDecoder = drawableDecoder;
-        this.bitmapPool = bitmapPool;
-    }
-
     @Override // com.bumptech.glide.load.ResourceDecoder
-    public Resource<Bitmap> decode(Uri source, int width, int height, Options options) throws IOException {
-        Resource decode = this.drawableDecoder.decode(source);
+    public final Resource<Bitmap> decode(Uri uri, int i, int i2, Options options) throws IOException {
+        Resource decode = this.drawableDecoder.decode(uri);
         if (decode == null) {
             return null;
         }
-        return DrawableToBitmapConverter.convert(this.bitmapPool, ((DrawableResource) decode).get(), width, height);
+        return DrawableToBitmapConverter.convert(this.bitmapPool, ((DrawableResource) decode).get(), i, i2);
     }
 
     @Override // com.bumptech.glide.load.ResourceDecoder
-    public boolean handles(Uri source, Options options) throws IOException {
-        return "android.resource".equals(source.getScheme());
+    public final boolean handles(Uri uri, Options options) throws IOException {
+        return "android.resource".equals(uri.getScheme());
+    }
+
+    public ResourceBitmapDecoder(ResourceDrawableDecoder resourceDrawableDecoder, BitmapPool bitmapPool) {
+        this.drawableDecoder = resourceDrawableDecoder;
+        this.bitmapPool = bitmapPool;
     }
 }

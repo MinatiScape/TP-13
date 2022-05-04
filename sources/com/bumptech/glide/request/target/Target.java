@@ -8,17 +8,17 @@ import com.bumptech.glide.request.transition.Transition;
 public interface Target<R> extends LifecycleListener {
     Request getRequest();
 
-    void getSize(SizeReadyCallback cb);
+    void getSize(SizeReadyCallback sizeReadyCallback);
 
-    void onLoadCleared(Drawable placeholder);
+    void onLoadCleared(Drawable drawable);
 
-    void onLoadFailed(Drawable errorDrawable);
+    void onLoadFailed(Drawable drawable);
 
-    void onLoadStarted(Drawable placeholder);
+    void onLoadStarted(Drawable drawable);
 
-    void onResourceReady(R resource, Transition<? super R> transition);
+    void onResourceReady(R r, Transition<? super R> transition);
 
-    void removeCallback(SizeReadyCallback cb);
+    void removeCallback(SizeReadyCallback sizeReadyCallback);
 
     void setRequest(Request request);
 }

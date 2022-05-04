@@ -13,6 +13,4 @@ public interface MyPhotosStarter {
 
         void onPermissionsGranted();
     }
-
-    void requestCustomPhotoPicker(PermissionChangedListener permissionChangedListener);
 }

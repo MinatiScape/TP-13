@@ -7,7 +7,7 @@ import android.view.accessibility.AccessibilityEvent;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerViewAccessibilityDelegate;
 /* loaded from: classes.dex */
-public class WallpaperPickerRecyclerViewAccessibilityDelegate extends RecyclerViewAccessibilityDelegate {
+public final class WallpaperPickerRecyclerViewAccessibilityDelegate extends RecyclerViewAccessibilityDelegate {
     public final BottomSheetHost mBottomSheetHost;
     public final int mColumns;
     public final RecyclerView mGridRecyclerView;
@@ -19,8 +19,20 @@ public class WallpaperPickerRecyclerViewAccessibilityDelegate extends RecyclerVi
         int getBottomSheetState();
 
         default boolean isExpanded() {
-            return getBottomSheetState() == 3;
+            if (getBottomSheetState() == 3) {
+                return true;
+            }
+            return false;
         }
+    }
+
+    @Override // androidx.recyclerview.widget.RecyclerViewAccessibilityDelegate, androidx.core.view.AccessibilityDelegateCompat
+    public final boolean performAccessibilityAction(View view, int i, Bundle bundle) {
+        BottomSheetHost bottomSheetHost;
+        if (i == 4096 && (bottomSheetHost = this.mBottomSheetHost) != null && !bottomSheetHost.isExpanded()) {
+            this.mBottomSheetHost.expandBottomSheet();
+        }
+        return super.performAccessibilityAction(view, i, bundle);
     }
 
     public WallpaperPickerRecyclerViewAccessibilityDelegate(RecyclerView recyclerView, BottomSheetHost bottomSheetHost, int i) {
@@ -31,7 +43,7 @@ public class WallpaperPickerRecyclerViewAccessibilityDelegate extends RecyclerVi
     }
 
     @Override // androidx.core.view.AccessibilityDelegateCompat
-    public boolean onRequestSendAccessibilityEvent(ViewGroup viewGroup, View view, AccessibilityEvent accessibilityEvent) {
+    public final boolean onRequestSendAccessibilityEvent(ViewGroup viewGroup, View view, AccessibilityEvent accessibilityEvent) {
         if (accessibilityEvent.getEventType() == 32768) {
             int childLayoutPosition = this.mGridRecyclerView.getChildLayoutPosition(view);
             BottomSheetHost bottomSheetHost = this.mBottomSheetHost;
@@ -39,15 +51,6 @@ public class WallpaperPickerRecyclerViewAccessibilityDelegate extends RecyclerVi
                 this.mBottomSheetHost.expandBottomSheet();
             }
         }
-        return this.mOriginalDelegate.onRequestSendAccessibilityEvent(viewGroup, view, accessibilityEvent);
-    }
-
-    @Override // androidx.recyclerview.widget.RecyclerViewAccessibilityDelegate, androidx.core.view.AccessibilityDelegateCompat
-    public boolean performAccessibilityAction(View view, int i, Bundle bundle) {
-        BottomSheetHost bottomSheetHost;
-        if (i == 4096 && (bottomSheetHost = this.mBottomSheetHost) != null && !bottomSheetHost.isExpanded()) {
-            this.mBottomSheetHost.expandBottomSheet();
-        }
-        return super.performAccessibilityAction(view, i, bundle);
+        return super.onRequestSendAccessibilityEvent(viewGroup, view, accessibilityEvent);
     }
 }

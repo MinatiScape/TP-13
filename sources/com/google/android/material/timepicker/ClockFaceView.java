@@ -9,11 +9,13 @@ import android.graphics.RadialGradient;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
+import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -31,7 +33,7 @@ import com.google.android.material.timepicker.ClockHandView;
 import com.google.common.math.IntMath;
 import java.util.Arrays;
 /* loaded from: classes.dex */
-public class ClockFaceView extends RadialViewGroup implements ClockHandView.OnRotateListener {
+class ClockFaceView extends RadialViewGroup implements ClockHandView.OnRotateListener {
     public final int clockHandPadding;
     public final ClockHandView clockHandView;
     public final int clockSize;
@@ -44,11 +46,15 @@ public class ClockFaceView extends RadialViewGroup implements ClockHandView.OnRo
     public final ColorStateList textColor;
     public final SparseArray<TextView> textViewPool;
     public final Rect textViewRect;
-    public final AccessibilityDelegateCompat valueAccessibilityDelegate;
+    public final AnonymousClass2 valueAccessibilityDelegate;
     public String[] values;
 
     public ClockFaceView(Context context) {
         this(context, null);
+    }
+
+    public ClockFaceView(Context context, AttributeSet attributeSet) {
+        this(context, attributeSet, R.attr.materialClockStyle);
     }
 
     public final void findIntersectingTextView() {
@@ -60,45 +66,27 @@ public class ClockFaceView extends RadialViewGroup implements ClockHandView.OnRo
                 this.textViewRect.offset(textView.getPaddingLeft(), textView.getPaddingTop());
                 offsetDescendantRectToMyCoords(textView, this.textViewRect);
                 this.scratch.set(this.textViewRect);
-                textView.getPaint().setShader(!RectF.intersects(rectF, this.scratch) ? null : new RadialGradient(rectF.centerX() - this.scratch.left, rectF.centerY() - this.scratch.top, 0.5f * rectF.width(), this.gradientColors, this.gradientPositions, Shader.TileMode.CLAMP));
+                if (RectF.intersects(rectF, this.scratch)) {
+                    textView.getPaint().setShader(new RadialGradient(rectF.centerX() - this.scratch.left, rectF.centerY() - this.scratch.top, 0.5f * rectF.width(), this.gradientColors, this.gradientPositions, Shader.TileMode.CLAMP));
+                    textView.setSelected(true);
+                } else {
+                    textView.getPaint().setShader(null);
+                    textView.setSelected(false);
+                }
                 textView.invalidate();
             }
         }
     }
 
-    @Override // android.view.View
-    public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo accessibilityNodeInfo) {
-        super.onInitializeAccessibilityNodeInfo(accessibilityNodeInfo);
-        accessibilityNodeInfo.setCollectionInfo((AccessibilityNodeInfo.CollectionInfo) AccessibilityNodeInfoCompat.CollectionInfoCompat.obtain(1, this.values.length, false, 1).mInfo);
-    }
-
-    @Override // androidx.constraintlayout.widget.ConstraintLayout, android.view.ViewGroup, android.view.View
-    public void onLayout(boolean z, int i, int i2, int i3, int i4) {
-        super.onLayout(z, i, i2, i3, i4);
-        findIntersectingTextView();
-    }
-
-    @Override // androidx.constraintlayout.widget.ConstraintLayout, android.view.View
-    public void onMeasure(int i, int i2) {
-        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-        int max = (int) (this.clockSize / Math.max(Math.max(this.minimumHeight / displayMetrics.heightPixels, this.minimumWidth / displayMetrics.widthPixels), 1.0f));
-        int makeMeasureSpec = View.MeasureSpec.makeMeasureSpec(max, IntMath.MAX_SIGNED_POWER_OF_TWO);
-        setMeasuredDimension(max, max);
-        super.onMeasure(makeMeasureSpec, makeMeasureSpec);
-    }
-
     @Override // com.google.android.material.timepicker.ClockHandView.OnRotateListener
-    public void onRotate(float f, boolean z) {
+    public final void onRotate(float f) {
         if (Math.abs(this.currentHandRotation - f) > 0.001f) {
             this.currentHandRotation = f;
             findIntersectingTextView();
         }
     }
 
-    public ClockFaceView(Context context, AttributeSet attributeSet) {
-        this(context, attributeSet, R.attr.materialClockStyle);
-    }
-
+    /* JADX WARN: Type inference failed for: r9v3, types: [com.google.android.material.timepicker.ClockFaceView$2] */
     @SuppressLint({"ClickableViewAccessibility"})
     public ClockFaceView(Context context, AttributeSet attributeSet, int i) {
         super(context, attributeSet, i);
@@ -118,13 +106,12 @@ public class ClockFaceView extends RadialViewGroup implements ClockHandView.OnRo
         int colorForState = colorStateList.getColorForState(new int[]{16842913}, colorStateList.getDefaultColor());
         this.gradientColors = new int[]{colorForState, colorForState, colorStateList.getDefaultColor()};
         clockHandView.listeners.add(this);
-        ThreadLocal<TypedValue> threadLocal = AppCompatResources.TL_TYPED_VALUE;
-        int defaultColor = context.getColorStateList(R.color.material_timepicker_clockface).getDefaultColor();
+        int defaultColor = AppCompatResources.getColorStateList(context, R.color.material_timepicker_clockface).getDefaultColor();
         ColorStateList colorStateList2 = MaterialResources.getColorStateList(context, obtainStyledAttributes, 0);
         setBackgroundColor(colorStateList2 != null ? colorStateList2.getDefaultColor() : defaultColor);
         getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() { // from class: com.google.android.material.timepicker.ClockFaceView.1
             @Override // android.view.ViewTreeObserver.OnPreDrawListener
-            public boolean onPreDraw() {
+            public final boolean onPreDraw() {
                 if (!ClockFaceView.this.isShown()) {
                     return true;
                 }
@@ -145,13 +132,28 @@ public class ClockFaceView extends RadialViewGroup implements ClockHandView.OnRo
         obtainStyledAttributes.recycle();
         this.valueAccessibilityDelegate = new AccessibilityDelegateCompat() { // from class: com.google.android.material.timepicker.ClockFaceView.2
             @Override // androidx.core.view.AccessibilityDelegateCompat
-            public void onInitializeAccessibilityNodeInfo(View view, AccessibilityNodeInfoCompat accessibilityNodeInfoCompat) {
+            public final void onInitializeAccessibilityNodeInfo(View view, AccessibilityNodeInfoCompat accessibilityNodeInfoCompat) {
                 this.mOriginalDelegate.onInitializeAccessibilityNodeInfo(view, accessibilityNodeInfoCompat.mInfo);
                 int intValue = ((Integer) view.getTag(R.id.material_value_index)).intValue();
                 if (intValue > 0) {
                     accessibilityNodeInfoCompat.mInfo.setTraversalAfter(ClockFaceView.this.textViewPool.get(intValue - 1));
                 }
-                accessibilityNodeInfoCompat.setCollectionItemInfo(AccessibilityNodeInfoCompat.CollectionItemInfoCompat.obtain(0, 1, intValue, 1, false, view.isSelected()));
+                accessibilityNodeInfoCompat.setCollectionItemInfo(AccessibilityNodeInfoCompat.CollectionItemInfoCompat.obtain(0, 1, intValue, 1, view.isSelected()));
+                accessibilityNodeInfoCompat.mInfo.setClickable(true);
+                accessibilityNodeInfoCompat.addAction(AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_CLICK);
+            }
+
+            @Override // androidx.core.view.AccessibilityDelegateCompat
+            public final boolean performAccessibilityAction(View view, int i2, Bundle bundle) {
+                if (i2 != 16) {
+                    return super.performAccessibilityAction(view, i2, bundle);
+                }
+                long uptimeMillis = SystemClock.uptimeMillis();
+                float x = view.getX() + (view.getWidth() / 2.0f);
+                float height = (view.getHeight() / 2.0f) + view.getY();
+                ClockFaceView.this.clockHandView.onTouchEvent(MotionEvent.obtain(uptimeMillis, uptimeMillis, 0, x, height, 0));
+                ClockFaceView.this.clockHandView.onTouchEvent(MotionEvent.obtain(uptimeMillis, uptimeMillis, 1, x, height, 0));
+                return true;
             }
         };
         String[] strArr = new String[12];
@@ -180,5 +182,26 @@ public class ClockFaceView extends RadialViewGroup implements ClockHandView.OnRo
         this.minimumHeight = resources.getDimensionPixelSize(R.dimen.material_time_picker_minimum_screen_height);
         this.minimumWidth = resources.getDimensionPixelSize(R.dimen.material_time_picker_minimum_screen_width);
         this.clockSize = resources.getDimensionPixelSize(R.dimen.material_clock_size);
+    }
+
+    @Override // android.view.View
+    public final void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo accessibilityNodeInfo) {
+        super.onInitializeAccessibilityNodeInfo(accessibilityNodeInfo);
+        accessibilityNodeInfo.setCollectionInfo((AccessibilityNodeInfo.CollectionInfo) AccessibilityNodeInfoCompat.CollectionInfoCompat.obtain(1, this.values.length, 1).mInfo);
+    }
+
+    @Override // androidx.constraintlayout.widget.ConstraintLayout, android.view.ViewGroup, android.view.View
+    public final void onLayout(boolean z, int i, int i2, int i3, int i4) {
+        super.onLayout(z, i, i2, i3, i4);
+        findIntersectingTextView();
+    }
+
+    @Override // androidx.constraintlayout.widget.ConstraintLayout, android.view.View
+    public final void onMeasure(int i, int i2) {
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        int max = (int) (this.clockSize / Math.max(Math.max(this.minimumHeight / displayMetrics.heightPixels, this.minimumWidth / displayMetrics.widthPixels), 1.0f));
+        int makeMeasureSpec = View.MeasureSpec.makeMeasureSpec(max, IntMath.MAX_SIGNED_POWER_OF_TWO);
+        setMeasuredDimension(max, max);
+        super.onMeasure(makeMeasureSpec, makeMeasureSpec);
     }
 }

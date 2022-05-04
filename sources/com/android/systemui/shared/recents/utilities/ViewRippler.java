@@ -16,6 +16,13 @@ public class ViewRippler {
     };
     private View mRoot;
 
+    public void stop() {
+        View view = this.mRoot;
+        if (view != null) {
+            view.removeCallbacks(this.mRipple);
+        }
+    }
+
     public void start(View view) {
         stop();
         this.mRoot = view;
@@ -24,12 +31,5 @@ public class ViewRippler {
         this.mRoot.postOnAnimationDelayed(this.mRipple, 4000L);
         this.mRoot.postOnAnimationDelayed(this.mRipple, 6000L);
         this.mRoot.postOnAnimationDelayed(this.mRipple, 8000L);
-    }
-
-    public void stop() {
-        View view = this.mRoot;
-        if (view != null) {
-            view.removeCallbacks(this.mRipple);
-        }
     }
 }

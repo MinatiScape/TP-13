@@ -1,6 +1,5 @@
 package androidx.fragment.app;
 
-import android.support.media.ExifInterface$$ExternalSyntheticOutline0;
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 import android.util.Log;
 import android.view.View;
@@ -15,8 +14,6 @@ import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
 import java.util.WeakHashMap;
 /* loaded from: classes.dex */
 public abstract class SpecialEffectsController {
@@ -36,13 +33,8 @@ public abstract class SpecialEffectsController {
         }
 
         @Override // androidx.fragment.app.SpecialEffectsController.Operation
-        public void complete() {
-            super.complete();
-            this.mFragmentStateManager.moveToExpectedState();
-        }
-
-        @Override // androidx.fragment.app.SpecialEffectsController.Operation
-        public void onStart() {
+        public final void onStart() {
+            float f;
             if (this.mLifecycleImpact == Operation.LifecycleImpact.ADDING) {
                 Fragment fragment = this.mFragmentStateManager.mFragment;
                 View findFocus = fragment.mView.findFocus();
@@ -61,180 +53,19 @@ public abstract class SpecialEffectsController {
                     requireView.setVisibility(4);
                 }
                 Fragment.AnimationInfo animationInfo = fragment.mAnimationInfo;
-                requireView.setAlpha(animationInfo == null ? 1.0f : animationInfo.mPostOnViewCreatedAlpha);
+                if (animationInfo == null) {
+                    f = 1.0f;
+                } else {
+                    f = animationInfo.mPostOnViewCreatedAlpha;
+                }
+                requireView.setAlpha(f);
             }
         }
-    }
 
-    public SpecialEffectsController(ViewGroup viewGroup) {
-        this.mContainer = viewGroup;
-    }
-
-    public static SpecialEffectsController getOrCreateController(ViewGroup viewGroup, FragmentManager fragmentManager) {
-        return getOrCreateController(viewGroup, fragmentManager.getSpecialEffectsControllerFactory());
-    }
-
-    public final void enqueue(Operation.State state, Operation.LifecycleImpact lifecycleImpact, FragmentStateManager fragmentStateManager) {
-        synchronized (this.mPendingOperations) {
-            CancellationSignal cancellationSignal = new CancellationSignal();
-            Operation findPendingOperation = findPendingOperation(fragmentStateManager.mFragment);
-            if (findPendingOperation != null) {
-                findPendingOperation.mergeWith(state, lifecycleImpact);
-                return;
-            }
-            final FragmentStateManagerOperation fragmentStateManagerOperation = new FragmentStateManagerOperation(state, lifecycleImpact, fragmentStateManager, cancellationSignal);
-            this.mPendingOperations.add(fragmentStateManagerOperation);
-            fragmentStateManagerOperation.mCompletionListeners.add(new Runnable() { // from class: androidx.fragment.app.SpecialEffectsController.1
-                @Override // java.lang.Runnable
-                public void run() {
-                    if (SpecialEffectsController.this.mPendingOperations.contains(fragmentStateManagerOperation)) {
-                        FragmentStateManagerOperation fragmentStateManagerOperation2 = fragmentStateManagerOperation;
-                        fragmentStateManagerOperation2.mFinalState.applyState(fragmentStateManagerOperation2.mFragment.mView);
-                    }
-                }
-            });
-            fragmentStateManagerOperation.mCompletionListeners.add(new Runnable() { // from class: androidx.fragment.app.SpecialEffectsController.2
-                @Override // java.lang.Runnable
-                public void run() {
-                    SpecialEffectsController.this.mPendingOperations.remove(fragmentStateManagerOperation);
-                    SpecialEffectsController.this.mRunningOperations.remove(fragmentStateManagerOperation);
-                }
-            });
-        }
-    }
-
-    public abstract void executeOperations(List<Operation> list, boolean z);
-
-    public void executePendingOperations() {
-        if (!this.mIsContainerPostponed) {
-            ViewGroup viewGroup = this.mContainer;
-            WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-            if (!viewGroup.isAttachedToWindow()) {
-                forceCompleteAllOperations();
-                this.mOperationDirectionIsPop = false;
-                return;
-            }
-            synchronized (this.mPendingOperations) {
-                if (!this.mPendingOperations.isEmpty()) {
-                    ArrayList arrayList = new ArrayList(this.mRunningOperations);
-                    this.mRunningOperations.clear();
-                    Iterator it = arrayList.iterator();
-                    while (it.hasNext()) {
-                        Operation operation = (Operation) it.next();
-                        if (FragmentManager.isLoggingEnabled(2)) {
-                            Log.v("FragmentManager", "SpecialEffectsController: Cancelling operation " + operation);
-                        }
-                        operation.cancel();
-                        if (!operation.mIsComplete) {
-                            this.mRunningOperations.add(operation);
-                        }
-                    }
-                    updateFinalState();
-                    ArrayList arrayList2 = new ArrayList(this.mPendingOperations);
-                    this.mPendingOperations.clear();
-                    this.mRunningOperations.addAll(arrayList2);
-                    Iterator it2 = arrayList2.iterator();
-                    while (it2.hasNext()) {
-                        ((Operation) it2.next()).onStart();
-                    }
-                    executeOperations(arrayList2, this.mOperationDirectionIsPop);
-                    this.mOperationDirectionIsPop = false;
-                }
-            }
-        }
-    }
-
-    public final Operation findPendingOperation(Fragment fragment) {
-        Iterator<Operation> it = this.mPendingOperations.iterator();
-        while (it.hasNext()) {
-            Operation next = it.next();
-            if (next.mFragment.equals(fragment) && !next.mIsCanceled) {
-                return next;
-            }
-        }
-        return null;
-    }
-
-    public void forceCompleteAllOperations() {
-        String str;
-        String str2;
-        ViewGroup viewGroup = this.mContainer;
-        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-        boolean isAttachedToWindow = viewGroup.isAttachedToWindow();
-        synchronized (this.mPendingOperations) {
-            updateFinalState();
-            Iterator<Operation> it = this.mPendingOperations.iterator();
-            while (it.hasNext()) {
-                it.next().onStart();
-            }
-            Iterator it2 = new ArrayList(this.mRunningOperations).iterator();
-            while (it2.hasNext()) {
-                Operation operation = (Operation) it2.next();
-                if (FragmentManager.isLoggingEnabled(2)) {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("SpecialEffectsController: ");
-                    if (isAttachedToWindow) {
-                        str2 = "";
-                    } else {
-                        str2 = "Container " + this.mContainer + " is not attached to window. ";
-                    }
-                    sb.append(str2);
-                    sb.append("Cancelling running operation ");
-                    sb.append(operation);
-                    Log.v("FragmentManager", sb.toString());
-                }
-                operation.cancel();
-            }
-            Iterator it3 = new ArrayList(this.mPendingOperations).iterator();
-            while (it3.hasNext()) {
-                Operation operation2 = (Operation) it3.next();
-                if (FragmentManager.isLoggingEnabled(2)) {
-                    StringBuilder sb2 = new StringBuilder();
-                    sb2.append("SpecialEffectsController: ");
-                    if (isAttachedToWindow) {
-                        str = "";
-                    } else {
-                        str = "Container " + this.mContainer + " is not attached to window. ";
-                    }
-                    sb2.append(str);
-                    sb2.append("Cancelling pending operation ");
-                    sb2.append(operation2);
-                    Log.v("FragmentManager", sb2.toString());
-                }
-                operation2.cancel();
-            }
-        }
-    }
-
-    public void markPostponedState() {
-        synchronized (this.mPendingOperations) {
-            updateFinalState();
-            this.mIsContainerPostponed = false;
-            int size = this.mPendingOperations.size() - 1;
-            while (true) {
-                if (size < 0) {
-                    break;
-                }
-                Operation operation = this.mPendingOperations.get(size);
-                Operation.State from = Operation.State.from(operation.mFragment.mView);
-                Operation.State state = operation.mFinalState;
-                Operation.State state2 = Operation.State.VISIBLE;
-                if (state == state2 && from != state2) {
-                    this.mIsContainerPostponed = operation.mFragment.isPostponed();
-                    break;
-                }
-                size--;
-            }
-        }
-    }
-
-    public final void updateFinalState() {
-        Iterator<Operation> it = this.mPendingOperations.iterator();
-        while (it.hasNext()) {
-            Operation next = it.next();
-            if (next.mLifecycleImpact == Operation.LifecycleImpact.ADDING) {
-                next.mergeWith(Operation.State.from(next.mFragment.requireView().getVisibility()), Operation.LifecycleImpact.NONE);
-            }
+        @Override // androidx.fragment.app.SpecialEffectsController.Operation
+        public final void complete() {
+            super.complete();
+            this.mFragmentStateManager.moveToExpectedState();
         }
     }
 
@@ -243,7 +74,7 @@ public abstract class SpecialEffectsController {
         public State mFinalState;
         public final Fragment mFragment;
         public LifecycleImpact mLifecycleImpact;
-        public final List<Runnable> mCompletionListeners = new ArrayList();
+        public final ArrayList mCompletionListeners = new ArrayList();
         public final HashSet<CancellationSignal> mSpecialEffectsSignals = new HashSet<>();
         public boolean mIsCanceled = false;
         public boolean mIsComplete = false;
@@ -255,16 +86,63 @@ public abstract class SpecialEffectsController {
             REMOVING
         }
 
-        public Operation(State state, LifecycleImpact lifecycleImpact, Fragment fragment, CancellationSignal cancellationSignal) {
-            this.mFinalState = state;
-            this.mLifecycleImpact = lifecycleImpact;
-            this.mFragment = fragment;
-            cancellationSignal.setOnCancelListener(new CancellationSignal.OnCancelListener() { // from class: androidx.fragment.app.SpecialEffectsController.Operation.1
-                @Override // androidx.core.os.CancellationSignal.OnCancelListener
-                public void onCancel() {
-                    Operation.this.cancel();
+        public void onStart() {
+        }
+
+        /* loaded from: classes.dex */
+        public enum State {
+            REMOVED,
+            VISIBLE,
+            GONE,
+            INVISIBLE;
+
+            public static State from(View view) {
+                if (view.getAlpha() == HingeAngleProviderKt.FULLY_CLOSED_DEGREES && view.getVisibility() == 0) {
+                    return INVISIBLE;
                 }
-            });
+                return from(view.getVisibility());
+            }
+
+            public final void applyState(View view) {
+                int ordinal = ordinal();
+                if (ordinal == 0) {
+                    ViewGroup viewGroup = (ViewGroup) view.getParent();
+                    if (viewGroup != null) {
+                        if (FragmentManager.isLoggingEnabled(2)) {
+                            Log.v("FragmentManager", "SpecialEffectsController: Removing view " + view + " from container " + viewGroup);
+                        }
+                        viewGroup.removeView(view);
+                    }
+                } else if (ordinal == 1) {
+                    if (FragmentManager.isLoggingEnabled(2)) {
+                        Log.v("FragmentManager", "SpecialEffectsController: Setting view " + view + " to VISIBLE");
+                    }
+                    view.setVisibility(0);
+                } else if (ordinal == 2) {
+                    if (FragmentManager.isLoggingEnabled(2)) {
+                        Log.v("FragmentManager", "SpecialEffectsController: Setting view " + view + " to GONE");
+                    }
+                    view.setVisibility(8);
+                } else if (ordinal == 3) {
+                    if (FragmentManager.isLoggingEnabled(2)) {
+                        Log.v("FragmentManager", "SpecialEffectsController: Setting view " + view + " to INVISIBLE");
+                    }
+                    view.setVisibility(4);
+                }
+            }
+
+            public static State from(int i) {
+                if (i == 0) {
+                    return VISIBLE;
+                }
+                if (i == 4) {
+                    return INVISIBLE;
+                }
+                if (i == 8) {
+                    return GONE;
+                }
+                throw new IllegalArgumentException("Unknown visibility " + i);
+            }
         }
 
         public final void cancel() {
@@ -287,8 +165,9 @@ public abstract class SpecialEffectsController {
                     Log.v("FragmentManager", "SpecialEffectsController: " + this + " has called complete.");
                 }
                 this.mIsComplete = true;
-                for (Runnable runnable : this.mCompletionListeners) {
-                    runnable.run();
+                Iterator it = this.mCompletionListeners.iterator();
+                while (it.hasNext()) {
+                    ((Runnable) it.next()).run();
                 }
             }
         }
@@ -339,68 +218,190 @@ public abstract class SpecialEffectsController {
             }
         }
 
-        public void onStart() {
-        }
-
-        public String toString() {
+        public final String toString() {
             return "Operation {" + Integer.toHexString(System.identityHashCode(this)) + "} {mFinalState = " + this.mFinalState + "} {mLifecycleImpact = " + this.mLifecycleImpact + "} {mFragment = " + this.mFragment + "}";
         }
 
-        /* loaded from: classes.dex */
-        public enum State {
-            REMOVED,
-            VISIBLE,
-            GONE,
-            INVISIBLE;
-
-            public static State from(View view) {
-                if (view.getAlpha() == HingeAngleProviderKt.FULLY_CLOSED_DEGREES && view.getVisibility() == 0) {
-                    return INVISIBLE;
+        public Operation(State state, LifecycleImpact lifecycleImpact, Fragment fragment, CancellationSignal cancellationSignal) {
+            this.mFinalState = state;
+            this.mLifecycleImpact = lifecycleImpact;
+            this.mFragment = fragment;
+            cancellationSignal.setOnCancelListener(new CancellationSignal.OnCancelListener() { // from class: androidx.fragment.app.SpecialEffectsController.Operation.1
+                @Override // androidx.core.os.CancellationSignal.OnCancelListener
+                public final void onCancel() {
+                    Operation.this.cancel();
                 }
-                return from(view.getVisibility());
-            }
+            });
+        }
+    }
 
-            public void applyState(View view) {
-                int ordinal = ordinal();
-                if (ordinal == 0) {
-                    ViewGroup viewGroup = (ViewGroup) view.getParent();
-                    if (viewGroup != null) {
+    public abstract void executeOperations(ArrayList arrayList, boolean z);
+
+    public final void enqueue(Operation.State state, Operation.LifecycleImpact lifecycleImpact, FragmentStateManager fragmentStateManager) {
+        synchronized (this.mPendingOperations) {
+            CancellationSignal cancellationSignal = new CancellationSignal();
+            Operation findPendingOperation = findPendingOperation(fragmentStateManager.mFragment);
+            if (findPendingOperation != null) {
+                findPendingOperation.mergeWith(state, lifecycleImpact);
+                return;
+            }
+            final FragmentStateManagerOperation fragmentStateManagerOperation = new FragmentStateManagerOperation(state, lifecycleImpact, fragmentStateManager, cancellationSignal);
+            this.mPendingOperations.add(fragmentStateManagerOperation);
+            fragmentStateManagerOperation.mCompletionListeners.add(new Runnable() { // from class: androidx.fragment.app.SpecialEffectsController.1
+                @Override // java.lang.Runnable
+                public final void run() {
+                    if (SpecialEffectsController.this.mPendingOperations.contains(fragmentStateManagerOperation)) {
+                        FragmentStateManagerOperation fragmentStateManagerOperation2 = fragmentStateManagerOperation;
+                        fragmentStateManagerOperation2.mFinalState.applyState(fragmentStateManagerOperation2.mFragment.mView);
+                    }
+                }
+            });
+            fragmentStateManagerOperation.mCompletionListeners.add(new Runnable() { // from class: androidx.fragment.app.SpecialEffectsController.2
+                @Override // java.lang.Runnable
+                public final void run() {
+                    SpecialEffectsController.this.mPendingOperations.remove(fragmentStateManagerOperation);
+                    SpecialEffectsController.this.mRunningOperations.remove(fragmentStateManagerOperation);
+                }
+            });
+        }
+    }
+
+    public final void executePendingOperations() {
+        if (!this.mIsContainerPostponed) {
+            ViewGroup viewGroup = this.mContainer;
+            WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
+            if (!ViewCompat.Api19Impl.isAttachedToWindow(viewGroup)) {
+                forceCompleteAllOperations();
+                this.mOperationDirectionIsPop = false;
+                return;
+            }
+            synchronized (this.mPendingOperations) {
+                if (!this.mPendingOperations.isEmpty()) {
+                    ArrayList arrayList = new ArrayList(this.mRunningOperations);
+                    this.mRunningOperations.clear();
+                    Iterator it = arrayList.iterator();
+                    while (it.hasNext()) {
+                        Operation operation = (Operation) it.next();
                         if (FragmentManager.isLoggingEnabled(2)) {
-                            Log.v("FragmentManager", "SpecialEffectsController: Removing view " + view + " from container " + viewGroup);
+                            Log.v("FragmentManager", "SpecialEffectsController: Cancelling operation " + operation);
                         }
-                        viewGroup.removeView(view);
+                        operation.cancel();
+                        if (!operation.mIsComplete) {
+                            this.mRunningOperations.add(operation);
+                        }
                     }
-                } else if (ordinal == 1) {
-                    if (FragmentManager.isLoggingEnabled(2)) {
-                        Log.v("FragmentManager", "SpecialEffectsController: Setting view " + view + " to VISIBLE");
+                    updateFinalState();
+                    ArrayList arrayList2 = new ArrayList(this.mPendingOperations);
+                    this.mPendingOperations.clear();
+                    this.mRunningOperations.addAll(arrayList2);
+                    Iterator it2 = arrayList2.iterator();
+                    while (it2.hasNext()) {
+                        ((Operation) it2.next()).onStart();
                     }
-                    view.setVisibility(0);
-                } else if (ordinal == 2) {
-                    if (FragmentManager.isLoggingEnabled(2)) {
-                        Log.v("FragmentManager", "SpecialEffectsController: Setting view " + view + " to GONE");
-                    }
-                    view.setVisibility(8);
-                } else if (ordinal == 3) {
-                    if (FragmentManager.isLoggingEnabled(2)) {
-                        Log.v("FragmentManager", "SpecialEffectsController: Setting view " + view + " to INVISIBLE");
-                    }
-                    view.setVisibility(4);
+                    executeOperations(arrayList2, this.mOperationDirectionIsPop);
+                    this.mOperationDirectionIsPop = false;
                 }
-            }
-
-            public static State from(int i) {
-                if (i == 0) {
-                    return VISIBLE;
-                }
-                if (i == 4) {
-                    return INVISIBLE;
-                }
-                if (i == 8) {
-                    return GONE;
-                }
-                throw new IllegalArgumentException(ExifInterface$$ExternalSyntheticOutline0.m("Unknown visibility ", i));
             }
         }
+    }
+
+    public final Operation findPendingOperation(Fragment fragment) {
+        Iterator<Operation> it = this.mPendingOperations.iterator();
+        while (it.hasNext()) {
+            Operation next = it.next();
+            if (next.mFragment.equals(fragment) && !next.mIsCanceled) {
+                return next;
+            }
+        }
+        return null;
+    }
+
+    public final void forceCompleteAllOperations() {
+        String str;
+        String str2;
+        ViewGroup viewGroup = this.mContainer;
+        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
+        boolean isAttachedToWindow = ViewCompat.Api19Impl.isAttachedToWindow(viewGroup);
+        synchronized (this.mPendingOperations) {
+            updateFinalState();
+            Iterator<Operation> it = this.mPendingOperations.iterator();
+            while (it.hasNext()) {
+                it.next().onStart();
+            }
+            Iterator it2 = new ArrayList(this.mRunningOperations).iterator();
+            while (it2.hasNext()) {
+                Operation operation = (Operation) it2.next();
+                if (FragmentManager.isLoggingEnabled(2)) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("SpecialEffectsController: ");
+                    if (isAttachedToWindow) {
+                        str2 = "";
+                    } else {
+                        str2 = "Container " + this.mContainer + " is not attached to window. ";
+                    }
+                    sb.append(str2);
+                    sb.append("Cancelling running operation ");
+                    sb.append(operation);
+                    Log.v("FragmentManager", sb.toString());
+                }
+                operation.cancel();
+            }
+            Iterator it3 = new ArrayList(this.mPendingOperations).iterator();
+            while (it3.hasNext()) {
+                Operation operation2 = (Operation) it3.next();
+                if (FragmentManager.isLoggingEnabled(2)) {
+                    StringBuilder sb2 = new StringBuilder();
+                    sb2.append("SpecialEffectsController: ");
+                    if (isAttachedToWindow) {
+                        str = "";
+                    } else {
+                        str = "Container " + this.mContainer + " is not attached to window. ";
+                    }
+                    sb2.append(str);
+                    sb2.append("Cancelling pending operation ");
+                    sb2.append(operation2);
+                    Log.v("FragmentManager", sb2.toString());
+                }
+                operation2.cancel();
+            }
+        }
+    }
+
+    public final void markPostponedState() {
+        synchronized (this.mPendingOperations) {
+            updateFinalState();
+            this.mIsContainerPostponed = false;
+            int size = this.mPendingOperations.size();
+            while (true) {
+                size--;
+                if (size < 0) {
+                    break;
+                }
+                Operation operation = this.mPendingOperations.get(size);
+                Operation.State from = Operation.State.from(operation.mFragment.mView);
+                Operation.State state = operation.mFinalState;
+                Operation.State state2 = Operation.State.VISIBLE;
+                if (state == state2 && from != state2) {
+                    Fragment.AnimationInfo animationInfo = operation.mFragment.mAnimationInfo;
+                    this.mIsContainerPostponed = false;
+                    break;
+                }
+            }
+        }
+    }
+
+    public final void updateFinalState() {
+        Iterator<Operation> it = this.mPendingOperations.iterator();
+        while (it.hasNext()) {
+            Operation next = it.next();
+            if (next.mLifecycleImpact == Operation.LifecycleImpact.ADDING) {
+                next.mergeWith(Operation.State.from(next.mFragment.requireView().getVisibility()), Operation.LifecycleImpact.NONE);
+            }
+        }
+    }
+
+    public SpecialEffectsController(ViewGroup viewGroup) {
+        this.mContainer = viewGroup;
     }
 
     public static SpecialEffectsController getOrCreateController(ViewGroup viewGroup, SpecialEffectsControllerFactory specialEffectsControllerFactory) {
@@ -408,7 +409,7 @@ public abstract class SpecialEffectsController {
         if (tag instanceof SpecialEffectsController) {
             return (SpecialEffectsController) tag;
         }
-        Objects.requireNonNull((FragmentManager.AnonymousClass4) specialEffectsControllerFactory);
+        ((FragmentManager.AnonymousClass3) specialEffectsControllerFactory).getClass();
         DefaultSpecialEffectsController defaultSpecialEffectsController = new DefaultSpecialEffectsController(viewGroup);
         viewGroup.setTag(R.id.special_effects_controller_view_tag, defaultSpecialEffectsController);
         return defaultSpecialEffectsController;

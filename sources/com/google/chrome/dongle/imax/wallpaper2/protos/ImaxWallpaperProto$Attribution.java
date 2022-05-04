@@ -14,7 +14,7 @@ public final class ImaxWallpaperProto$Attribution extends GeneratedMessageLite<I
 
     /* loaded from: classes.dex */
     public static final class Builder extends GeneratedMessageLite.Builder<ImaxWallpaperProto$Attribution, Builder> implements MessageLiteOrBuilder {
-        public Builder(ImaxWallpaperProto$1 imaxWallpaperProto$1) {
+        public Builder() {
             super(ImaxWallpaperProto$Attribution.DEFAULT_INSTANCE);
         }
     }
@@ -26,7 +26,7 @@ public final class ImaxWallpaperProto$Attribution extends GeneratedMessageLite<I
     }
 
     @Override // com.google.protobuf.GeneratedMessageLite
-    public final Object dynamicMethod(GeneratedMessageLite.MethodToInvoke methodToInvoke, Object obj, Object obj2) {
+    public final Object dynamicMethod(GeneratedMessageLite.MethodToInvoke methodToInvoke) {
         switch (methodToInvoke.ordinal()) {
             case 0:
                 return (byte) 1;
@@ -37,7 +37,7 @@ public final class ImaxWallpaperProto$Attribution extends GeneratedMessageLite<I
             case 3:
                 return new ImaxWallpaperProto$Attribution();
             case 4:
-                return new Builder(null);
+                return new Builder();
             case 5:
                 return DEFAULT_INSTANCE;
             case 6:
@@ -57,7 +57,7 @@ public final class ImaxWallpaperProto$Attribution extends GeneratedMessageLite<I
         }
     }
 
-    public String getText() {
+    public final String getText() {
         return this.text_;
     }
 }

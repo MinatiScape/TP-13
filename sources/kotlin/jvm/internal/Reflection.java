@@ -1,9 +1,8 @@
 package kotlin.jvm.internal;
 
-import java.util.Objects;
 import kotlin.reflect.KClass;
 /* loaded from: classes.dex */
-public class Reflection {
+public final class Reflection {
     public static final KClass[] EMPTY_K_CLASS_ARRAY;
     public static final ReflectionFactory factory;
 
@@ -18,10 +17,5 @@ public class Reflection {
         }
         factory = reflectionFactory;
         EMPTY_K_CLASS_ARRAY = new KClass[0];
-    }
-
-    public static KClass getOrCreateKotlinClass(Class cls) {
-        Objects.requireNonNull(factory);
-        return new ClassReference(cls);
     }
 }

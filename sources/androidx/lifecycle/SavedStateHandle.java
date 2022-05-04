@@ -16,17 +16,18 @@ import java.util.Set;
 /* loaded from: classes.dex */
 public final class SavedStateHandle {
     public static final Class[] ACCEPTABLE_CLASSES = {Boolean.TYPE, boolean[].class, Double.TYPE, double[].class, Integer.TYPE, int[].class, Long.TYPE, long[].class, String.class, String[].class, Binder.class, Bundle.class, Byte.TYPE, byte[].class, Character.TYPE, char[].class, CharSequence.class, CharSequence[].class, ArrayList.class, Float.TYPE, float[].class, Parcelable.class, Parcelable[].class, Serializable.class, Short.TYPE, short[].class, SparseArray.class, Size.class, SizeF.class};
-    public final Map<String, ?> mLiveDatas;
-    public final Map<String, Object> mRegular;
-    public final SavedStateRegistry.SavedStateProvider mSavedStateProvider;
-    public final Map<String, SavedStateRegistry.SavedStateProvider> mSavedStateProviders;
+    public final HashMap mLiveDatas;
+    public final HashMap mRegular;
+    public final AnonymousClass1 mSavedStateProvider;
+    public final HashMap mSavedStateProviders;
 
-    public SavedStateHandle(Map<String, Object> initialState) {
+    /* JADX WARN: Type inference failed for: r0v2, types: [androidx.lifecycle.SavedStateHandle$1] */
+    public SavedStateHandle(HashMap hashMap) {
         this.mSavedStateProviders = new HashMap();
         this.mLiveDatas = new HashMap();
         this.mSavedStateProvider = new SavedStateRegistry.SavedStateProvider() { // from class: androidx.lifecycle.SavedStateHandle.1
             @Override // androidx.savedstate.SavedStateRegistry.SavedStateProvider
-            public Bundle saveState() {
+            public final Bundle saveState() {
                 for (Map.Entry entry : new HashMap(SavedStateHandle.this.mSavedStateProviders).entrySet()) {
                     SavedStateHandle.this.set((String) entry.getKey(), ((SavedStateRegistry.SavedStateProvider) entry.getValue()).saveState());
                 }
@@ -43,34 +44,36 @@ public final class SavedStateHandle {
                 return bundle;
             }
         };
-        this.mRegular = new HashMap(initialState);
+        this.mRegular = new HashMap(hashMap);
     }
 
-    public <T> void set(String key, T value) {
-        if (value != null) {
-            for (Class cls : ACCEPTABLE_CLASSES) {
-                if (!cls.isInstance(value)) {
+    public final <T> void set(String str, T t) {
+        if (t != null) {
+            Class[] clsArr = ACCEPTABLE_CLASSES;
+            for (int i = 0; i < 29; i++) {
+                if (!clsArr[i].isInstance(t)) {
                 }
             }
             StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Can't put value with type ");
-            m.append(value.getClass());
+            m.append(t.getClass());
             m.append(" into saved state");
             throw new IllegalArgumentException(m.toString());
         }
-        MutableLiveData mutableLiveData = (MutableLiveData) this.mLiveDatas.get(key);
+        MutableLiveData mutableLiveData = (MutableLiveData) this.mLiveDatas.get(str);
         if (mutableLiveData != null) {
-            mutableLiveData.setValue(value);
+            mutableLiveData.setValue(t);
         } else {
-            this.mRegular.put(key, value);
+            this.mRegular.put(str, t);
         }
     }
 
+    /* JADX WARN: Type inference failed for: r0v2, types: [androidx.lifecycle.SavedStateHandle$1] */
     public SavedStateHandle() {
         this.mSavedStateProviders = new HashMap();
         this.mLiveDatas = new HashMap();
         this.mSavedStateProvider = new SavedStateRegistry.SavedStateProvider() { // from class: androidx.lifecycle.SavedStateHandle.1
             @Override // androidx.savedstate.SavedStateRegistry.SavedStateProvider
-            public Bundle saveState() {
+            public final Bundle saveState() {
                 for (Map.Entry entry : new HashMap(SavedStateHandle.this.mSavedStateProviders).entrySet()) {
                     SavedStateHandle.this.set((String) entry.getKey(), ((SavedStateRegistry.SavedStateProvider) entry.getValue()).saveState());
                 }

@@ -2,59 +2,40 @@ package kotlin.text;
 
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
+/* compiled from: StringsJVM.kt */
 /* loaded from: classes.dex */
 public class StringsKt__StringsJVMKt extends StringsKt__StringNumberConversionsKt {
-    public static final boolean regionMatches(@NotNull String regionMatches, int i, @NotNull String other, int i2, int i3, boolean z) {
-        Intrinsics.checkNotNullParameter(regionMatches, "$this$regionMatches");
+    public static final boolean regionMatches(@NotNull String str, @NotNull String other, int i, int i2, boolean z) {
+        Intrinsics.checkNotNullParameter(str, "<this>");
         Intrinsics.checkNotNullParameter(other, "other");
         if (!z) {
-            return regionMatches.regionMatches(i, other, i2, i3);
+            return str.regionMatches(0, other, i, i2);
         }
-        return regionMatches.regionMatches(z, i, other, i2, i3);
+        return str.regionMatches(z, 0, other, i, i2);
     }
 
-    public static String replace$default(String str, String str2, String str3, boolean z, int i) {
-        int i2 = 0;
-        if ((i & 4) != 0) {
-            z = false;
+    public static void replace$default(String str) {
+        Intrinsics.checkNotNullParameter(str, "<this>");
+        int indexOf = StringsKt__StringsKt.indexOf(str, "/", 0, false);
+        if (indexOf >= 0) {
+            int length = (str.length() - 1) + 1;
+            if (length >= 0) {
+                StringBuilder sb = new StringBuilder(length);
+                int i = 0;
+                do {
+                    sb.append((CharSequence) str, i, indexOf);
+                    sb.append("-");
+                    i = indexOf + 1;
+                    if (indexOf >= str.length()) {
+                        break;
+                    }
+                    indexOf = StringsKt__StringsKt.indexOf(str, "/", indexOf + 1, false);
+                } while (indexOf > 0);
+                sb.append((CharSequence) str, i, str.length());
+                Intrinsics.checkNotNullExpressionValue(sb.toString(), "stringBuilder.append(this, i, length).toString()");
+                return;
+            }
+            throw new OutOfMemoryError();
         }
-        int indexOf = StringsKt__StringsKt.indexOf(str, str2, 0, z);
-        if (indexOf < 0) {
-            return str;
-        }
-        int length = str2.length();
-        int i3 = 1;
-        if (length >= 1) {
-            i3 = length;
-        }
-        int length2 = str3.length() + (str.length() - length);
-        if (length2 >= 0) {
-            StringBuilder sb = new StringBuilder(length2);
-            do {
-                sb.append((CharSequence) str, i2, indexOf);
-                sb.append(str3);
-                i2 = indexOf + length;
-                if (indexOf >= str.length()) {
-                    break;
-                }
-                indexOf = StringsKt__StringsKt.indexOf(str, str2, indexOf + i3, z);
-            } while (indexOf > 0);
-            sb.append((CharSequence) str, i2, str.length());
-            String sb2 = sb.toString();
-            Intrinsics.checkNotNullExpressionValue(sb2, "stringBuilder.append(this, i, length).toString()");
-            return sb2;
-        }
-        throw new OutOfMemoryError();
-    }
-
-    public static boolean startsWith$default(String str, String str2, boolean z, int i) {
-        if ((i & 2) != 0) {
-            z = false;
-        }
-        boolean z2 = z;
-        if (!z2) {
-            return str.startsWith(str2);
-        }
-        return regionMatches(str, 0, str2, 0, str2.length(), z2);
     }
 }

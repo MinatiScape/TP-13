@@ -1,134 +1,107 @@
 package kotlinx.coroutines.scheduling;
 
-import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.atomic.AtomicReferenceArray;
-import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
-import kotlin.jvm.internal.Intrinsics;
+import kotlinx.atomicfu.AtomicInt;
+import kotlinx.atomicfu.AtomicRef;
+import kotlinx.coroutines.DebugKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: WorkQueue.kt */
 /* loaded from: classes.dex */
 public final class WorkQueue {
-    public static final AtomicReferenceFieldUpdater lastScheduledTask$FU = AtomicReferenceFieldUpdater.newUpdater(WorkQueue.class, Object.class, "lastScheduledTask");
-    public static final AtomicIntegerFieldUpdater producerIndex$FU = AtomicIntegerFieldUpdater.newUpdater(WorkQueue.class, "producerIndex");
-    public static final AtomicIntegerFieldUpdater consumerIndex$FU = AtomicIntegerFieldUpdater.newUpdater(WorkQueue.class, "consumerIndex");
+    @NotNull
     public final AtomicReferenceArray<Task> buffer = new AtomicReferenceArray<>(128);
-    public volatile Object lastScheduledTask = null;
-    public volatile int producerIndex = 0;
-    public volatile int consumerIndex = 0;
-
-    public final boolean add(@NotNull Task task, @NotNull GlobalQueue globalQueue) {
-        Intrinsics.checkParameterIsNotNull(globalQueue, "globalQueue");
-        Task task2 = (Task) lastScheduledTask$FU.getAndSet(this, task);
-        if (task2 != null) {
-            return addLast(task2, globalQueue);
-        }
-        return true;
-    }
-
-    /* JADX WARN: Removed duplicated region for block: B:10:0x002b  */
-    /* JADX WARN: Removed duplicated region for block: B:26:0x006a A[SYNTHETIC] */
-    /*
-        Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
-    */
-    public final boolean addLast(@org.jetbrains.annotations.NotNull kotlinx.coroutines.scheduling.Task r10, @org.jetbrains.annotations.NotNull kotlinx.coroutines.scheduling.GlobalQueue r11) {
-        /*
-            r9 = this;
-            java.lang.String r0 = "globalQueue"
-            kotlin.jvm.internal.Intrinsics.checkParameterIsNotNull(r11, r0)
-            r0 = 0
-            r1 = 1
-            r2 = r1
-        L8:
-            int r3 = r9.getBufferSize$kotlinx_coroutines_core()
-            r4 = 127(0x7f, float:1.78E-43)
-            if (r3 != r4) goto L11
-            goto L1c
-        L11:
-            int r3 = r9.producerIndex
-            r3 = r3 & r4
-            java.util.concurrent.atomic.AtomicReferenceArray<kotlinx.coroutines.scheduling.Task> r4 = r9.buffer
-            java.lang.Object r4 = r4.get(r3)
-            if (r4 == 0) goto L1e
-        L1c:
-            r3 = r0
-            goto L29
-        L1e:
-            java.util.concurrent.atomic.AtomicReferenceArray<kotlinx.coroutines.scheduling.Task> r4 = r9.buffer
-            r4.lazySet(r3, r10)
-            java.util.concurrent.atomic.AtomicIntegerFieldUpdater r3 = kotlinx.coroutines.scheduling.WorkQueue.producerIndex$FU
-            r3.incrementAndGet(r9)
-            r3 = r1
-        L29:
-            if (r3 != 0) goto L6a
-            int r2 = r9.getBufferSize$kotlinx_coroutines_core()
-            int r2 = r2 / 2
-            if (r2 >= r1) goto L34
-            r2 = r1
-        L34:
-            r3 = r0
-        L35:
-            if (r3 >= r2) goto L68
-        L37:
-            int r4 = r9.consumerIndex
-            int r5 = r9.producerIndex
-            int r5 = r4 - r5
-            r6 = 0
-            if (r5 != 0) goto L41
-            goto L60
-        L41:
-            r5 = r4 & 127(0x7f, float:1.78E-43)
-            java.util.concurrent.atomic.AtomicReferenceArray<kotlinx.coroutines.scheduling.Task> r7 = r9.buffer
-            java.lang.Object r7 = r7.get(r5)
-            kotlinx.coroutines.scheduling.Task r7 = (kotlinx.coroutines.scheduling.Task) r7
-            if (r7 == 0) goto L37
-            java.util.concurrent.atomic.AtomicIntegerFieldUpdater r7 = kotlinx.coroutines.scheduling.WorkQueue.consumerIndex$FU
-            int r8 = r4 + 1
-            boolean r4 = r7.compareAndSet(r9, r4, r8)
-            if (r4 == 0) goto L37
-            java.util.concurrent.atomic.AtomicReferenceArray<kotlinx.coroutines.scheduling.Task> r4 = r9.buffer
-            java.lang.Object r4 = r4.getAndSet(r5, r6)
-            r6 = r4
-            kotlinx.coroutines.scheduling.Task r6 = (kotlinx.coroutines.scheduling.Task) r6
-        L60:
-            if (r6 == 0) goto L68
-            r9.addToGlobalQueue(r11, r6)
-            int r3 = r3 + 1
-            goto L35
-        L68:
-            r2 = r0
-            goto L8
-        L6a:
-            return r2
-        */
-        throw new UnsupportedOperationException("Method not decompiled: kotlinx.coroutines.scheduling.WorkQueue.addLast(kotlinx.coroutines.scheduling.Task, kotlinx.coroutines.scheduling.GlobalQueue):boolean");
-    }
-
-    public final void addToGlobalQueue(GlobalQueue globalQueue, Task task) {
-        if (!globalQueue.addLast(task)) {
-            throw new IllegalStateException("GlobalQueue could not be closed yet".toString());
-        }
-    }
-
-    public final int getBufferSize$kotlinx_coroutines_core() {
-        return this.producerIndex - this.consumerIndex;
-    }
+    @NotNull
+    public final AtomicRef<Task> lastScheduledTask = new AtomicRef<>(null);
+    @NotNull
+    public final AtomicInt producerIndex = new AtomicInt();
+    @NotNull
+    public final AtomicInt consumerIndex = new AtomicInt();
+    @NotNull
+    public final AtomicInt blockingTasksInBuffer = new AtomicInt();
 
     @Nullable
-    public final Task poll() {
-        Task task = (Task) lastScheduledTask$FU.getAndSet(this, null);
-        if (task != null) {
+    public final Task add(@NotNull Task task, boolean z) {
+        if (z) {
+            return addLast(task);
+        }
+        Task andSet = this.lastScheduledTask.getAndSet(task);
+        if (andSet == null) {
+            return null;
+        }
+        return addLast(andSet);
+    }
+
+    public final Task addLast(Task task) {
+        boolean z = true;
+        if (task.taskContext.getTaskMode() != 1) {
+            z = false;
+        }
+        if (z) {
+            this.blockingTasksInBuffer.incrementAndGet();
+        }
+        if (getBufferSize$external__kotlinx_coroutines__android_common__kotlinx_coroutines() == 127) {
             return task;
         }
+        int i = this.producerIndex.value & 127;
+        while (this.buffer.get(i) != null) {
+            Thread.yield();
+        }
+        this.buffer.lazySet(i, task);
+        this.producerIndex.incrementAndGet();
+        return null;
+    }
+
+    public final int getBufferSize$external__kotlinx_coroutines__android_common__kotlinx_coroutines() {
+        return this.producerIndex.value - this.consumerIndex.value;
+    }
+
+    public final Task pollBuffer() {
+        Task andSet;
         while (true) {
-            int i = this.consumerIndex;
-            if (i - this.producerIndex == 0) {
+            int i = this.consumerIndex.value;
+            if (i - this.producerIndex.value == 0) {
                 return null;
             }
             int i2 = i & 127;
-            if (this.buffer.get(i2) != null && consumerIndex$FU.compareAndSet(this, i, i + 1)) {
-                return this.buffer.getAndSet(i2, null);
+            if (this.consumerIndex.compareAndSet(i, i + 1) && (andSet = this.buffer.getAndSet(i2, null)) != null) {
+                boolean z = true;
+                if (andSet.taskContext.getTaskMode() != 1) {
+                    z = false;
+                }
+                if (z) {
+                    this.blockingTasksInBuffer.decrementAndGet();
+                    boolean z2 = DebugKt.DEBUG;
+                }
+                return andSet;
             }
         }
+    }
+
+    public final long tryStealLastScheduled(WorkQueue workQueue, boolean z) {
+        Task task;
+        do {
+            task = workQueue.lastScheduledTask.value;
+            if (task == null) {
+                return -2L;
+            }
+            if (z) {
+                boolean z2 = true;
+                if (task.taskContext.getTaskMode() != 1) {
+                    z2 = false;
+                }
+                if (!z2) {
+                    return -2L;
+                }
+            }
+            TasksKt.schedulerTimeSource.getClass();
+            long nanoTime = System.nanoTime() - task.submissionTime;
+            long j = TasksKt.WORK_STEALING_TIME_RESOLUTION_NS;
+            if (nanoTime < j) {
+                return j - nanoTime;
+            }
+        } while (!workQueue.lastScheduledTask.compareAndSet(task, null));
+        add(task, false);
+        return -1L;
     }
 }

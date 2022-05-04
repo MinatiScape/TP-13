@@ -3,14 +3,15 @@ package com.google.android.gms.phenotype;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.android.gms.internal.zzbkw;
+/* compiled from: FlagOverrideCreator.java */
 /* loaded from: classes.dex */
 public final class zzl implements Parcelable.Creator<FlagOverride> {
     @Override // android.os.Parcelable.Creator
     public final /* synthetic */ FlagOverride createFromParcel(Parcel parcel) {
         int zza = zzbkw.zza(parcel);
         String str = null;
-        boolean z = false;
         Flag flag = null;
+        boolean z = false;
         String str2 = null;
         while (parcel.dataPosition() < zza) {
             int readInt = parcel.readInt();

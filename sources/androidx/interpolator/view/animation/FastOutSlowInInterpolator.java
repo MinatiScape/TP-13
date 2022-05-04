@@ -1,9 +1,10 @@
 package androidx.interpolator.view.animation;
 
 import android.view.animation.Interpolator;
+import androidx.core.R$attr;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 /* loaded from: classes.dex */
-public class FastOutSlowInInterpolator implements Interpolator {
+public final class FastOutSlowInInterpolator implements Interpolator {
     public static final float STEP;
     public static final float[] VALUES;
 
@@ -14,7 +15,7 @@ public class FastOutSlowInInterpolator implements Interpolator {
     }
 
     @Override // android.animation.TimeInterpolator
-    public float getInterpolation(float input) {
-        return LookupTableInterpolator.interpolate(VALUES, STEP, input);
+    public final float getInterpolation(float f) {
+        return R$attr.interpolate(VALUES, STEP, f);
     }
 }

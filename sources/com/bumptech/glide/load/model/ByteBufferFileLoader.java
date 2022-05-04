@@ -12,63 +12,63 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 /* loaded from: classes.dex */
-public class ByteBufferFileLoader implements ModelLoader<File, ByteBuffer> {
+public final class ByteBufferFileLoader implements ModelLoader<File, ByteBuffer> {
 
     /* loaded from: classes.dex */
     public static final class ByteBufferFetcher implements DataFetcher<ByteBuffer> {
         public final File file;
+
+        @Override // com.bumptech.glide.load.data.DataFetcher
+        public final void cancel() {
+        }
+
+        @Override // com.bumptech.glide.load.data.DataFetcher
+        public final void cleanup() {
+        }
+
+        @Override // com.bumptech.glide.load.data.DataFetcher
+        public final void loadData(Priority priority, DataFetcher.DataCallback<? super ByteBuffer> dataCallback) {
+            try {
+                dataCallback.onDataReady(ByteBufferUtil.fromFile(this.file));
+            } catch (IOException e) {
+                if (Log.isLoggable("ByteBufferFileLoader", 3)) {
+                    Log.d("ByteBufferFileLoader", "Failed to obtain ByteBuffer for file", e);
+                }
+                dataCallback.onLoadFailed(e);
+            }
+        }
 
         public ByteBufferFetcher(File file) {
             this.file = file;
         }
 
         @Override // com.bumptech.glide.load.data.DataFetcher
-        public void cancel() {
-        }
-
-        @Override // com.bumptech.glide.load.data.DataFetcher
-        public void cleanup() {
-        }
-
-        @Override // com.bumptech.glide.load.data.DataFetcher
-        public Class<ByteBuffer> getDataClass() {
+        public final Class<ByteBuffer> getDataClass() {
             return ByteBuffer.class;
         }
 
         @Override // com.bumptech.glide.load.data.DataFetcher
-        public DataSource getDataSource() {
+        public final DataSource getDataSource() {
             return DataSource.LOCAL;
-        }
-
-        @Override // com.bumptech.glide.load.data.DataFetcher
-        public void loadData(Priority priority, DataFetcher.DataCallback<? super ByteBuffer> callback) {
-            try {
-                callback.onDataReady(ByteBufferUtil.fromFile(this.file));
-            } catch (IOException e) {
-                if (Log.isLoggable("ByteBufferFileLoader", 3)) {
-                    Log.d("ByteBufferFileLoader", "Failed to obtain ByteBuffer for file", e);
-                }
-                callback.onLoadFailed(e);
-            }
         }
     }
 
     /* loaded from: classes.dex */
     public static class Factory implements ModelLoaderFactory<File, ByteBuffer> {
         @Override // com.bumptech.glide.load.model.ModelLoaderFactory
-        public ModelLoader<File, ByteBuffer> build(MultiModelLoaderFactory multiFactory) {
+        public final ModelLoader<File, ByteBuffer> build(MultiModelLoaderFactory multiModelLoaderFactory) {
             return new ByteBufferFileLoader();
         }
     }
 
     @Override // com.bumptech.glide.load.model.ModelLoader
-    public ModelLoader.LoadData<ByteBuffer> buildLoadData(File file, int width, int height, Options options) {
+    public final ModelLoader.LoadData<ByteBuffer> buildLoadData(File file, int i, int i2, Options options) {
         File file2 = file;
         return new ModelLoader.LoadData<>(new ObjectKey(file2), new ByteBufferFetcher(file2));
     }
 
     @Override // com.bumptech.glide.load.model.ModelLoader
-    public /* bridge */ /* synthetic */ boolean handles(File file) {
+    public final /* bridge */ /* synthetic */ boolean handles(File file) {
         return true;
     }
 }

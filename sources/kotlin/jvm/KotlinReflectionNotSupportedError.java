@@ -1,6 +1,7 @@
 package kotlin.jvm;
 
 import org.jetbrains.annotations.Nullable;
+/* compiled from: KotlinReflectionNotSupportedError.kt */
 /* loaded from: classes.dex */
 public class KotlinReflectionNotSupportedError extends Error {
     public KotlinReflectionNotSupportedError() {

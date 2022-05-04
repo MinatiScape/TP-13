@@ -13,10 +13,4 @@ public class VisibilityAwareImageButton extends ImageButton {
             this.userSetVisibility = i;
         }
     }
-
-    @Override // android.widget.ImageView, android.view.View
-    public void setVisibility(int i) {
-        super.setVisibility(i);
-        this.userSetVisibility = i;
-    }
 }

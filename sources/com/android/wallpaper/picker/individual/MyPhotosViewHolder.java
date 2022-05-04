@@ -8,15 +8,16 @@ import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.ImageView;
+import androidx.appcompat.R$bool;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.transition.R$id;
 import com.android.systemui.shared.R;
 import com.android.wallpaper.asset.Asset;
 import com.android.wallpaper.asset.ContentUriAsset;
 import com.android.wallpaper.picker.MyPhotosStarter;
-import java.util.Objects;
+import com.android.wallpaper.picker.WallpaperPickerDelegate;
 /* loaded from: classes.dex */
-public class MyPhotosViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, MyPhotosStarter.PermissionChangedListener {
+public final class MyPhotosViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, MyPhotosStarter.PermissionChangedListener {
     public final Activity mActivity;
     public final MyPhotosStarter mMyPhotosStarter;
     public final ImageView mOverlayIconView;
@@ -24,7 +25,7 @@ public class MyPhotosViewHolder extends RecyclerView.ViewHolder implements View.
 
     /* renamed from: com.android.wallpaper.picker.individual.MyPhotosViewHolder$2  reason: invalid class name */
     /* loaded from: classes.dex */
-    public class AnonymousClass2 implements AssetListener {
+    public final class AnonymousClass2 implements AssetListener {
         public AnonymousClass2() {
         }
     }
@@ -33,34 +34,31 @@ public class MyPhotosViewHolder extends RecyclerView.ViewHolder implements View.
     public interface AssetListener {
     }
 
-    public MyPhotosViewHolder(Activity activity, MyPhotosStarter myPhotosStarter, int i, View view) {
-        super(view);
-        this.mActivity = activity;
-        this.mMyPhotosStarter = myPhotosStarter;
-        view.getLayoutParams().height = i;
-        view.findViewById(R.id.tile).setOnClickListener(this);
-        this.mThumbnailView = (ImageView) view.findViewById(R.id.thumbnail);
-        this.mOverlayIconView = (ImageView) view.findViewById(R.id.overlay_icon);
+    @Override // com.android.wallpaper.picker.MyPhotosStarter.PermissionChangedListener
+    public final void onPermissionsDenied(boolean z) {
     }
 
-    public static boolean isReadExternalStoragePermissionGranted(Context context) {
-        return context.getPackageManager().checkPermission("android.permission.READ_EXTERNAL_STORAGE", context.getPackageName()) == 0;
-    }
-
-    public void bind() {
-        if (isReadExternalStoragePermissionGranted(this.mActivity)) {
+    public final void bind$1() {
+        boolean z;
+        Activity activity = this.mActivity;
+        if (activity.getPackageManager().checkPermission("android.permission.READ_EXTERNAL_STORAGE", activity.getPackageName()) == 0) {
+            z = true;
+        } else {
+            z = false;
+        }
+        if (z) {
             this.mOverlayIconView.setVisibility(8);
-            final Activity activity = this.mActivity;
-            final AnonymousClass2 r2 = new AnonymousClass2();
-            isReadExternalStoragePermissionGranted(activity);
+            final Activity activity2 = this.mActivity;
+            final AnonymousClass2 r3 = new AnonymousClass2();
+            activity2.getPackageManager().checkPermission("android.permission.READ_EXTERNAL_STORAGE", activity2.getPackageName());
             new AsyncTask<Void, Void, Asset>() { // from class: com.android.wallpaper.picker.individual.MyPhotosViewHolder.1
                 @Override // android.os.AsyncTask
-                public Asset doInBackground(Void[] voidArr) {
-                    Cursor query = activity.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[]{"_id", "datetaken"}, null, null, "datetaken DESC LIMIT 1");
+                public final Asset doInBackground(Void[] voidArr) {
+                    Cursor query = activity2.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[]{"_id", "datetaken"}, null, null, "datetaken DESC LIMIT 1");
                     ContentUriAsset contentUriAsset = null;
                     if (query != null) {
                         if (query.moveToNext()) {
-                            Context context = activity;
+                            Context context = activity2;
                             contentUriAsset = new ContentUriAsset(context, Uri.parse(MediaStore.Images.Media.EXTERNAL_CONTENT_URI + "/" + query.getString(0)), false);
                         }
                         query.close();
@@ -69,15 +67,16 @@ public class MyPhotosViewHolder extends RecyclerView.ViewHolder implements View.
                 }
 
                 @Override // android.os.AsyncTask
-                public void onPostExecute(Asset asset) {
+                public final void onPostExecute(Asset asset) {
                     Asset asset2 = asset;
-                    AnonymousClass2 r22 = (AnonymousClass2) r2;
-                    Objects.requireNonNull(r22);
-                    if (asset2 != null) {
-                        MyPhotosViewHolder myPhotosViewHolder = MyPhotosViewHolder.this;
-                        Activity activity2 = myPhotosViewHolder.mActivity;
-                        asset2.loadDrawable(activity2, myPhotosViewHolder.mThumbnailView, R$id.getColorAttr(activity2, 16844080));
+                    AnonymousClass2 r2 = (AnonymousClass2) r3;
+                    if (asset2 == null) {
+                        r2.getClass();
+                        return;
                     }
+                    MyPhotosViewHolder myPhotosViewHolder = MyPhotosViewHolder.this;
+                    Activity activity3 = myPhotosViewHolder.mActivity;
+                    asset2.loadDrawable(activity3, myPhotosViewHolder.mThumbnailView, R$bool.getColorAttr(activity3, 16844080));
                 }
             }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Void[0]);
             return;
@@ -87,16 +86,22 @@ public class MyPhotosViewHolder extends RecyclerView.ViewHolder implements View.
     }
 
     @Override // android.view.View.OnClickListener
-    public void onClick(View view) {
-        this.mMyPhotosStarter.requestCustomPhotoPicker(this);
+    public final void onClick(View view) {
+        ((WallpaperPickerDelegate) this.mMyPhotosStarter).requestCustomPhotoPicker(this);
+    }
+
+    public MyPhotosViewHolder(FragmentActivity fragmentActivity, MyPhotosStarter myPhotosStarter, int i, View view) {
+        super(view);
+        this.mActivity = fragmentActivity;
+        this.mMyPhotosStarter = myPhotosStarter;
+        view.getLayoutParams().height = i;
+        view.findViewById(R.id.tile).setOnClickListener(this);
+        this.mThumbnailView = (ImageView) view.findViewById(R.id.thumbnail);
+        this.mOverlayIconView = (ImageView) view.findViewById(R.id.overlay_icon);
     }
 
     @Override // com.android.wallpaper.picker.MyPhotosStarter.PermissionChangedListener
-    public void onPermissionsDenied(boolean z) {
-    }
-
-    @Override // com.android.wallpaper.picker.MyPhotosStarter.PermissionChangedListener
-    public void onPermissionsGranted() {
-        bind();
+    public final void onPermissionsGranted() {
+        bind$1();
     }
 }

@@ -16,17 +16,11 @@ import android.window.IRemoteTransitionFinishedCallback;
 import android.window.RemoteTransition;
 import android.window.TransitionInfo;
 import android.window.WindowContainerTransaction;
-import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 import com.android.wm.shell.util.CounterRotator;
 /* loaded from: classes.dex */
 public class RemoteAnimationAdapterCompat {
     private final RemoteTransitionCompat mRemoteTransition;
     private final RemoteAnimationAdapter mWrapped;
-
-    public RemoteAnimationAdapterCompat(RemoteAnimationRunnerCompat remoteAnimationRunnerCompat, long j, long j2, IApplicationThread iApplicationThread) {
-        this.mWrapped = new RemoteAnimationAdapter(wrapRemoteAnimationRunner(remoteAnimationRunnerCompat), j, j2);
-        this.mRemoteTransition = buildRemoteTransition(remoteAnimationRunnerCompat, iApplicationThread);
-    }
 
     public static RemoteTransitionCompat buildRemoteTransition(RemoteAnimationRunnerCompat remoteAnimationRunnerCompat, IApplicationThread iApplicationThread) {
         return new RemoteTransitionCompat(new RemoteTransition(wrapRemoteTransition(remoteAnimationRunnerCompat), iApplicationThread));
@@ -59,23 +53,25 @@ public class RemoteAnimationAdapterCompat {
             }
 
             public void startAnimation(IBinder iBinder, final TransitionInfo transitionInfo, SurfaceControl.Transaction transaction, final IRemoteTransitionFinishedCallback iRemoteTransitionFinishedCallback) {
-                CounterRotator counterRotator;
-                final CounterRotator counterRotator2;
                 final ArrayMap arrayMap = new ArrayMap();
                 RemoteAnimationTargetCompat[] wrap = RemoteAnimationTargetCompat.wrap(transitionInfo, false, transaction, arrayMap);
                 RemoteAnimationTargetCompat[] wrap2 = RemoteAnimationTargetCompat.wrap(transitionInfo, true, transaction, arrayMap);
                 RemoteAnimationTargetCompat[] remoteAnimationTargetCompatArr = new RemoteAnimationTargetCompat[0];
-                float f = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
-                TransitionInfo.Change change = null;
                 int i = 0;
                 int i2 = 0;
                 boolean z = false;
+                float f = 0.0f;
                 float f2 = 0.0f;
+                TransitionInfo.Change change = null;
                 TransitionInfo.Change change2 = null;
                 for (int size = transitionInfo.getChanges().size() - 1; size >= 0; size--) {
                     TransitionInfo.Change change3 = (TransitionInfo.Change) transitionInfo.getChanges().get(size);
                     if (change3.getTaskInfo() != null && change3.getTaskInfo().getActivityType() == 2) {
-                        z = change3.getMode() == 1 || change3.getMode() == 3;
+                        if (change3.getMode() == 1 || change3.getMode() == 3) {
+                            z = true;
+                        } else {
+                            z = false;
+                        }
                         i = transitionInfo.getChanges().size() - size;
                         change = change3;
                     } else if ((change3.getFlags() & 2) != 0) {
@@ -83,25 +79,22 @@ public class RemoteAnimationAdapterCompat {
                     }
                     if (change3.getParent() == null && change3.getEndRotation() >= 0 && change3.getEndRotation() != change3.getStartRotation()) {
                         i2 = change3.getEndRotation() - change3.getStartRotation();
-                        f = change3.getEndAbsBounds().width();
                         f2 = change3.getEndAbsBounds().height();
+                        f = change3.getEndAbsBounds().width();
                     }
                 }
-                final CounterRotator counterRotator3 = new CounterRotator();
-                CounterRotator counterRotator4 = new CounterRotator();
-                if (change == null || i2 == 0 || change.getParent() == null) {
-                    counterRotator = counterRotator4;
-                } else {
-                    counterRotator = counterRotator4;
+                final CounterRotator counterRotator = new CounterRotator();
+                final CounterRotator counterRotator2 = new CounterRotator();
+                if (change != null && i2 != 0 && change.getParent() != null) {
                     int i3 = i;
-                    counterRotator3.setup(transaction, transitionInfo.getChange(change.getParent()).getLeash(), i2, f, f2);
-                    SurfaceControl surfaceControl = counterRotator3.mSurface;
+                    counterRotator.setup(transaction, transitionInfo.getChange(change.getParent()).getLeash(), i2, f, f2);
+                    SurfaceControl surfaceControl = counterRotator.mSurface;
                     if (surfaceControl != null) {
                         transaction.setLayer(surfaceControl, i3);
                     }
                 }
                 if (z) {
-                    SurfaceControl surfaceControl2 = counterRotator3.mSurface;
+                    SurfaceControl surfaceControl2 = counterRotator.mSurface;
                     if (surfaceControl2 != null) {
                         transaction.setLayer(surfaceControl2, transitionInfo.getChanges().size() * 3);
                     }
@@ -111,28 +104,25 @@ public class RemoteAnimationAdapterCompat {
                         int mode = ((TransitionInfo.Change) transitionInfo.getChanges().get(size2)).getMode();
                         if (TransitionInfo.isIndependent(change4, transitionInfo) && (mode == 2 || mode == 4)) {
                             transaction.setLayer(surfaceControl3, (transitionInfo.getChanges().size() * 3) - size2);
-                            SurfaceControl surfaceControl4 = counterRotator3.mSurface;
+                            SurfaceControl surfaceControl4 = counterRotator.mSurface;
                             if (surfaceControl4 != null) {
                                 transaction.reparent(surfaceControl3, surfaceControl4);
-                                counterRotator3.mRotateChildren.add(surfaceControl3);
                             }
                         }
                     }
                     for (int length = wrap2.length - 1; length >= 0; length--) {
-                        transaction.show(wrap2[length].leash.getSurfaceControl());
-                        transaction.setAlpha(wrap2[length].leash.getSurfaceControl(), 1.0f);
+                        transaction.show(wrap2[length].leash);
+                        transaction.setAlpha(wrap2[length].leash, 1.0f);
                     }
                 } else {
                     if (change != null) {
                         SurfaceControl surfaceControl5 = (SurfaceControl) arrayMap.get(change.getLeash());
-                        SurfaceControl surfaceControl6 = counterRotator3.mSurface;
+                        SurfaceControl surfaceControl6 = counterRotator.mSurface;
                         if (surfaceControl6 != null) {
                             transaction.reparent(surfaceControl5, surfaceControl6);
-                            counterRotator3.mRotateChildren.add(surfaceControl5);
                         }
                     }
                     if (!(change2 == null || i2 == 0 || change2.getParent() == null)) {
-                        counterRotator2 = counterRotator;
                         counterRotator2.setup(transaction, transitionInfo.getChange(change2.getParent()).getLeash(), i2, f, f2);
                         SurfaceControl surfaceControl7 = counterRotator2.mSurface;
                         if (surfaceControl7 != null) {
@@ -141,62 +131,56 @@ public class RemoteAnimationAdapterCompat {
                             SurfaceControl surfaceControl9 = counterRotator2.mSurface;
                             if (surfaceControl9 != null) {
                                 transaction.reparent(surfaceControl8, surfaceControl9);
-                                counterRotator2.mRotateChildren.add(surfaceControl8);
                             }
                         }
-                        transaction.apply();
-                        RemoteAnimationRunnerCompat.this.onAnimationStart(0, wrap, wrap2, remoteAnimationTargetCompatArr, new Runnable() { // from class: com.android.systemui.shared.system.RemoteAnimationAdapterCompat.2.1
-                            @Override // java.lang.Runnable
-                            @SuppressLint({"NewApi"})
-                            public void run() {
-                                try {
-                                    counterRotator3.cleanUp(transitionInfo.getRootLeash());
-                                    counterRotator2.cleanUp(transitionInfo.getRootLeash());
-                                    for (int i4 = 0; i4 < transitionInfo.getChanges().size(); i4++) {
-                                        ((TransitionInfo.Change) transitionInfo.getChanges().get(i4)).getLeash().release();
-                                    }
-                                    SurfaceControl.Transaction transaction2 = new SurfaceControl.Transaction();
-                                    for (int i5 = 0; i5 < arrayMap.size(); i5++) {
-                                        if (arrayMap.keyAt(i5) != arrayMap.valueAt(i5)) {
-                                            transaction2.remove((SurfaceControl) arrayMap.valueAt(i5));
-                                        }
-                                    }
-                                    transaction2.apply();
-                                    iRemoteTransitionFinishedCallback.onTransitionFinished((WindowContainerTransaction) null, (SurfaceControl.Transaction) null);
-                                } catch (RemoteException e) {
-                                    Log.e("ActivityOptionsCompat", "Failed to call app controlled animation finished callback", e);
-                                }
-                            }
-                        });
                     }
                 }
-                counterRotator2 = counterRotator;
                 transaction.apply();
                 RemoteAnimationRunnerCompat.this.onAnimationStart(0, wrap, wrap2, remoteAnimationTargetCompatArr, new Runnable() { // from class: com.android.systemui.shared.system.RemoteAnimationAdapterCompat.2.1
                     @Override // java.lang.Runnable
                     @SuppressLint({"NewApi"})
                     public void run() {
-                        try {
-                            counterRotator3.cleanUp(transitionInfo.getRootLeash());
-                            counterRotator2.cleanUp(transitionInfo.getRootLeash());
-                            for (int i4 = 0; i4 < transitionInfo.getChanges().size(); i4++) {
-                                ((TransitionInfo.Change) transitionInfo.getChanges().get(i4)).getLeash().release();
+                        SurfaceControl.Transaction transaction2 = new SurfaceControl.Transaction();
+                        SurfaceControl surfaceControl10 = counterRotator.mSurface;
+                        if (surfaceControl10 != null) {
+                            transaction2.remove(surfaceControl10);
+                        }
+                        SurfaceControl surfaceControl11 = counterRotator2.mSurface;
+                        if (surfaceControl11 != null) {
+                            transaction2.remove(surfaceControl11);
+                        }
+                        int size3 = transitionInfo.getChanges().size();
+                        while (true) {
+                            size3--;
+                            if (size3 < 0) {
+                                break;
                             }
-                            SurfaceControl.Transaction transaction2 = new SurfaceControl.Transaction();
-                            for (int i5 = 0; i5 < arrayMap.size(); i5++) {
-                                if (arrayMap.keyAt(i5) != arrayMap.valueAt(i5)) {
-                                    transaction2.remove((SurfaceControl) arrayMap.valueAt(i5));
+                            ((TransitionInfo.Change) transitionInfo.getChanges().get(size3)).getLeash().release();
+                        }
+                        int size4 = arrayMap.size();
+                        while (true) {
+                            size4--;
+                            if (size4 >= 0) {
+                                ((SurfaceControl) arrayMap.valueAt(size4)).release();
+                            } else {
+                                try {
+                                    iRemoteTransitionFinishedCallback.onTransitionFinished((WindowContainerTransaction) null, transaction2);
+                                    return;
+                                } catch (RemoteException e) {
+                                    Log.e("ActivityOptionsCompat", "Failed to call app controlled animation finished callback", e);
+                                    return;
                                 }
                             }
-                            transaction2.apply();
-                            iRemoteTransitionFinishedCallback.onTransitionFinished((WindowContainerTransaction) null, (SurfaceControl.Transaction) null);
-                        } catch (RemoteException e) {
-                            Log.e("ActivityOptionsCompat", "Failed to call app controlled animation finished callback", e);
                         }
                     }
                 });
             }
         };
+    }
+
+    public RemoteAnimationAdapterCompat(RemoteAnimationRunnerCompat remoteAnimationRunnerCompat, long j, long j2, IApplicationThread iApplicationThread) {
+        this.mWrapped = new RemoteAnimationAdapter(wrapRemoteAnimationRunner(remoteAnimationRunnerCompat), j, j2);
+        this.mRemoteTransition = buildRemoteTransition(remoteAnimationRunnerCompat, iApplicationThread);
     }
 
     public RemoteTransitionCompat getRemoteTransition() {

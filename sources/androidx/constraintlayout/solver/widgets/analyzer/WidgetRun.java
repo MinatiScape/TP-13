@@ -4,7 +4,7 @@ import androidx.constraintlayout.solver.widgets.ConstraintAnchor;
 import androidx.constraintlayout.solver.widgets.ConstraintWidget;
 /* loaded from: classes.dex */
 public abstract class WidgetRun implements Dependency {
-    public int dimensionBehavior;
+    public ConstraintWidget.DimensionBehaviour dimensionBehavior;
     public int matchConstraintsType;
     public RunGroup runGroup;
     public ConstraintWidget widget;
@@ -13,16 +13,47 @@ public abstract class WidgetRun implements Dependency {
     public boolean resolved = false;
     public DependencyNode start = new DependencyNode(this);
     public DependencyNode end = new DependencyNode(this);
-    public int mRunType = 1;
+    public RunType mRunType = RunType.NONE;
 
-    public WidgetRun(ConstraintWidget constraintWidget) {
-        this.widget = constraintWidget;
+    /* loaded from: classes.dex */
+    public enum RunType {
+        NONE,
+        /* JADX INFO: Fake field, exist only in values array */
+        START,
+        /* JADX INFO: Fake field, exist only in values array */
+        END,
+        CENTER
     }
 
-    public final void addTarget(DependencyNode dependencyNode, DependencyNode dependencyNode2, int i) {
+    public static void addTarget(DependencyNode dependencyNode, DependencyNode dependencyNode2, int i) {
         dependencyNode.targets.add(dependencyNode2);
         dependencyNode.margin = i;
         dependencyNode2.dependencies.add(dependencyNode);
+    }
+
+    public static DependencyNode getTarget(ConstraintAnchor constraintAnchor) {
+        ConstraintAnchor constraintAnchor2 = constraintAnchor.mTarget;
+        if (constraintAnchor2 == null) {
+            return null;
+        }
+        ConstraintWidget constraintWidget = constraintAnchor2.mOwner;
+        int ordinal = constraintAnchor2.mType.ordinal();
+        if (ordinal == 1) {
+            return constraintWidget.horizontalRun.start;
+        }
+        if (ordinal == 2) {
+            return constraintWidget.verticalRun.start;
+        }
+        if (ordinal == 3) {
+            return constraintWidget.horizontalRun.end;
+        }
+        if (ordinal == 4) {
+            return constraintWidget.verticalRun.end;
+        }
+        if (ordinal != 5) {
+            return null;
+        }
+        return constraintWidget.verticalRun.baseline;
     }
 
     public abstract void apply();
@@ -30,6 +61,12 @@ public abstract class WidgetRun implements Dependency {
     public abstract void applyToWidget();
 
     public abstract void clear();
+
+    public abstract boolean supportsWrapComputation();
+
+    @Override // androidx.constraintlayout.solver.widgets.analyzer.Dependency
+    public void update(Dependency dependency) {
+    }
 
     public final int getLimitedDimension(int i, int i2) {
         int i3;
@@ -57,31 +94,6 @@ public abstract class WidgetRun implements Dependency {
         return i3;
     }
 
-    public final DependencyNode getTarget(ConstraintAnchor constraintAnchor) {
-        ConstraintAnchor constraintAnchor2 = constraintAnchor.mTarget;
-        if (constraintAnchor2 == null) {
-            return null;
-        }
-        ConstraintWidget constraintWidget = constraintAnchor2.mOwner;
-        int ordinal = constraintAnchor2.mType.ordinal();
-        if (ordinal == 1) {
-            return constraintWidget.horizontalRun.start;
-        }
-        if (ordinal == 2) {
-            return constraintWidget.verticalRun.start;
-        }
-        if (ordinal == 3) {
-            return constraintWidget.horizontalRun.end;
-        }
-        if (ordinal == 4) {
-            return constraintWidget.verticalRun.end;
-        }
-        if (ordinal != 5) {
-            return null;
-        }
-        return constraintWidget.verticalRun.baseline;
-    }
-
     public long getWrapDimension() {
         DimensionDependency dimensionDependency = this.dimension;
         if (dimensionDependency.resolved) {
@@ -90,22 +102,20 @@ public abstract class WidgetRun implements Dependency {
         return 0L;
     }
 
-    public abstract boolean supportsWrapComputation();
-
-    @Override // androidx.constraintlayout.solver.widgets.analyzer.Dependency
-    public void update(Dependency dependency) {
+    public WidgetRun(ConstraintWidget constraintWidget) {
+        this.widget = constraintWidget;
     }
 
-    /* JADX WARN: Code restructure failed: missing block: B:24:0x0051, code lost:
-        if (r9.matchConstraintsType == 3) goto L47;
+    /* JADX WARN: Code restructure failed: missing block: B:25:0x0053, code lost:
+        if (r10.matchConstraintsType == 3) goto L48;
      */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public void updateRunCenter(androidx.constraintlayout.solver.widgets.ConstraintAnchor r12, androidx.constraintlayout.solver.widgets.ConstraintAnchor r13, int r14) {
+    public final void updateRunCenter(androidx.constraintlayout.solver.widgets.ConstraintAnchor r13, androidx.constraintlayout.solver.widgets.ConstraintAnchor r14, int r15) {
         /*
-            Method dump skipped, instructions count: 244
+            Method dump skipped, instructions count: 246
             To view this dump add '--comments-level debug' option
         */
         throw new UnsupportedOperationException("Method not decompiled: androidx.constraintlayout.solver.widgets.analyzer.WidgetRun.updateRunCenter(androidx.constraintlayout.solver.widgets.ConstraintAnchor, androidx.constraintlayout.solver.widgets.ConstraintAnchor, int):void");
@@ -120,7 +130,7 @@ public abstract class WidgetRun implements Dependency {
         dimensionDependency.dependencies.add(dependencyNode);
     }
 
-    public final DependencyNode getTarget(ConstraintAnchor constraintAnchor, int i) {
+    public static DependencyNode getTarget(ConstraintAnchor constraintAnchor, int i) {
         ConstraintAnchor constraintAnchor2 = constraintAnchor.mTarget;
         if (constraintAnchor2 == null) {
             return null;

@@ -1,39 +1,53 @@
 package kotlin.coroutines;
 
-import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import kotlin.Result;
 import kotlin.coroutines.intrinsics.CoroutineSingletons;
 import kotlin.coroutines.jvm.internal.CoroutineStackFrame;
+import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: SafeContinuationJvm.kt */
 /* loaded from: classes.dex */
 public final class SafeContinuation<T> implements Continuation<T>, CoroutineStackFrame {
     @Deprecated
     public static final AtomicReferenceFieldUpdater<SafeContinuation<?>, Object> RESULT = AtomicReferenceFieldUpdater.newUpdater(SafeContinuation.class, Object.class, "result");
+    @NotNull
     public final Continuation<T> delegate;
+    @Nullable
     public volatile Object result;
 
+    public SafeContinuation() {
+        throw null;
+    }
+
     /* JADX WARN: Multi-variable type inference failed */
-    public SafeContinuation(@NotNull Continuation<? super T> continuation) {
+    public SafeContinuation(@NotNull Continuation<? super T> delegate) {
+        Intrinsics.checkNotNullParameter(delegate, "delegate");
         CoroutineSingletons coroutineSingletons = CoroutineSingletons.UNDECIDED;
-        this.delegate = continuation;
+        this.delegate = delegate;
         this.result = coroutineSingletons;
     }
 
     @Override // kotlin.coroutines.jvm.internal.CoroutineStackFrame
     @Nullable
-    public CoroutineStackFrame getCallerFrame() {
+    public final StackTraceElement getStackTraceElement() {
+        return null;
+    }
+
+    @Override // kotlin.coroutines.jvm.internal.CoroutineStackFrame
+    @Nullable
+    public final CoroutineStackFrame getCallerFrame() {
         Continuation<T> continuation = this.delegate;
-        if (!(continuation instanceof CoroutineStackFrame)) {
-            continuation = null;
+        if (continuation instanceof CoroutineStackFrame) {
+            return (CoroutineStackFrame) continuation;
         }
-        return (CoroutineStackFrame) continuation;
+        return null;
     }
 
     @Override // kotlin.coroutines.Continuation
     @NotNull
-    public CoroutineContext getContext() {
+    public final CoroutineContext getContext() {
         return this.delegate.getContext();
     }
 
@@ -57,14 +71,8 @@ public final class SafeContinuation<T> implements Continuation<T>, CoroutineStac
         throw ((Result.Failure) obj).exception;
     }
 
-    @Override // kotlin.coroutines.jvm.internal.CoroutineStackFrame
-    @Nullable
-    public StackTraceElement getStackTraceElement() {
-        return null;
-    }
-
     @Override // kotlin.coroutines.Continuation
-    public void resumeWith(@NotNull Object obj) {
+    public final void resumeWith(@NotNull Object obj) {
         while (true) {
             Object obj2 = this.result;
             CoroutineSingletons coroutineSingletons = CoroutineSingletons.UNDECIDED;
@@ -83,9 +91,7 @@ public final class SafeContinuation<T> implements Continuation<T>, CoroutineStac
     }
 
     @NotNull
-    public String toString() {
-        StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("SafeContinuation for ");
-        m.append(this.delegate);
-        return m.toString();
+    public final String toString() {
+        return Intrinsics.stringPlus("SafeContinuation for ", this.delegate);
     }
 }

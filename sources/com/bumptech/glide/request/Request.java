@@ -5,15 +5,15 @@ public interface Request {
 
     void clear();
 
+    boolean isAnyResourceSet();
+
     boolean isCleared();
 
     boolean isComplete();
 
-    boolean isEquivalentTo(Request other);
-
-    boolean isResourceSet();
+    boolean isEquivalentTo(Request request);
 
     boolean isRunning();
 
-    void recycle();
+    void pause();
 }

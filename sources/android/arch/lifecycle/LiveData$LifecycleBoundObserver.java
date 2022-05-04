@@ -1,4 +1,6 @@
 package android.arch.lifecycle;
+
+import androidx.transition.PathMotion;
 /* loaded from: classes.dex */
-public class LiveData$LifecycleBoundObserver implements GenericLifecycleObserver {
+class LiveData$LifecycleBoundObserver extends PathMotion implements GenericLifecycleObserver {
 }

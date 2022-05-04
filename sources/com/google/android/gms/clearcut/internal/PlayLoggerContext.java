@@ -3,10 +3,9 @@ package com.google.android.gms.clearcut.internal;
 import android.os.Parcel;
 import android.os.Parcelable;
 import androidx.core.R$id;
-import androidx.slice.view.R$layout;
+import com.android.wallpaper.util.LaunchUtils;
 import com.google.android.gms.internal.zzbkv;
 import java.util.Arrays;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public class PlayLoggerContext extends zzbkv {
     public static final Parcelable.Creator<PlayLoggerContext> CREATOR = new zzu();
@@ -32,7 +31,7 @@ public class PlayLoggerContext extends zzbkv {
         this.qosTier = i3;
     }
 
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
@@ -45,41 +44,41 @@ public class PlayLoggerContext extends zzbkv {
         return false;
     }
 
-    public int hashCode() {
+    public final int hashCode() {
         return Arrays.hashCode(new Object[]{this.packageName, Integer.valueOf(this.packageVersionCode), Integer.valueOf(this.logSource), this.logSourceName, this.uploadAccountName, this.loggingId, Boolean.valueOf(this.logAndroidId), Boolean.valueOf(this.isAnonymous), Integer.valueOf(this.qosTier)});
     }
 
-    public String toString() {
+    public final String toString() {
         return "PlayLoggerContext[package=" + this.packageName + ",packageVersionCode=" + this.packageVersionCode + ",logSource=" + this.logSource + ",logSourceName=" + this.logSourceName + ",uploadAccount=" + this.uploadAccountName + ",loggingId=" + this.loggingId + ",logAndroidId=" + this.logAndroidId + ",isAnonymous=" + this.isAnonymous + ",qosTier=" + this.qosTier + "]";
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
-        int zzb = R$layout.zzb(parcel, 20293);
-        R$layout.zza(parcel, 2, this.packageName, false);
+    public final void writeToParcel(Parcel parcel, int i) {
+        int zzb = R$id.zzb(parcel, 20293);
+        R$id.zza(parcel, 2, this.packageName);
         int i2 = this.packageVersionCode;
-        R$layout.zzb(parcel, 3, 4);
+        R$id.zzb(parcel, 3, 4);
         parcel.writeInt(i2);
         int i3 = this.logSource;
-        R$layout.zzb(parcel, 4, 4);
+        R$id.zzb(parcel, 4, 4);
         parcel.writeInt(i3);
-        R$layout.zza(parcel, 5, this.uploadAccountName, false);
-        R$layout.zza(parcel, 6, this.loggingId, false);
+        R$id.zza(parcel, 5, this.uploadAccountName);
+        R$id.zza(parcel, 6, this.loggingId);
         boolean z = this.logAndroidId;
-        R$layout.zzb(parcel, 7, 4);
+        R$id.zzb(parcel, 7, 4);
         parcel.writeInt(z ? 1 : 0);
-        R$layout.zza(parcel, 8, this.logSourceName, false);
+        R$id.zza(parcel, 8, this.logSourceName);
         boolean z2 = this.isAnonymous;
-        R$layout.zzb(parcel, 9, 4);
+        R$id.zzb(parcel, 9, 4);
         parcel.writeInt(z2 ? 1 : 0);
         int i4 = this.qosTier;
-        R$layout.zzb(parcel, 10, 4);
+        R$id.zzb(parcel, 10, 4);
         parcel.writeInt(i4);
-        R$layout.zzc(parcel, zzb);
+        R$id.zzc(parcel, zzb);
     }
 
-    public PlayLoggerContext(String str, int i, int i2, String str2, String str3, String str4, boolean z, int i3) {
-        Objects.requireNonNull(str, "null reference");
+    public PlayLoggerContext(String str, int i, int i2, String str2, String str3, String str4, boolean z) {
+        LaunchUtils.zza(str);
         this.packageName = str;
         this.packageVersionCode = i;
         this.logSource = i2;
@@ -88,6 +87,6 @@ public class PlayLoggerContext extends zzbkv {
         this.loggingId = str4;
         this.logAndroidId = !z;
         this.isAnonymous = z;
-        this.qosTier = i3;
+        this.qosTier = 0;
     }
 }

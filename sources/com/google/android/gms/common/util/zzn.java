@@ -3,6 +3,7 @@ package com.google.android.gms.common.util;
 import android.text.TextUtils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+/* compiled from: JsonUtils.java */
 /* loaded from: classes.dex */
 public final class zzn {
     public static final Pattern zzb = Pattern.compile("[\\\\\"/\b\f\n\r\t]");

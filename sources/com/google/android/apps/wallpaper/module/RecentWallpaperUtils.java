@@ -14,21 +14,17 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
-import kotlin.Unit;
-import kotlin.coroutines.Continuation;
 import kotlin.coroutines.SafeContinuation;
-import kotlin.coroutines.intrinsics.CoroutineSingletons;
 import kotlin.coroutines.intrinsics.IntrinsicsKt__IntrinsicsKt;
+import kotlin.coroutines.jvm.internal.ContinuationImpl;
 import kotlin.jvm.internal.Intrinsics;
 import kotlin.text.StringsKt__StringsJVMKt;
 import kotlin.text.StringsKt__StringsKt;
-import kotlinx.coroutines.BuildersKt;
-import kotlinx.coroutines.Dispatchers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
+/* compiled from: RecentWallpaperUtils.kt */
 /* loaded from: classes.dex */
 public final class RecentWallpaperUtils {
     public static final void access$storeBitmap(Context context, String str, Bitmap bitmap) {
@@ -44,143 +40,13 @@ public final class RecentWallpaperUtils {
         }
     }
 
-    @NotNull
-    public static final JSONArray cleanUpRecentsArray(@NotNull JSONArray jSONArray, @NotNull Context context) {
-        ArrayList arrayList = new ArrayList();
-        int length = jSONArray.length() - 1;
-        if (length >= 0) {
-            while (true) {
-                int i = length - 1;
-                JSONObject jSONObject = jSONArray.getJSONObject(length);
-                if (jSONObject.has("component") && jSONObject.getString("component") != null) {
-                    String string = jSONObject.getString("component");
-                    Intrinsics.checkNotNullExpressionValue(string, "entry.getString(KEY_COMPONENT)");
-                    List split$default = StringsKt__StringsKt.split$default(string, new String[]{"/"}, false, 0, 6);
-                    if (context.getPackageManager().resolveService(new Intent("android.service.wallpaper.WallpaperService").setClassName((String) split$default.get(0), (String) split$default.get(1)), 0) == null) {
-                        arrayList.add(jSONObject.getString(FlagManager.FIELD_ID));
-                        jSONArray.remove(length);
-                    }
-                }
-                if (i < 0) {
-                    break;
-                }
-                length = i;
-            }
-        }
-        while (jSONArray.length() > 5) {
-            Object remove = jSONArray.remove(0);
-            Objects.requireNonNull(remove, "null cannot be cast to non-null type org.json.JSONObject");
-            arrayList.add(((JSONObject) remove).getString(FlagManager.FIELD_ID));
-        }
-        Iterator it = arrayList.iterator();
-        while (it.hasNext()) {
-            String removedId = (String) it.next();
-            Intrinsics.checkNotNullExpressionValue(removedId, "removedId");
-            context.deleteFile(getWallpaperFullBitmapFileName(removedId));
-            context.deleteFile(getWallpaperThumbnailFileName(removedId));
-        }
-        return jSONArray;
-    }
-
-    public static final JSONObject createRecentEntryJson(String str, String str2, List<String> list, String str3, WallpaperInfo wallpaperInfo, Integer num) {
-        JSONObject jSONObject = new JSONObject();
-        jSONObject.put(FlagManager.FIELD_ID, str);
-        jSONObject.putOpt("collectionId", str2);
-        if (list != null) {
-            Object[] array = list.toArray(new String[0]);
-            Objects.requireNonNull(array, "null cannot be cast to non-null type kotlin.Array<T>");
-            jSONObject.putOpt("attributions", new JSONArray(array));
-        }
-        jSONObject.putOpt("actionUrl", str3);
-        if (wallpaperInfo != null) {
-            jSONObject.put("component", wallpaperInfo.getComponent().getPackageName() + '/' + ((Object) wallpaperInfo.getComponent().getClassName()));
-        }
-        if (num != null) {
-            jSONObject.put("color", num.intValue());
-        }
-        return jSONObject;
-    }
-
-    @NotNull
-    public static final String getWallpaperFullBitmapFileName(@NotNull String wallpaperId) {
-        Intrinsics.checkNotNullParameter(wallpaperId, "wallpaperId");
-        StringsKt__StringsJVMKt.replace$default(wallpaperId, "/", "-", false, 4);
-        return "wp-full-" + wallpaperId + ".png";
-    }
-
-    @NotNull
-    public static final String getWallpaperThumbnailFileName(@NotNull String wallpaperId) {
-        Intrinsics.checkNotNullParameter(wallpaperId, "wallpaperId");
-        StringsKt__StringsJVMKt.replace$default(wallpaperId, "/", "-", false, 4);
-        return "wp-thumb-" + wallpaperId + ".png";
-    }
-
-    public static final Object obtainPlaceHolderColor(Asset asset, Context context, Continuation continuation) {
-        final SafeContinuation safeContinuation = new SafeContinuation(IntrinsicsKt__IntrinsicsKt.intercepted(continuation));
-        if (asset == null) {
-            safeContinuation.resumeWith(null);
-        } else {
-            Object systemService = context.getSystemService("window");
-            Objects.requireNonNull(systemService, "null cannot be cast to non-null type android.view.WindowManager");
-            Point screenSize = ScreenSizeCalculator.getInstance().getScreenSize(((WindowManager) systemService).getDefaultDisplay());
-            asset.decodeBitmap(screenSize.x / 2, screenSize.y / 2, new Asset.BitmapReceiver() { // from class: com.google.android.apps.wallpaper.module.RecentWallpaperUtils$obtainPlaceHolderColor$2$1
-                @Override // com.android.wallpaper.asset.Asset.BitmapReceiver
-                public final void onBitmapDecoded(@Nullable Bitmap bitmap) {
-                    if (bitmap != null) {
-                        boolean z = false;
-                        if (bitmap.getConfig() == Bitmap.Config.HARDWARE) {
-                            bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
-                            Intrinsics.checkNotNullExpressionValue(bitmap, "bitmap.copy(Bitmap.Config.ARGB_8888, false)");
-                            z = true;
-                        }
-                        WallpaperColors fromBitmap = WallpaperColors.fromBitmap(bitmap);
-                        if (z) {
-                            bitmap.recycle();
-                        }
-                        safeContinuation.resumeWith(Integer.valueOf(fromBitmap.getPrimaryColor().toArgb()));
-                        return;
-                    }
-                    safeContinuation.resumeWith(null);
-                }
-            });
-        }
-        return safeContinuation.getOrThrow();
-    }
-
-    @NotNull
-    public static final List<RecentWallpaperEntry> parseRecentWallpapers(@NotNull JSONArray jsonArray) {
-        ArrayList arrayList;
-        Intrinsics.checkNotNullParameter(jsonArray, "jsonArray");
-        int length = jsonArray.length();
-        ArrayList arrayList2 = new ArrayList(length);
-        for (int i = 0; i < length; i++) {
-            JSONObject jSONObject = jsonArray.getJSONObject(i);
-            Intrinsics.checkNotNullExpressionValue(jSONObject, "jsonArray.getJSONObject(it)");
-            String string = jSONObject.getString(FlagManager.FIELD_ID);
-            Intrinsics.checkNotNullExpressionValue(string, "obj.getString(KEY_ID)");
-            String optString = jSONObject.optString("collectionId", null);
-            JSONArray optJSONArray = jSONObject.optJSONArray("attributions");
-            if (optJSONArray == null) {
-                arrayList = null;
-            } else {
-                int length2 = optJSONArray.length();
-                arrayList = new ArrayList(length2);
-                for (int i2 = 0; i2 < length2; i2++) {
-                    arrayList.add(optJSONArray.getString(i2));
-                }
-            }
-            arrayList2.add(new RecentWallpaperEntry(string, optString, arrayList, jSONObject.optString("actionUrl", null), jSONObject.optString("component", null), Integer.valueOf(jSONObject.optInt("color", 0))));
-        }
-        return arrayList2;
-    }
-
     /* JADX WARN: Removed duplicated region for block: B:10:0x0021  */
     /* JADX WARN: Removed duplicated region for block: B:14:0x0043  */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public static final /* synthetic */ java.lang.Object recentFromImageWallpaperInfo(com.android.wallpaper.model.WallpaperInfo r12, android.content.Context r13, kotlin.coroutines.Continuation r14) {
+    public static final java.lang.Object access$recentFromImageWallpaperInfo(com.android.wallpaper.model.WallpaperInfo r12, android.content.Context r13, kotlin.coroutines.Continuation r14) {
         /*
             boolean r0 = r14 instanceof com.google.android.apps.wallpaper.module.RecentWallpaperUtils$recentFromImageWallpaperInfo$1
             if (r0 == 0) goto L13
@@ -238,7 +104,7 @@ public final class RecentWallpaperUtils {
             r0.label = r3
             java.lang.Object r12 = obtainPlaceHolderColor(r12, r13, r0)
             if (r12 != r1) goto L70
-            return r1
+            goto L7d
         L70:
             r6 = r14
             r7 = r2
@@ -249,10 +115,11 @@ public final class RecentWallpaperUtils {
             r10 = 0
             r11 = r14
             java.lang.Integer r11 = (java.lang.Integer) r11
-            org.json.JSONObject r12 = createRecentEntryJson(r6, r7, r8, r9, r10, r11)
-            return r12
+            org.json.JSONObject r1 = createRecentEntryJson(r6, r7, r8, r9, r10, r11)
+        L7d:
+            return r1
         */
-        throw new UnsupportedOperationException("Method not decompiled: com.google.android.apps.wallpaper.module.RecentWallpaperUtils.recentFromImageWallpaperInfo(com.android.wallpaper.model.WallpaperInfo, android.content.Context, kotlin.coroutines.Continuation):java.lang.Object");
+        throw new UnsupportedOperationException("Method not decompiled: com.google.android.apps.wallpaper.module.RecentWallpaperUtils.access$recentFromImageWallpaperInfo(com.android.wallpaper.model.WallpaperInfo, android.content.Context, kotlin.coroutines.Continuation):java.lang.Object");
     }
 
     /* JADX WARN: Removed duplicated region for block: B:10:0x0021  */
@@ -261,7 +128,7 @@ public final class RecentWallpaperUtils {
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public static final java.lang.Object recentFromLiveWallpaper(com.android.wallpaper.model.LiveWallpaperInfo r12, android.content.Context r13, kotlin.coroutines.Continuation r14) {
+    public static final java.lang.Object access$recentFromLiveWallpaper(com.android.wallpaper.model.LiveWallpaperInfo r12, android.content.Context r13, kotlin.coroutines.Continuation r14) {
         /*
             boolean r0 = r14 instanceof com.google.android.apps.wallpaper.module.RecentWallpaperUtils$recentFromLiveWallpaper$1
             if (r0 == 0) goto L13
@@ -316,8 +183,8 @@ public final class RecentWallpaperUtils {
             r5 = 0
             android.content.pm.ResolveInfo r2 = r2.resolveService(r4, r5)
             if (r2 != 0) goto L68
-            r12 = 0
-            return r12
+            r1 = 0
+            goto L9b
         L68:
             java.lang.String r2 = r12.getWallpaperId()
             java.lang.String r4 = "wallpaper.wallpaperId"
@@ -332,7 +199,7 @@ public final class RecentWallpaperUtils {
             r0.label = r3
             java.lang.Object r12 = obtainPlaceHolderColor(r12, r13, r0)
             if (r12 != r1) goto L8e
-            return r1
+            goto L9b
         L8e:
             r10 = r14
             r6 = r2
@@ -343,52 +210,179 @@ public final class RecentWallpaperUtils {
             r11 = r14
             java.lang.Integer r11 = (java.lang.Integer) r11
             r9 = 0
-            org.json.JSONObject r12 = createRecentEntryJson(r6, r7, r8, r9, r10, r11)
-            return r12
+            org.json.JSONObject r1 = createRecentEntryJson(r6, r7, r8, r9, r10, r11)
+        L9b:
+            return r1
         */
-        throw new UnsupportedOperationException("Method not decompiled: com.google.android.apps.wallpaper.module.RecentWallpaperUtils.recentFromLiveWallpaper(com.android.wallpaper.model.LiveWallpaperInfo, android.content.Context, kotlin.coroutines.Continuation):java.lang.Object");
+        throw new UnsupportedOperationException("Method not decompiled: com.google.android.apps.wallpaper.module.RecentWallpaperUtils.access$recentFromLiveWallpaper(com.android.wallpaper.model.LiveWallpaperInfo, android.content.Context, kotlin.coroutines.Continuation):java.lang.Object");
     }
 
-    public static final boolean reorderRecentsOnly(@NotNull JSONArray jSONArray, @NotNull String str) {
-        JSONObject jSONObject;
-        int i;
-        int length = jSONArray.length();
-        if (length > 0) {
-            i = 0;
+    @NotNull
+    public static final void cleanUpRecentsArray(@NotNull JSONArray jSONArray, @NotNull Context context) {
+        ArrayList arrayList = new ArrayList();
+        int length = jSONArray.length() - 1;
+        if (length >= 0) {
             while (true) {
-                int i2 = i + 1;
-                jSONObject = jSONArray.getJSONObject(i);
-                if (Intrinsics.areEqual(jSONObject.get(FlagManager.FIELD_ID), str)) {
-                    break;
-                } else if (i2 >= length) {
-                    break;
-                } else {
-                    i = i2;
+                int i = length - 1;
+                JSONObject jSONObject = jSONArray.getJSONObject(length);
+                if (jSONObject.has("component") && jSONObject.getString("component") != null) {
+                    String string = jSONObject.getString("component");
+                    Intrinsics.checkNotNullExpressionValue(string, "entry.getString(KEY_COMPONENT)");
+                    List split$default = StringsKt__StringsKt.split$default(string, new String[]{"/"});
+                    if (context.getPackageManager().resolveService(new Intent("android.service.wallpaper.WallpaperService").setClassName((String) split$default.get(0), (String) split$default.get(1)), 0) == null) {
+                        arrayList.add(jSONObject.getString(FlagManager.EXTRA_ID));
+                        jSONArray.remove(length);
+                    }
                 }
+                if (i < 0) {
+                    break;
+                }
+                length = i;
             }
-        } else {
-            jSONObject = null;
         }
-        i = -1;
+        while (jSONArray.length() > 5) {
+            Object remove = jSONArray.remove(0);
+            if (remove != null) {
+                arrayList.add(((JSONObject) remove).getString(FlagManager.EXTRA_ID));
+            } else {
+                throw new NullPointerException("null cannot be cast to non-null type org.json.JSONObject");
+            }
+        }
+        Iterator it = arrayList.iterator();
+        while (it.hasNext()) {
+            String removedId = (String) it.next();
+            Intrinsics.checkNotNullExpressionValue(removedId, "removedId");
+            context.deleteFile(getWallpaperFullBitmapFileName(removedId));
+            context.deleteFile(getWallpaperThumbnailFileName(removedId));
+        }
+    }
+
+    public static final JSONObject createRecentEntryJson(String str, String str2, List<String> list, String str3, WallpaperInfo wallpaperInfo, Integer num) {
+        JSONObject jSONObject = new JSONObject();
+        jSONObject.put(FlagManager.EXTRA_ID, str);
+        jSONObject.putOpt("collectionId", str2);
+        if (list != null) {
+            Object[] array = list.toArray(new String[0]);
+            if (array != null) {
+                jSONObject.putOpt("attributions", new JSONArray(array));
+            } else {
+                throw new NullPointerException("null cannot be cast to non-null type kotlin.Array<T of kotlin.collections.ArraysKt__ArraysJVMKt.toTypedArray>");
+            }
+        }
+        jSONObject.putOpt("actionUrl", str3);
+        if (wallpaperInfo != null) {
+            jSONObject.put("component", wallpaperInfo.getComponent().getPackageName() + '/' + ((Object) wallpaperInfo.getComponent().getClassName()));
+        }
+        if (num != null) {
+            jSONObject.put("color", num.intValue());
+        }
+        return jSONObject;
+    }
+
+    @NotNull
+    public static final String getWallpaperFullBitmapFileName(@NotNull String wallpaperId) {
+        Intrinsics.checkNotNullParameter(wallpaperId, "wallpaperId");
+        StringsKt__StringsJVMKt.replace$default(wallpaperId);
+        return "wp-full-" + wallpaperId + ".png";
+    }
+
+    @NotNull
+    public static final String getWallpaperThumbnailFileName(@NotNull String wallpaperId) {
+        Intrinsics.checkNotNullParameter(wallpaperId, "wallpaperId");
+        StringsKt__StringsJVMKt.replace$default(wallpaperId);
+        return "wp-thumb-" + wallpaperId + ".png";
+    }
+
+    public static final Object obtainPlaceHolderColor(Asset asset, Context context, ContinuationImpl continuationImpl) {
+        final SafeContinuation safeContinuation = new SafeContinuation(IntrinsicsKt__IntrinsicsKt.intercepted(continuationImpl));
+        if (asset == null) {
+            safeContinuation.resumeWith(null);
+        } else {
+            Object systemService = context.getSystemService("window");
+            if (systemService != null) {
+                Point screenSize = ScreenSizeCalculator.getInstance().getScreenSize(((WindowManager) systemService).getDefaultDisplay());
+                asset.decodeBitmap(screenSize.x / 2, screenSize.y / 2, new Asset.BitmapReceiver() { // from class: com.google.android.apps.wallpaper.module.RecentWallpaperUtils$obtainPlaceHolderColor$2$1
+                    @Override // com.android.wallpaper.asset.Asset.BitmapReceiver
+                    public final void onBitmapDecoded(@Nullable Bitmap bitmap) {
+                        if (bitmap != null) {
+                            boolean z = false;
+                            if (bitmap.getConfig() == Bitmap.Config.HARDWARE) {
+                                bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
+                                Intrinsics.checkNotNullExpressionValue(bitmap, "bitmap.copy(Bitmap.Config.ARGB_8888, false)");
+                                z = true;
+                            }
+                            WallpaperColors fromBitmap = WallpaperColors.fromBitmap(bitmap);
+                            if (z) {
+                                bitmap.recycle();
+                            }
+                            safeContinuation.resumeWith(Integer.valueOf(fromBitmap.getPrimaryColor().toArgb()));
+                            return;
+                        }
+                        safeContinuation.resumeWith(null);
+                    }
+                });
+            } else {
+                throw new NullPointerException("null cannot be cast to non-null type android.view.WindowManager");
+            }
+        }
+        return safeContinuation.getOrThrow();
+    }
+
+    @NotNull
+    public static final ArrayList parseRecentWallpapers(@NotNull JSONArray jsonArray) {
+        ArrayList arrayList;
+        Intrinsics.checkNotNullParameter(jsonArray, "jsonArray");
+        int length = jsonArray.length();
+        ArrayList arrayList2 = new ArrayList(length);
+        int i = 0;
+        while (i < length) {
+            int i2 = i + 1;
+            JSONObject jSONObject = jsonArray.getJSONObject(i);
+            Intrinsics.checkNotNullExpressionValue(jSONObject, "jsonArray.getJSONObject(it)");
+            String string = jSONObject.getString(FlagManager.EXTRA_ID);
+            Intrinsics.checkNotNullExpressionValue(string, "obj.getString(KEY_ID)");
+            String optString = jSONObject.optString("collectionId", null);
+            JSONArray optJSONArray = jSONObject.optJSONArray("attributions");
+            if (optJSONArray == null) {
+                arrayList = null;
+            } else {
+                int length2 = optJSONArray.length();
+                ArrayList arrayList3 = new ArrayList(length2);
+                for (int i3 = 0; i3 < length2; i3++) {
+                    arrayList3.add(optJSONArray.getString(i3));
+                }
+                arrayList = arrayList3;
+            }
+            arrayList2.add(new RecentWallpaperEntry(string, optString, arrayList, jSONObject.optString("actionUrl", null), jSONObject.optString("component", null), Integer.valueOf(jSONObject.optInt("color", 0))));
+            i = i2;
+        }
+        return arrayList2;
+    }
+
+    public static final boolean reorderRecentsOnly(@NotNull JSONArray jSONArray, @NotNull String id) {
+        Intrinsics.checkNotNullParameter(id, "id");
+        int length = jSONArray.length();
+        Object obj = null;
+        int i = 0;
+        while (true) {
+            if (i >= length) {
+                i = -1;
+                break;
+            }
+            int i2 = i + 1;
+            JSONObject jSONObject = jSONArray.getJSONObject(i);
+            if (Intrinsics.areEqual(jSONObject.get(FlagManager.EXTRA_ID), id)) {
+                obj = jSONObject;
+                break;
+            }
+            i = i2;
+            obj = jSONObject;
+        }
         if (i == -1) {
             return false;
         }
         jSONArray.remove(i);
-        jSONArray.put(jSONObject);
+        jSONArray.put(obj);
         return true;
-    }
-
-    @Nullable
-    public static final Object saveFullBitmap(@NotNull Context context, @NotNull String str, @NotNull Bitmap bitmap, @NotNull Continuation<? super Unit> continuation) {
-        Dispatchers dispatchers = Dispatchers.INSTANCE;
-        Object withContext = BuildersKt.withContext(Dispatchers.IO, new RecentWallpaperUtils$saveFullBitmap$2(context, str, bitmap, null), continuation);
-        return withContext == CoroutineSingletons.COROUTINE_SUSPENDED ? withContext : Unit.INSTANCE;
-    }
-
-    @Nullable
-    public static final Object saveThumbnail(@NotNull Context context, @NotNull String str, @Nullable com.android.wallpaper.model.WallpaperInfo wallpaperInfo, @Nullable Bitmap bitmap, @NotNull Continuation<? super Unit> continuation) {
-        Dispatchers dispatchers = Dispatchers.INSTANCE;
-        Object withContext = BuildersKt.withContext(Dispatchers.IO, new RecentWallpaperUtils$saveThumbnail$2(context, bitmap, str, wallpaperInfo, null), continuation);
-        return withContext == CoroutineSingletons.COROUTINE_SUSPENDED ? withContext : Unit.INSTANCE;
     }
 }

@@ -5,6 +5,7 @@ import android.os.Parcelable;
 import com.google.android.gms.common.server.response.FieldMappingDictionary;
 import com.google.android.gms.internal.zzbkw;
 import java.util.ArrayList;
+/* compiled from: FieldMappingDictionaryEntryCreator.java */
 /* loaded from: classes.dex */
 public final class zzk implements Parcelable.Creator<FieldMappingDictionary.Entry> {
     @Override // android.os.Parcelable.Creator

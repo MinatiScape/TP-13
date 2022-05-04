@@ -26,7 +26,7 @@ import java.util.WeakHashMap;
 /* loaded from: classes.dex */
 public class NavigationMenuItemView extends ForegroundLinearLayout implements MenuView.ItemView {
     public static final int[] CHECKED_STATE_SET = {16842912};
-    public final AccessibilityDelegateCompat accessibilityDelegate;
+    public final AnonymousClass1 accessibilityDelegate;
     public FrameLayout actionArea;
     public boolean checkable;
     public int iconSize;
@@ -37,20 +37,25 @@ public class NavigationMenuItemView extends ForegroundLinearLayout implements Me
         this(context, null);
     }
 
-    @Override // androidx.appcompat.view.menu.MenuView.ItemView
-    public MenuItemImpl getItemData() {
-        return this.itemData;
+    public NavigationMenuItemView(Context context, AttributeSet attributeSet) {
+        this(context, attributeSet, 0);
     }
 
     @Override // androidx.appcompat.view.menu.MenuView.ItemView
-    public void initialize(MenuItemImpl menuItemImpl, int i) {
+    public final void initialize(MenuItemImpl menuItemImpl) {
+        int i;
         StateListDrawable stateListDrawable;
         this.itemData = menuItemImpl;
         int i2 = menuItemImpl.mId;
         if (i2 > 0) {
             setId(i2);
         }
-        setVisibility(menuItemImpl.isVisible() ? 0 : 8);
+        if (menuItemImpl.isVisible()) {
+            i = 0;
+        } else {
+            i = 8;
+        }
+        setVisibility(i);
         boolean z = true;
         if (getBackground() == null) {
             TypedValue typedValue = new TypedValue();
@@ -62,13 +67,13 @@ public class NavigationMenuItemView extends ForegroundLinearLayout implements Me
                 stateListDrawable = null;
             }
             WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-            setBackground(stateListDrawable);
+            ViewCompat.Api16Impl.setBackground(this, stateListDrawable);
         }
         boolean isCheckable = menuItemImpl.isCheckable();
         refreshDrawableState();
         if (this.checkable != isCheckable) {
             this.checkable = isCheckable;
-            this.accessibilityDelegate.sendAccessibilityEvent(this.textView, QuickStepContract.SYSUI_STATE_QUICK_SETTINGS_EXPANDED);
+            sendAccessibilityEvent(this.textView, QuickStepContract.SYSUI_STATE_QUICK_SETTINGS_EXPANDED);
         }
         boolean isChecked = menuItemImpl.isChecked();
         refreshDrawableState();
@@ -116,29 +121,26 @@ public class NavigationMenuItemView extends ForegroundLinearLayout implements Me
     }
 
     @Override // android.view.ViewGroup, android.view.View
-    public int[] onCreateDrawableState(int i) {
+    public final int[] onCreateDrawableState(int i) {
         int[] onCreateDrawableState = super.onCreateDrawableState(i + 1);
         MenuItemImpl menuItemImpl = this.itemData;
         if (menuItemImpl != null && menuItemImpl.isCheckable() && this.itemData.isChecked()) {
-            ViewGroup.mergeDrawableStates(onCreateDrawableState, CHECKED_STATE_SET);
+            View.mergeDrawableStates(onCreateDrawableState, CHECKED_STATE_SET);
         }
         return onCreateDrawableState;
     }
 
-    public NavigationMenuItemView(Context context, AttributeSet attributeSet) {
-        this(context, attributeSet, 0);
-    }
-
+    /* JADX WARN: Type inference failed for: r4v1, types: [com.google.android.material.internal.NavigationMenuItemView$1, androidx.core.view.AccessibilityDelegateCompat] */
     public NavigationMenuItemView(Context context, AttributeSet attributeSet, int i) {
         super(context, attributeSet, i);
-        AccessibilityDelegateCompat accessibilityDelegateCompat = new AccessibilityDelegateCompat() { // from class: com.google.android.material.internal.NavigationMenuItemView.1
+        ?? r4 = new AccessibilityDelegateCompat() { // from class: com.google.android.material.internal.NavigationMenuItemView.1
             @Override // androidx.core.view.AccessibilityDelegateCompat
-            public void onInitializeAccessibilityNodeInfo(View view, AccessibilityNodeInfoCompat accessibilityNodeInfoCompat) {
+            public final void onInitializeAccessibilityNodeInfo(View view, AccessibilityNodeInfoCompat accessibilityNodeInfoCompat) {
                 this.mOriginalDelegate.onInitializeAccessibilityNodeInfo(view, accessibilityNodeInfoCompat.mInfo);
                 accessibilityNodeInfoCompat.mInfo.setCheckable(NavigationMenuItemView.this.checkable);
             }
         };
-        this.accessibilityDelegate = accessibilityDelegateCompat;
+        this.accessibilityDelegate = r4;
         if (this.mOrientation != 0) {
             this.mOrientation = 0;
             requestLayout();
@@ -148,6 +150,11 @@ public class NavigationMenuItemView extends ForegroundLinearLayout implements Me
         CheckedTextView checkedTextView = (CheckedTextView) findViewById(R.id.design_menu_item_text);
         this.textView = checkedTextView;
         checkedTextView.setDuplicateParentStateEnabled(true);
-        ViewCompat.setAccessibilityDelegate(checkedTextView, accessibilityDelegateCompat);
+        ViewCompat.setAccessibilityDelegate(checkedTextView, r4);
+    }
+
+    @Override // androidx.appcompat.view.menu.MenuView.ItemView
+    public final MenuItemImpl getItemData() {
+        return this.itemData;
     }
 }

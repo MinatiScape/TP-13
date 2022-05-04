@@ -4,20 +4,21 @@ import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: KCallable.kt */
 /* loaded from: classes.dex */
 public interface KCallable<R> extends KAnnotatedElement {
     R call(@NotNull Object... objArr);
 
-    R callBy(@NotNull Map<?, ? extends Object> map);
+    R callBy(@NotNull Map<Object, ? extends Object> map);
 
     @NotNull
-    List<?> getParameters();
+    List<Object> getParameters();
 
     @NotNull
     KType getReturnType();
 
     @NotNull
-    List<?> getTypeParameters();
+    List<Object> getTypeParameters();
 
     @Nullable
     KVisibility getVisibility();

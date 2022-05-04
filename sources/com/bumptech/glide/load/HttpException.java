@@ -6,13 +6,17 @@ public final class HttpException extends IOException {
     private static final long serialVersionUID = 1;
     private final int statusCode;
 
-    public HttpException(String message) {
-        super(message, null);
-        this.statusCode = -1;
+    public HttpException() {
+        throw null;
     }
 
-    public HttpException(String message, int statusCode) {
-        super(message, null);
-        this.statusCode = statusCode;
+    @Deprecated
+    public HttpException(String str) {
+        this(str, -1, null);
+    }
+
+    public HttpException(String str, int i, IOException iOException) {
+        super(str + ", status code: " + i, iOException);
+        this.statusCode = i;
     }
 }

@@ -10,9 +10,9 @@ import java.util.concurrent.TimeoutException;
 /* loaded from: classes.dex */
 public final class CallbackToFutureAdapter$SafeFuture<T> implements ListenableFuture<T> {
     public final WeakReference<CallbackToFutureAdapter$Completer<T>> completerWeakReference;
-    public final AbstractResolvableFuture<T> delegate = (AbstractResolvableFuture<T>) new AbstractResolvableFuture<?>() { // from class: androidx.concurrent.futures.CallbackToFutureAdapter$SafeFuture.1
+    public final AnonymousClass1 delegate = new AbstractResolvableFuture<T>() { // from class: androidx.concurrent.futures.CallbackToFutureAdapter$SafeFuture.1
         @Override // androidx.concurrent.futures.AbstractResolvableFuture
-        public String pendingToString() {
+        public final String pendingToString() {
             CallbackToFutureAdapter$Completer<T> callbackToFutureAdapter$Completer = CallbackToFutureAdapter$SafeFuture.this.completerWeakReference.get();
             if (callbackToFutureAdapter$Completer == null) {
                 return "Completer object has been garbage collected, future will fail soon";
@@ -24,14 +24,15 @@ public final class CallbackToFutureAdapter$SafeFuture<T> implements ListenableFu
         }
     };
 
-    public CallbackToFutureAdapter$SafeFuture(CallbackToFutureAdapter$Completer<T> callbackToFutureAdapter$Completer) {
-        this.completerWeakReference = new WeakReference<>(callbackToFutureAdapter$Completer);
+    @Override // java.util.concurrent.Future
+    public final T get() throws InterruptedException, ExecutionException {
+        return get();
     }
 
     @Override // java.util.concurrent.Future
-    public boolean cancel(boolean z) {
+    public final boolean cancel(boolean z) {
         CallbackToFutureAdapter$Completer<T> callbackToFutureAdapter$Completer = this.completerWeakReference.get();
-        boolean cancel = this.delegate.cancel(z);
+        boolean cancel = cancel(z);
         if (cancel && callbackToFutureAdapter$Completer != null) {
             callbackToFutureAdapter$Completer.tag = null;
             callbackToFutureAdapter$Completer.future = null;
@@ -41,26 +42,26 @@ public final class CallbackToFutureAdapter$SafeFuture<T> implements ListenableFu
     }
 
     @Override // java.util.concurrent.Future
-    public T get() throws InterruptedException, ExecutionException {
-        return this.delegate.get();
+    public final T get(long j, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {
+        return get(j, timeUnit);
     }
 
     @Override // java.util.concurrent.Future
-    public boolean isCancelled() {
+    public final boolean isCancelled() {
         return this.delegate.value instanceof AbstractResolvableFuture.Cancellation;
     }
 
     @Override // java.util.concurrent.Future
-    public boolean isDone() {
-        return this.delegate.isDone();
+    public final boolean isDone() {
+        return isDone();
     }
 
-    public String toString() {
-        return this.delegate.toString();
+    public final String toString() {
+        return toString();
     }
 
-    @Override // java.util.concurrent.Future
-    public T get(long j, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {
-        return this.delegate.get(j, timeUnit);
+    /* JADX WARN: Type inference failed for: r0v0, types: [androidx.concurrent.futures.CallbackToFutureAdapter$SafeFuture$1] */
+    public CallbackToFutureAdapter$SafeFuture(CallbackToFutureAdapter$Completer<T> callbackToFutureAdapter$Completer) {
+        this.completerWeakReference = new WeakReference<>(callbackToFutureAdapter$Completer);
     }
 }

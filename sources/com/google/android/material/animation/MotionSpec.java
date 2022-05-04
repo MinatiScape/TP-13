@@ -7,7 +7,6 @@ import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.TimeInterpolator;
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 import android.util.Log;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -15,19 +14,10 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import androidx.collection.SimpleArrayMap;
 import java.util.ArrayList;
-import java.util.List;
 /* loaded from: classes.dex */
-public class MotionSpec {
+public final class MotionSpec {
     public final SimpleArrayMap<String, MotionTiming> timings = new SimpleArrayMap<>();
     public final SimpleArrayMap<String, PropertyValuesHolder[]> propertyValues = new SimpleArrayMap<>();
-
-    public static MotionSpec createFromAttribute(Context context, TypedArray typedArray, int i) {
-        int resourceId;
-        if (!typedArray.hasValue(i) || (resourceId = typedArray.getResourceId(i, 0)) == 0) {
-            return null;
-        }
-        return createFromResource(context, resourceId);
-    }
 
     public static MotionSpec createFromResource(Context context, int i) {
         try {
@@ -49,11 +39,11 @@ public class MotionSpec {
         }
     }
 
-    public static MotionSpec createSpecFromAnimators(List<Animator> list) {
+    public static MotionSpec createSpecFromAnimators(ArrayList arrayList) {
         MotionSpec motionSpec = new MotionSpec();
-        int size = list.size();
+        int size = arrayList.size();
         for (int i = 0; i < size; i++) {
-            Animator animator = list.get(i);
+            Animator animator = (Animator) arrayList.get(i);
             if (animator instanceof ObjectAnimator) {
                 ObjectAnimator objectAnimator = (ObjectAnimator) animator;
                 motionSpec.propertyValues.put(objectAnimator.getPropertyName(), objectAnimator.getValues());
@@ -79,7 +69,7 @@ public class MotionSpec {
         return motionSpec;
     }
 
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
@@ -89,18 +79,24 @@ public class MotionSpec {
         return this.timings.equals(((MotionSpec) obj).timings);
     }
 
-    public MotionTiming getTiming(String str) {
+    public final MotionTiming getTiming(String str) {
+        boolean z;
         if (this.timings.getOrDefault(str, null) != null) {
+            z = true;
+        } else {
+            z = false;
+        }
+        if (z) {
             return this.timings.getOrDefault(str, null);
         }
         throw new IllegalArgumentException();
     }
 
-    public int hashCode() {
+    public final int hashCode() {
         return this.timings.hashCode();
     }
 
-    public String toString() {
+    public final String toString() {
         return '\n' + MotionSpec.class.getName() + '{' + Integer.toHexString(System.identityHashCode(this)) + " timings: " + this.timings + "}\n";
     }
 }

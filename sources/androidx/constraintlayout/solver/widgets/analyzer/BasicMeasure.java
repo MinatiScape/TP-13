@@ -6,14 +6,14 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 import java.util.ArrayList;
 /* loaded from: classes.dex */
-public class BasicMeasure {
+public final class BasicMeasure {
     public ConstraintWidgetContainer constraintWidgetContainer;
     public final ArrayList<ConstraintWidget> mVariableDimensionsWidgets = new ArrayList<>();
     public Measure mMeasure = new Measure();
 
     /* loaded from: classes.dex */
     public static class Measure {
-        public int horizontalBehavior;
+        public ConstraintWidget.DimensionBehaviour horizontalBehavior;
         public int horizontalDimension;
         public int measuredBaseline;
         public boolean measuredHasBaseline;
@@ -21,7 +21,7 @@ public class BasicMeasure {
         public boolean measuredNeedsSolverPass;
         public int measuredWidth;
         public boolean useDeprecated;
-        public int verticalBehavior;
+        public ConstraintWidget.DimensionBehaviour verticalBehavior;
         public int verticalDimension;
     }
 
@@ -29,61 +29,86 @@ public class BasicMeasure {
     public interface Measurer {
     }
 
-    public BasicMeasure(ConstraintWidgetContainer constraintWidgetContainer) {
-        this.constraintWidgetContainer = constraintWidgetContainer;
-    }
-
     public final boolean measure(Measurer measurer, ConstraintWidget constraintWidget, boolean z) {
-        this.mMeasure.horizontalBehavior = constraintWidget.getHorizontalDimensionBehaviour$enumunboxing$();
-        this.mMeasure.verticalBehavior = constraintWidget.getVerticalDimensionBehaviour$enumunboxing$();
-        this.mMeasure.horizontalDimension = constraintWidget.getWidth();
-        this.mMeasure.verticalDimension = constraintWidget.getHeight();
+        boolean z2;
+        boolean z3;
+        boolean z4;
+        boolean z5;
+        ConstraintWidget.DimensionBehaviour dimensionBehaviour = ConstraintWidget.DimensionBehaviour.FIXED;
         Measure measure = this.mMeasure;
-        measure.measuredNeedsSolverPass = false;
-        measure.useDeprecated = z;
-        boolean z2 = true;
-        boolean z3 = measure.horizontalBehavior == 3;
-        boolean z4 = measure.verticalBehavior == 3;
-        boolean z5 = z3 && constraintWidget.mDimensionRatio > HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
-        boolean z6 = z4 && constraintWidget.mDimensionRatio > HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
-        if (z5 && constraintWidget.mResolvedMatchConstraintDefault[0] == 4) {
-            measure.horizontalBehavior = 1;
-        }
-        if (z6 && constraintWidget.mResolvedMatchConstraintDefault[1] == 4) {
-            measure.verticalBehavior = 1;
-        }
-        ((ConstraintLayout.Measurer) measurer).measure(constraintWidget, measure);
-        constraintWidget.setWidth(this.mMeasure.measuredWidth);
-        constraintWidget.setHeight(this.mMeasure.measuredHeight);
+        ConstraintWidget.DimensionBehaviour[] dimensionBehaviourArr = constraintWidget.mListDimensionBehaviors;
+        measure.horizontalBehavior = dimensionBehaviourArr[0];
+        boolean z6 = true;
+        measure.verticalBehavior = dimensionBehaviourArr[1];
+        measure.horizontalDimension = constraintWidget.getWidth();
+        this.mMeasure.verticalDimension = constraintWidget.getHeight();
         Measure measure2 = this.mMeasure;
-        constraintWidget.hasBaseline = measure2.measuredHasBaseline;
-        int i = measure2.measuredBaseline;
-        constraintWidget.mBaselineDistance = i;
-        if (i <= 0) {
+        measure2.measuredNeedsSolverPass = false;
+        measure2.useDeprecated = z;
+        ConstraintWidget.DimensionBehaviour dimensionBehaviour2 = measure2.horizontalBehavior;
+        ConstraintWidget.DimensionBehaviour dimensionBehaviour3 = ConstraintWidget.DimensionBehaviour.MATCH_CONSTRAINT;
+        if (dimensionBehaviour2 == dimensionBehaviour3) {
+            z2 = true;
+        } else {
             z2 = false;
         }
-        constraintWidget.hasBaseline = z2;
-        measure2.useDeprecated = false;
-        return measure2.measuredNeedsSolverPass;
+        if (measure2.verticalBehavior == dimensionBehaviour3) {
+            z3 = true;
+        } else {
+            z3 = false;
+        }
+        if (!z2 || constraintWidget.mDimensionRatio <= HingeAngleProviderKt.FULLY_CLOSED_DEGREES) {
+            z4 = false;
+        } else {
+            z4 = true;
+        }
+        if (!z3 || constraintWidget.mDimensionRatio <= HingeAngleProviderKt.FULLY_CLOSED_DEGREES) {
+            z5 = false;
+        } else {
+            z5 = true;
+        }
+        if (z4 && constraintWidget.mResolvedMatchConstraintDefault[0] == 4) {
+            measure2.horizontalBehavior = dimensionBehaviour;
+        }
+        if (z5 && constraintWidget.mResolvedMatchConstraintDefault[1] == 4) {
+            measure2.verticalBehavior = dimensionBehaviour;
+        }
+        ((ConstraintLayout.Measurer) measurer).measure(constraintWidget, measure2);
+        constraintWidget.setWidth(this.mMeasure.measuredWidth);
+        constraintWidget.setHeight(this.mMeasure.measuredHeight);
+        Measure measure3 = this.mMeasure;
+        constraintWidget.hasBaseline = measure3.measuredHasBaseline;
+        int i = measure3.measuredBaseline;
+        constraintWidget.mBaselineDistance = i;
+        if (i <= 0) {
+            z6 = false;
+        }
+        constraintWidget.hasBaseline = z6;
+        measure3.useDeprecated = false;
+        return measure3.measuredNeedsSolverPass;
     }
 
     public final void solveLinearSystem(ConstraintWidgetContainer constraintWidgetContainer, int i, int i2) {
         int i3 = constraintWidgetContainer.mMinWidth;
         int i4 = constraintWidgetContainer.mMinHeight;
-        constraintWidgetContainer.setMinWidth(0);
-        constraintWidgetContainer.setMinHeight(0);
-        constraintWidgetContainer.mWidth = i;
-        int i5 = constraintWidgetContainer.mMinWidth;
-        if (i < i5) {
-            constraintWidgetContainer.mWidth = i5;
+        constraintWidgetContainer.mMinWidth = 0;
+        constraintWidgetContainer.mMinHeight = 0;
+        constraintWidgetContainer.setWidth(i);
+        constraintWidgetContainer.setHeight(i2);
+        if (i3 < 0) {
+            constraintWidgetContainer.mMinWidth = 0;
+        } else {
+            constraintWidgetContainer.mMinWidth = i3;
         }
-        constraintWidgetContainer.mHeight = i2;
-        int i6 = constraintWidgetContainer.mMinHeight;
-        if (i2 < i6) {
-            constraintWidgetContainer.mHeight = i6;
+        if (i4 < 0) {
+            constraintWidgetContainer.mMinHeight = 0;
+        } else {
+            constraintWidgetContainer.mMinHeight = i4;
         }
-        constraintWidgetContainer.setMinWidth(i3);
-        constraintWidgetContainer.setMinHeight(i4);
         this.constraintWidgetContainer.layout();
+    }
+
+    public BasicMeasure(ConstraintWidgetContainer constraintWidgetContainer) {
+        this.constraintWidgetContainer = constraintWidgetContainer;
     }
 }

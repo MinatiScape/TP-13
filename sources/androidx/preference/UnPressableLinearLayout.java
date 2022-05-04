@@ -10,7 +10,7 @@ public class UnPressableLinearLayout extends LinearLayout {
     }
 
     @Override // android.view.ViewGroup, android.view.View
-    public void dispatchSetPressed(boolean z) {
+    public final void dispatchSetPressed(boolean z) {
     }
 
     public UnPressableLinearLayout(Context context, AttributeSet attributeSet) {

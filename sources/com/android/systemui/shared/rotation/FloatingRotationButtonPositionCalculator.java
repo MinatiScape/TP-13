@@ -4,23 +4,19 @@ import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalS
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: FloatingRotationButtonPositionCalculator.kt */
 /* loaded from: classes.dex */
 public final class FloatingRotationButtonPositionCalculator {
     private final int defaultMargin;
     private final int taskbarMarginBottom;
     private final int taskbarMarginLeft;
 
+    /* compiled from: FloatingRotationButtonPositionCalculator.kt */
     /* loaded from: classes.dex */
     public static final class Position {
         private final int gravity;
         private final int translationX;
         private final int translationY;
-
-        public Position(int i, int i2, int i3) {
-            this.gravity = i;
-            this.translationX = i2;
-            this.translationY = i3;
-        }
 
         public static /* synthetic */ Position copy$default(Position position, int i, int i2, int i3, int i4, Object obj) {
             if ((i4 & 1) != 0) {
@@ -63,18 +59,6 @@ public final class FloatingRotationButtonPositionCalculator {
             return this.gravity == position.gravity && this.translationX == position.translationX && this.translationY == position.translationY;
         }
 
-        public final int getGravity() {
-            return this.gravity;
-        }
-
-        public final int getTranslationX() {
-            return this.translationX;
-        }
-
-        public final int getTranslationY() {
-            return this.translationY;
-        }
-
         public int hashCode() {
             int hashCode = Integer.hashCode(this.translationX);
             return Integer.hashCode(this.translationY) + ((hashCode + (Integer.hashCode(this.gravity) * 31)) * 31);
@@ -91,12 +75,58 @@ public final class FloatingRotationButtonPositionCalculator {
             m.append(')');
             return m.toString();
         }
+
+        public Position(int i, int i2, int i3) {
+            this.gravity = i;
+            this.translationX = i2;
+            this.translationY = i3;
+        }
+
+        public final int getGravity() {
+            return this.gravity;
+        }
+
+        public final int getTranslationX() {
+            return this.translationX;
+        }
+
+        public final int getTranslationY() {
+            return this.translationY;
+        }
     }
 
-    public FloatingRotationButtonPositionCalculator(int i, int i2, int i3) {
-        this.defaultMargin = i;
-        this.taskbarMarginLeft = i2;
-        this.taskbarMarginBottom = i3;
+    @NotNull
+    public final Position calculatePosition(int i, boolean z, boolean z2) {
+        boolean z3;
+        int i2;
+        int i3;
+        boolean z4 = false;
+        if (i == 0 || i == 1) {
+            z3 = true;
+        } else {
+            z3 = false;
+        }
+        if (z3 && z && !z2) {
+            z4 = true;
+        }
+        int resolveGravity = resolveGravity(i);
+        if (z4) {
+            i2 = this.taskbarMarginLeft;
+        } else {
+            i2 = this.defaultMargin;
+        }
+        if (z4) {
+            i3 = this.taskbarMarginBottom;
+        } else {
+            i3 = this.defaultMargin;
+        }
+        if ((resolveGravity & 5) == 5) {
+            i2 = -i2;
+        }
+        if ((resolveGravity & 80) == 80) {
+            i3 = -i3;
+        }
+        return new Position(resolveGravity, i2, i3);
     }
 
     private final int resolveGravity(int i) {
@@ -115,21 +145,9 @@ public final class FloatingRotationButtonPositionCalculator {
         throw new IllegalArgumentException(Intrinsics.stringPlus("Invalid rotation ", Integer.valueOf(i)));
     }
 
-    @NotNull
-    public final Position calculatePosition(int i, boolean z, boolean z2) {
-        boolean z3 = false;
-        if ((i == 0 || i == 1) && z && !z2) {
-            z3 = true;
-        }
-        int resolveGravity = resolveGravity(i);
-        int i2 = z3 ? this.taskbarMarginLeft : this.defaultMargin;
-        int i3 = z3 ? this.taskbarMarginBottom : this.defaultMargin;
-        if ((resolveGravity & 5) == 5) {
-            i2 = -i2;
-        }
-        if ((resolveGravity & 80) == 80) {
-            i3 = -i3;
-        }
-        return new Position(resolveGravity, i2, i3);
+    public FloatingRotationButtonPositionCalculator(int i, int i2, int i3) {
+        this.defaultMargin = i;
+        this.taskbarMarginLeft = i2;
+        this.taskbarMarginBottom = i3;
     }
 }

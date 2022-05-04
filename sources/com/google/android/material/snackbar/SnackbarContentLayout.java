@@ -1,7 +1,6 @@
 package com.google.android.material.snackbar;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
@@ -10,95 +9,105 @@ import android.widget.TextView;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.ViewPropertyAnimatorCompat;
 import com.android.systemui.shared.R;
-import com.google.android.material.R$styleable;
 import java.util.WeakHashMap;
 /* loaded from: classes.dex */
-public class SnackbarContentLayout extends LinearLayout {
+public class SnackbarContentLayout extends LinearLayout implements ContentViewCallback {
     public Button actionView;
     public int maxInlineActionWidth;
-    public int maxWidth;
     public TextView messageView;
 
     public SnackbarContentLayout(Context context) {
         this(context, null);
     }
 
+    public SnackbarContentLayout(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet);
+    }
+
     @Override // android.view.View
-    public void onFinishInflate() {
+    public final void onFinishInflate() {
         super.onFinishInflate();
         this.messageView = (TextView) findViewById(R.id.snackbar_text);
         this.actionView = (Button) findViewById(R.id.snackbar_action);
     }
 
-    /* JADX WARN: Code restructure failed: missing block: B:17:0x0055, code lost:
-        if (updateViewsWithinLayout(1, r0, r0 - r1) != false) goto L22;
+    /* JADX WARN: Code restructure failed: missing block: B:15:0x0047, code lost:
+        if (updateViewsWithinLayout(1, r0, r0 - r2) != false) goto L21;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:21:0x0060, code lost:
-        if (updateViewsWithinLayout(0, r0, r0) != false) goto L22;
+    /* JADX WARN: Code restructure failed: missing block: B:19:0x0052, code lost:
+        if (updateViewsWithinLayout(0, r0, r0) != false) goto L21;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:22:0x0062, code lost:
-        r3 = true;
+    /* JADX WARN: Code restructure failed: missing block: B:20:0x0055, code lost:
+        r1 = false;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:21:0x0056, code lost:
+        if (r1 == false) goto L24;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:22:0x0058, code lost:
+        super.onMeasure(r8, r9);
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:23:0x005b, code lost:
+        return;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:24:?, code lost:
+        return;
      */
     @Override // android.widget.LinearLayout, android.view.View
     /*
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public void onMeasure(int r8, int r9) {
+    public final void onMeasure(int r8, int r9) {
         /*
             r7 = this;
             super.onMeasure(r8, r9)
-            int r0 = r7.maxWidth
-            if (r0 <= 0) goto L18
-            int r0 = r7.getMeasuredWidth()
-            int r1 = r7.maxWidth
-            if (r0 <= r1) goto L18
-            r8 = 1073741824(0x40000000, float:2.0)
-            int r8 = android.view.View.MeasureSpec.makeMeasureSpec(r1, r8)
-            super.onMeasure(r8, r9)
-        L18:
+            int r0 = r7.getOrientation()
+            r1 = 1
+            if (r0 != r1) goto Lb
+            return
+        Lb:
             android.content.res.Resources r0 = r7.getResources()
-            r1 = 2131165410(0x7f0700e2, float:1.7945036E38)
-            int r0 = r0.getDimensionPixelSize(r1)
-            android.content.res.Resources r1 = r7.getResources()
-            r2 = 2131165409(0x7f0700e1, float:1.7945034E38)
-            int r1 = r1.getDimensionPixelSize(r2)
-            android.widget.TextView r2 = r7.messageView
-            android.text.Layout r2 = r2.getLayout()
-            int r2 = r2.getLineCount()
-            r3 = 0
-            r4 = 1
-            if (r2 <= r4) goto L3e
-            r2 = r4
-            goto L3f
-        L3e:
-            r2 = r3
-        L3f:
-            if (r2 == 0) goto L58
+            r2 = 2131165406(0x7f0700de, float:1.7945028E38)
+            int r0 = r0.getDimensionPixelSize(r2)
+            android.content.res.Resources r2 = r7.getResources()
+            r3 = 2131165405(0x7f0700dd, float:1.7945026E38)
+            int r2 = r2.getDimensionPixelSize(r3)
+            android.widget.TextView r3 = r7.messageView
+            android.text.Layout r3 = r3.getLayout()
+            int r3 = r3.getLineCount()
+            r4 = 0
+            if (r3 <= r1) goto L30
+            r3 = r1
+            goto L31
+        L30:
+            r3 = r4
+        L31:
+            if (r3 == 0) goto L4a
             int r5 = r7.maxInlineActionWidth
-            if (r5 <= 0) goto L58
+            if (r5 <= 0) goto L4a
             android.widget.Button r5 = r7.actionView
             int r5 = r5.getMeasuredWidth()
             int r6 = r7.maxInlineActionWidth
-            if (r5 <= r6) goto L58
-            int r1 = r0 - r1
-            boolean r0 = r7.updateViewsWithinLayout(r4, r0, r1)
-            if (r0 == 0) goto L63
-            goto L62
-        L58:
-            if (r2 == 0) goto L5b
-            goto L5c
-        L5b:
-            r0 = r1
-        L5c:
-            boolean r0 = r7.updateViewsWithinLayout(r3, r0, r0)
-            if (r0 == 0) goto L63
-        L62:
-            r3 = r4
-        L63:
-            if (r3 == 0) goto L68
+            if (r5 <= r6) goto L4a
+            int r2 = r0 - r2
+            boolean r0 = r7.updateViewsWithinLayout(r1, r0, r2)
+            if (r0 == 0) goto L55
+            goto L56
+        L4a:
+            if (r3 == 0) goto L4d
+            goto L4e
+        L4d:
+            r0 = r2
+        L4e:
+            boolean r0 = r7.updateViewsWithinLayout(r4, r0, r0)
+            if (r0 == 0) goto L55
+            goto L56
+        L55:
+            r1 = r4
+        L56:
+            if (r1 == 0) goto L5b
             super.onMeasure(r8, r9)
-        L68:
+        L5b:
             return
         */
         throw new UnsupportedOperationException("Method not decompiled: com.google.android.material.snackbar.SnackbarContentLayout.onMeasure(int, int):void");
@@ -117,19 +126,11 @@ public class SnackbarContentLayout extends LinearLayout {
         }
         TextView textView = this.messageView;
         WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-        if (textView.isPaddingRelative()) {
-            textView.setPaddingRelative(textView.getPaddingStart(), i2, textView.getPaddingEnd(), i3);
+        if (ViewCompat.Api17Impl.isPaddingRelative(textView)) {
+            ViewCompat.Api17Impl.setPaddingRelative(textView, ViewCompat.Api17Impl.getPaddingStart(textView), i2, ViewCompat.Api17Impl.getPaddingEnd(textView), i3);
             return true;
         }
         textView.setPadding(textView.getPaddingLeft(), i2, textView.getPaddingRight(), i3);
         return true;
-    }
-
-    public SnackbarContentLayout(Context context, AttributeSet attributeSet) {
-        super(context, attributeSet);
-        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, R$styleable.SnackbarLayout);
-        this.maxWidth = obtainStyledAttributes.getDimensionPixelSize(0, -1);
-        this.maxInlineActionWidth = obtainStyledAttributes.getDimensionPixelSize(7, -1);
-        obtainStyledAttributes.recycle();
     }
 }

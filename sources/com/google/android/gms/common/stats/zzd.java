@@ -2,19 +2,18 @@ package com.google.android.gms.common.stats;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 import com.google.android.gms.internal.zzbkw;
 import java.util.ArrayList;
+/* compiled from: WakeLockEventCreator.java */
 /* loaded from: classes.dex */
 public final class zzd implements Parcelable.Creator<WakeLockEvent> {
     @Override // android.os.Parcelable.Creator
     public final WakeLockEvent createFromParcel(Parcel parcel) {
         int zza = zzbkw.zza(parcel);
         long j = 0;
-        int i = 0;
-        float f = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
         long j2 = 0;
         long j3 = 0;
+        int i = 0;
         int i2 = 0;
         int i3 = 0;
         int i4 = 0;
@@ -24,6 +23,7 @@ public final class zzd implements Parcelable.Creator<WakeLockEvent> {
         String str3 = null;
         String str4 = null;
         String str5 = null;
+        float f = 0.0f;
         while (parcel.dataPosition() < zza) {
             int readInt = parcel.readInt();
             switch (65535 & readInt) {
@@ -49,9 +49,8 @@ public final class zzd implements Parcelable.Creator<WakeLockEvent> {
                     int zza2 = zzbkw.zza(parcel, readInt);
                     int dataPosition = parcel.dataPosition();
                     if (zza2 != 0) {
-                        ArrayList<String> createStringArrayList = parcel.createStringArrayList();
+                        arrayList = parcel.createStringArrayList();
                         parcel.setDataPosition(dataPosition + zza2);
-                        arrayList = createStringArrayList;
                         break;
                     } else {
                         arrayList = null;
@@ -76,7 +75,8 @@ public final class zzd implements Parcelable.Creator<WakeLockEvent> {
                     i4 = zzbkw.zzg(parcel, readInt);
                     break;
                 case 15:
-                    f = zzbkw.zzl(parcel, readInt);
+                    zzbkw.zza(parcel, readInt, 4);
+                    f = parcel.readFloat();
                     break;
                 case 16:
                     j3 = zzbkw.zzi(parcel, readInt);

@@ -39,14 +39,6 @@ public class PluginInstance<T extends Plugin> {
         private final List<String> mPrivilegedPlugins;
         private final VersionChecker mVersionChecker;
 
-        public Factory(ClassLoader classLoader, InstanceFactory<?> instanceFactory, VersionChecker versionChecker, List<String> list, boolean z) {
-            this.mPrivilegedPlugins = list;
-            this.mBaseClassLoader = classLoader;
-            this.mInstanceFactory = instanceFactory;
-            this.mVersionChecker = versionChecker;
-            this.mIsDebug = z;
-        }
-
         private ClassLoader getClassLoader(ApplicationInfo applicationInfo, ClassLoader classLoader) {
             if (!this.mIsDebug && !isPluginPackagePrivileged(applicationInfo.packageName)) {
                 StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Cannot get class loader for non-privileged plugin. Src:");
@@ -95,12 +87,13 @@ public class PluginInstance<T extends Plugin> {
             ?? create = this.mInstanceFactory.create(cls2);
             return new PluginInstance<>(componentName, create, pluginContextWrapper, this.mVersionChecker.checkVersion(cls2, cls, create));
         }
-    }
 
-    /* loaded from: classes.dex */
-    public static class InstanceFactory<T extends Plugin> {
-        public T create(Class cls) throws IllegalAccessException, InstantiationException {
-            return (T) cls.newInstance();
+        public Factory(ClassLoader classLoader, InstanceFactory<?> instanceFactory, VersionChecker versionChecker, List<String> list, boolean z) {
+            this.mPrivilegedPlugins = list;
+            this.mBaseClassLoader = classLoader;
+            this.mInstanceFactory = instanceFactory;
+            this.mVersionChecker = versionChecker;
+            this.mIsDebug = z;
         }
     }
 
@@ -120,32 +113,19 @@ public class PluginInstance<T extends Plugin> {
         }
     }
 
-    public PluginInstance(ComponentName componentName, T t, Context context, VersionInfo versionInfo) {
-        this.mComponentName = componentName;
-        this.mPlugin = t;
-        this.mPluginContext = context;
-        this.mVersionInfo = versionInfo;
+    /* loaded from: classes.dex */
+    public static class InstanceFactory<T extends Plugin> {
+        public T create(Class cls) throws IllegalAccessException, InstantiationException {
+            return (T) cls.newInstance();
+        }
     }
 
     public boolean containsPluginClass(Class cls) {
         return this.mPlugin.getClass().getName().equals(cls.getName());
     }
 
-    public ComponentName getComponentName() {
-        return this.mComponentName;
-    }
-
     public String getPackage() {
         return this.mComponentName.getPackageName();
-    }
-
-    @VisibleForTesting
-    public Context getPluginContext() {
-        return this.mPluginContext;
-    }
-
-    public VersionInfo getVersionInfo() {
-        return this.mVersionInfo;
     }
 
     public void onCreate(Context context, PluginListener<T> pluginListener) {
@@ -162,5 +142,25 @@ public class PluginInstance<T extends Plugin> {
         if (!(t instanceof PluginFragment)) {
             t.onDestroy();
         }
+    }
+
+    public PluginInstance(ComponentName componentName, T t, Context context, VersionInfo versionInfo) {
+        this.mComponentName = componentName;
+        this.mPlugin = t;
+        this.mPluginContext = context;
+        this.mVersionInfo = versionInfo;
+    }
+
+    public ComponentName getComponentName() {
+        return this.mComponentName;
+    }
+
+    @VisibleForTesting
+    public Context getPluginContext() {
+        return this.mPluginContext;
+    }
+
+    public VersionInfo getVersionInfo() {
+        return this.mVersionInfo;
     }
 }

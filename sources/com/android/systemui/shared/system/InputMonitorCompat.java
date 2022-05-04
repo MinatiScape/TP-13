@@ -9,10 +9,6 @@ import com.android.systemui.shared.system.InputChannelCompat;
 public class InputMonitorCompat {
     private final InputMonitor mInputMonitor;
 
-    public InputMonitorCompat(String str, int i) {
-        this.mInputMonitor = InputManager.getInstance().monitorGestureInput(str, i);
-    }
-
     public void dispose() {
         this.mInputMonitor.dispose();
     }
@@ -23,5 +19,9 @@ public class InputMonitorCompat {
 
     public void pilferPointers() {
         this.mInputMonitor.pilferPointers();
+    }
+
+    public InputMonitorCompat(String str, int i) {
+        this.mInputMonitor = InputManager.getInstance().monitorGestureInput(str, i);
     }
 }

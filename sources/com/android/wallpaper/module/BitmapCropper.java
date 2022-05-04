@@ -8,6 +8,6 @@ public interface BitmapCropper {
     public interface Callback {
         void onBitmapCropped(Bitmap bitmap);
 
-        void onError(Throwable th);
+        void onError(OutOfMemoryError outOfMemoryError);
     }
 }

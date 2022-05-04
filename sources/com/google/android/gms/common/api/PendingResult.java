@@ -6,6 +6,6 @@ public abstract class PendingResult<R extends Result> {
 
     /* loaded from: classes.dex */
     public interface zza {
-        void zza(Status status);
+        void zza();
     }
 }

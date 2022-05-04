@@ -1,6 +1,7 @@
 package com.android.systemui.unfold.progress;
 
 import org.jetbrains.annotations.NotNull;
+/* compiled from: PhysicsBasedUnfoldTransitionProgressProvider.kt */
 /* loaded from: classes.dex */
 public final class PhysicsBasedUnfoldTransitionProgressProviderKt {
     private static final boolean DEBUG = true;

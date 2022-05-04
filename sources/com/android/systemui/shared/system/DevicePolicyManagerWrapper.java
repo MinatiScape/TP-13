@@ -7,14 +7,14 @@ public class DevicePolicyManagerWrapper {
     private static final DevicePolicyManagerWrapper sInstance = new DevicePolicyManagerWrapper();
     private static final DevicePolicyManager sDevicePolicyManager = (DevicePolicyManager) AppGlobals.getInitialApplication().getSystemService(DevicePolicyManager.class);
 
+    public boolean isLockTaskPermitted(String str) {
+        return sDevicePolicyManager.isLockTaskPermitted(str);
+    }
+
     private DevicePolicyManagerWrapper() {
     }
 
     public static DevicePolicyManagerWrapper getInstance() {
         return sInstance;
-    }
-
-    public boolean isLockTaskPermitted(String str) {
-        return sDevicePolicyManager.isLockTaskPermitted(str);
     }
 }

@@ -3,44 +3,26 @@ package com.bumptech.glide.load.resource.bitmap;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import androidx.collection.ContainerHelpers;
 import com.bumptech.glide.load.engine.Initializable;
 import com.bumptech.glide.load.engine.Resource;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public final class LazyBitmapDrawableResource implements Resource<BitmapDrawable>, Initializable {
     public final Resource<Bitmap> bitmapResource;
     public final Resources resources;
 
-    public LazyBitmapDrawableResource(Resources resources, Resource<Bitmap> bitmapResource) {
-        Objects.requireNonNull(resources, "Argument must not be null");
-        this.resources = resources;
-        this.bitmapResource = bitmapResource;
-    }
-
-    public static Resource<BitmapDrawable> obtain(Resources resources, Resource<Bitmap> bitmapResource) {
-        if (bitmapResource == null) {
-            return null;
-        }
-        return new LazyBitmapDrawableResource(resources, bitmapResource);
-    }
-
     @Override // com.bumptech.glide.load.engine.Resource
-    public BitmapDrawable get() {
+    public final BitmapDrawable get() {
         return new BitmapDrawable(this.resources, this.bitmapResource.get());
     }
 
     @Override // com.bumptech.glide.load.engine.Resource
-    public Class<BitmapDrawable> getResourceClass() {
-        return BitmapDrawable.class;
-    }
-
-    @Override // com.bumptech.glide.load.engine.Resource
-    public int getSize() {
+    public final int getSize() {
         return this.bitmapResource.getSize();
     }
 
     @Override // com.bumptech.glide.load.engine.Initializable
-    public void initialize() {
+    public final void initialize() {
         Resource<Bitmap> resource = this.bitmapResource;
         if (resource instanceof Initializable) {
             ((Initializable) resource).initialize();
@@ -48,7 +30,19 @@ public final class LazyBitmapDrawableResource implements Resource<BitmapDrawable
     }
 
     @Override // com.bumptech.glide.load.engine.Resource
-    public void recycle() {
+    public final void recycle() {
         this.bitmapResource.recycle();
+    }
+
+    public LazyBitmapDrawableResource(Resources resources, Resource<Bitmap> resource) {
+        ContainerHelpers.checkNotNull(resources);
+        this.resources = resources;
+        ContainerHelpers.checkNotNull(resource);
+        this.bitmapResource = resource;
+    }
+
+    @Override // com.bumptech.glide.load.engine.Resource
+    public final Class<BitmapDrawable> getResourceClass() {
+        return BitmapDrawable.class;
     }
 }

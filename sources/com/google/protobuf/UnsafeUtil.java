@@ -1,7 +1,6 @@
 package com.google.protobuf;
 
 import java.lang.reflect.Field;
-import java.nio.Buffer;
 import java.security.PrivilegedExceptionAction;
 import java.util.logging.Logger;
 import sun.misc.Unsafe;
@@ -10,15 +9,15 @@ public final class UnsafeUtil {
     public static final long BYTE_ARRAY_BASE_OFFSET;
     public static final boolean HAS_UNSAFE_ARRAY_OPERATIONS;
     public static final boolean HAS_UNSAFE_BYTEBUFFER_OPERATIONS;
-    public static final MemoryAccessor MEMORY_ACCESSOR;
+    public static final JvmMemoryAccessor MEMORY_ACCESSOR;
     public static final Unsafe UNSAFE;
     public static final Logger logger = Logger.getLogger(UnsafeUtil.class.getName());
 
     /* renamed from: com.google.protobuf.UnsafeUtil$1  reason: invalid class name */
     /* loaded from: classes.dex */
-    public class AnonymousClass1 implements PrivilegedExceptionAction<Unsafe> {
+    public final class AnonymousClass1 implements PrivilegedExceptionAction<Unsafe> {
         @Override // java.security.PrivilegedExceptionAction
-        public Unsafe run() throws Exception {
+        public final Unsafe run() throws Exception {
             Field[] declaredFields;
             for (Field field : Unsafe.class.getDeclaredFields()) {
                 field.setAccessible(true);
@@ -31,11 +30,8 @@ public final class UnsafeUtil {
         }
     }
 
-    /* loaded from: classes.dex */
-    public static final class JvmMemoryAccessor extends MemoryAccessor {
-        public JvmMemoryAccessor(Unsafe unsafe) {
-            super(unsafe);
-        }
+    public UnsafeUtil() {
+        throw null;
     }
 
     /* loaded from: classes.dex */
@@ -47,11 +43,17 @@ public final class UnsafeUtil {
         }
     }
 
-    /* JADX WARN: Removed duplicated region for block: B:39:0x0237  */
-    /* JADX WARN: Removed duplicated region for block: B:50:0x0107 A[EXC_TOP_SPLITTER, SYNTHETIC] */
+    /* JADX WARN: Can't wrap try/catch for region: R(20:2|61|3|5|(1:7)(1:8)|9|(1:11)(10:59|12|13|73|14|71|15|(4:18|69|19|(2:21|(14:27|28|63|29|30|39|(3:67|41|42)|45|65|46|(1:52)(1:51)|(1:56)|57|58)))(1:23)|24|(0))|26|38|39|(0)|45|65|46|(1:49)|52|(2:54|56)|57|58|(1:(0))) */
+    /* JADX WARN: Code restructure failed: missing block: B:47:0x0259, code lost:
+        r0 = null;
+     */
+    /* JADX WARN: Removed duplicated region for block: B:27:0x009b A[Catch: all -> 0x00fa, TRY_LEAVE, TryCatch #5 {all -> 0x00fa, blocks: (B:19:0x0081, B:27:0x009b), top: B:69:0x0081 }] */
+    /* JADX WARN: Removed duplicated region for block: B:49:0x025c  */
+    /* JADX WARN: Removed duplicated region for block: B:54:0x0269  */
+    /* JADX WARN: Removed duplicated region for block: B:67:0x0126 A[EXC_TOP_SPLITTER, SYNTHETIC] */
     static {
         /*
-            Method dump skipped, instructions count: 583
+            Method dump skipped, instructions count: 633
             To view this dump add '--comments-level debug' option
         */
         throw new UnsupportedOperationException("Method not decompiled: com.google.protobuf.UnsafeUtil.<clinit>():void");
@@ -72,41 +74,27 @@ public final class UnsafeUtil {
         return -1;
     }
 
-    public static int arrayIndexScale(Class<?> cls) {
+    public static void arrayIndexScale(Class cls) {
         if (HAS_UNSAFE_ARRAY_OPERATIONS) {
-            return MEMORY_ACCESSOR.unsafe.arrayIndexScale(cls);
+            MEMORY_ACCESSOR.unsafe.arrayIndexScale(cls);
         }
-        return -1;
-    }
-
-    public static Field bufferAddressField() {
-        Field field;
-        try {
-            field = Buffer.class.getDeclaredField("address");
-        } catch (Throwable unused) {
-            field = null;
-        }
-        if (field == null || field.getType() != Long.TYPE) {
-            return null;
-        }
-        return field;
     }
 
     public static boolean getBoolean(Object obj, long j) {
-        return ((JvmMemoryAccessor) MEMORY_ACCESSOR).unsafe.getBoolean(obj, j);
+        return MEMORY_ACCESSOR.unsafe.getBoolean(obj, j);
     }
 
     public static byte getByte(byte[] bArr, long j) {
-        MemoryAccessor memoryAccessor = MEMORY_ACCESSOR;
-        return ((JvmMemoryAccessor) memoryAccessor).unsafe.getByte(bArr, BYTE_ARRAY_BASE_OFFSET + j);
+        JvmMemoryAccessor jvmMemoryAccessor = MEMORY_ACCESSOR;
+        return jvmMemoryAccessor.unsafe.getByte(bArr, BYTE_ARRAY_BASE_OFFSET + j);
     }
 
     public static double getDouble(Object obj, long j) {
-        return ((JvmMemoryAccessor) MEMORY_ACCESSOR).unsafe.getDouble(obj, j);
+        return MEMORY_ACCESSOR.unsafe.getDouble(obj, j);
     }
 
     public static float getFloat(Object obj, long j) {
-        return ((JvmMemoryAccessor) MEMORY_ACCESSOR).unsafe.getFloat(obj, j);
+        return MEMORY_ACCESSOR.unsafe.getFloat(obj, j);
     }
 
     public static int getInt(Object obj, long j) {
@@ -121,21 +109,13 @@ public final class UnsafeUtil {
         return MEMORY_ACCESSOR.unsafe.getObject(obj, j);
     }
 
-    public static void putBoolean(Object obj, long j, boolean z) {
-        ((JvmMemoryAccessor) MEMORY_ACCESSOR).unsafe.putBoolean(obj, j, z);
-    }
-
     public static void putByte(byte[] bArr, long j, byte b) {
-        MemoryAccessor memoryAccessor = MEMORY_ACCESSOR;
-        ((JvmMemoryAccessor) memoryAccessor).unsafe.putByte(bArr, BYTE_ARRAY_BASE_OFFSET + j, b);
+        JvmMemoryAccessor jvmMemoryAccessor = MEMORY_ACCESSOR;
+        jvmMemoryAccessor.unsafe.putByte(bArr, BYTE_ARRAY_BASE_OFFSET + j, b);
     }
 
     public static void putDouble(Object obj, long j, double d) {
-        ((JvmMemoryAccessor) MEMORY_ACCESSOR).unsafe.putDouble(obj, j, d);
-    }
-
-    public static void putFloat(Object obj, long j, float f) {
-        ((JvmMemoryAccessor) MEMORY_ACCESSOR).unsafe.putFloat(obj, j, f);
+        MEMORY_ACCESSOR.unsafe.putDouble(obj, j, d);
     }
 
     public static void putInt(Object obj, long j, int i) {
@@ -148,5 +128,12 @@ public final class UnsafeUtil {
 
     public static void putObject(Object obj, long j, Object obj2) {
         MEMORY_ACCESSOR.unsafe.putObject(obj, j, obj2);
+    }
+
+    /* loaded from: classes.dex */
+    public static final class JvmMemoryAccessor extends MemoryAccessor {
+        public JvmMemoryAccessor(Unsafe unsafe) {
+            super(unsafe);
+        }
     }
 }

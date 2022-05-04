@@ -6,17 +6,18 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 import androidx.fragment.app.FragmentTransaction;
 import java.util.ArrayList;
+/* JADX INFO: Access modifiers changed from: package-private */
 @SuppressLint({"BanParcelableUsage"})
 /* loaded from: classes.dex */
 public final class BackStackRecordState implements Parcelable {
     public static final Parcelable.Creator<BackStackRecordState> CREATOR = new Parcelable.Creator<BackStackRecordState>() { // from class: androidx.fragment.app.BackStackRecordState.1
         @Override // android.os.Parcelable.Creator
-        public BackStackRecordState createFromParcel(Parcel parcel) {
+        public final BackStackRecordState createFromParcel(Parcel parcel) {
             return new BackStackRecordState(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public BackStackRecordState[] newArray(int i) {
+        public final BackStackRecordState[] newArray(int i) {
             return new BackStackRecordState[i];
         }
     };
@@ -52,7 +53,7 @@ public final class BackStackRecordState implements Parcelable {
                 arrayList.add(fragment != null ? fragment.mWho : null);
                 int[] iArr = this.mOps;
                 int i4 = i3 + 1;
-                iArr[i3] = op.mTopmostFragment ? 1 : 0;
+                iArr[i3] = op.mFromExpandedOp ? 1 : 0;
                 int i5 = i4 + 1;
                 iArr[i4] = op.mEnterAnim;
                 int i6 = i5 + 1;
@@ -80,12 +81,12 @@ public final class BackStackRecordState implements Parcelable {
     }
 
     @Override // android.os.Parcelable
-    public int describeContents() {
+    public final int describeContents() {
         return 0;
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
+    public final void writeToParcel(Parcel parcel, int i) {
         parcel.writeIntArray(this.mOps);
         parcel.writeStringList(this.mFragmentWhos);
         parcel.writeIntArray(this.mOldMaxLifecycleStates);

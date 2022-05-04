@@ -1,12 +1,12 @@
 package androidx.appcompat.app;
 /* loaded from: classes.dex */
-public class TwilightCalculator {
+public final class TwilightCalculator {
     public static TwilightCalculator sInstance;
     public int state;
     public long sunrise;
     public long sunset;
 
-    public void calculateTwilight(long j, double d, double d2) {
+    public final void calculateTwilight(long j, double d, double d2) {
         float f;
         float f2;
         double d3;

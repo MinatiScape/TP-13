@@ -52,8 +52,19 @@ public class WindowManagerWrapper {
     public static final Interpolator RESIZE_INTERPOLATOR = InsetsController.RESIZE_INTERPOLATOR;
     private static final WindowManagerWrapper sInstance = new WindowManagerWrapper();
 
-    public static WindowManagerWrapper getInstance() {
-        return sInstance;
+    @Deprecated
+    public void setPipVisibility(boolean z) {
+    }
+
+    public SurfaceControl mirrorDisplay(int i) {
+        try {
+            SurfaceControl surfaceControl = new SurfaceControl();
+            WindowManagerGlobal.getWindowManagerService().mirrorDisplay(i, surfaceControl);
+            return surfaceControl;
+        } catch (RemoteException e) {
+            Log.e(TAG, "Unable to reach window manager", e);
+            return null;
+        }
     }
 
     public int getNavBarPosition(int i) {
@@ -78,17 +89,6 @@ public class WindowManagerWrapper {
             return WindowManagerGlobal.getWindowManagerService().hasNavigationBar(i);
         } catch (RemoteException unused) {
             return false;
-        }
-    }
-
-    public SurfaceControl mirrorDisplay(int i) {
-        try {
-            SurfaceControl surfaceControl = new SurfaceControl();
-            WindowManagerGlobal.getWindowManagerService().mirrorDisplay(i, surfaceControl);
-            return surfaceControl;
-        } catch (RemoteException e) {
-            Log.e(TAG, "Unable to reach window manager", e);
-            return null;
         }
     }
 
@@ -124,19 +124,19 @@ public class WindowManagerWrapper {
         }
     }
 
-    @Deprecated
-    public void setPipVisibility(boolean z) {
-    }
-
-    public void setProvidesInsetsTypes(WindowManager.LayoutParams layoutParams, int[] iArr) {
-        layoutParams.providesInsetsTypes = iArr;
-    }
-
     public void setRecentsVisibility(boolean z) {
         try {
             WindowManagerGlobal.getWindowManagerService().setRecentsVisibility(z);
         } catch (RemoteException unused) {
             Log.w(TAG, "Failed to set recents visibility");
         }
+    }
+
+    public void setProvidesInsetsTypes(WindowManager.LayoutParams layoutParams, int[] iArr) {
+        layoutParams.providesInsetsTypes = iArr;
+    }
+
+    public static WindowManagerWrapper getInstance() {
+        return sInstance;
     }
 }

@@ -26,8 +26,20 @@ public class TextInputEditText extends AppCompatEditText {
         this(context, null);
     }
 
+    public TextInputEditText(Context context, AttributeSet attributeSet) {
+        this(context, attributeSet, R.attr.editTextStyle);
+    }
+
+    public TextInputEditText(Context context, AttributeSet attributeSet, int i) {
+        super(MaterialThemeOverlay.wrap(context, attributeSet, i, 0), attributeSet, i);
+        this.parentRect = new Rect();
+        TypedArray obtainStyledAttributes = ThemeEnforcement.obtainStyledAttributes(context, attributeSet, R$styleable.TextInputEditText, i, R.style.Widget_Design_TextInputEditText, new int[0]);
+        this.textInputLayoutFocusedRectEnabled = obtainStyledAttributes.getBoolean(0, false);
+        obtainStyledAttributes.recycle();
+    }
+
     @Override // android.widget.TextView, android.view.View
-    public void getFocusedRect(Rect rect) {
+    public final void getFocusedRect(Rect rect) {
         super.getFocusedRect(rect);
         TextInputLayout textInputLayout = getTextInputLayout();
         if (textInputLayout != null && this.textInputLayoutFocusedRectEnabled && rect != null) {
@@ -37,7 +49,7 @@ public class TextInputEditText extends AppCompatEditText {
     }
 
     @Override // android.view.View
-    public boolean getGlobalVisibleRect(Rect rect, Point point) {
+    public final boolean getGlobalVisibleRect(Rect rect, Point point) {
         boolean globalVisibleRect = super.getGlobalVisibleRect(rect, point);
         TextInputLayout textInputLayout = getTextInputLayout();
         if (!(textInputLayout == null || !this.textInputLayoutFocusedRectEnabled || rect == null)) {
@@ -48,7 +60,7 @@ public class TextInputEditText extends AppCompatEditText {
     }
 
     @Override // android.widget.TextView
-    public CharSequence getHint() {
+    public final CharSequence getHint() {
         TextInputLayout textInputLayout = getTextInputLayout();
         if (textInputLayout == null || !textInputLayout.isProvidingHint) {
             return super.getHint();
@@ -66,7 +78,7 @@ public class TextInputEditText extends AppCompatEditText {
     }
 
     @Override // android.widget.TextView, android.view.View
-    public void onAttachedToWindow() {
+    public final void onAttachedToWindow() {
         super.onAttachedToWindow();
         TextInputLayout textInputLayout = getTextInputLayout();
         if (textInputLayout != null && textInputLayout.isProvidingHint && super.getHint() == null && Build.MANUFACTURER.toLowerCase(Locale.ENGLISH).equals("meizu")) {
@@ -75,23 +87,29 @@ public class TextInputEditText extends AppCompatEditText {
     }
 
     @Override // androidx.appcompat.widget.AppCompatEditText, android.widget.TextView, android.view.View
-    public InputConnection onCreateInputConnection(EditorInfo editorInfo) {
+    public final InputConnection onCreateInputConnection(EditorInfo editorInfo) {
+        CharSequence charSequence;
         InputConnection onCreateInputConnection = super.onCreateInputConnection(editorInfo);
         if (onCreateInputConnection != null && editorInfo.hintText == null) {
             TextInputLayout textInputLayout = getTextInputLayout();
-            editorInfo.hintText = textInputLayout != null ? textInputLayout.getHint() : null;
+            if (textInputLayout != null) {
+                charSequence = textInputLayout.getHint();
+            } else {
+                charSequence = null;
+            }
+            editorInfo.hintText = charSequence;
         }
         return onCreateInputConnection;
     }
 
     @Override // android.view.View
-    public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo accessibilityNodeInfo) {
+    public final void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo accessibilityNodeInfo) {
         super.onInitializeAccessibilityNodeInfo(accessibilityNodeInfo);
         getTextInputLayout();
     }
 
     @Override // android.view.View
-    public boolean requestRectangleOnScreen(Rect rect) {
+    public final boolean requestRectangleOnScreen(Rect rect) {
         boolean requestRectangleOnScreen = super.requestRectangleOnScreen(rect);
         TextInputLayout textInputLayout = getTextInputLayout();
         if (textInputLayout != null && this.textInputLayoutFocusedRectEnabled) {
@@ -99,20 +117,5 @@ public class TextInputEditText extends AppCompatEditText {
             textInputLayout.requestRectangleOnScreen(this.parentRect, true);
         }
         return requestRectangleOnScreen;
-    }
-
-    public TextInputEditText(Context context, AttributeSet attributeSet) {
-        this(context, attributeSet, R.attr.editTextStyle);
-    }
-
-    public TextInputEditText(Context context, AttributeSet attributeSet, int i) {
-        super(MaterialThemeOverlay.wrap(context, attributeSet, i, 0), attributeSet, i);
-        this.parentRect = new Rect();
-        int[] iArr = R$styleable.TextInputEditText;
-        ThemeEnforcement.checkCompatibleTheme(context, attributeSet, i, R.style.Widget_Design_TextInputEditText);
-        ThemeEnforcement.checkTextAppearance(context, attributeSet, iArr, i, R.style.Widget_Design_TextInputEditText, new int[0]);
-        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, iArr, i, R.style.Widget_Design_TextInputEditText);
-        this.textInputLayoutFocusedRectEnabled = obtainStyledAttributes.getBoolean(0, false);
-        obtainStyledAttributes.recycle();
     }
 }

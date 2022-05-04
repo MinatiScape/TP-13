@@ -4,40 +4,55 @@ import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.view.View;
 import android.widget.ImageView;
+import com.android.systemui.monet.Style;
 import com.android.systemui.shared.R;
 import java.util.Map;
-import java.util.Objects;
 /* loaded from: classes.dex */
-public class ColorSeedOption extends ColorOption {
-    public final int[] mPreviewColorIds = {R.id.color_preview_0, R.id.color_preview_1, R.id.color_preview_2, R.id.color_preview_3};
+public final class ColorSeedOption extends ColorOption {
     public final PreviewInfo mPreviewInfo;
     public final String mSource;
+
+    public ColorSeedOption(String str, Map<String, String> map, boolean z, String str2, Style style, int i, PreviewInfo previewInfo) {
+        super(str, map, z, style, i);
+        this.mSource = str2;
+        this.mPreviewInfo = previewInfo;
+    }
+
+    @Override // com.android.customization.model.CustomizationOption
+    public final int getLayoutResId() {
+        return R.layout.color_option;
+    }
 
     /* loaded from: classes.dex */
     public static class PreviewInfo {
         public int[] darkColors;
         public int[] lightColors;
 
-        public PreviewInfo(int[] iArr, int[] iArr2, AnonymousClass1 r3) {
+        public PreviewInfo(int[] iArr, int[] iArr2) {
             this.lightColors = iArr;
             this.darkColors = iArr2;
         }
     }
 
-    public ColorSeedOption(String str, Map<String, String> map, boolean z, String str2, int i, PreviewInfo previewInfo) {
-        super(str, map, z, i);
-        this.mSource = str2;
-        this.mPreviewInfo = previewInfo;
-    }
-
     @Override // com.android.customization.model.CustomizationOption
-    public void bindThumbnailTile(View view) {
+    public final void bindThumbnailTile(View view) {
+        boolean z;
+        int[] iArr;
         int i;
         Resources resources = view.getContext().getResources();
         PreviewInfo previewInfo = this.mPreviewInfo;
-        Objects.requireNonNull(previewInfo);
+        previewInfo.getClass();
         int i2 = 0;
-        int[] iArr = (resources.getConfiguration().uiMode & 48) == 32 ? previewInfo.darkColors : previewInfo.lightColors;
+        if ((resources.getConfiguration().uiMode & 48) == 32) {
+            z = true;
+        } else {
+            z = false;
+        }
+        if (z) {
+            iArr = previewInfo.darkColors;
+        } else {
+            iArr = previewInfo.lightColors;
+        }
         if (view.isActivated()) {
             i = resources.getDimensionPixelSize(R.dimen.color_seed_option_tile_padding_selected);
         } else {
@@ -57,13 +72,8 @@ public class ColorSeedOption extends ColorOption {
         }
     }
 
-    @Override // com.android.customization.model.CustomizationOption
-    public int getLayoutResId() {
-        return R.layout.color_seed_option;
-    }
-
     @Override // com.android.customization.model.color.ColorOption
-    public String getSource() {
+    public final String getSource() {
         return this.mSource;
     }
 }

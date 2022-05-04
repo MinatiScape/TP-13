@@ -8,15 +8,16 @@ import android.os.Parcelable;
 import com.google.android.gms.common.Feature;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.internal.zzbkw;
+/* compiled from: GetServiceRequestCreator.java */
 /* loaded from: classes.dex */
 public final class zzk implements Parcelable.Creator<GetServiceRequest> {
     @Override // android.os.Parcelable.Creator
     public final /* synthetic */ GetServiceRequest createFromParcel(Parcel parcel) {
         int zza = zzbkw.zza(parcel);
         int i = 0;
-        String str = null;
         int i2 = 0;
         int i3 = 0;
+        String str = null;
         IBinder iBinder = null;
         Scope[] scopeArr = null;
         Bundle bundle = null;

@@ -18,10 +18,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class GoogleApiAvailabilityLight {
     public static final int GOOGLE_PLAY_SERVICES_VERSION_CODE = 12529000;
 
-    static {
-        AtomicBoolean atomicBoolean = GooglePlayServicesUtilLight.zza;
-    }
-
     public Intent getErrorResolutionIntent(Context context, int i, String str) {
         if (i == 1 || i == 2) {
             if (context == null || !zzi.zzb(context)) {
@@ -46,7 +42,7 @@ public class GoogleApiAvailabilityLight {
                 String sb = m.toString();
                 int i2 = zzs.$r8$clinit;
                 Intent intent = new Intent("android.intent.action.VIEW");
-                Uri.Builder appendQueryParameter = Uri.parse("market://details").buildUpon().appendQueryParameter(FlagManager.FIELD_ID, "com.google.android.gms");
+                Uri.Builder appendQueryParameter = Uri.parse("market://details").buildUpon().appendQueryParameter(FlagManager.EXTRA_ID, "com.google.android.gms");
                 if (!TextUtils.isEmpty(sb)) {
                     appendQueryParameter.appendQueryParameter("pcampaignid", sb);
                 }
@@ -70,38 +66,34 @@ public class GoogleApiAvailabilityLight {
         }
     }
 
-    public PendingIntent getErrorResolutionPendingIntent(Context context, int i, int i2, String str) {
-        Intent errorResolutionIntent = getErrorResolutionIntent(context, i, str);
-        if (errorResolutionIntent == null) {
-            return null;
-        }
-        return PendingIntent.getActivity(context, i2, errorResolutionIntent, 134217728);
+    static {
+        AtomicBoolean atomicBoolean = GooglePlayServicesUtilLight.zza;
     }
 
-    /* JADX WARN: Can't wrap try/catch for region: R(14:2|(2:114|3)|5|(4:9|2b|24|(2:26|(2:28|29))(2:30|31))|35|(4:37|(3:39|(1:44)(1:43)|45)|46|(13:48|(1:51)(1:52)|53|(2:108|55)|112|57|58|f7|72|(1:74)(1:(6:82|(1:84)(1:85)|(1:87)|(1:89)(4:90|(2:106|92)|95|(1:97)(1:98))|103|(1:105)(1:119))(1:80))|81|103|(0)(0)))|49|(0)(0)|53|(0)|112|57|58|f7) */
-    /* JADX WARN: Code restructure failed: missing block: B:102:0x019d, code lost:
-        android.util.Log.w("GooglePlayServicesUtil", "Google Play services is missing.");
-     */
-    /* JADX WARN: Removed duplicated region for block: B:105:0x01aa A[ORIG_RETURN, RETURN] */
-    /* JADX WARN: Removed duplicated region for block: B:108:0x00dc A[EXC_TOP_SPLITTER, SYNTHETIC] */
-    /* JADX WARN: Removed duplicated region for block: B:110:0x00f8 A[EXC_TOP_SPLITTER, SYNTHETIC] */
-    /* JADX WARN: Removed duplicated region for block: B:119:? A[RETURN, SYNTHETIC] */
-    /* JADX WARN: Removed duplicated region for block: B:51:0x00cd  */
-    /* JADX WARN: Removed duplicated region for block: B:52:0x00cf  */
+    /* JADX WARN: Removed duplicated region for block: B:106:0x01b8  */
+    /* JADX WARN: Removed duplicated region for block: B:117:0x01f3  */
+    /* JADX WARN: Removed duplicated region for block: B:119:0x01f5  */
+    /* JADX WARN: Removed duplicated region for block: B:139:? A[RETURN, SYNTHETIC] */
+    /* JADX WARN: Removed duplicated region for block: B:51:0x00db  */
+    /* JADX WARN: Removed duplicated region for block: B:52:0x00dd  */
+    /* JADX WARN: Removed duplicated region for block: B:54:0x00e0  */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public int isGooglePlayServicesAvailable(android.content.Context r11, int r12) {
+    public static int isGooglePlayServicesAvailable(android.content.Context r11, int r12) {
         /*
-            Method dump skipped, instructions count: 429
+            Method dump skipped, instructions count: 507
             To view this dump add '--comments-level debug' option
         */
         throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.common.GoogleApiAvailabilityLight.isGooglePlayServicesAvailable(android.content.Context, int):int");
     }
 
-    public boolean isUserResolvableError(int i) {
-        AtomicBoolean atomicBoolean = GooglePlayServicesUtilLight.zza;
-        return i == 1 || i == 2 || i == 3 || i == 9;
+    public PendingIntent getErrorResolutionPendingIntent(Context context, int i, String str) {
+        Intent errorResolutionIntent = getErrorResolutionIntent(context, i, str);
+        if (errorResolutionIntent == null) {
+            return null;
+        }
+        return PendingIntent.getActivity(context, 0, errorResolutionIntent, 134217728);
     }
 }

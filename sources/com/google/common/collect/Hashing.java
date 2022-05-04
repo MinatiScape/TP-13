@@ -3,18 +3,17 @@ package com.google.common.collect;
 import com.google.common.math.IntMath;
 /* loaded from: classes.dex */
 public final class Hashing {
-    public static int closedTableSize(int expectedEntries, double loadFactor) {
-        int max = Math.max(expectedEntries, 2);
+    public static int closedTableSize(int i) {
+        int max = Math.max(i, 2);
         int highestOneBit = Integer.highestOneBit(max);
-        if (max <= ((int) (loadFactor * highestOneBit))) {
+        if (max <= ((int) (1.0d * highestOneBit))) {
             return highestOneBit;
         }
-        int i = highestOneBit << 1;
-        return i > 0 ? i : IntMath.MAX_SIGNED_POWER_OF_TWO;
-    }
-
-    public static boolean needsResizing(int size, int tableSize, double loadFactor) {
-        return ((double) size) > loadFactor * ((double) tableSize) && tableSize < 1073741824;
+        int i2 = highestOneBit << 1;
+        if (i2 > 0) {
+            return i2;
+        }
+        return IntMath.MAX_SIGNED_POWER_OF_TWO;
     }
 
     public static int smear(int hashCode) {
@@ -22,6 +21,12 @@ public final class Hashing {
     }
 
     public static int smearedHash(Object o) {
-        return smear(o == null ? 0 : o.hashCode());
+        int i;
+        if (o == null) {
+            i = 0;
+        } else {
+            i = o.hashCode();
+        }
+        return smear(i);
     }
 }

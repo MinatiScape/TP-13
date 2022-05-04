@@ -12,10 +12,10 @@ public class PluginPrefs {
     private final Set<String> mPluginActions;
     private final SharedPreferences mSharedPrefs;
 
-    public PluginPrefs(Context context) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences(PREFS, 0);
-        this.mSharedPrefs = sharedPreferences;
-        this.mPluginActions = new ArraySet(sharedPreferences.getStringSet(PLUGIN_ACTIONS, null));
+    public synchronized void addAction(String str) {
+        if (this.mPluginActions.add(str)) {
+            this.mSharedPrefs.edit().putStringSet(PLUGIN_ACTIONS, this.mPluginActions).apply();
+        }
     }
 
     public static boolean hasPlugins(Context context) {
@@ -26,13 +26,13 @@ public class PluginPrefs {
         context.getSharedPreferences(PREFS, 0).edit().putBoolean(HAS_PLUGINS, true).apply();
     }
 
-    public synchronized void addAction(String str) {
-        if (this.mPluginActions.add(str)) {
-            this.mSharedPrefs.edit().putStringSet(PLUGIN_ACTIONS, this.mPluginActions).apply();
-        }
-    }
-
     public Set<String> getPluginList() {
         return new ArraySet(this.mPluginActions);
+    }
+
+    public PluginPrefs(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(PREFS, 0);
+        this.mSharedPrefs = sharedPreferences;
+        this.mPluginActions = new ArraySet(sharedPreferences.getStringSet(PLUGIN_ACTIONS, null));
     }
 }

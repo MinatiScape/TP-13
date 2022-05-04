@@ -4,7 +4,6 @@ import android.content.Context;
 import android.provider.Settings;
 import android.util.Log;
 import com.android.customization.model.theme.ThemeManager;
-import java.util.HashSet;
 import kotlin.ResultKt;
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
@@ -17,32 +16,28 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
+/* compiled from: ThemeSanitizerReceiver.kt */
 @DebugMetadata(c = "com.google.android.apps.wallpaper.module.ThemeSanitizerReceiver$sanitizeThemes$2", f = "ThemeSanitizerReceiver.kt", l = {}, m = "invokeSuspend")
 /* loaded from: classes.dex */
-public final class ThemeSanitizerReceiver$sanitizeThemes$2 extends SuspendLambda implements Function2<CoroutineScope, Continuation<? super Unit>, Object> {
+final class ThemeSanitizerReceiver$sanitizeThemes$2 extends SuspendLambda implements Function2<CoroutineScope, Continuation<? super Unit>, Object> {
     public final /* synthetic */ Context $context;
     public int label;
-    private /* synthetic */ CoroutineScope p$;
 
     /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
     public ThemeSanitizerReceiver$sanitizeThemes$2(Context context, Continuation<? super ThemeSanitizerReceiver$sanitizeThemes$2> continuation) {
-        super(2, continuation);
+        super(continuation);
         this.$context = context;
     }
 
     @Override // kotlin.coroutines.jvm.internal.BaseContinuationImpl
     @NotNull
     public final Continuation<Unit> create(@Nullable Object obj, @NotNull Continuation<?> continuation) {
-        ThemeSanitizerReceiver$sanitizeThemes$2 themeSanitizerReceiver$sanitizeThemes$2 = new ThemeSanitizerReceiver$sanitizeThemes$2(this.$context, continuation);
-        themeSanitizerReceiver$sanitizeThemes$2.p$ = (CoroutineScope) obj;
-        return themeSanitizerReceiver$sanitizeThemes$2;
+        return new ThemeSanitizerReceiver$sanitizeThemes$2(this.$context, continuation);
     }
 
     @Override // kotlin.jvm.functions.Function2
-    public Object invoke(CoroutineScope coroutineScope, Continuation<? super Unit> continuation) {
-        ThemeSanitizerReceiver$sanitizeThemes$2 themeSanitizerReceiver$sanitizeThemes$2 = new ThemeSanitizerReceiver$sanitizeThemes$2(this.$context, continuation);
-        themeSanitizerReceiver$sanitizeThemes$2.p$ = coroutineScope;
-        return themeSanitizerReceiver$sanitizeThemes$2.invokeSuspend(Unit.INSTANCE);
+    public final Object invoke(CoroutineScope coroutineScope, Continuation<? super Unit> continuation) {
+        return ((ThemeSanitizerReceiver$sanitizeThemes$2) create(coroutineScope, continuation)).invokeSuspend(Unit.INSTANCE);
     }
 
     @Override // kotlin.coroutines.jvm.internal.BaseContinuationImpl
@@ -58,23 +53,17 @@ public final class ThemeSanitizerReceiver$sanitizeThemes$2 extends SuspendLambda
             if (jSONObject.has("android.theme.customization.system_palette")) {
                 int length = names.length();
                 int i = 0;
-                if (length > 0) {
-                    int i2 = 0;
-                    while (true) {
-                        int i3 = i + 1;
-                        String string = names.getString(i);
-                        if (!Intrinsics.areEqual("android.theme.customization.accent_color", string) && ((HashSet) ThemeManager.THEME_CATEGORIES).contains(string)) {
-                            jSONObject.remove(string);
-                            i2 = 1;
-                        }
-                        if (i3 >= length) {
-                            break;
-                        }
-                        i = i3;
+                boolean z = false;
+                while (i < length) {
+                    int i2 = i + 1;
+                    String string = names.getString(i);
+                    if (!Intrinsics.areEqual("android.theme.customization.accent_color", string) && ThemeManager.THEME_CATEGORIES.contains(string)) {
+                        jSONObject.remove(string);
+                        z = true;
                     }
                     i = i2;
                 }
-                if (i == 0) {
+                if (!z) {
                     return Unit.INSTANCE;
                 }
                 Settings.Secure.putString(this.$context.getContentResolver(), "theme_customization_overlay_packages", jSONObject.toString());

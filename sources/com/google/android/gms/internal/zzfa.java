@@ -5,10 +5,11 @@ import android.os.IBinder;
 import android.os.IInterface;
 import android.os.Parcel;
 import android.os.RemoteException;
+/* compiled from: BaseStub.java */
 /* loaded from: classes.dex */
 public class zzfa extends Binder implements IInterface {
     @Override // android.os.IInterface
-    public IBinder asBinder() {
+    public final IBinder asBinder() {
         return this;
     }
 

@@ -1,32 +1,56 @@
 package kotlinx.coroutines.internal;
 
-import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
+import kotlin.jvm.internal.Intrinsics;
+import kotlinx.atomicfu.AtomicRef;
 import kotlinx.coroutines.DebugKt;
+import kotlinx.coroutines.internal.LockFreeLinkedListNode;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: Atomic.kt */
 /* loaded from: classes.dex */
 public abstract class AtomicOp<T> extends OpDescriptor {
-    public static final AtomicReferenceFieldUpdater _consensus$FU = AtomicReferenceFieldUpdater.newUpdater(AtomicOp.class, Object.class, "_consensus");
-    public volatile Object _consensus = AtomicKt.NO_DECISION;
+    @NotNull
+    public final AtomicRef<Object> _consensus = new AtomicRef<>(AtomicKt.NO_DECISION);
 
-    public abstract void complete(T t, @Nullable Object obj);
+    @Nullable
+    public abstract Symbol prepare(Object obj);
 
-    /* JADX WARN: Multi-variable type inference failed */
     @Override // kotlinx.coroutines.internal.OpDescriptor
     @Nullable
     public final Object perform(@Nullable Object obj) {
-        Object obj2 = this._consensus;
-        Object obj3 = AtomicKt.NO_DECISION;
-        if (obj2 == obj3) {
+        boolean z;
+        LockFreeLinkedListNode lockFreeLinkedListNode;
+        Object obj2 = this._consensus.value;
+        Symbol symbol = AtomicKt.NO_DECISION;
+        if (obj2 == symbol) {
             obj2 = prepare(obj);
-            boolean z = DebugKt.DEBUG;
-            if (!_consensus$FU.compareAndSet(this, obj3, obj2)) {
-                obj2 = this._consensus;
+            boolean z2 = DebugKt.DEBUG;
+            Object obj3 = this._consensus.value;
+            if (obj3 != symbol) {
+                obj2 = obj3;
+            } else if (!this._consensus.compareAndSet(symbol, obj2)) {
+                obj2 = this._consensus.value;
             }
         }
-        complete(obj, obj2);
+        LockFreeLinkedListNode.CondAddOp condAddOp = (LockFreeLinkedListNode.CondAddOp) this;
+        LockFreeLinkedListNode affected = (LockFreeLinkedListNode) obj;
+        Intrinsics.checkNotNullParameter(affected, "affected");
+        if (obj2 == null) {
+            z = true;
+        } else {
+            z = false;
+        }
+        if (z) {
+            lockFreeLinkedListNode = condAddOp.newNode;
+        } else {
+            lockFreeLinkedListNode = condAddOp.oldNext;
+        }
+        if (lockFreeLinkedListNode != null && affected._next.compareAndSet(condAddOp, lockFreeLinkedListNode) && z) {
+            LockFreeLinkedListNode lockFreeLinkedListNode2 = condAddOp.newNode;
+            LockFreeLinkedListNode lockFreeLinkedListNode3 = condAddOp.oldNext;
+            Intrinsics.checkNotNull(lockFreeLinkedListNode3);
+            lockFreeLinkedListNode2.finishAdd(lockFreeLinkedListNode3);
+        }
         return obj2;
     }
-
-    @Nullable
-    public abstract Object prepare(T t);
 }

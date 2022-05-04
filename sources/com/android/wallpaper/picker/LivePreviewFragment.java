@@ -14,22 +14,23 @@ import android.content.pm.ServiceInfo;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import androidx.cardview.R$style;
 import androidx.cardview.widget.CardView;
+import androidx.collection.ArraySet;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.widget.ContentLoadingProgressBar$$ExternalSyntheticLambda2;
 import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.LiveData;
-import androidx.slice.Slice;
 import androidx.slice.SliceItem;
-import androidx.slice.SliceSpec;
 import androidx.slice.widget.ListContent;
 import androidx.slice.widget.ShortcutView;
 import androidx.slice.widget.SliceChildView;
@@ -39,13 +40,10 @@ import androidx.slice.widget.SliceViewPolicy;
 import androidx.slice.widget.TemplateView;
 import com.android.systemui.shared.R;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
-import com.android.wallpaper.compat.BuildCompat;
 import com.android.wallpaper.model.SetWallpaperViewModel;
 import com.android.wallpaper.picker.PreviewFragment;
-import com.android.wallpaper.util.DiskBasedLogger$$ExternalSyntheticLambda1;
 import com.android.wallpaper.util.FullScreenAnimation;
 import com.android.wallpaper.util.ScreenSizeCalculator;
-import com.android.wallpaper.util.SizeCalculator;
 import com.android.wallpaper.util.WallpaperConnection;
 import com.android.wallpaper.util.WallpaperSurfaceCallback;
 import com.android.wallpaper.widget.BottomActionBar;
@@ -53,7 +51,6 @@ import com.android.wallpaper.widget.LockScreenPreviewer;
 import com.android.wallpaper.widget.WallpaperColorsLoader;
 import com.google.android.material.tabs.TabLayout;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Future;
 /* loaded from: classes.dex */
@@ -67,7 +64,7 @@ public class LivePreviewFragment extends PreviewFragment implements WallpaperCon
     public ViewGroup mPreviewContainer;
     public Point mScreenSize;
     public Intent mSettingsIntent;
-    public LiveData<Slice> mSettingsLiveData;
+    public SliceLiveData.SliceLiveDataImpl mSettingsLiveData;
     public SliceView mSettingsSliceView;
     public TouchForwardingLayout mTouchForwardingLayout;
     public WallpaperColors mWallpaperColors;
@@ -79,29 +76,35 @@ public class LivePreviewFragment extends PreviewFragment implements WallpaperCon
 
     /* loaded from: classes.dex */
     public final class PreviewCustomizeSettingsContent extends BottomActionBar.BottomSheetContent<View> {
-        public PreviewCustomizeSettingsContent(Context context, AnonymousClass1 r3) {
+        @Override // com.android.wallpaper.widget.BottomActionBar.BottomSheetContent
+        public final int getViewId() {
+            return R.layout.preview_customize_settings;
+        }
+
+        public PreviewCustomizeSettingsContent(Context context) {
             super(context);
         }
 
         @Override // com.android.wallpaper.widget.BottomActionBar.BottomSheetContent
-        public int getViewId() {
-            return R.layout.preview_customize_settings;
-        }
-
-        @Override // com.android.wallpaper.widget.BottomActionBar.BottomSheetContent
-        public void onRecreateView(View view) {
+        public final void onRecreateView() {
+            boolean z;
             SliceView sliceView;
             LivePreviewFragment livePreviewFragment = LivePreviewFragment.this;
-            LiveData<Slice> liveData = livePreviewFragment.mSettingsLiveData;
-            if (liveData != null) {
-                if ((liveData.mObservers.mSize > 0) && (sliceView = livePreviewFragment.mSettingsSliceView) != null) {
-                    liveData.removeObserver(sliceView);
+            SliceLiveData.SliceLiveDataImpl sliceLiveDataImpl = livePreviewFragment.mSettingsLiveData;
+            if (sliceLiveDataImpl != null) {
+                if (sliceLiveDataImpl.mObservers.mSize > 0) {
+                    z = true;
+                } else {
+                    z = false;
+                }
+                if (z && (sliceView = livePreviewFragment.mSettingsSliceView) != null) {
+                    sliceLiveDataImpl.removeObserver(sliceView);
                 }
             }
         }
 
         @Override // com.android.wallpaper.widget.BottomActionBar.BottomSheetContent
-        public void onViewCreated(View view) {
+        public final void onViewCreated(View view) {
             TemplateView templateView;
             ListContent listContent;
             LivePreviewFragment.this.mSettingsSliceView = (SliceView) view.findViewById(R.id.settings_slice);
@@ -160,38 +163,139 @@ public class LivePreviewFragment extends PreviewFragment implements WallpaperCon
                 }
             }
             LivePreviewFragment livePreviewFragment = LivePreviewFragment.this;
-            LiveData<Slice> liveData = livePreviewFragment.mSettingsLiveData;
-            if (liveData != null) {
-                liveData.observeForever(livePreviewFragment.mSettingsSliceView);
+            SliceLiveData.SliceLiveDataImpl sliceLiveDataImpl = livePreviewFragment.mSettingsLiveData;
+            if (sliceLiveDataImpl != null) {
+                sliceLiveDataImpl.observeForever(livePreviewFragment.mSettingsSliceView);
             }
         }
     }
 
+    @Override // com.android.wallpaper.picker.PreviewFragment
+    public final int getLayoutResId() {
+        return R.layout.fragment_live_preview;
+    }
+
+    @Override // androidx.fragment.app.Fragment
+    public final void onDestroyView() {
+        SliceView sliceView;
+        boolean z = true;
+        this.mCalled = true;
+        SliceLiveData.SliceLiveDataImpl sliceLiveDataImpl = this.mSettingsLiveData;
+        if (sliceLiveDataImpl != null) {
+            if (sliceLiveDataImpl.mObservers.mSize <= 0) {
+                z = false;
+            }
+            if (z && (sliceView = this.mSettingsSliceView) != null) {
+                sliceLiveDataImpl.removeObserver(sliceView);
+                this.mSettingsLiveData = null;
+            }
+        }
+        WallpaperConnection wallpaperConnection = this.mWallpaperConnection;
+        if (wallpaperConnection != null) {
+            wallpaperConnection.disconnect();
+            this.mWallpaperConnection = null;
+        }
+        LockScreenPreviewer lockScreenPreviewer = this.mLockScreenPreviewer;
+        if (lockScreenPreviewer != null) {
+            lockScreenPreviewer.release();
+        }
+        this.mWorkspaceSurfaceCallback.cleanUp();
+        this.mWorkspaceSurface.getHolder().removeCallback(this.mWorkspaceSurfaceCallback);
+        this.mWallpaperSurfaceCallback.cleanUp();
+        this.mWallpaperSurface.getHolder().removeCallback(this.mWallpaperSurfaceCallback);
+    }
+
+    @Override // androidx.fragment.app.Fragment
+    public final void onPause() {
+        this.mCalled = true;
+        WallpaperConnection wallpaperConnection = this.mWallpaperConnection;
+        if (wallpaperConnection != null) {
+            wallpaperConnection.setVisibility(false);
+        }
+    }
+
+    @Override // androidx.fragment.app.Fragment
+    public final void onStop() {
+        this.mCalled = true;
+        WallpaperConnection wallpaperConnection = this.mWallpaperConnection;
+        if (wallpaperConnection != null) {
+            wallpaperConnection.disconnect();
+            this.mWallpaperConnection = null;
+        }
+    }
+
+    public Intent getWallpaperIntent(WallpaperInfo wallpaperInfo) {
+        return new Intent("android.service.wallpaper.WallpaperService").setClassName(wallpaperInfo.getPackageName(), wallpaperInfo.getServiceName());
+    }
+
+    @Override // com.android.wallpaper.util.WallpaperConnection.WallpaperConnectionListener
+    public void onWallpaperColorsChanged(WallpaperColors wallpaperColors, int i) {
+        FullScreenAnimation.FullScreenTextColor fullScreenTextColor;
+        this.mWallpaperColors = wallpaperColors;
+        this.mLockScreenPreviewer.setColor(wallpaperColors);
+        FullScreenAnimation fullScreenAnimation = this.mFullScreenAnimation;
+        if (wallpaperColors == null || (wallpaperColors.getColorHints() & 1) == 0) {
+            fullScreenTextColor = FullScreenAnimation.FullScreenTextColor.LIGHT;
+        } else {
+            fullScreenTextColor = FullScreenAnimation.FullScreenTextColor.DARK;
+        }
+        fullScreenAnimation.mFullScreenTextColor = fullScreenTextColor;
+        fullScreenAnimation.animateColor(fullScreenAnimation.mIsFullScreen);
+    }
+
+    public void previewLiveWallpaper() {
+        this.mWallpaperSurface.post(new ContentLoadingProgressBar$$ExternalSyntheticLambda2(this, 1));
+    }
+
+    @Override // com.android.wallpaper.picker.PreviewFragment
+    public final void setCurrentWallpaper(int i) {
+        this.mWallpaperSetter.setCurrentWallpaper(getActivity(), this.mWallpaper, null, i, HingeAngleProviderKt.FULLY_CLOSED_DEGREES, null, this.mWallpaperColors, new SetWallpaperViewModel.AnonymousClass1());
+    }
+
+    @Override // com.android.wallpaper.picker.PreviewFragment
+    public final void updateScreenPreview(boolean z) {
+        int i;
+        SurfaceView surfaceView = this.mWorkspaceSurface;
+        int i2 = 0;
+        if (z) {
+            i = 0;
+        } else {
+            i = 4;
+        }
+        surfaceView.setVisibility(i);
+        ViewGroup viewGroup = this.mLockPreviewContainer;
+        if (z) {
+            i2 = 4;
+        }
+        viewGroup.setVisibility(i2);
+        this.mFullScreenAnimation.mIsHomeSelected = z;
+    }
+
     public String getDeleteAction(WallpaperInfo wallpaperInfo) {
+        ServiceInfo serviceInfo;
         Bundle bundle;
         WallpaperInfo wallpaperInfo2 = WallpaperManager.getInstance(requireContext()).getWallpaperInfo();
-        ServiceInfo serviceInfo = wallpaperInfo.getServiceInfo();
-        ApplicationInfo applicationInfo = serviceInfo.applicationInfo;
+        ServiceInfo serviceInfo2 = wallpaperInfo.getServiceInfo();
+        ApplicationInfo applicationInfo = serviceInfo2.applicationInfo;
         boolean z = true;
         if (applicationInfo == null || (applicationInfo.flags & 1) == 0) {
             z = false;
         }
         if (!z) {
             StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("This wallpaper is not pre-installed: ");
-            m.append(serviceInfo.name);
+            m.append(serviceInfo2.name);
             Log.d("LivePreviewFragment", m.toString());
             return null;
         }
-        ServiceInfo serviceInfo2 = wallpaperInfo2 == null ? null : wallpaperInfo2.getServiceInfo();
-        if ((serviceInfo2 == null || !TextUtils.equals(serviceInfo.name, serviceInfo2.name)) && (bundle = serviceInfo.metaData) != null) {
+        if (wallpaperInfo2 == null) {
+            serviceInfo = null;
+        } else {
+            serviceInfo = wallpaperInfo2.getServiceInfo();
+        }
+        if ((serviceInfo == null || !TextUtils.equals(serviceInfo2.name, serviceInfo.name)) && (bundle = serviceInfo2.metaData) != null) {
             return bundle.getString("action_delete_live_wallpaper");
         }
         return null;
-    }
-
-    @Override // com.android.wallpaper.picker.PreviewFragment
-    public int getLayoutResId() {
-        return R.layout.fragment_live_preview;
     }
 
     public String getSettingsActivity(WallpaperInfo wallpaperInfo) {
@@ -200,14 +304,7 @@ public class LivePreviewFragment extends PreviewFragment implements WallpaperCon
 
     @SuppressLint({"NewApi"})
     public Uri getSettingsSliceUri(WallpaperInfo wallpaperInfo) {
-        if (BuildCompat.sSdk >= 29) {
-            return wallpaperInfo.getSettingsSliceUri();
-        }
-        return null;
-    }
-
-    public Intent getWallpaperIntent(WallpaperInfo wallpaperInfo) {
-        return new Intent("android.service.wallpaper.WallpaperService").setClassName(wallpaperInfo.getPackageName(), wallpaperInfo.getServiceName());
+        return wallpaperInfo.getSettingsSliceUri();
     }
 
     @Override // com.android.wallpaper.picker.PreviewFragment, com.android.wallpaper.picker.AppbarFragment, com.android.wallpaper.picker.BottomActionBarFragment
@@ -220,52 +317,25 @@ public class LivePreviewFragment extends PreviewFragment implements WallpaperCon
         BottomActionBar.BottomAction bottomAction3 = BottomActionBar.BottomAction.CUSTOMIZE;
         BottomActionBar.BottomAction bottomAction4 = BottomActionBar.BottomAction.APPLY;
         bottomActionBar2.showActionsOnly(bottomAction, bottomAction2, BottomActionBar.BottomAction.EDIT, bottomAction3, bottomAction4);
-        ((PreviewFragment) this).mBottomActionBar.setActionClickListener(bottomAction4, new View.OnClickListener(this) { // from class: com.android.wallpaper.picker.LivePreviewFragment$$ExternalSyntheticLambda1
-            public final /* synthetic */ LivePreviewFragment f$0;
-
-            {
-                this.f$0 = this;
-            }
-
+        ((PreviewFragment) this).mBottomActionBar.setActionClickListener(bottomAction4, new View.OnClickListener() { // from class: com.android.wallpaper.picker.LivePreviewFragment$$ExternalSyntheticLambda2
             @Override // android.view.View.OnClickListener
             public final void onClick(View view) {
-                switch (r3) {
-                    case 0:
-                        LivePreviewFragment livePreviewFragment = this.f$0;
-                        int i = LivePreviewFragment.$r8$clinit;
-                        livePreviewFragment.onSetWallpaperClicked(null);
-                        return;
-                    case 1:
-                        LivePreviewFragment livePreviewFragment2 = this.f$0;
-                        livePreviewFragment2.startActivity(livePreviewFragment2.mSettingsIntent, null);
-                        return;
-                    default:
-                        final LivePreviewFragment livePreviewFragment3 = this.f$0;
-                        int i2 = LivePreviewFragment.$r8$clinit;
-                        Objects.requireNonNull(livePreviewFragment3);
-                        new AlertDialog.Builder(livePreviewFragment3.getContext()).setMessage(R.string.delete_wallpaper_confirmation).setOnDismissListener(new DialogInterface.OnDismissListener() { // from class: com.android.wallpaper.picker.LivePreviewFragment$$ExternalSyntheticLambda0
-                            @Override // android.content.DialogInterface.OnDismissListener
-                            public final void onDismiss(DialogInterface dialogInterface) {
-                                LivePreviewFragment livePreviewFragment4 = LivePreviewFragment.this;
-                                int i3 = LivePreviewFragment.$r8$clinit;
-                                ((PreviewFragment) livePreviewFragment4).mBottomActionBar.deselectAction(BottomActionBar.BottomAction.DELETE);
-                            }
-                        }).setPositiveButton(R.string.delete_live_wallpaper, new CategoryFragment$$ExternalSyntheticLambda0(livePreviewFragment3)).setNegativeButton(17039360, (DialogInterface.OnClickListener) null).create().show();
-                        return;
-                }
+                LivePreviewFragment livePreviewFragment = LivePreviewFragment.this;
+                int i = LivePreviewFragment.$r8$clinit;
+                livePreviewFragment.onSetWallpaperClicked(livePreviewFragment.mWallpaper);
             }
         });
         ((PreviewFragment) this).mBottomActionBar.bindBottomSheetContentWithAction(new PreviewFragment.WallpaperInfoContent(getContext()), bottomAction);
         final View findViewById = this.mView.findViewById(R.id.separated_tabs_container);
         ((PreviewFragment) this).mBottomActionBar.mAccessibilityCallback = new BottomActionBar.AccessibilityCallback() { // from class: com.android.wallpaper.picker.LivePreviewFragment.3
             @Override // com.android.wallpaper.widget.BottomActionBar.AccessibilityCallback
-            public void onBottomSheetCollapsed() {
+            public final void onBottomSheetCollapsed() {
                 LivePreviewFragment.this.mPreviewContainer.setImportantForAccessibility(1);
                 findViewById.setImportantForAccessibility(1);
             }
 
             @Override // com.android.wallpaper.widget.BottomActionBar.AccessibilityCallback
-            public void onBottomSheetExpanded() {
+            public final void onBottomSheetExpanded() {
                 LivePreviewFragment.this.mPreviewContainer.setImportantForAccessibility(4);
                 findViewById.setImportantForAccessibility(4);
             }
@@ -273,43 +343,15 @@ public class LivePreviewFragment extends PreviewFragment implements WallpaperCon
         Uri settingsSliceUri = getSettingsSliceUri(this.mWallpaper.getWallpaperComponent());
         if (settingsSliceUri != null) {
             Context requireContext = requireContext();
-            Set<SliceSpec> set = SliceLiveData.SUPPORTED_SPECS;
-            this.mSettingsLiveData = new SliceLiveData.SliceLiveDataImpl(requireContext.getApplicationContext(), settingsSliceUri, null);
-            ((PreviewFragment) this).mBottomActionBar.bindBottomSheetContentWithAction(new PreviewCustomizeSettingsContent(getContext(), null), bottomAction3);
+            ArraySet arraySet = SliceLiveData.SUPPORTED_SPECS;
+            this.mSettingsLiveData = new SliceLiveData.SliceLiveDataImpl(requireContext.getApplicationContext(), settingsSliceUri);
+            ((PreviewFragment) this).mBottomActionBar.bindBottomSheetContentWithAction(new PreviewCustomizeSettingsContent(getContext()), bottomAction3);
         } else if (this.mSettingsIntent != null) {
-            ((PreviewFragment) this).mBottomActionBar.setActionClickListener(bottomAction3, new View.OnClickListener(this) { // from class: com.android.wallpaper.picker.LivePreviewFragment$$ExternalSyntheticLambda1
-                public final /* synthetic */ LivePreviewFragment f$0;
-
-                {
-                    this.f$0 = this;
-                }
-
+            ((PreviewFragment) this).mBottomActionBar.setActionClickListener(bottomAction3, new View.OnClickListener() { // from class: com.android.wallpaper.picker.LivePreviewFragment$$ExternalSyntheticLambda3
                 @Override // android.view.View.OnClickListener
                 public final void onClick(View view) {
-                    switch (r3) {
-                        case 0:
-                            LivePreviewFragment livePreviewFragment = this.f$0;
-                            int i = LivePreviewFragment.$r8$clinit;
-                            livePreviewFragment.onSetWallpaperClicked(null);
-                            return;
-                        case 1:
-                            LivePreviewFragment livePreviewFragment2 = this.f$0;
-                            livePreviewFragment2.startActivity(livePreviewFragment2.mSettingsIntent, null);
-                            return;
-                        default:
-                            final LivePreviewFragment livePreviewFragment3 = this.f$0;
-                            int i2 = LivePreviewFragment.$r8$clinit;
-                            Objects.requireNonNull(livePreviewFragment3);
-                            new AlertDialog.Builder(livePreviewFragment3.getContext()).setMessage(R.string.delete_wallpaper_confirmation).setOnDismissListener(new DialogInterface.OnDismissListener() { // from class: com.android.wallpaper.picker.LivePreviewFragment$$ExternalSyntheticLambda0
-                                @Override // android.content.DialogInterface.OnDismissListener
-                                public final void onDismiss(DialogInterface dialogInterface) {
-                                    LivePreviewFragment livePreviewFragment4 = LivePreviewFragment.this;
-                                    int i3 = LivePreviewFragment.$r8$clinit;
-                                    ((PreviewFragment) livePreviewFragment4).mBottomActionBar.deselectAction(BottomActionBar.BottomAction.DELETE);
-                                }
-                            }).setPositiveButton(R.string.delete_live_wallpaper, new CategoryFragment$$ExternalSyntheticLambda0(livePreviewFragment3)).setNegativeButton(17039360, (DialogInterface.OnClickListener) null).create().show();
-                            return;
-                    }
+                    LivePreviewFragment livePreviewFragment = LivePreviewFragment.this;
+                    livePreviewFragment.startActivity(livePreviewFragment.mSettingsIntent, null);
                 }
             });
         } else {
@@ -318,46 +360,38 @@ public class LivePreviewFragment extends PreviewFragment implements WallpaperCon
         if (TextUtils.isEmpty(getDeleteAction(this.mWallpaper.getWallpaperComponent()))) {
             ((PreviewFragment) this).mBottomActionBar.hideActions(bottomAction2);
         } else {
-            ((PreviewFragment) this).mBottomActionBar.setActionClickListener(bottomAction2, new View.OnClickListener(this) { // from class: com.android.wallpaper.picker.LivePreviewFragment$$ExternalSyntheticLambda1
-                public final /* synthetic */ LivePreviewFragment f$0;
-
-                {
-                    this.f$0 = this;
-                }
-
+            ((PreviewFragment) this).mBottomActionBar.setActionClickListener(bottomAction2, new View.OnClickListener() { // from class: com.android.wallpaper.picker.LivePreviewFragment$$ExternalSyntheticLambda4
                 @Override // android.view.View.OnClickListener
                 public final void onClick(View view) {
-                    switch (r3) {
-                        case 0:
-                            LivePreviewFragment livePreviewFragment = this.f$0;
-                            int i = LivePreviewFragment.$r8$clinit;
-                            livePreviewFragment.onSetWallpaperClicked(null);
-                            return;
-                        case 1:
-                            LivePreviewFragment livePreviewFragment2 = this.f$0;
-                            livePreviewFragment2.startActivity(livePreviewFragment2.mSettingsIntent, null);
-                            return;
-                        default:
-                            final LivePreviewFragment livePreviewFragment3 = this.f$0;
+                    final LivePreviewFragment livePreviewFragment = LivePreviewFragment.this;
+                    int i = LivePreviewFragment.$r8$clinit;
+                    livePreviewFragment.getClass();
+                    new AlertDialog.Builder(livePreviewFragment.getContext()).setMessage(R.string.delete_wallpaper_confirmation).setOnDismissListener(new DialogInterface.OnDismissListener() { // from class: com.android.wallpaper.picker.LivePreviewFragment$$ExternalSyntheticLambda1
+                        @Override // android.content.DialogInterface.OnDismissListener
+                        public final void onDismiss(DialogInterface dialogInterface) {
+                            LivePreviewFragment livePreviewFragment2 = LivePreviewFragment.this;
                             int i2 = LivePreviewFragment.$r8$clinit;
-                            Objects.requireNonNull(livePreviewFragment3);
-                            new AlertDialog.Builder(livePreviewFragment3.getContext()).setMessage(R.string.delete_wallpaper_confirmation).setOnDismissListener(new DialogInterface.OnDismissListener() { // from class: com.android.wallpaper.picker.LivePreviewFragment$$ExternalSyntheticLambda0
-                                @Override // android.content.DialogInterface.OnDismissListener
-                                public final void onDismiss(DialogInterface dialogInterface) {
-                                    LivePreviewFragment livePreviewFragment4 = LivePreviewFragment.this;
-                                    int i3 = LivePreviewFragment.$r8$clinit;
-                                    ((PreviewFragment) livePreviewFragment4).mBottomActionBar.deselectAction(BottomActionBar.BottomAction.DELETE);
-                                }
-                            }).setPositiveButton(R.string.delete_live_wallpaper, new CategoryFragment$$ExternalSyntheticLambda0(livePreviewFragment3)).setNegativeButton(17039360, (DialogInterface.OnClickListener) null).create().show();
-                            return;
-                    }
+                            ((PreviewFragment) livePreviewFragment2).mBottomActionBar.deselectAction(BottomActionBar.BottomAction.DELETE);
+                        }
+                    }).setPositiveButton(R.string.delete_live_wallpaper, new DialogInterface.OnClickListener() { // from class: com.android.wallpaper.picker.LivePreviewFragment$$ExternalSyntheticLambda0
+                        @Override // android.content.DialogInterface.OnClickListener
+                        public final void onClick(DialogInterface dialogInterface, int i2) {
+                            LivePreviewFragment livePreviewFragment2 = LivePreviewFragment.this;
+                            if (livePreviewFragment2.mDeleteIntent != null) {
+                                livePreviewFragment2.requireContext().startService(livePreviewFragment2.mDeleteIntent);
+                                livePreviewFragment2.finishActivity(false);
+                            }
+                        }
+                    }).setNegativeButton(17039360, (DialogInterface.OnClickListener) null).create().show();
                 }
             });
         }
         ((PreviewFragment) this).mBottomActionBar.setVisibility(0);
-        ((PreviewFragment) this).mBottomActionBar.disableActions();
+        BottomActionBar bottomActionBar3 = ((PreviewFragment) this).mBottomActionBar;
+        bottomActionBar3.getClass();
+        bottomActionBar3.disableActions(BottomActionBar.BottomAction.values());
         WallpaperConnection wallpaperConnection = this.mWallpaperConnection;
-        if (wallpaperConnection != null && wallpaperConnection.mEngineReady) {
+        if (wallpaperConnection != null && wallpaperConnection.isEngineReady()) {
             z = true;
         }
         if (z) {
@@ -397,7 +431,7 @@ public class LivePreviewFragment extends PreviewFragment implements WallpaperCon
         this.mScreenSize = ScreenSizeCalculator.getInstance().getScreenSize(requireActivity.getWindowManager().getDefaultDisplay());
         this.mPreviewContainer = (ViewGroup) onCreateView.findViewById(R.id.live_wallpaper_preview);
         this.mTouchForwardingLayout = (TouchForwardingLayout) onCreateView.findViewById(R.id.touch_forwarding_layout);
-        onCreateView.findViewById(R.id.preview_header).setBackgroundColor(requireActivity.getColor(R.color.settingslib_colorSurfaceHeader));
+        updatePreviewHeader(onCreateView);
         ConstraintSet constraintSet = new ConstraintSet();
         constraintSet.clone((ConstraintLayout) this.mPreviewContainer);
         constraintSet.get(this.mTouchForwardingLayout.getId()).layout.dimensionRatio = String.format(Locale.US, "%d:%d", Integer.valueOf(this.mScreenSize.x), Integer.valueOf(this.mScreenSize.y));
@@ -407,7 +441,7 @@ public class LivePreviewFragment extends PreviewFragment implements WallpaperCon
         LockScreenPreviewer lockScreenPreviewer = new LockScreenPreviewer(this.mLifecycleRegistry, getContext(), this.mLockPreviewContainer);
         this.mLockScreenPreviewer = lockScreenPreviewer;
         lockScreenPreviewer.setDateViewVisibility(!this.mFullScreenAnimation.mIsFullScreen);
-        this.mFullScreenAnimation.mFullScreenStatusListener = new LivePreviewFragment$$ExternalSyntheticLambda3(this, 0);
+        this.mFullScreenAnimation.mFullScreenStatusListener = new LivePreviewFragment$$ExternalSyntheticLambda7(this);
         this.mWallpaperSurface = (SurfaceView) this.mHomePreviewCard.findViewById(R.id.wallpaper_surface);
         TouchForwardingLayout touchForwardingLayout = this.mTouchForwardingLayout;
         CardView cardView = this.mHomePreviewCard;
@@ -418,54 +452,24 @@ public class LivePreviewFragment extends PreviewFragment implements WallpaperCon
         this.mWorkspaceSurfaceCallback = createWorkspaceSurfaceCallback(surfaceView);
         this.mWallpaperSurfaceCallback = new WallpaperSurfaceCallback(getContext(), this.mHomePreviewCard, this.mWallpaperSurface, this.mPlaceholderColorFuture, new WallpaperSurfaceCallback.SurfaceListener() { // from class: com.android.wallpaper.picker.LivePreviewFragment.1
             @Override // com.android.wallpaper.util.WallpaperSurfaceCallback.SurfaceListener
-            public void onSurfaceCreated() {
-                LivePreviewFragment.this.previewLiveWallpaper(null);
+            public final void onSurfaceCreated() {
+                LivePreviewFragment.this.previewLiveWallpaper();
             }
         });
         setUpTabs((TabLayout) onCreateView.findViewById(R.id.separated_tabs));
         onCreateView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() { // from class: com.android.wallpaper.picker.LivePreviewFragment.2
             @Override // android.view.View.OnLayoutChangeListener
-            public void onLayoutChange(View view, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8) {
+            public final void onLayoutChange(View view, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8) {
                 CardView cardView2 = LivePreviewFragment.this.mHomePreviewCard;
-                cardView2.setRadius(SizeCalculator.getPreviewCornerRadius(requireActivity, cardView2.getMeasuredWidth()));
+                cardView2.setRadius(R$style.getPreviewCornerRadius(requireActivity, cardView2.getMeasuredWidth()));
                 onCreateView.removeOnLayoutChangeListener(this);
             }
         });
         return onCreateView;
     }
 
-    @Override // androidx.fragment.app.Fragment
-    public void onDestroyView() {
-        SliceView sliceView;
-        boolean z = true;
-        this.mCalled = true;
-        LiveData<Slice> liveData = this.mSettingsLiveData;
-        if (liveData != null) {
-            if (liveData.mObservers.mSize <= 0) {
-                z = false;
-            }
-            if (z && (sliceView = this.mSettingsSliceView) != null) {
-                liveData.removeObserver(sliceView);
-                this.mSettingsLiveData = null;
-            }
-        }
-        WallpaperConnection wallpaperConnection = this.mWallpaperConnection;
-        if (wallpaperConnection != null) {
-            wallpaperConnection.disconnect();
-            this.mWallpaperConnection = null;
-        }
-        LockScreenPreviewer lockScreenPreviewer = this.mLockScreenPreviewer;
-        if (lockScreenPreviewer != null) {
-            lockScreenPreviewer.release();
-        }
-        this.mWorkspaceSurfaceCallback.cleanUp();
-        this.mWorkspaceSurface.getHolder().removeCallback(this.mWorkspaceSurfaceCallback);
-        this.mWallpaperSurfaceCallback.cleanUp();
-        this.mWallpaperSurface.getHolder().removeCallback(this.mWallpaperSurfaceCallback);
-    }
-
     @Override // com.android.wallpaper.util.WallpaperConnection.WallpaperConnectionListener
-    public void onEngineShown() {
+    public final void onEngineShown() {
         if (getActivity() != null) {
             this.mWallpaperSurfaceCallback.mHomeImageWallpaper.animate().setStartDelay(250L).setDuration(250L).alpha(HingeAngleProviderKt.FULLY_CLOSED_DEGREES).setInterpolator(PreviewFragment.ALPHA_OUT).start();
             BottomActionBar bottomActionBar = ((PreviewFragment) this).mBottomActionBar;
@@ -475,33 +479,12 @@ public class LivePreviewFragment extends PreviewFragment implements WallpaperCon
         }
     }
 
-    @Override // androidx.fragment.app.Fragment
-    public void onPause() {
-        this.mCalled = true;
-        WallpaperConnection wallpaperConnection = this.mWallpaperConnection;
-        if (wallpaperConnection != null) {
-            wallpaperConnection.mIsVisible = false;
-            wallpaperConnection.setEngineVisibility(false);
-        }
-    }
-
     @Override // com.android.wallpaper.picker.PreviewFragment, androidx.fragment.app.Fragment
-    public void onResume() {
+    public final void onResume() {
         super.onResume();
         WallpaperConnection wallpaperConnection = this.mWallpaperConnection;
         if (wallpaperConnection != null) {
-            wallpaperConnection.mIsVisible = true;
-            wallpaperConnection.setEngineVisibility(true);
-        }
-    }
-
-    @Override // androidx.fragment.app.Fragment
-    public void onStop() {
-        this.mCalled = true;
-        WallpaperConnection wallpaperConnection = this.mWallpaperConnection;
-        if (wallpaperConnection != null) {
-            wallpaperConnection.disconnect();
-            this.mWallpaperConnection = null;
+            wallpaperConnection.setVisibility(true);
         }
     }
 
@@ -510,30 +493,41 @@ public class LivePreviewFragment extends PreviewFragment implements WallpaperCon
         super.onViewCreated(view, bundle);
         this.mWallpaperSurface.getHolder().addCallback(this.mWallpaperSurfaceCallback);
         this.mWallpaperSurface.setZOrderMediaOverlay(true);
-        this.mHomePreviewCard.setOnTouchListener(new LivePreviewFragment$$ExternalSyntheticLambda2(this));
+        this.mHomePreviewCard.setOnTouchListener(new View.OnTouchListener() { // from class: com.android.wallpaper.picker.LivePreviewFragment$$ExternalSyntheticLambda5
+            @Override // android.view.View.OnTouchListener
+            public final boolean onTouch(View view2, MotionEvent motionEvent) {
+                LivePreviewFragment livePreviewFragment = LivePreviewFragment.this;
+                WallpaperConnection wallpaperConnection = livePreviewFragment.mWallpaperConnection;
+                if (wallpaperConnection == null || wallpaperConnection.getEngine() == null) {
+                    return false;
+                }
+                float width = livePreviewFragment.mTouchForwardingLayout.getWidth() / livePreviewFragment.mScreenSize.x;
+                int actionMasked = motionEvent.getActionMasked();
+                if (actionMasked == 0) {
+                    ((PreviewFragment) livePreviewFragment).mBottomActionBar.hideBottomSheetAndDeselectButtonIfExpanded();
+                }
+                MotionEvent obtainNoHistory = MotionEvent.obtainNoHistory(motionEvent);
+                obtainNoHistory.setLocation(motionEvent.getX() / width, motionEvent.getY() / width);
+                try {
+                    livePreviewFragment.mWallpaperConnection.getEngine().dispatchPointer(obtainNoHistory);
+                    if (actionMasked == 1) {
+                        livePreviewFragment.mWallpaperConnection.getEngine().dispatchWallpaperCommand("android.wallpaper.tap", (int) motionEvent.getX(), (int) motionEvent.getY(), 0, (Bundle) null);
+                    } else if (actionMasked == 6) {
+                        int actionIndex = motionEvent.getActionIndex();
+                        livePreviewFragment.mWallpaperConnection.getEngine().dispatchWallpaperCommand("android.wallpaper.secondaryTap", (int) motionEvent.getX(actionIndex), (int) motionEvent.getY(actionIndex), 0, (Bundle) null);
+                    }
+                    return false;
+                } catch (RemoteException unused) {
+                    Log.e("LivePreviewFragment", "Remote exception of wallpaper connection");
+                    return false;
+                }
+            }
+        });
         this.mWorkspaceSurface.setZOrderMediaOverlay(true);
         this.mWorkspaceSurface.getHolder().addCallback(this.mWorkspaceSurfaceCallback);
     }
 
-    @Override // com.android.wallpaper.util.WallpaperConnection.WallpaperConnectionListener
-    public void onWallpaperColorsChanged(WallpaperColors wallpaperColors, int i) {
-        this.mWallpaperColors = wallpaperColors;
-        this.mLockScreenPreviewer.setColor(wallpaperColors);
-        FullScreenAnimation fullScreenAnimation = this.mFullScreenAnimation;
-        fullScreenAnimation.mFullScreenTextColor = (wallpaperColors == null || (wallpaperColors.getColorHints() & 1) == 0) ? 3 : 2;
-        fullScreenAnimation.animateColor(fullScreenAnimation.mIsFullScreen);
-    }
-
-    public void previewLiveWallpaper(ImageView imageView) {
-        this.mWallpaperSurface.post(new DiskBasedLogger$$ExternalSyntheticLambda1(this));
-    }
-
-    @Override // com.android.wallpaper.picker.PreviewFragment
-    public void setCurrentWallpaper(int i) {
-        this.mWallpaperSetter.setCurrentWallpaper(getActivity(), this.mWallpaper, null, i, HingeAngleProviderKt.FULLY_CLOSED_DEGREES, null, this.mWallpaperColors, new SetWallpaperViewModel.AnonymousClass1());
-    }
-
-    public void setUpLiveWallpaperPreview(com.android.wallpaper.model.WallpaperInfo wallpaperInfo) {
+    public final void setUpLiveWallpaperPreview(com.android.wallpaper.model.WallpaperInfo wallpaperInfo) {
         FragmentActivity activity = getActivity();
         if (activity != null && !activity.isFinishing()) {
             WallpaperConnection wallpaperConnection = this.mWallpaperConnection;
@@ -543,27 +537,14 @@ public class LivePreviewFragment extends PreviewFragment implements WallpaperCon
             if (WallpaperConnection.isPreviewAvailable()) {
                 WallpaperConnection wallpaperConnection2 = new WallpaperConnection(getWallpaperIntent(wallpaperInfo.getWallpaperComponent()), activity, this, this.mWallpaperSurface);
                 this.mWallpaperConnection = wallpaperConnection2;
-                wallpaperConnection2.mIsVisible = true;
-                wallpaperConnection2.setEngineVisibility(true);
+                wallpaperConnection2.setVisibility(true);
             } else {
-                WallpaperColorsLoader.getWallpaperColors(activity, wallpaperInfo.getThumbAsset(activity), new LivePreviewFragment$$ExternalSyntheticLambda3(this, 1));
+                WallpaperColorsLoader.getWallpaperColors(activity, wallpaperInfo.getThumbAsset(activity), new LivePreviewFragment$$ExternalSyntheticLambda6(this));
             }
             WallpaperConnection wallpaperConnection3 = this.mWallpaperConnection;
             if (wallpaperConnection3 != null && !wallpaperConnection3.connect()) {
                 this.mWallpaperConnection = null;
             }
         }
-    }
-
-    @Override // com.android.wallpaper.picker.PreviewFragment
-    public void updateScreenPreview(boolean z) {
-        int i = 0;
-        this.mWorkspaceSurface.setVisibility(z ? 0 : 4);
-        ViewGroup viewGroup = this.mLockPreviewContainer;
-        if (z) {
-            i = 4;
-        }
-        viewGroup.setVisibility(i);
-        this.mFullScreenAnimation.mIsHomeSelected = z;
     }
 }

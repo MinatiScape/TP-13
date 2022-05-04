@@ -21,7 +21,6 @@ import android.util.Log;
 import androidx.versionedparcelable.CustomVersionedParcelable;
 import com.android.systemui.shared.system.QuickStepContract;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public class IconCompat extends CustomVersionedParcelable {
     public static final PorterDuff.Mode DEFAULT_TINT_MODE = PorterDuff.Mode.SRC_IN;
@@ -55,13 +54,33 @@ public class IconCompat extends CustomVersionedParcelable {
     }
 
     public static IconCompat createFromIcon(Context context, Icon icon) {
-        Objects.requireNonNull(icon);
+        icon.getClass();
         int type = icon.getType();
         if (type == 2) {
             String resPackage = icon.getResPackage();
             try {
-                return createWithResource(getResources(context, resPackage), resPackage, icon.getResId());
-            } catch (Resources.NotFoundException unused) {
+                Resources resources = getResources(context, resPackage);
+                int resId = icon.getResId();
+                if (resPackage == null) {
+                    throw new IllegalArgumentException("Package must not be null.");
+                } else if (resId != 0) {
+                    IconCompat iconCompat = new IconCompat(2);
+                    iconCompat.mInt1 = resId;
+                    if (resources != null) {
+                        try {
+                            iconCompat.mObj1 = resources.getResourceName(resId);
+                        } catch (Resources.NotFoundException unused) {
+                            throw new IllegalArgumentException("Icon resource cannot be found");
+                        }
+                    } else {
+                        iconCompat.mObj1 = resPackage;
+                    }
+                    iconCompat.mString1 = resPackage;
+                    return iconCompat;
+                } else {
+                    throw new IllegalArgumentException("Drawable resource ID must not be 0");
+                }
+            } catch (Resources.NotFoundException unused2) {
                 throw new IllegalArgumentException("Icon resource cannot be found");
             }
         } else if (type == 4) {
@@ -69,25 +88,25 @@ public class IconCompat extends CustomVersionedParcelable {
             if (uri != null) {
                 String uri2 = uri.toString();
                 if (uri2 != null) {
-                    IconCompat iconCompat = new IconCompat(4);
-                    iconCompat.mObj1 = uri2;
-                    return iconCompat;
+                    IconCompat iconCompat2 = new IconCompat(4);
+                    iconCompat2.mObj1 = uri2;
+                    return iconCompat2;
                 }
                 throw new IllegalArgumentException("Uri must not be null.");
             }
             throw new IllegalArgumentException("Uri must not be null.");
         } else if (type != 6) {
-            IconCompat iconCompat2 = new IconCompat(-1);
-            iconCompat2.mObj1 = icon;
-            return iconCompat2;
+            IconCompat iconCompat3 = new IconCompat(-1);
+            iconCompat3.mObj1 = icon;
+            return iconCompat3;
         } else {
             Uri uri3 = icon.getUri();
             if (uri3 != null) {
                 String uri4 = uri3.toString();
                 if (uri4 != null) {
-                    IconCompat iconCompat3 = new IconCompat(6);
-                    iconCompat3.mObj1 = uri4;
-                    return iconCompat3;
+                    IconCompat iconCompat4 = new IconCompat(6);
+                    iconCompat4.mObj1 = uri4;
+                    return iconCompat4;
                 }
                 throw new IllegalArgumentException("Uri must not be null.");
             }
@@ -95,75 +114,24 @@ public class IconCompat extends CustomVersionedParcelable {
         }
     }
 
-    public static Bitmap createLegacyIconFromAdaptiveIcon(Bitmap adaptiveIconBitmap, boolean addShadow) {
-        int min = (int) (Math.min(adaptiveIconBitmap.getWidth(), adaptiveIconBitmap.getHeight()) * 0.6666667f);
-        Bitmap createBitmap = Bitmap.createBitmap(min, min, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(createBitmap);
-        Paint paint = new Paint(3);
-        float f = min;
-        float f2 = 0.5f * f;
-        float f3 = 0.9166667f * f2;
-        if (addShadow) {
-            float f4 = 0.010416667f * f;
-            paint.setColor(0);
-            paint.setShadowLayer(f4, HingeAngleProviderKt.FULLY_CLOSED_DEGREES, f * 0.020833334f, 1023410176);
-            canvas.drawCircle(f2, f2, f3, paint);
-            paint.setShadowLayer(f4, HingeAngleProviderKt.FULLY_CLOSED_DEGREES, HingeAngleProviderKt.FULLY_CLOSED_DEGREES, 503316480);
-            canvas.drawCircle(f2, f2, f3, paint);
-            paint.clearShadowLayer();
-        }
-        paint.setColor(-16777216);
-        Shader.TileMode tileMode = Shader.TileMode.CLAMP;
-        BitmapShader bitmapShader = new BitmapShader(adaptiveIconBitmap, tileMode, tileMode);
-        Matrix matrix = new Matrix();
-        matrix.setTranslate((-(adaptiveIconBitmap.getWidth() - min)) / 2, (-(adaptiveIconBitmap.getHeight() - min)) / 2);
-        bitmapShader.setLocalMatrix(matrix);
-        paint.setShader(bitmapShader);
-        canvas.drawCircle(f2, f2, f3, paint);
-        canvas.setBitmap(null);
-        return createBitmap;
-    }
-
-    public static IconCompat createWithResource(Resources r, String pkg, int resId) {
-        if (pkg == null) {
-            throw new IllegalArgumentException("Package must not be null.");
-        } else if (resId != 0) {
-            IconCompat iconCompat = new IconCompat(2);
-            iconCompat.mInt1 = resId;
-            if (r != null) {
-                try {
-                    iconCompat.mObj1 = r.getResourceName(resId);
-                } catch (Resources.NotFoundException unused) {
-                    throw new IllegalArgumentException("Icon resource cannot be found");
-                }
-            } else {
-                iconCompat.mObj1 = pkg;
-            }
-            iconCompat.mString1 = pkg;
-            return iconCompat;
-        } else {
-            throw new IllegalArgumentException("Drawable resource ID must not be 0");
-        }
-    }
-
-    public static Resources getResources(Context context, String resPackage) {
-        if ("android".equals(resPackage)) {
+    public static Resources getResources(Context context, String str) {
+        if ("android".equals(str)) {
             return Resources.getSystem();
         }
         PackageManager packageManager = context.getPackageManager();
         try {
-            ApplicationInfo applicationInfo = packageManager.getApplicationInfo(resPackage, QuickStepContract.SYSUI_STATE_ASSIST_GESTURE_CONSTRAINED);
+            ApplicationInfo applicationInfo = packageManager.getApplicationInfo(str, QuickStepContract.SYSUI_STATE_ASSIST_GESTURE_CONSTRAINED);
             if (applicationInfo != null) {
                 return packageManager.getResourcesForApplication(applicationInfo);
             }
             return null;
         } catch (PackageManager.NameNotFoundException e) {
-            Log.e("IconCompat", String.format("Unable to find pkg=%s for icon", resPackage), e);
+            Log.e("IconCompat", String.format("Unable to find pkg=%s for icon", str), e);
             return null;
         }
     }
 
-    public void checkResource(Context context) {
+    public final void checkResource(Context context) {
         Object obj;
         if (this.mType == 2 && (obj = this.mObj1) != null) {
             String str = (String) obj;
@@ -186,7 +154,7 @@ public class IconCompat extends CustomVersionedParcelable {
         }
     }
 
-    public int getResId() {
+    public final int getResId() {
         int i = this.mType;
         if (i == -1) {
             return ((Icon) this.mObj1).getResId();
@@ -197,7 +165,7 @@ public class IconCompat extends CustomVersionedParcelable {
         throw new IllegalStateException("called getResId() on " + this);
     }
 
-    public String getResPackage() {
+    public final String getResPackage() {
         int i = this.mType;
         if (i == -1) {
             return ((Icon) this.mObj1).getResPackage();
@@ -211,7 +179,7 @@ public class IconCompat extends CustomVersionedParcelable {
         }
     }
 
-    public Uri getUri() {
+    public final Uri getUri() {
         int i = this.mType;
         if (i == -1) {
             return ((Icon) this.mObj1).getUri();
@@ -222,12 +190,7 @@ public class IconCompat extends CustomVersionedParcelable {
         throw new IllegalStateException("called getUri() on " + this);
     }
 
-    public Drawable loadDrawable(Context context) {
-        checkResource(context);
-        return toIcon(context).loadDrawable(context);
-    }
-
-    public Icon toIcon(Context context) {
+    public final Icon toIcon$1() {
         Icon icon;
         switch (this.mType) {
             case -1:
@@ -265,7 +228,7 @@ public class IconCompat extends CustomVersionedParcelable {
         return icon;
     }
 
-    public String toString() {
+    public final String toString() {
         String str;
         if (this.mType == -1) {
             return String.valueOf(this.mObj1);
@@ -336,8 +299,41 @@ public class IconCompat extends CustomVersionedParcelable {
         return sb.toString();
     }
 
-    public IconCompat(int mType) {
-        this.mType = -1;
+    public static Bitmap createLegacyIconFromAdaptiveIcon(Bitmap bitmap, boolean z) {
+        int min = (int) (Math.min(bitmap.getWidth(), bitmap.getHeight()) * 0.6666667f);
+        Bitmap createBitmap = Bitmap.createBitmap(min, min, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(createBitmap);
+        Paint paint = new Paint(3);
+        float f = min;
+        float f2 = 0.5f * f;
+        float f3 = 0.9166667f * f2;
+        if (z) {
+            float f4 = 0.010416667f * f;
+            paint.setColor(0);
+            paint.setShadowLayer(f4, HingeAngleProviderKt.FULLY_CLOSED_DEGREES, f * 0.020833334f, 1023410176);
+            canvas.drawCircle(f2, f2, f3, paint);
+            paint.setShadowLayer(f4, HingeAngleProviderKt.FULLY_CLOSED_DEGREES, HingeAngleProviderKt.FULLY_CLOSED_DEGREES, 503316480);
+            canvas.drawCircle(f2, f2, f3, paint);
+            paint.clearShadowLayer();
+        }
+        paint.setColor(-16777216);
+        Shader.TileMode tileMode = Shader.TileMode.CLAMP;
+        BitmapShader bitmapShader = new BitmapShader(bitmap, tileMode, tileMode);
+        Matrix matrix = new Matrix();
+        matrix.setTranslate((-(bitmap.getWidth() - min)) / 2, (-(bitmap.getHeight() - min)) / 2);
+        bitmapShader.setLocalMatrix(matrix);
+        paint.setShader(bitmapShader);
+        canvas.drawCircle(f2, f2, f3, paint);
+        canvas.setBitmap(null);
+        return createBitmap;
+    }
+
+    public final Drawable loadDrawable(Context context) {
+        checkResource(context);
+        return toIcon$1().loadDrawable(context);
+    }
+
+    public IconCompat(int i) {
         this.mData = null;
         this.mParcelable = null;
         this.mInt1 = 0;
@@ -345,6 +341,6 @@ public class IconCompat extends CustomVersionedParcelable {
         this.mTintList = null;
         this.mTintMode = DEFAULT_TINT_MODE;
         this.mTintModeStr = null;
-        this.mType = mType;
+        this.mType = i;
     }
 }

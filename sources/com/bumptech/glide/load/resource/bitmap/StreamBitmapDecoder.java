@@ -1,94 +1,110 @@
 package com.bumptech.glide.load.resource.bitmap;
 
 import android.graphics.Bitmap;
-import com.android.systemui.shared.system.QuickStepContract;
 import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.ResourceDecoder;
 import com.bumptech.glide.load.engine.Resource;
 import com.bumptech.glide.load.engine.bitmap_recycle.ArrayPool;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.load.resource.bitmap.Downsampler;
-import com.bumptech.glide.util.ExceptionCatchingInputStream;
+import com.bumptech.glide.load.resource.bitmap.ImageReader;
+import com.bumptech.glide.util.ExceptionPassthroughInputStream;
 import com.bumptech.glide.util.MarkEnforcingInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayDeque;
-import java.util.Objects;
-import java.util.Queue;
 /* loaded from: classes.dex */
-public class StreamBitmapDecoder implements ResourceDecoder<InputStream, Bitmap> {
+public final class StreamBitmapDecoder implements ResourceDecoder<InputStream, Bitmap> {
     public final ArrayPool byteArrayPool;
     public final Downsampler downsampler;
 
     /* loaded from: classes.dex */
     public static class UntrustedCallbacks implements Downsampler.DecodeCallbacks {
         public final RecyclableBufferedInputStream bufferedStream;
-        public final ExceptionCatchingInputStream exceptionStream;
-
-        public UntrustedCallbacks(RecyclableBufferedInputStream bufferedStream, ExceptionCatchingInputStream exceptionStream) {
-            this.bufferedStream = bufferedStream;
-            this.exceptionStream = exceptionStream;
-        }
+        public final ExceptionPassthroughInputStream exceptionStream;
 
         @Override // com.bumptech.glide.load.resource.bitmap.Downsampler.DecodeCallbacks
-        public void onDecodeComplete(BitmapPool bitmapPool, Bitmap downsampled) throws IOException {
+        public final void onDecodeComplete(BitmapPool bitmapPool, Bitmap bitmap) throws IOException {
             IOException iOException = this.exceptionStream.exception;
             if (iOException != null) {
-                if (downsampled != null) {
-                    bitmapPool.put(downsampled);
+                if (bitmap != null) {
+                    bitmapPool.put(bitmap);
                 }
                 throw iOException;
             }
         }
 
         @Override // com.bumptech.glide.load.resource.bitmap.Downsampler.DecodeCallbacks
-        public void onObtainBounds() {
+        public final void onObtainBounds() {
             RecyclableBufferedInputStream recyclableBufferedInputStream = this.bufferedStream;
             synchronized (recyclableBufferedInputStream) {
                 recyclableBufferedInputStream.marklimit = recyclableBufferedInputStream.buf.length;
             }
         }
-    }
 
-    public StreamBitmapDecoder(Downsampler downsampler, ArrayPool byteArrayPool) {
-        this.downsampler = downsampler;
-        this.byteArrayPool = byteArrayPool;
+        public UntrustedCallbacks(RecyclableBufferedInputStream recyclableBufferedInputStream, ExceptionPassthroughInputStream exceptionPassthroughInputStream) {
+            this.bufferedStream = recyclableBufferedInputStream;
+            this.exceptionStream = exceptionPassthroughInputStream;
+        }
     }
 
     @Override // com.bumptech.glide.load.ResourceDecoder
-    public Resource<Bitmap> decode(InputStream source, int width, int height, Options options) throws IOException {
-        RecyclableBufferedInputStream recyclableBufferedInputStream;
+    public final Resource<Bitmap> decode(InputStream inputStream, int i, int i2, Options options) throws IOException {
         boolean z;
-        ExceptionCatchingInputStream exceptionCatchingInputStream;
-        InputStream inputStream = source;
-        if (inputStream instanceof RecyclableBufferedInputStream) {
-            recyclableBufferedInputStream = (RecyclableBufferedInputStream) inputStream;
+        RecyclableBufferedInputStream recyclableBufferedInputStream;
+        ExceptionPassthroughInputStream exceptionPassthroughInputStream;
+        InputStream inputStream2 = inputStream;
+        if (inputStream2 instanceof RecyclableBufferedInputStream) {
+            recyclableBufferedInputStream = (RecyclableBufferedInputStream) inputStream2;
             z = false;
         } else {
             z = true;
-            recyclableBufferedInputStream = new RecyclableBufferedInputStream(inputStream, this.byteArrayPool, QuickStepContract.SYSUI_STATE_ONE_HANDED_ACTIVE);
+            recyclableBufferedInputStream = new RecyclableBufferedInputStream(inputStream2, this.byteArrayPool);
         }
-        Queue<ExceptionCatchingInputStream> queue = ExceptionCatchingInputStream.QUEUE;
-        synchronized (queue) {
-            exceptionCatchingInputStream = (ExceptionCatchingInputStream) ((ArrayDeque) queue).poll();
+        ArrayDeque arrayDeque = ExceptionPassthroughInputStream.POOL;
+        synchronized (arrayDeque) {
+            exceptionPassthroughInputStream = (ExceptionPassthroughInputStream) arrayDeque.poll();
         }
-        if (exceptionCatchingInputStream == null) {
-            exceptionCatchingInputStream = new ExceptionCatchingInputStream();
+        if (exceptionPassthroughInputStream == null) {
+            exceptionPassthroughInputStream = new ExceptionPassthroughInputStream();
         }
-        exceptionCatchingInputStream.wrapped = recyclableBufferedInputStream;
+        exceptionPassthroughInputStream.wrapped = recyclableBufferedInputStream;
+        MarkEnforcingInputStream markEnforcingInputStream = new MarkEnforcingInputStream(exceptionPassthroughInputStream);
+        UntrustedCallbacks untrustedCallbacks = new UntrustedCallbacks(recyclableBufferedInputStream, exceptionPassthroughInputStream);
         try {
-            return this.downsampler.decode(new MarkEnforcingInputStream(exceptionCatchingInputStream), width, height, options, new UntrustedCallbacks(recyclableBufferedInputStream, exceptionCatchingInputStream));
-        } finally {
-            exceptionCatchingInputStream.release();
+            Downsampler downsampler = this.downsampler;
+            BitmapResource decode = downsampler.decode(new ImageReader.InputStreamImageReader(markEnforcingInputStream, downsampler.parsers, downsampler.byteArrayPool), i, i2, options, untrustedCallbacks);
+            exceptionPassthroughInputStream.exception = null;
+            exceptionPassthroughInputStream.wrapped = null;
+            synchronized (arrayDeque) {
+                arrayDeque.offer(exceptionPassthroughInputStream);
+            }
             if (z) {
                 recyclableBufferedInputStream.release();
+            }
+            return decode;
+        } catch (Throwable th) {
+            exceptionPassthroughInputStream.exception = null;
+            exceptionPassthroughInputStream.wrapped = null;
+            ArrayDeque arrayDeque2 = ExceptionPassthroughInputStream.POOL;
+            synchronized (arrayDeque2) {
+                arrayDeque2.offer(exceptionPassthroughInputStream);
+                if (z) {
+                    recyclableBufferedInputStream.release();
+                }
+                throw th;
             }
         }
     }
 
     @Override // com.bumptech.glide.load.ResourceDecoder
-    public boolean handles(InputStream source, Options options) throws IOException {
-        Objects.requireNonNull(this.downsampler);
+    public final boolean handles(InputStream inputStream, Options options) throws IOException {
+        this.downsampler.getClass();
         return true;
+    }
+
+    public StreamBitmapDecoder(Downsampler downsampler, ArrayPool arrayPool) {
+        this.downsampler = downsampler;
+        this.byteArrayPool = arrayPool;
     }
 }

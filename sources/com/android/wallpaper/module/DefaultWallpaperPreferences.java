@@ -1,8 +1,10 @@
 package com.android.wallpaper.module;
 
+import android.app.WallpaperColors;
 import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.text.TextUtils;
 import android.util.Log;
 import java.io.File;
@@ -22,7 +24,441 @@ public class DefaultWallpaperPreferences implements WallpaperPreferences {
     public Context mContext;
     public SharedPreferences mNoBackupPrefs;
     public SharedPreferences mSharedPrefs;
+    public DefaultWallpaperPreferences$$ExternalSyntheticLambda0 mSharedPrefsChangedListener;
 
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final List<String> getHomeWallpaperAttributions() {
+        return Arrays.asList(this.mSharedPrefs.getString("home_wallpaper_attribution_line_1", null), this.mSharedPrefs.getString("home_wallpaper_attribution_line_2", null), this.mSharedPrefs.getString("home_wallpaper_attribution_line_3", null));
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final List<String> getLockWallpaperAttributions() {
+        return Arrays.asList(this.mSharedPrefs.getString("lock_wallpaper_attribution_line_1", null), this.mSharedPrefs.getString("lock_wallpaper_attribution_line_2", null), this.mSharedPrefs.getString("lock_wallpaper_attribution_line_3", null));
+    }
+
+    public static int getCurrentDate() {
+        return Integer.parseInt(new SimpleDateFormat("yyyyMMdd", Locale.US).format(Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime()));
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void addDailyRotation(long j) {
+        try {
+            JSONArray jSONArray = new JSONArray(this.mNoBackupPrefs.getString("daily_rotation_timestamps", "[]"));
+            jSONArray.put(j);
+            this.mNoBackupPrefs.edit().putString("daily_rotation_timestamps", jSONArray.toString()).apply();
+        } catch (JSONException unused) {
+            Log.e("DefaultWPPreferences", "Failed to add a daily rotation timestamp due to a JSON parse exception");
+        }
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void clearDailyRotations() {
+        this.mNoBackupPrefs.edit().remove("daily_rotation_timestamps").remove("daily_wallpaper_enabled_timestamp").apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final int getAppLaunchCount() {
+        return this.mNoBackupPrefs.getInt("app_launch_count", 0);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final long getDailyWallpaperEnabledTimestamp() {
+        return this.mNoBackupPrefs.getLong("daily_wallpaper_enabled_timestamp", -1L);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final int getDailyWallpaperLastRotationStatus() {
+        return this.mNoBackupPrefs.getInt("last_rotation_status", -1);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final long getDailyWallpaperLastRotationStatusTimestamp() {
+        return this.mNoBackupPrefs.getLong("last_rotation_status_timestamp", 0L);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final int getFirstLaunchDateSinceSetup() {
+        return this.mNoBackupPrefs.getInt("first_launch_date_since_setup", 0);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final int getFirstWallpaperApplyDateSinceSetup() {
+        return this.mNoBackupPrefs.getInt("first_wallpaper_apply_date_since_setup", 0);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final int getHomeWallpaperActionIconRes() {
+        return getResIdPersistedByName("home_wallpaper_action_icon", "drawable");
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final int getHomeWallpaperActionLabelRes() {
+        return getResIdPersistedByName("home_wallpaper_action_label", "string");
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final String getHomeWallpaperActionUrl() {
+        return this.mSharedPrefs.getString("home_wallpaper_action_url", null);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final String getHomeWallpaperBackingFileName() {
+        return this.mNoBackupPrefs.getString("home_wallpaper_backing_file", null);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final String getHomeWallpaperCollectionId() {
+        return this.mSharedPrefs.getString("home_wallpaper_collection_id", null);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final long getHomeWallpaperHashCode() {
+        return this.mSharedPrefs.getLong("home_wallpaper_hash_code", 0L);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final int getHomeWallpaperManagerId() {
+        return this.mNoBackupPrefs.getInt("home_wallpaper_id", 0);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final String getHomeWallpaperPackageName() {
+        return this.mNoBackupPrefs.getString("home_wallpaper_package_name", null);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final String getHomeWallpaperRemoteId() {
+        return this.mNoBackupPrefs.getString("home_wallpaper_remote_id", null);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final String getHomeWallpaperServiceName() {
+        return this.mNoBackupPrefs.getString("home_wallpaper_service_name", null);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final long getLastDailyLogTimestamp() {
+        return this.mNoBackupPrefs.getLong("last_daily_log_timestamp", 0L);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final long getLastDailyRotationTimestamp() {
+        try {
+            JSONArray jSONArray = new JSONArray(this.mNoBackupPrefs.getString("daily_rotation_timestamps", "[]"));
+            if (jSONArray.length() == 0) {
+                return -1L;
+            }
+            return jSONArray.getLong(jSONArray.length() - 1);
+        } catch (JSONException unused) {
+            Log.e("DefaultWPPreferences", "Failed to find a daily rotation timestamp due to a JSON parse exception");
+            return -1L;
+        }
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final int getLockWallpaperActionIconRes() {
+        return getResIdPersistedByName("lock_wallpaper_action_icon", "drawable");
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final int getLockWallpaperActionLabelRes() {
+        return getResIdPersistedByName("lock_wallpaper_action_label", "string");
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final String getLockWallpaperActionUrl() {
+        return this.mSharedPrefs.getString("lock_wallpaper_action_url", null);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final String getLockWallpaperBackingFileName() {
+        return this.mNoBackupPrefs.getString("lock_wallpaper_backing_file", null);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final String getLockWallpaperCollectionId() {
+        return this.mSharedPrefs.getString("lock_wallpaper_collection_id", null);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final long getLockWallpaperHashCode() {
+        return this.mSharedPrefs.getLong("lock_wallpaper_hash_code", 0L);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final int getLockWallpaperId() {
+        return this.mNoBackupPrefs.getInt("lock_wallpaper_id", 0);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final String getLockWallpaperRemoteId() {
+        return this.mNoBackupPrefs.getString("lock_wallpaper_remote_id", null);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final int getNumDaysDailyRotationFailed() {
+        return this.mNoBackupPrefs.getInt("num_days_daily_rotation_failed", 0);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final int getNumDaysDailyRotationNotAttempted() {
+        return this.mNoBackupPrefs.getInt("num_days_daily_rotation_not_attempted", 0);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final int getPendingDailyWallpaperUpdateStatus() {
+        return this.mNoBackupPrefs.getInt("pending_daily_wallpaper_update_status", 0);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final int getPendingWallpaperSetStatus() {
+        return this.mNoBackupPrefs.getInt("pending_wallpaper_set_status", 0);
+    }
+
+    public final int getResIdPersistedByName(String str, String str2) {
+        String string = this.mSharedPrefs.getString(str, null);
+        if (string == null) {
+            return 0;
+        }
+        return this.mContext.getResources().getIdentifier(string, str2, this.mContext.getPackageName());
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final WallpaperColors getWallpaperColors(String str) {
+        Color color;
+        String string = this.mNoBackupPrefs.getString("preview_wallpaper_color_id" + str, "");
+        Color color2 = null;
+        if (string.equals("")) {
+            return null;
+        }
+        String[] split = string.split(",");
+        Color valueOf = Color.valueOf(Integer.parseInt(split[0]));
+        if (split.length >= 2) {
+            color = Color.valueOf(Integer.parseInt(split[1]));
+        } else {
+            color = null;
+        }
+        if (split.length >= 3) {
+            color2 = Color.valueOf(Integer.parseInt(split[2]));
+        }
+        return new WallpaperColors(valueOf, color, color2, 4);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final int getWallpaperPresentationMode() {
+        return this.mSharedPrefs.getInt("wallpaper_presentation_mode", 1);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void incrementNumDaysDailyRotationFailed() {
+        this.mNoBackupPrefs.edit().putInt("num_days_daily_rotation_failed", getNumDaysDailyRotationFailed() + 1).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void incrementNumDaysDailyRotationNotAttempted() {
+        this.mNoBackupPrefs.edit().putInt("num_days_daily_rotation_not_attempted", getNumDaysDailyRotationNotAttempted() + 1).apply();
+    }
+
+    public final void persistResIdByName(String str, int i) {
+        this.mSharedPrefs.edit().putString(str, this.mContext.getResources().getResourceName(i)).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void resetNumDaysDailyRotationFailed() {
+        this.mNoBackupPrefs.edit().putInt("num_days_daily_rotation_failed", 0).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void resetNumDaysDailyRotationNotAttempted() {
+        this.mNoBackupPrefs.edit().putInt("num_days_daily_rotation_not_attempted", 0).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setDailyWallpaperEnabledTimestamp(long j) {
+        this.mNoBackupPrefs.edit().putLong("daily_wallpaper_enabled_timestamp", j).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setDailyWallpaperRotationStatus(int i, long j) {
+        this.mNoBackupPrefs.edit().putInt("last_rotation_status", i).putLong("last_rotation_status_timestamp", j).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setHomeWallpaperActionIconRes(int i) {
+        persistResIdByName("home_wallpaper_action_icon", i);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setHomeWallpaperActionLabelRes(int i) {
+        persistResIdByName("home_wallpaper_action_label", i);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setHomeWallpaperActionUrl(String str) {
+        this.mSharedPrefs.edit().putString("home_wallpaper_action_url", str).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setHomeWallpaperAttributions(List<String> list) {
+        SharedPreferences.Editor edit = this.mSharedPrefs.edit();
+        if (list.size() > 0) {
+            edit.putString("home_wallpaper_attribution_line_1", list.get(0));
+        }
+        if (list.size() > 1) {
+            edit.putString("home_wallpaper_attribution_line_2", list.get(1));
+        }
+        if (list.size() > 2) {
+            edit.putString("home_wallpaper_attribution_line_3", list.get(2));
+        }
+        edit.apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setHomeWallpaperBackingFileName(String str) {
+        this.mNoBackupPrefs.edit().putString("home_wallpaper_backing_file", str).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setHomeWallpaperBaseImageUrl(String str) {
+        this.mNoBackupPrefs.edit().putString("home_wallpaper_base_image_url", str).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setHomeWallpaperCollectionId(String str) {
+        this.mSharedPrefs.edit().putString("home_wallpaper_collection_id", str).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setHomeWallpaperHashCode(long j) {
+        this.mSharedPrefs.edit().putLong("home_wallpaper_hash_code", j).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setHomeWallpaperManagerId(int i) {
+        this.mNoBackupPrefs.edit().putInt("home_wallpaper_id", i).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setHomeWallpaperPackageName(String str) {
+        this.mNoBackupPrefs.edit().putString("home_wallpaper_package_name", str).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setHomeWallpaperRemoteId(String str) {
+        this.mNoBackupPrefs.edit().putString("home_wallpaper_remote_id", str).apply();
+        setFirstWallpaperApplyDateIfNeeded();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setHomeWallpaperServiceName(String str) {
+        this.mNoBackupPrefs.edit().putString("home_wallpaper_service_name", str).apply();
+        setFirstWallpaperApplyDateIfNeeded();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setLastAppActiveTimestamp(long j) {
+        this.mNoBackupPrefs.edit().putLong("last_app_active_timestamp", j).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setLastDailyLogTimestamp(long j) {
+        this.mNoBackupPrefs.edit().putLong("last_daily_log_timestamp", j).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setLockWallpaperActionIconRes(int i) {
+        persistResIdByName("lock_wallpaper_action_icon", i);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setLockWallpaperActionLabelRes(int i) {
+        persistResIdByName("lock_wallpaper_action_label", i);
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setLockWallpaperActionUrl(String str) {
+        this.mSharedPrefs.edit().putString("lock_wallpaper_action_url", str).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setLockWallpaperAttributions(List<String> list) {
+        SharedPreferences.Editor edit = this.mSharedPrefs.edit();
+        if (list.size() > 0) {
+            edit.putString("lock_wallpaper_attribution_line_1", list.get(0));
+        }
+        if (list.size() > 1) {
+            edit.putString("lock_wallpaper_attribution_line_2", list.get(1));
+        }
+        if (list.size() > 2) {
+            edit.putString("lock_wallpaper_attribution_line_3", list.get(2));
+        }
+        edit.apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setLockWallpaperCollectionId(String str) {
+        this.mSharedPrefs.edit().putString("lock_wallpaper_collection_id", str).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setLockWallpaperHashCode(long j) {
+        this.mSharedPrefs.edit().putLong("lock_wallpaper_hash_code", j).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setLockWallpaperId(int i) {
+        this.mNoBackupPrefs.edit().putInt("lock_wallpaper_id", i).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setLockWallpaperRemoteId(String str) {
+        this.mNoBackupPrefs.edit().putString("lock_wallpaper_remote_id", str).apply();
+        setFirstWallpaperApplyDateIfNeeded();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setPendingDailyWallpaperUpdateStatus(int i) {
+        this.mNoBackupPrefs.edit().putInt("pending_daily_wallpaper_update_status", i).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setPendingDailyWallpaperUpdateStatusSync() {
+        this.mNoBackupPrefs.edit().putInt("pending_daily_wallpaper_update_status", 0).commit();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setPendingWallpaperSetStatus(int i) {
+        this.mNoBackupPrefs.edit().putInt("pending_wallpaper_set_status", i).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setPendingWallpaperSetStatusSync() {
+        this.mNoBackupPrefs.edit().putInt("pending_wallpaper_set_status", 0).commit();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void setWallpaperPresentationMode(int i) {
+        this.mSharedPrefs.edit().putInt("wallpaper_presentation_mode", i).apply();
+    }
+
+    @Override // com.android.wallpaper.module.WallpaperPreferences
+    public final void updateDailyWallpaperSet(int i, String str, String str2) {
+        if (i == 0) {
+            setHomeWallpaperCollectionId(str);
+            setHomeWallpaperRemoteId(str2);
+        } else if (i == 1) {
+            setLockWallpaperCollectionId(str);
+            setLockWallpaperRemoteId(str2);
+        } else if (i == 2) {
+            setHomeWallpaperCollectionId(str);
+            setHomeWallpaperRemoteId(str2);
+            setLockWallpaperCollectionId(str);
+            setLockWallpaperRemoteId(str2);
+        }
+    }
+
+    /* JADX WARN: Multi-variable type inference failed */
+    /* JADX WARN: Type inference failed for: r10v1, types: [android.content.SharedPreferences$OnSharedPreferenceChangeListener, com.android.wallpaper.module.DefaultWallpaperPreferences$$ExternalSyntheticLambda0] */
     public DefaultWallpaperPreferences(Context context) {
         this.mSharedPrefs = context.getSharedPreferences("wallpaper", 0);
         SharedPreferences sharedPreferences = context.getSharedPreferences("wallpaper-nobackup", 0);
@@ -90,32 +526,18 @@ public class DefaultWallpaperPreferences implements WallpaperPreferences {
         }
         this.mContext = context.getApplicationContext();
         final BackupManager backupManager = new BackupManager(context);
-        this.mSharedPrefs.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() { // from class: com.android.wallpaper.module.DefaultWallpaperPreferences$$ExternalSyntheticLambda1
+        ?? defaultWallpaperPreferences$$ExternalSyntheticLambda0 = new SharedPreferences.OnSharedPreferenceChangeListener() { // from class: com.android.wallpaper.module.DefaultWallpaperPreferences$$ExternalSyntheticLambda0
             @Override // android.content.SharedPreferences.OnSharedPreferenceChangeListener
             public final void onSharedPreferenceChanged(SharedPreferences sharedPreferences2, String str) {
                 backupManager.dataChanged();
             }
-        });
+        };
+        this.mSharedPrefsChangedListener = defaultWallpaperPreferences$$ExternalSyntheticLambda0;
+        this.mSharedPrefs.registerOnSharedPreferenceChangeListener(defaultWallpaperPreferences$$ExternalSyntheticLambda0);
     }
 
     @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void addDailyRotation(long j) {
-        try {
-            JSONArray jSONArray = new JSONArray(this.mNoBackupPrefs.getString("daily_rotation_timestamps", "[]"));
-            jSONArray.put(j);
-            this.mNoBackupPrefs.edit().putString("daily_rotation_timestamps", jSONArray.toString()).apply();
-        } catch (JSONException unused) {
-            Log.e("DefaultWPPreferences", "Failed to add a daily rotation timestamp due to a JSON parse exception");
-        }
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void clearDailyRotations() {
-        this.mNoBackupPrefs.edit().remove("daily_rotation_timestamps").remove("daily_wallpaper_enabled_timestamp").apply();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void clearHomeWallpaperMetadata() {
+    public final void clearHomeWallpaperMetadata() {
         String homeWallpaperBackingFileName = getHomeWallpaperBackingFileName();
         if (!TextUtils.isEmpty(homeWallpaperBackingFileName)) {
             new File(homeWallpaperBackingFileName).delete();
@@ -125,7 +547,7 @@ public class DefaultWallpaperPreferences implements WallpaperPreferences {
     }
 
     @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void clearLockWallpaperMetadata() {
+    public final void clearLockWallpaperMetadata() {
         String lockWallpaperBackingFileName = getLockWallpaperBackingFileName();
         if (!TextUtils.isEmpty(lockWallpaperBackingFileName)) {
             new File(lockWallpaperBackingFileName).delete();
@@ -135,16 +557,7 @@ public class DefaultWallpaperPreferences implements WallpaperPreferences {
     }
 
     @Override // com.android.wallpaper.module.WallpaperPreferences
-    public int getAppLaunchCount() {
-        return this.mNoBackupPrefs.getInt("app_launch_count", 0);
-    }
-
-    public final int getCurrentDate() {
-        return Integer.parseInt(new SimpleDateFormat("yyyyMMdd", Locale.US).format(Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime()));
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public List<Long> getDailyRotationsInLastWeek() {
+    public final ArrayList getDailyRotationsInLastWeek() {
         long dailyWallpaperEnabledTimestamp = getDailyWallpaperEnabledTimestamp();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
@@ -170,7 +583,7 @@ public class DefaultWallpaperPreferences implements WallpaperPreferences {
     }
 
     @Override // com.android.wallpaper.module.WallpaperPreferences
-    public List<Long> getDailyRotationsPreviousDay() {
+    public final ArrayList getDailyRotationsPreviousDay() {
         long dailyWallpaperEnabledTimestamp = getDailyWallpaperEnabledTimestamp();
         Calendar calendar = Calendar.getInstance();
         calendar.set(9, 0);
@@ -202,419 +615,33 @@ public class DefaultWallpaperPreferences implements WallpaperPreferences {
     }
 
     @Override // com.android.wallpaper.module.WallpaperPreferences
-    public long getDailyWallpaperEnabledTimestamp() {
-        return this.mNoBackupPrefs.getLong("daily_wallpaper_enabled_timestamp", -1L);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public int getDailyWallpaperLastRotationStatus() {
-        return this.mNoBackupPrefs.getInt("last_rotation_status", -1);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public long getDailyWallpaperLastRotationStatusTimestamp() {
-        return this.mNoBackupPrefs.getLong("last_rotation_status_timestamp", 0L);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public int getFirstLaunchDateSinceSetup() {
-        return this.mNoBackupPrefs.getInt("first_launch_date_since_setup", 0);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public int getFirstWallpaperApplyDateSinceSetup() {
-        return this.mNoBackupPrefs.getInt("first_wallpaper_apply_date_since_setup", 0);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public int getHomeWallpaperActionIconRes() {
-        return getResIdPersistedByName("home_wallpaper_action_icon", "drawable");
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public int getHomeWallpaperActionLabelRes() {
-        return getResIdPersistedByName("home_wallpaper_action_label", "string");
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public String getHomeWallpaperActionUrl() {
-        return this.mSharedPrefs.getString("home_wallpaper_action_url", null);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public List<String> getHomeWallpaperAttributions() {
-        return Arrays.asList(this.mSharedPrefs.getString("home_wallpaper_attribution_line_1", null), this.mSharedPrefs.getString("home_wallpaper_attribution_line_2", null), this.mSharedPrefs.getString("home_wallpaper_attribution_line_3", null));
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public String getHomeWallpaperBackingFileName() {
-        return this.mNoBackupPrefs.getString("home_wallpaper_backing_file", null);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public String getHomeWallpaperBaseImageUrl() {
-        return this.mNoBackupPrefs.getString("home_wallpaper_base_image_url", null);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public String getHomeWallpaperCollectionId() {
-        return this.mSharedPrefs.getString("home_wallpaper_collection_id", null);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public long getHomeWallpaperHashCode() {
-        return this.mSharedPrefs.getLong("home_wallpaper_hash_code", 0L);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public int getHomeWallpaperManagerId() {
-        return this.mNoBackupPrefs.getInt("home_wallpaper_id", 0);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public String getHomeWallpaperPackageName() {
-        return this.mNoBackupPrefs.getString("home_wallpaper_package_name", null);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public String getHomeWallpaperRemoteId() {
-        return this.mNoBackupPrefs.getString("home_wallpaper_remote_id", null);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public String getHomeWallpaperServiceName() {
-        return this.mNoBackupPrefs.getString("home_wallpaper_service_name", null);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public long getLastDailyLogTimestamp() {
-        return this.mNoBackupPrefs.getLong("last_daily_log_timestamp", 0L);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public long getLastDailyRotationTimestamp() {
-        try {
-            JSONArray jSONArray = new JSONArray(this.mNoBackupPrefs.getString("daily_rotation_timestamps", "[]"));
-            if (jSONArray.length() == 0) {
-                return -1L;
-            }
-            return jSONArray.getLong(jSONArray.length() - 1);
-        } catch (JSONException unused) {
-            Log.e("DefaultWPPreferences", "Failed to find a daily rotation timestamp due to a JSON parse exception");
-            return -1L;
-        }
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public long getLastSyncTimestamp() {
-        return this.mNoBackupPrefs.getLong("last_sync_timestamp", 0L);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public int getLockWallpaperActionIconRes() {
-        return getResIdPersistedByName("lock_wallpaper_action_icon", "drawable");
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public int getLockWallpaperActionLabelRes() {
-        return getResIdPersistedByName("lock_wallpaper_action_label", "string");
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public String getLockWallpaperActionUrl() {
-        return this.mSharedPrefs.getString("lock_wallpaper_action_url", null);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public List<String> getLockWallpaperAttributions() {
-        return Arrays.asList(this.mSharedPrefs.getString("lock_wallpaper_attribution_line_1", null), this.mSharedPrefs.getString("lock_wallpaper_attribution_line_2", null), this.mSharedPrefs.getString("lock_wallpaper_attribution_line_3", null));
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public String getLockWallpaperBackingFileName() {
-        return this.mNoBackupPrefs.getString("lock_wallpaper_backing_file", null);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public String getLockWallpaperCollectionId() {
-        return this.mSharedPrefs.getString("lock_wallpaper_collection_id", null);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public long getLockWallpaperHashCode() {
-        return this.mSharedPrefs.getLong("lock_wallpaper_hash_code", 0L);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public int getLockWallpaperId() {
-        return this.mNoBackupPrefs.getInt("lock_wallpaper_id", 0);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public String getLockWallpaperRemoteId() {
-        return this.mNoBackupPrefs.getString("lock_wallpaper_remote_id", null);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public int getNumDaysDailyRotationFailed() {
-        return this.mNoBackupPrefs.getInt("num_days_daily_rotation_failed", 0);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public int getNumDaysDailyRotationNotAttempted() {
-        return this.mNoBackupPrefs.getInt("num_days_daily_rotation_not_attempted", 0);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public int getPendingDailyWallpaperUpdateStatus() {
-        return this.mNoBackupPrefs.getInt("pending_daily_wallpaper_update_status", 0);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public int getPendingWallpaperSetStatus() {
-        return this.mNoBackupPrefs.getInt("pending_wallpaper_set_status", 0);
-    }
-
-    public final int getResIdPersistedByName(String str, String str2) {
-        String string = this.mSharedPrefs.getString(str, null);
-        if (string == null) {
-            return 0;
-        }
-        return this.mContext.getResources().getIdentifier(string, str2, this.mContext.getPackageName());
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public int getWallpaperPresentationMode() {
-        return this.mSharedPrefs.getInt("wallpaper_presentation_mode", 1);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void incrementAppLaunched() {
-        if (this.mNoBackupPrefs.getInt("first_launch_date_since_setup", 0) == 0) {
+    public final void incrementAppLaunched() {
+        if (getFirstLaunchDateSinceSetup() == 0) {
             this.mNoBackupPrefs.edit().putInt("first_launch_date_since_setup", getCurrentDate()).apply();
         }
-        int i = this.mNoBackupPrefs.getInt("app_launch_count", 0);
-        if (i < Integer.MAX_VALUE) {
-            this.mNoBackupPrefs.edit().putInt("app_launch_count", i + 1).apply();
+        int appLaunchCount = getAppLaunchCount();
+        if (appLaunchCount < Integer.MAX_VALUE) {
+            this.mNoBackupPrefs.edit().putInt("app_launch_count", appLaunchCount + 1).apply();
         }
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void incrementNumDaysDailyRotationFailed() {
-        this.mNoBackupPrefs.edit().putInt("num_days_daily_rotation_failed", this.mNoBackupPrefs.getInt("num_days_daily_rotation_failed", 0) + 1).apply();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void incrementNumDaysDailyRotationNotAttempted() {
-        this.mNoBackupPrefs.edit().putInt("num_days_daily_rotation_not_attempted", this.mNoBackupPrefs.getInt("num_days_daily_rotation_not_attempted", 0) + 1).apply();
-    }
-
-    public final void persistResIdByName(String str, int i) {
-        DefaultWallpaperPreferences$$ExternalSyntheticOutline0.m(this.mSharedPrefs, str, this.mContext.getResources().getResourceName(i));
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void resetNumDaysDailyRotationFailed() {
-        this.mNoBackupPrefs.edit().putInt("num_days_daily_rotation_failed", 0).apply();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void resetNumDaysDailyRotationNotAttempted() {
-        this.mNoBackupPrefs.edit().putInt("num_days_daily_rotation_not_attempted", 0).apply();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setDailyWallpaperEnabledTimestamp(long j) {
-        this.mNoBackupPrefs.edit().putLong("daily_wallpaper_enabled_timestamp", j).apply();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setDailyWallpaperRotationStatus(int i, long j) {
-        this.mNoBackupPrefs.edit().putInt("last_rotation_status", i).putLong("last_rotation_status_timestamp", j).apply();
     }
 
     public final void setFirstWallpaperApplyDateIfNeeded() {
-        if (this.mNoBackupPrefs.getInt("first_wallpaper_apply_date_since_setup", 0) == 0) {
+        if (getFirstWallpaperApplyDateSinceSetup() == 0) {
             this.mNoBackupPrefs.edit().putInt("first_wallpaper_apply_date_since_setup", getCurrentDate()).apply();
         }
     }
 
     @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setHomeWallpaperActionIconRes(int i) {
-        persistResIdByName("home_wallpaper_action_icon", i);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setHomeWallpaperActionLabelRes(int i) {
-        persistResIdByName("home_wallpaper_action_label", i);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setHomeWallpaperActionUrl(String str) {
-        DefaultWallpaperPreferences$$ExternalSyntheticOutline0.m(this.mSharedPrefs, "home_wallpaper_action_url", str);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setHomeWallpaperAttributions(List<String> list) {
-        SharedPreferences.Editor edit = this.mSharedPrefs.edit();
-        if (list.size() > 0) {
-            edit.putString("home_wallpaper_attribution_line_1", list.get(0));
+    public final void storeWallpaperColors(String str, WallpaperColors wallpaperColors) {
+        Color secondaryColor;
+        Color tertiaryColor;
+        String str2 = new String(String.valueOf(wallpaperColors.getPrimaryColor().toArgb()));
+        if (wallpaperColors.getSecondaryColor() != null) {
+            str2 = str2 + "," + secondaryColor.toArgb();
         }
-        if (list.size() > 1) {
-            edit.putString("home_wallpaper_attribution_line_2", list.get(1));
+        if (wallpaperColors.getTertiaryColor() != null) {
+            str2 = str2 + "," + tertiaryColor.toArgb();
         }
-        if (list.size() > 2) {
-            edit.putString("home_wallpaper_attribution_line_3", list.get(2));
-        }
-        edit.apply();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setHomeWallpaperBackingFileName(String str) {
-        DefaultWallpaperPreferences$$ExternalSyntheticOutline0.m(this.mNoBackupPrefs, "home_wallpaper_backing_file", str);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setHomeWallpaperBaseImageUrl(String str) {
-        DefaultWallpaperPreferences$$ExternalSyntheticOutline0.m(this.mNoBackupPrefs, "home_wallpaper_base_image_url", str);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setHomeWallpaperCollectionId(String str) {
-        DefaultWallpaperPreferences$$ExternalSyntheticOutline0.m(this.mSharedPrefs, "home_wallpaper_collection_id", str);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setHomeWallpaperHashCode(long j) {
-        this.mSharedPrefs.edit().putLong("home_wallpaper_hash_code", j).apply();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setHomeWallpaperManagerId(int i) {
-        this.mNoBackupPrefs.edit().putInt("home_wallpaper_id", i).apply();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setHomeWallpaperPackageName(String str) {
-        DefaultWallpaperPreferences$$ExternalSyntheticOutline0.m(this.mNoBackupPrefs, "home_wallpaper_package_name", str);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setHomeWallpaperRemoteId(String str) {
-        this.mNoBackupPrefs.edit().putString("home_wallpaper_remote_id", str).apply();
-        setFirstWallpaperApplyDateIfNeeded();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setHomeWallpaperServiceName(String str) {
-        this.mNoBackupPrefs.edit().putString("home_wallpaper_service_name", str).apply();
-        setFirstWallpaperApplyDateIfNeeded();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setLastAppActiveTimestamp(long j) {
-        this.mNoBackupPrefs.edit().putLong("last_app_active_timestamp", j).apply();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setLastDailyLogTimestamp(long j) {
-        this.mNoBackupPrefs.edit().putLong("last_daily_log_timestamp", j).apply();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setLastSyncTimestamp(long j) {
-        this.mNoBackupPrefs.edit().putLong("last_sync_timestamp", j).commit();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setLockWallpaperActionIconRes(int i) {
-        persistResIdByName("lock_wallpaper_action_icon", i);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setLockWallpaperActionLabelRes(int i) {
-        persistResIdByName("lock_wallpaper_action_label", i);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setLockWallpaperActionUrl(String str) {
-        DefaultWallpaperPreferences$$ExternalSyntheticOutline0.m(this.mSharedPrefs, "lock_wallpaper_action_url", str);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setLockWallpaperAttributions(List<String> list) {
-        SharedPreferences.Editor edit = this.mSharedPrefs.edit();
-        if (list.size() > 0) {
-            edit.putString("lock_wallpaper_attribution_line_1", list.get(0));
-        }
-        if (list.size() > 1) {
-            edit.putString("lock_wallpaper_attribution_line_2", list.get(1));
-        }
-        if (list.size() > 2) {
-            edit.putString("lock_wallpaper_attribution_line_3", list.get(2));
-        }
-        edit.apply();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setLockWallpaperCollectionId(String str) {
-        DefaultWallpaperPreferences$$ExternalSyntheticOutline0.m(this.mSharedPrefs, "lock_wallpaper_collection_id", str);
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setLockWallpaperHashCode(long j) {
-        this.mSharedPrefs.edit().putLong("lock_wallpaper_hash_code", j).apply();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setLockWallpaperId(int i) {
-        this.mNoBackupPrefs.edit().putInt("lock_wallpaper_id", i).apply();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setLockWallpaperRemoteId(String str) {
-        this.mNoBackupPrefs.edit().putString("lock_wallpaper_remote_id", str).apply();
-        setFirstWallpaperApplyDateIfNeeded();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setPendingDailyWallpaperUpdateStatus(int i) {
-        this.mNoBackupPrefs.edit().putInt("pending_daily_wallpaper_update_status", i).apply();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setPendingDailyWallpaperUpdateStatusSync(int i) {
-        this.mNoBackupPrefs.edit().putInt("pending_daily_wallpaper_update_status", i).commit();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setPendingWallpaperSetStatus(int i) {
-        this.mNoBackupPrefs.edit().putInt("pending_wallpaper_set_status", i).apply();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setPendingWallpaperSetStatusSync(int i) {
-        this.mNoBackupPrefs.edit().putInt("pending_wallpaper_set_status", i).commit();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void setWallpaperPresentationMode(int i) {
-        this.mSharedPrefs.edit().putInt("wallpaper_presentation_mode", i).apply();
-    }
-
-    @Override // com.android.wallpaper.module.WallpaperPreferences
-    public void updateDailyWallpaperSet(int i, String str, String str2) {
-        if (i == 0) {
-            setHomeWallpaperCollectionId(str);
-            setHomeWallpaperRemoteId(str2);
-        } else if (i == 1) {
-            setLockWallpaperCollectionId(str);
-            setLockWallpaperRemoteId(str2);
-        } else if (i == 2) {
-            setHomeWallpaperCollectionId(str);
-            setHomeWallpaperRemoteId(str2);
-            setLockWallpaperCollectionId(str);
-            setLockWallpaperRemoteId(str2);
-        }
+        this.mNoBackupPrefs.edit().putString("preview_wallpaper_color_id" + str, str2).apply();
     }
 }

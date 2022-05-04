@@ -9,40 +9,40 @@ import java.io.FileNotFoundException;
 /* loaded from: classes.dex */
 public class MicropaperProvider extends ContentProvider {
     @Override // android.content.ContentProvider
-    public int delete(Uri uri, String str, String[] strArr) {
-        throw new RuntimeException("delete method not implemented.");
-    }
-
-    @Override // android.content.ContentProvider
-    public String getType(Uri uri) {
-        throw new RuntimeException("getType method not implemented.");
-    }
-
-    @Override // android.content.ContentProvider
-    public Uri insert(Uri uri, ContentValues contentValues) {
-        throw new RuntimeException("insert method not implemented.");
-    }
-
-    @Override // android.content.ContentProvider
-    public boolean onCreate() {
+    public final boolean onCreate() {
         return true;
     }
 
     @Override // android.content.ContentProvider
-    public ParcelFileDescriptor openFile(Uri uri, String str) throws FileNotFoundException {
-        if (getCallingPackage().equals("com.google.pixel.dynamicwallpapers")) {
-            return getContext().getContentResolver().openFileDescriptor(Uri.parse(uri.getLastPathSegment()), str);
-        }
-        throw new IllegalStateException("Cannot openFile() from arbitrary package.");
+    public final int delete(Uri uri, String str, String[] strArr) {
+        throw new RuntimeException("delete method not implemented.");
     }
 
     @Override // android.content.ContentProvider
-    public Cursor query(Uri uri, String[] strArr, String str, String[] strArr2, String str2) {
+    public final String getType(Uri uri) {
+        throw new RuntimeException("getType method not implemented.");
+    }
+
+    @Override // android.content.ContentProvider
+    public final Uri insert(Uri uri, ContentValues contentValues) {
+        throw new RuntimeException("insert method not implemented.");
+    }
+
+    @Override // android.content.ContentProvider
+    public final Cursor query(Uri uri, String[] strArr, String str, String[] strArr2, String str2) {
         throw new RuntimeException("query method not implemented.");
     }
 
     @Override // android.content.ContentProvider
-    public int update(Uri uri, ContentValues contentValues, String str, String[] strArr) {
+    public final int update(Uri uri, ContentValues contentValues, String str, String[] strArr) {
         throw new RuntimeException("update method not implemented.");
+    }
+
+    @Override // android.content.ContentProvider
+    public final ParcelFileDescriptor openFile(Uri uri, String str) throws FileNotFoundException {
+        if (getCallingPackage().equals("com.google.pixel.dynamicwallpapers")) {
+            return getContext().getContentResolver().openFileDescriptor(Uri.parse(uri.getLastPathSegment()), str);
+        }
+        throw new IllegalStateException("Cannot openFile() from arbitrary package.");
     }
 }

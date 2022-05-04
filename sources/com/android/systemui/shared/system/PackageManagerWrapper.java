@@ -15,16 +15,9 @@ public class PackageManagerWrapper {
     private static final PackageManagerWrapper sInstance = new PackageManagerWrapper();
     private static final IPackageManager mIPackageManager = AppGlobals.getPackageManager();
 
-    private PackageManagerWrapper() {
-    }
-
-    public static PackageManagerWrapper getInstance() {
-        return sInstance;
-    }
-
     public ActivityInfo getActivityInfo(ComponentName componentName, int i) {
         try {
-            return mIPackageManager.getActivityInfo(componentName, 128, i);
+            return mIPackageManager.getActivityInfo(componentName, 128L, i);
         } catch (RemoteException e) {
             e.printStackTrace();
             return null;
@@ -47,5 +40,12 @@ public class PackageManagerWrapper {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private PackageManagerWrapper() {
+    }
+
+    public static PackageManagerWrapper getInstance() {
+        return sInstance;
     }
 }

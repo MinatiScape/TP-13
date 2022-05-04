@@ -2,7 +2,7 @@ package com.adobe.xmp.impl;
 
 import java.io.UnsupportedEncodingException;
 /* loaded from: classes.dex */
-public class Latin1Converter {
+public final class Latin1Converter {
     public static byte[] convertToUTF8(byte ch) {
         int i = ch & 255;
         if (i >= 128) {

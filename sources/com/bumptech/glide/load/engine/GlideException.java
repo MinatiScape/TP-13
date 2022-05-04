@@ -1,6 +1,7 @@
 package com.bumptech.glide.load.engine;
 
-import com.bumptech.glide.Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline0;
+import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
+import android.util.Log;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.Key;
 import java.io.IOException;
@@ -18,89 +19,118 @@ public final class GlideException extends Exception {
     private Class<?> dataClass;
     private DataSource dataSource;
     private String detailMessage;
+    private Exception exception;
     private Key key;
 
-    public GlideException(String message) {
-        List<Throwable> emptyList = Collections.emptyList();
-        this.detailMessage = message;
-        setStackTrace(EMPTY_ELEMENTS);
-        this.causes = emptyList;
-    }
-
-    public static void appendCauses(List<Throwable> causes, Appendable appendable) {
-        try {
-            appendCausesWrapped(causes, appendable);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void appendCausesWrapped(List<Throwable> causes, Appendable appendable) throws IOException {
-        int size = causes.size();
-        int i = 0;
-        while (i < size) {
-            int i2 = i + 1;
-            appendable.append("Cause (").append(String.valueOf(i2)).append(" of ").append(String.valueOf(size)).append("): ");
-            Throwable th = causes.get(i);
-            if (th instanceof GlideException) {
-                ((GlideException) th).printStackTrace(appendable);
-            } else {
-                appendExceptionMessage(th, appendable);
-            }
-            i = i2;
-        }
-    }
-
-    public static void appendExceptionMessage(Throwable t, Appendable appendable) {
-        try {
-            appendable.append(t.getClass().toString()).append(": ").append(t.getMessage()).append('\n');
-        } catch (IOException unused) {
-            throw new RuntimeException(t);
-        }
-    }
-
-    public final void addRootCauses(Throwable throwable, List<Throwable> rootCauses) {
-        if (throwable instanceof GlideException) {
-            for (Throwable th : ((GlideException) throwable).causes) {
-                addRootCauses(th, rootCauses);
-            }
-            return;
-        }
-        rootCauses.add(throwable);
+    public GlideException(String str) {
+        this(str, Collections.emptyList());
     }
 
     @Override // java.lang.Throwable
-    public Throwable fillInStackTrace() {
+    public final Throwable fillInStackTrace() {
         return this;
     }
 
     @Override // java.lang.Throwable
-    public String getMessage() {
+    public final void printStackTrace() {
+        printStackTrace((Appendable) System.err);
+    }
+
+    /* loaded from: classes.dex */
+    public static final class IndentedAppendable implements Appendable {
+        public final Appendable appendable;
+        public boolean printedNewLine = true;
+
+        @Override // java.lang.Appendable
+        public final Appendable append(char c) throws IOException {
+            boolean z = false;
+            if (this.printedNewLine) {
+                this.printedNewLine = false;
+                this.appendable.append("  ");
+            }
+            if (c == '\n') {
+                z = true;
+            }
+            this.printedNewLine = z;
+            this.appendable.append(c);
+            return this;
+        }
+
+        public IndentedAppendable(Appendable appendable) {
+            this.appendable = appendable;
+        }
+
+        @Override // java.lang.Appendable
+        public final Appendable append(CharSequence charSequence) throws IOException {
+            if (charSequence == null) {
+                charSequence = "";
+            }
+            append(charSequence, 0, charSequence.length());
+            return this;
+        }
+
+        @Override // java.lang.Appendable
+        public final Appendable append(CharSequence charSequence, int i, int i2) throws IOException {
+            if (charSequence == null) {
+                charSequence = "";
+            }
+            boolean z = false;
+            if (this.printedNewLine) {
+                this.printedNewLine = false;
+                this.appendable.append("  ");
+            }
+            if (charSequence.length() > 0 && charSequence.charAt(i2 - 1) == '\n') {
+                z = true;
+            }
+            this.printedNewLine = z;
+            this.appendable.append(charSequence, i, i2);
+            return this;
+        }
+    }
+
+    public GlideException(String str, List<Throwable> list) {
+        this.detailMessage = str;
+        setStackTrace(EMPTY_ELEMENTS);
+        this.causes = list;
+    }
+
+    public static void addRootCauses(Throwable th, ArrayList arrayList) {
+        if (th instanceof GlideException) {
+            for (Throwable th2 : ((GlideException) th).causes) {
+                addRootCauses(th2, arrayList);
+            }
+            return;
+        }
+        arrayList.add(th);
+    }
+
+    @Override // java.lang.Throwable
+    public final String getMessage() {
         String str;
         String str2;
         StringBuilder sb = new StringBuilder(71);
         sb.append(this.detailMessage);
-        Class<?> cls = this.dataClass;
         String str3 = "";
-        if (cls != null) {
-            String valueOf = String.valueOf(cls);
-            str = Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline0.m(valueOf.length() + 2, ", ", valueOf);
+        if (this.dataClass != null) {
+            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m(", ");
+            m.append(this.dataClass);
+            str = m.toString();
         } else {
             str = str3;
         }
         sb.append(str);
-        DataSource dataSource = this.dataSource;
-        if (dataSource != null) {
-            String valueOf2 = String.valueOf(dataSource);
-            str2 = Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline0.m(valueOf2.length() + 2, ", ", valueOf2);
+        if (this.dataSource != null) {
+            StringBuilder m2 = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m(", ");
+            m2.append(this.dataSource);
+            str2 = m2.toString();
         } else {
             str2 = str3;
         }
         sb.append(str2);
-        Key key = this.key;
-        if (key != null) {
-            String valueOf3 = String.valueOf(key);
-            str3 = Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline0.m(valueOf3.length() + 2, ", ", valueOf3);
+        if (this.key != null) {
+            StringBuilder m3 = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m(", ");
+            m3.append(this.key);
+            str3 = m3.toString();
         }
         sb.append(str3);
         ArrayList arrayList = new ArrayList();
@@ -109,11 +139,11 @@ public final class GlideException extends Exception {
             return sb.toString();
         }
         if (arrayList.size() == 1) {
-            sb.append("\nThere was 1 cause:");
+            sb.append("\nThere was 1 root cause:");
         } else {
             sb.append("\nThere were ");
             sb.append(arrayList.size());
-            sb.append(" causes:");
+            sb.append(" root causes:");
         }
         Iterator it = arrayList.iterator();
         while (it.hasNext()) {
@@ -128,83 +158,73 @@ public final class GlideException extends Exception {
         return sb.toString();
     }
 
-    @Override // java.lang.Throwable
-    public void printStackTrace() {
-        printStackTrace((Appendable) System.err);
+    public final void logRootCauses() {
+        ArrayList arrayList = new ArrayList();
+        addRootCauses(this, arrayList);
+        int size = arrayList.size();
+        int i = 0;
+        while (i < size) {
+            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Root cause (");
+            int i2 = i + 1;
+            m.append(i2);
+            m.append(" of ");
+            m.append(size);
+            m.append(")");
+            Log.i("Glide", m.toString(), (Throwable) arrayList.get(i));
+            i = i2;
+        }
     }
 
-    public void setLoggingDetails(Key key, DataSource dataSource) {
+    public final void setLoggingDetails(Key key, DataSource dataSource, Class<?> cls) {
         this.key = key;
         this.dataSource = dataSource;
-        this.dataClass = null;
+        this.dataClass = cls;
+    }
+
+    public static void appendCauses(List list, IndentedAppendable indentedAppendable) {
+        try {
+            appendCausesWrapped(list, indentedAppendable);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void appendCausesWrapped(List list, IndentedAppendable indentedAppendable) throws IOException {
+        int size = list.size();
+        int i = 0;
+        while (i < size) {
+            indentedAppendable.append("Cause (");
+            int i2 = i + 1;
+            indentedAppendable.append(String.valueOf(i2));
+            indentedAppendable.append(" of ");
+            indentedAppendable.append(String.valueOf(size));
+            indentedAppendable.append("): ");
+            Throwable th = (Throwable) list.get(i);
+            if (th instanceof GlideException) {
+                ((GlideException) th).printStackTrace(indentedAppendable);
+            } else {
+                appendExceptionMessage(th, indentedAppendable);
+            }
+            i = i2;
+        }
+    }
+
+    public static void appendExceptionMessage(Throwable th, Appendable appendable) {
+        try {
+            appendable.append(th.getClass().toString()).append(": ").append(th.getMessage()).append('\n');
+        } catch (IOException unused) {
+            throw new RuntimeException(th);
+        }
     }
 
     @Override // java.lang.Throwable
-    public void printStackTrace(PrintStream err) {
-        printStackTrace((Appendable) err);
+    public final void printStackTrace(PrintStream printStream) {
+        printStackTrace((Appendable) printStream);
     }
 
     @Override // java.lang.Throwable
-    public void printStackTrace(PrintWriter err) {
-        printStackTrace((Appendable) err);
-    }
-
-    public void setLoggingDetails(Key key, DataSource dataSource, Class<?> dataClass) {
-        this.key = key;
-        this.dataSource = dataSource;
-        this.dataClass = dataClass;
-    }
-
-    /* loaded from: classes.dex */
-    public static final class IndentedAppendable implements Appendable {
-        public final Appendable appendable;
-        public boolean printedNewLine = true;
-
-        public IndentedAppendable(Appendable appendable) {
-            this.appendable = appendable;
-        }
-
-        @Override // java.lang.Appendable
-        public Appendable append(char c) throws IOException {
-            boolean z = false;
-            if (this.printedNewLine) {
-                this.printedNewLine = false;
-                this.appendable.append("  ");
-            }
-            if (c == '\n') {
-                z = true;
-            }
-            this.printedNewLine = z;
-            this.appendable.append(c);
-            return this;
-        }
-
-        @Override // java.lang.Appendable
-        public Appendable append(CharSequence charSequence) throws IOException {
-            if (charSequence == null) {
-                charSequence = "";
-            }
-            append(charSequence, 0, charSequence.length());
-            return this;
-        }
-
-        @Override // java.lang.Appendable
-        public Appendable append(CharSequence charSequence, int start, int end) throws IOException {
-            if (charSequence == null) {
-                charSequence = "";
-            }
-            boolean z = false;
-            if (this.printedNewLine) {
-                this.printedNewLine = false;
-                this.appendable.append("  ");
-            }
-            if (charSequence.length() > 0 && charSequence.charAt(end - 1) == '\n') {
-                z = true;
-            }
-            this.printedNewLine = z;
-            this.appendable.append(charSequence, start, end);
-            return this;
-        }
+    public final void printStackTrace(PrintWriter printWriter) {
+        printStackTrace((Appendable) printWriter);
     }
 
     public final void printStackTrace(Appendable appendable) {
@@ -212,16 +232,7 @@ public final class GlideException extends Exception {
         appendCauses(this.causes, new IndentedAppendable(appendable));
     }
 
-    public GlideException(String detailMessage, Throwable cause) {
-        List<Throwable> singletonList = Collections.singletonList(cause);
-        this.detailMessage = detailMessage;
-        setStackTrace(EMPTY_ELEMENTS);
-        this.causes = singletonList;
-    }
-
-    public GlideException(String detailMessage, List<Throwable> causes) {
-        this.detailMessage = detailMessage;
-        setStackTrace(EMPTY_ELEMENTS);
-        this.causes = causes;
+    public final void setOrigin(RuntimeException runtimeException) {
+        this.exception = runtimeException;
     }
 }

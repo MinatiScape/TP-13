@@ -1,23 +1,19 @@
 package com.bumptech.glide.manager;
 
-import com.adobe.xmp.XMPPathFactory$$ExternalSyntheticOutline0;
 import com.bumptech.glide.request.Request;
+import com.bumptech.glide.util.Util;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.WeakHashMap;
 /* loaded from: classes.dex */
-public class RequestTracker {
+public final class RequestTracker {
     public boolean isPaused;
     public final Set<Request> requests = Collections.newSetFromMap(new WeakHashMap());
-    public final List<Request> pendingRequests = new ArrayList();
+    public final ArrayList pendingRequests = new ArrayList();
 
-    public void addRequest(Request request) {
-        this.requests.add(request);
-    }
-
-    public final boolean clearRemoveAndMaybeRecycle(Request request, boolean isSafeToRecycle) {
+    public final boolean clearAndRemove(Request request) {
         boolean z = true;
         if (request == null) {
             return true;
@@ -28,24 +24,30 @@ public class RequestTracker {
         }
         if (z) {
             request.clear();
-            if (isSafeToRecycle) {
-                request.recycle();
-            }
         }
         return z;
     }
 
-    public String toString() {
-        String obj = super.toString();
-        int size = this.requests.size();
-        boolean z = this.isPaused;
-        StringBuilder sb = new StringBuilder(XMPPathFactory$$ExternalSyntheticOutline0.m(obj, 41));
-        sb.append(obj);
-        sb.append("{numRequests=");
-        sb.append(size);
-        sb.append(", isPaused=");
-        sb.append(z);
-        sb.append("}");
-        return sb.toString();
+    public void addRequest(Request request) {
+        this.requests.add(request);
+    }
+
+    public final void restartRequests() {
+        Iterator it = Util.getSnapshot(this.requests).iterator();
+        while (it.hasNext()) {
+            Request request = (Request) it.next();
+            if (!request.isComplete() && !request.isCleared()) {
+                request.clear();
+                if (!this.isPaused) {
+                    request.begin();
+                } else {
+                    this.pendingRequests.add(request);
+                }
+            }
+        }
+    }
+
+    public final String toString() {
+        return super.toString() + "{numRequests=" + this.requests.size() + ", isPaused=" + this.isPaused + "}";
     }
 }

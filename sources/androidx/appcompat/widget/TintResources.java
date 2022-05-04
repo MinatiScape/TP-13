@@ -1,4 +1,4 @@
 package androidx.appcompat.widget;
 /* loaded from: classes.dex */
-public class TintResources extends ResourcesWrapper {
+public final class TintResources extends ResourcesWrapper {
 }

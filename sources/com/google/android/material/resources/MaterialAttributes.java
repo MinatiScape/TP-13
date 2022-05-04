@@ -3,18 +3,13 @@ package com.google.android.material.resources;
 import android.content.Context;
 import android.util.TypedValue;
 /* loaded from: classes.dex */
-public class MaterialAttributes {
+public final class MaterialAttributes {
     public static TypedValue resolve(Context context, int i) {
         TypedValue typedValue = new TypedValue();
         if (context.getTheme().resolveAttribute(i, typedValue, true)) {
             return typedValue;
         }
         return null;
-    }
-
-    public static boolean resolveBoolean(Context context, int i, boolean z) {
-        TypedValue resolve = resolve(context, i);
-        return (resolve == null || resolve.type != 18) ? z : resolve.data != 0;
     }
 
     public static int resolveOrThrow(Context context, int i, String str) {

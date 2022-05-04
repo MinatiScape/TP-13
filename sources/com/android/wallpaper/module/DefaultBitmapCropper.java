@@ -7,23 +7,17 @@ import android.util.Log;
 import com.android.wallpaper.asset.Asset;
 import com.android.wallpaper.module.BitmapCropper;
 /* loaded from: classes.dex */
-public class DefaultBitmapCropper implements BitmapCropper {
+public final class DefaultBitmapCropper implements BitmapCropper {
 
     /* loaded from: classes.dex */
     public static class ScaleBitmapTask extends AsyncTask<Void, Void, Boolean> {
         public Bitmap mBitmap;
         public final BitmapCropper.Callback mCallback;
         public final Rect mCropRect;
-        public Throwable mThrowable;
-
-        public ScaleBitmapTask(Bitmap bitmap, Rect rect, BitmapCropper.Callback callback) {
-            this.mBitmap = bitmap;
-            this.mCropRect = rect;
-            this.mCallback = callback;
-        }
+        public OutOfMemoryError mThrowable;
 
         @Override // android.os.AsyncTask
-        public Boolean doInBackground(Void[] voidArr) {
+        public final Boolean doInBackground(Void[] voidArr) {
             Bitmap bitmap = this.mBitmap;
             if (bitmap == null) {
                 return Boolean.FALSE;
@@ -39,19 +33,25 @@ public class DefaultBitmapCropper implements BitmapCropper {
         }
 
         @Override // android.os.AsyncTask
-        public void onPostExecute(Boolean bool) {
+        public final void onPostExecute(Boolean bool) {
             if (bool.booleanValue()) {
                 this.mCallback.onBitmapCropped(this.mBitmap);
             } else {
                 this.mCallback.onError(this.mThrowable);
             }
         }
+
+        public ScaleBitmapTask(Bitmap bitmap, Rect rect, BitmapCropper.Callback callback) {
+            this.mBitmap = bitmap;
+            this.mCropRect = rect;
+            this.mCallback = callback;
+        }
     }
 
-    public void cropAndScaleBitmap(Asset asset, float f, final Rect rect, boolean z, final BitmapCropper.Callback callback) {
-        asset.decodeBitmapRegion(new Rect(Math.round(rect.left / f), Math.round(rect.top / f), Math.round(rect.right / f), Math.round(rect.bottom / f)), rect.width(), rect.height(), z, new Asset.BitmapReceiver(this) { // from class: com.android.wallpaper.module.DefaultBitmapCropper.1
+    public final void cropAndScaleBitmap(Asset asset, float f, final Rect rect, boolean z, final BitmapCropper.Callback callback) {
+        asset.decodeBitmapRegion(new Rect(Math.round(rect.left / f), Math.round(rect.top / f), Math.round(rect.right / f), Math.round(rect.bottom / f)), rect.width(), rect.height(), z, new Asset.BitmapReceiver() { // from class: com.android.wallpaper.module.DefaultBitmapCropper.1
             @Override // com.android.wallpaper.asset.Asset.BitmapReceiver
-            public void onBitmapDecoded(Bitmap bitmap) {
+            public final void onBitmapDecoded(Bitmap bitmap) {
                 new ScaleBitmapTask(bitmap, rect, callback).execute(new Void[0]);
             }
         });

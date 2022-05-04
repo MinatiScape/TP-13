@@ -2,6 +2,7 @@ package com.google.android.gms.common.util;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+/* compiled from: DeviceProperties.java */
 /* loaded from: classes.dex */
 public final class zzi {
     public static Boolean zzc;
@@ -19,6 +20,9 @@ public final class zzi {
         if (zzc == null) {
             zzc = Boolean.valueOf(context.getPackageManager().hasSystemFeature("android.hardware.type.watch"));
         }
-        return zzc.booleanValue();
+        if (zzc.booleanValue()) {
+            return true;
+        }
+        return false;
     }
 }

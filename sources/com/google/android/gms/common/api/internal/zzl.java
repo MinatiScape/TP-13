@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+/* compiled from: BackgroundDetector.java */
 /* loaded from: classes.dex */
 public final class zzl implements Application.ActivityLifecycleCallbacks, ComponentCallbacks2 {
     public static final zzl zza = new zzl();
@@ -16,29 +17,11 @@ public final class zzl implements Application.ActivityLifecycleCallbacks, Compon
     public boolean zze = false;
 
     @Override // android.app.Application.ActivityLifecycleCallbacks
-    public final void onActivityCreated(Activity activity, Bundle bundle) {
-        boolean compareAndSet = this.zzb.compareAndSet(true, false);
-        this.zzc.set(true);
-        if (compareAndSet) {
-            zzb(false);
-        }
-    }
-
-    @Override // android.app.Application.ActivityLifecycleCallbacks
     public final void onActivityDestroyed(Activity activity) {
     }
 
     @Override // android.app.Application.ActivityLifecycleCallbacks
     public final void onActivityPaused(Activity activity) {
-    }
-
-    @Override // android.app.Application.ActivityLifecycleCallbacks
-    public final void onActivityResumed(Activity activity) {
-        boolean compareAndSet = this.zzb.compareAndSet(true, false);
-        this.zzc.set(true);
-        if (compareAndSet) {
-            zzb(false);
-        }
     }
 
     @Override // android.app.Application.ActivityLifecycleCallbacks
@@ -59,6 +42,24 @@ public final class zzl implements Application.ActivityLifecycleCallbacks, Compon
 
     @Override // android.content.ComponentCallbacks
     public final void onLowMemory() {
+    }
+
+    @Override // android.app.Application.ActivityLifecycleCallbacks
+    public final void onActivityCreated(Activity activity, Bundle bundle) {
+        boolean compareAndSet = this.zzb.compareAndSet(true, false);
+        this.zzc.set(true);
+        if (compareAndSet) {
+            zzb(false);
+        }
+    }
+
+    @Override // android.app.Application.ActivityLifecycleCallbacks
+    public final void onActivityResumed(Activity activity) {
+        boolean compareAndSet = this.zzb.compareAndSet(true, false);
+        this.zzc.set(true);
+        if (compareAndSet) {
+            zzb(false);
+        }
     }
 
     @Override // android.content.ComponentCallbacks2

@@ -8,7 +8,7 @@ import android.content.res.Resources;
 import android.view.LayoutInflater;
 import com.android.systemui.shared.R;
 /* loaded from: classes.dex */
-public class ContextThemeWrapper extends ContextWrapper {
+public final class ContextThemeWrapper extends ContextWrapper {
     public LayoutInflater mInflater;
     public Configuration mOverrideConfiguration;
     public Resources mResources;
@@ -16,10 +16,15 @@ public class ContextThemeWrapper extends ContextWrapper {
     public int mThemeResource;
 
     public ContextThemeWrapper() {
-        super(null);
+        throw null;
     }
 
-    public void applyOverrideConfiguration(Configuration configuration) {
+    public ContextThemeWrapper(Context context, int i) {
+        super(context);
+        this.mThemeResource = i;
+    }
+
+    public final void applyOverrideConfiguration(Configuration configuration) {
         if (this.mResources != null) {
             throw new IllegalStateException("getResources() or getAssets() has already been called");
         } else if (this.mOverrideConfiguration == null) {
@@ -29,18 +34,8 @@ public class ContextThemeWrapper extends ContextWrapper {
         }
     }
 
-    @Override // android.content.ContextWrapper
-    public void attachBaseContext(Context context) {
-        super.attachBaseContext(context);
-    }
-
     @Override // android.content.ContextWrapper, android.content.Context
-    public AssetManager getAssets() {
-        return getResources().getAssets();
-    }
-
-    @Override // android.content.ContextWrapper, android.content.Context
-    public Resources getResources() {
+    public final Resources getResources() {
         if (this.mResources == null) {
             Configuration configuration = this.mOverrideConfiguration;
             if (configuration == null) {
@@ -53,7 +48,7 @@ public class ContextThemeWrapper extends ContextWrapper {
     }
 
     @Override // android.content.ContextWrapper, android.content.Context
-    public Object getSystemService(String str) {
+    public final Object getSystemService(String str) {
         if (!"layout_inflater".equals(str)) {
             return getBaseContext().getSystemService(str);
         }
@@ -64,7 +59,7 @@ public class ContextThemeWrapper extends ContextWrapper {
     }
 
     @Override // android.content.ContextWrapper, android.content.Context
-    public Resources.Theme getTheme() {
+    public final Resources.Theme getTheme() {
         Resources.Theme theme = this.mTheme;
         if (theme != null) {
             return theme;
@@ -76,12 +71,14 @@ public class ContextThemeWrapper extends ContextWrapper {
         return this.mTheme;
     }
 
-    public int getThemeResId() {
-        return this.mThemeResource;
-    }
-
     public final void initializeTheme() {
+        boolean z;
         if (this.mTheme == null) {
+            z = true;
+        } else {
+            z = false;
+        }
+        if (z) {
             this.mTheme = getResources().newTheme();
             Resources.Theme theme = getBaseContext().getTheme();
             if (theme != null) {
@@ -92,20 +89,29 @@ public class ContextThemeWrapper extends ContextWrapper {
     }
 
     @Override // android.content.ContextWrapper, android.content.Context
-    public void setTheme(int i) {
+    public final void setTheme(int i) {
         if (this.mThemeResource != i) {
             this.mThemeResource = i;
             initializeTheme();
         }
     }
 
-    public ContextThemeWrapper(Context context, int i) {
-        super(context);
-        this.mThemeResource = i;
-    }
-
     public ContextThemeWrapper(Context context, Resources.Theme theme) {
         super(context);
         this.mTheme = theme;
+    }
+
+    @Override // android.content.ContextWrapper, android.content.Context
+    public final AssetManager getAssets() {
+        return getResources().getAssets();
+    }
+
+    @Override // android.content.ContextWrapper
+    public final void attachBaseContext(Context context) {
+        super.attachBaseContext(context);
+    }
+
+    public final int getThemeResId() {
+        return this.mThemeResource;
     }
 }

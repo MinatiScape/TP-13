@@ -12,53 +12,14 @@ public class SafeIterableMap<K, V> implements Iterable<Map.Entry<K, V>> {
     public Entry<K, V> mStart;
 
     /* loaded from: classes.dex */
-    public static class AscendingIterator<K, V> extends ListIterator<K, V> {
-        public AscendingIterator(Entry<K, V> entry, Entry<K, V> entry2) {
-            super(entry, entry2);
-        }
-
-        @Override // androidx.arch.core.internal.SafeIterableMap.ListIterator
-        public Entry<K, V> backward(Entry<K, V> entry) {
-            return entry.mPrevious;
-        }
-
-        @Override // androidx.arch.core.internal.SafeIterableMap.ListIterator
-        public Entry<K, V> forward(Entry<K, V> entry) {
-            return entry.mNext;
-        }
-    }
-
-    /* loaded from: classes.dex */
-    public static class DescendingIterator<K, V> extends ListIterator<K, V> {
-        public DescendingIterator(Entry<K, V> entry, Entry<K, V> entry2) {
-            super(entry, entry2);
-        }
-
-        @Override // androidx.arch.core.internal.SafeIterableMap.ListIterator
-        public Entry<K, V> backward(Entry<K, V> entry) {
-            return entry.mNext;
-        }
-
-        @Override // androidx.arch.core.internal.SafeIterableMap.ListIterator
-        public Entry<K, V> forward(Entry<K, V> entry) {
-            return entry.mPrevious;
-        }
-    }
-
-    /* loaded from: classes.dex */
     public static class Entry<K, V> implements Map.Entry<K, V> {
         public final K mKey;
         public Entry<K, V> mNext;
         public Entry<K, V> mPrevious;
         public final V mValue;
 
-        public Entry(K k, V v) {
-            this.mKey = k;
-            this.mValue = v;
-        }
-
         @Override // java.util.Map.Entry
-        public boolean equals(Object obj) {
+        public final boolean equals(Object obj) {
             if (obj == this) {
                 return true;
             }
@@ -70,27 +31,32 @@ public class SafeIterableMap<K, V> implements Iterable<Map.Entry<K, V>> {
         }
 
         @Override // java.util.Map.Entry
-        public K getKey() {
-            return this.mKey;
-        }
-
-        @Override // java.util.Map.Entry
-        public V getValue() {
-            return this.mValue;
-        }
-
-        @Override // java.util.Map.Entry
-        public int hashCode() {
+        public final int hashCode() {
             return this.mValue.hashCode() ^ this.mKey.hashCode();
         }
 
         @Override // java.util.Map.Entry
-        public V setValue(V v) {
+        public final V setValue(V v) {
             throw new UnsupportedOperationException("An entry modification is not supported");
         }
 
-        public String toString() {
+        public final String toString() {
             return this.mKey + "=" + this.mValue;
+        }
+
+        public Entry(K k, V v) {
+            this.mKey = k;
+            this.mValue = v;
+        }
+
+        @Override // java.util.Map.Entry
+        public final K getKey() {
+            return this.mKey;
+        }
+
+        @Override // java.util.Map.Entry
+        public final V getValue() {
+            return this.mValue;
         }
     }
 
@@ -103,33 +69,51 @@ public class SafeIterableMap<K, V> implements Iterable<Map.Entry<K, V>> {
         }
 
         @Override // java.util.Iterator
-        public boolean hasNext() {
-            if (this.mBeforeStart) {
-                return SafeIterableMap.this.mStart != null;
+        public final boolean hasNext() {
+            if (!this.mBeforeStart) {
+                Entry<K, V> entry = this.mCurrent;
+                if (entry == null || entry.mNext == null) {
+                    return false;
+                }
+                return true;
+            } else if (SafeIterableMap.this.mStart != null) {
+                return true;
+            } else {
+                return false;
             }
-            Entry<K, V> entry = this.mCurrent;
-            return (entry == null || entry.mNext == null) ? false : true;
         }
 
         @Override // java.util.Iterator
-        public Object next() {
+        public final Object next() {
+            Entry<K, V> entry;
             if (this.mBeforeStart) {
                 this.mBeforeStart = false;
                 this.mCurrent = SafeIterableMap.this.mStart;
             } else {
-                Entry<K, V> entry = this.mCurrent;
-                this.mCurrent = entry != null ? entry.mNext : null;
+                Entry<K, V> entry2 = this.mCurrent;
+                if (entry2 != null) {
+                    entry = entry2.mNext;
+                } else {
+                    entry = null;
+                }
+                this.mCurrent = entry;
             }
             return this.mCurrent;
         }
 
         @Override // androidx.arch.core.internal.SafeIterableMap.SupportRemove
-        public void supportRemove(Entry<K, V> entry) {
+        public final void supportRemove(Entry<K, V> entry) {
+            boolean z;
             Entry<K, V> entry2 = this.mCurrent;
             if (entry == entry2) {
                 Entry<K, V> entry3 = entry2.mPrevious;
                 this.mCurrent = entry3;
-                this.mBeforeStart = entry3 == null;
+                if (entry3 == null) {
+                    z = true;
+                } else {
+                    z = false;
+                }
+                this.mBeforeStart = z;
             }
         }
     }
@@ -139,30 +123,34 @@ public class SafeIterableMap<K, V> implements Iterable<Map.Entry<K, V>> {
         public Entry<K, V> mExpectedEnd;
         public Entry<K, V> mNext;
 
-        public ListIterator(Entry<K, V> entry, Entry<K, V> entry2) {
-            this.mExpectedEnd = entry2;
-            this.mNext = entry;
-        }
-
         public abstract Entry<K, V> backward(Entry<K, V> entry);
 
         public abstract Entry<K, V> forward(Entry<K, V> entry);
 
         @Override // java.util.Iterator
-        public boolean hasNext() {
-            return this.mNext != null;
+        public final boolean hasNext() {
+            if (this.mNext != null) {
+                return true;
+            }
+            return false;
         }
 
         @Override // java.util.Iterator
-        public Object next() {
-            Entry<K, V> entry = this.mNext;
-            Entry<K, V> entry2 = this.mExpectedEnd;
-            this.mNext = (entry == entry2 || entry2 == null) ? null : forward(entry);
-            return entry;
+        public final Object next() {
+            Entry<K, V> entry;
+            Entry<K, V> entry2 = this.mNext;
+            Entry<K, V> entry3 = this.mExpectedEnd;
+            if (entry2 == entry3 || entry3 == null) {
+                entry = null;
+            } else {
+                entry = forward(entry2);
+            }
+            this.mNext = entry;
+            return entry2;
         }
 
         @Override // androidx.arch.core.internal.SafeIterableMap.SupportRemove
-        public void supportRemove(Entry<K, V> entry) {
+        public final void supportRemove(Entry<K, V> entry) {
             Entry<K, V> entry2 = null;
             if (this.mExpectedEnd == entry && entry == this.mNext) {
                 this.mNext = null;
@@ -180,6 +168,11 @@ public class SafeIterableMap<K, V> implements Iterable<Map.Entry<K, V>> {
                 }
                 this.mNext = entry2;
             }
+        }
+
+        public ListIterator(Entry<K, V> entry, Entry<K, V> entry2) {
+            this.mExpectedEnd = entry2;
+            this.mNext = entry;
         }
     }
 
@@ -204,7 +197,7 @@ public class SafeIterableMap<K, V> implements Iterable<Map.Entry<K, V>> {
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public boolean equals(java.lang.Object r6) {
+    public final boolean equals(java.lang.Object r6) {
         /*
             r5 = this;
             r0 = 1
@@ -267,7 +260,31 @@ public class SafeIterableMap<K, V> implements Iterable<Map.Entry<K, V>> {
         return entry;
     }
 
-    public int hashCode() {
+    @Override // java.lang.Iterable
+    public final Iterator<Map.Entry<K, V>> iterator() {
+        AscendingIterator ascendingIterator = new AscendingIterator(this.mStart, this.mEnd);
+        this.mIterators.put(ascendingIterator, Boolean.FALSE);
+        return ascendingIterator;
+    }
+
+    public final String toString() {
+        StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("[");
+        Iterator<Map.Entry<K, V>> it = iterator();
+        while (true) {
+            ListIterator listIterator = (ListIterator) it;
+            if (listIterator.hasNext()) {
+                m.append(((Map.Entry) listIterator.next()).toString());
+                if (listIterator.hasNext()) {
+                    m.append(", ");
+                }
+            } else {
+                m.append("]");
+                return m.toString();
+            }
+        }
+    }
+
+    public final int hashCode() {
         Iterator<Map.Entry<K, V>> it = iterator();
         int i = 0;
         while (true) {
@@ -277,43 +294,6 @@ public class SafeIterableMap<K, V> implements Iterable<Map.Entry<K, V>> {
             }
             i += ((Map.Entry) listIterator.next()).hashCode();
         }
-    }
-
-    @Override // java.lang.Iterable
-    public Iterator<Map.Entry<K, V>> iterator() {
-        AscendingIterator ascendingIterator = new AscendingIterator(this.mStart, this.mEnd);
-        this.mIterators.put(ascendingIterator, Boolean.FALSE);
-        return ascendingIterator;
-    }
-
-    public SafeIterableMap<K, V>.IteratorWithAdditions iteratorWithAdditions() {
-        SafeIterableMap<K, V>.IteratorWithAdditions iteratorWithAdditions = new IteratorWithAdditions();
-        this.mIterators.put(iteratorWithAdditions, Boolean.FALSE);
-        return iteratorWithAdditions;
-    }
-
-    public Entry<K, V> put(K k, V v) {
-        Entry<K, V> entry = new Entry<>(k, v);
-        this.mSize++;
-        Entry<K, V> entry2 = this.mEnd;
-        if (entry2 == null) {
-            this.mStart = entry;
-            this.mEnd = entry;
-            return entry;
-        }
-        entry2.mNext = entry;
-        entry.mPrevious = entry2;
-        this.mEnd = entry;
-        return entry;
-    }
-
-    public V putIfAbsent(K k, V v) {
-        Entry<K, V> entry = get(k);
-        if (entry != null) {
-            return entry.mValue;
-        }
-        put(k, v);
-        return null;
     }
 
     public V remove(K k) {
@@ -344,20 +324,37 @@ public class SafeIterableMap<K, V> implements Iterable<Map.Entry<K, V>> {
         return entry.mValue;
     }
 
-    public String toString() {
-        StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("[");
-        Iterator<Map.Entry<K, V>> it = iterator();
-        while (true) {
-            ListIterator listIterator = (ListIterator) it;
-            if (listIterator.hasNext()) {
-                m.append(((Map.Entry) listIterator.next()).toString());
-                if (listIterator.hasNext()) {
-                    m.append(", ");
-                }
-            } else {
-                m.append("]");
-                return m.toString();
-            }
+    /* loaded from: classes.dex */
+    public static class AscendingIterator<K, V> extends ListIterator<K, V> {
+        public AscendingIterator(Entry<K, V> entry, Entry<K, V> entry2) {
+            super(entry, entry2);
+        }
+
+        @Override // androidx.arch.core.internal.SafeIterableMap.ListIterator
+        public final Entry<K, V> backward(Entry<K, V> entry) {
+            return entry.mPrevious;
+        }
+
+        @Override // androidx.arch.core.internal.SafeIterableMap.ListIterator
+        public final Entry<K, V> forward(Entry<K, V> entry) {
+            return entry.mNext;
+        }
+    }
+
+    /* loaded from: classes.dex */
+    public static class DescendingIterator<K, V> extends ListIterator<K, V> {
+        public DescendingIterator(Entry<K, V> entry, Entry<K, V> entry2) {
+            super(entry, entry2);
+        }
+
+        @Override // androidx.arch.core.internal.SafeIterableMap.ListIterator
+        public final Entry<K, V> backward(Entry<K, V> entry) {
+            return entry.mNext;
+        }
+
+        @Override // androidx.arch.core.internal.SafeIterableMap.ListIterator
+        public final Entry<K, V> forward(Entry<K, V> entry) {
+            return entry.mPrevious;
         }
     }
 }

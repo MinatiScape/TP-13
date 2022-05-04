@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.ParcelFileDescriptor;
 import android.os.Parcelable;
 import com.google.android.gms.internal.zzbkw;
+/* compiled from: BitmapTeleporterCreator.java */
 /* loaded from: classes.dex */
 public final class zza implements Parcelable.Creator<BitmapTeleporter> {
     @Override // android.os.Parcelable.Creator

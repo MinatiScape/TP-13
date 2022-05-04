@@ -4,11 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import androidx.cardview.R$style;
 import com.android.systemui.shared.R;
 import com.android.wallpaper.asset.Asset;
 import com.android.wallpaper.asset.FileAsset;
-import com.android.wallpaper.module.DefaultPartnerProvider;
-import com.android.wallpaper.module.InjectorProvider;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -16,12 +15,12 @@ import java.util.List;
 public class LegacyPartnerWallpaperInfo extends WallpaperInfo {
     public static final Parcelable.Creator<LegacyPartnerWallpaperInfo> CREATOR = new Parcelable.Creator<LegacyPartnerWallpaperInfo>() { // from class: com.android.wallpaper.model.LegacyPartnerWallpaperInfo.1
         @Override // android.os.Parcelable.Creator
-        public LegacyPartnerWallpaperInfo createFromParcel(Parcel parcel) {
-            return new LegacyPartnerWallpaperInfo(parcel, (AnonymousClass1) null);
+        public final LegacyPartnerWallpaperInfo createFromParcel(Parcel parcel) {
+            return new LegacyPartnerWallpaperInfo(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public LegacyPartnerWallpaperInfo[] newArray(int i) {
+        public final LegacyPartnerWallpaperInfo[] newArray(int i) {
             return new LegacyPartnerWallpaperInfo[i];
         }
     };
@@ -38,59 +37,71 @@ public class LegacyPartnerWallpaperInfo extends WallpaperInfo {
     }
 
     @Override // com.android.wallpaper.model.WallpaperInfo
-    public Asset getAsset(Context context) {
+    public final List<String> getAttributions(Context context) {
+        return Arrays.asList(context.getResources().getString(R.string.on_device_wallpaper_title));
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final int getBackupPermission() {
+        return 0;
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final Asset getAsset(Context context) {
+        File file;
         if (this.mAsset == null) {
-            File systemLegacyDir = getSystemLegacyDir(context);
-            this.mAsset = new FileAsset(systemLegacyDir == null ? null : new File(systemLegacyDir, this.mFullName));
+            if (!this.mFetchedSystemLegacyDir) {
+                this.mSystemLegacyDir = R$style.getInjector().getPartnerProvider(context).getLegacyWallpaperDirectory();
+                this.mFetchedSystemLegacyDir = true;
+            }
+            File file2 = this.mSystemLegacyDir;
+            if (file2 == null) {
+                file = null;
+            } else {
+                file = new File(file2, this.mFullName);
+            }
+            this.mAsset = new FileAsset(file);
         }
         return this.mAsset;
     }
 
     @Override // com.android.wallpaper.model.WallpaperInfo
-    public List<String> getAttributions(Context context) {
-        return Arrays.asList(context.getResources().getString(R.string.on_device_wallpaper_title));
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public int getBackupPermission() {
-        return 0;
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public String getCollectionId(Context context) {
-        return context.getString(R.string.on_device_wallpaper_collection_id);
-    }
-
-    public final File getSystemLegacyDir(Context context) {
-        if (!this.mFetchedSystemLegacyDir) {
-            this.mSystemLegacyDir = ((DefaultPartnerProvider) InjectorProvider.getInjector().getPartnerProvider(context)).getLegacyWallpaperDirectory();
-            this.mFetchedSystemLegacyDir = true;
-        }
-        return this.mSystemLegacyDir;
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public Asset getThumbAsset(Context context) {
+    public final Asset getThumbAsset(Context context) {
+        File file;
         if (this.mThumbAsset == null) {
-            File systemLegacyDir = getSystemLegacyDir(context);
-            this.mThumbAsset = new FileAsset(systemLegacyDir == null ? null : new File(systemLegacyDir, this.mThumbName));
+            if (!this.mFetchedSystemLegacyDir) {
+                this.mSystemLegacyDir = R$style.getInjector().getPartnerProvider(context).getLegacyWallpaperDirectory();
+                this.mFetchedSystemLegacyDir = true;
+            }
+            File file2 = this.mSystemLegacyDir;
+            if (file2 == null) {
+                file = null;
+            } else {
+                file = new File(file2, this.mThumbName);
+            }
+            this.mThumbAsset = new FileAsset(file);
         }
         return this.mThumbAsset;
     }
 
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public void showPreview(Activity activity, InlinePreviewIntentFactory inlinePreviewIntentFactory, int i) {
-        activity.startActivityForResult(inlinePreviewIntentFactory.newIntent(activity, this), i);
-    }
-
     @Override // com.android.wallpaper.model.WallpaperInfo, android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
+    public final void writeToParcel(Parcel parcel, int i) {
         parcel.writeInt(this.mPlaceholderColor);
         parcel.writeString(this.mThumbName);
         parcel.writeString(this.mFullName);
     }
 
-    public LegacyPartnerWallpaperInfo(Parcel parcel, AnonymousClass1 r2) {
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final String getCollectionId(Context context) {
+        return context.getString(R.string.on_device_wallpaper_collection_id);
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final void showPreview(Activity activity, InlinePreviewIntentFactory inlinePreviewIntentFactory, int i) {
+        activity.startActivityForResult(inlinePreviewIntentFactory.newIntent(activity, this), i);
+    }
+
+    public LegacyPartnerWallpaperInfo(Parcel parcel) {
         super(parcel);
         this.mThumbName = parcel.readString();
         this.mFullName = parcel.readString();

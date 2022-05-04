@@ -13,7 +13,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.graphics.ColorUtils;
 import com.android.systemui.shared.R;
 /* loaded from: classes.dex */
-public class ThemeUtils {
+public final class ThemeUtils {
     public static final ThreadLocal<TypedValue> TL_TYPED_VALUE = new ThreadLocal<>();
     public static final int[] DISABLED_STATE_SET = {-16842910};
     public static final int[] FOCUSED_STATE_SET = {16842908};
@@ -31,23 +31,6 @@ public class ThemeUtils {
         } finally {
             obtainStyledAttributes.recycle();
         }
-    }
-
-    public static int getDisabledThemeAttrColor(Context context, int i) {
-        ColorStateList themeAttrColorStateList = getThemeAttrColorStateList(context, i);
-        if (themeAttrColorStateList != null && themeAttrColorStateList.isStateful()) {
-            return themeAttrColorStateList.getColorForState(DISABLED_STATE_SET, themeAttrColorStateList.getDefaultColor());
-        }
-        ThreadLocal<TypedValue> threadLocal = TL_TYPED_VALUE;
-        TypedValue typedValue = threadLocal.get();
-        if (typedValue == null) {
-            typedValue = new TypedValue();
-            threadLocal.set(typedValue);
-        }
-        context.getTheme().resolveAttribute(16842803, typedValue, true);
-        float f = typedValue.getFloat();
-        int themeAttrColor = getThemeAttrColor(context, i);
-        return ColorUtils.setAlphaComponent(themeAttrColor, Math.round(Color.alpha(themeAttrColor) * f));
     }
 
     public static int getThemeAttrColor(Context context, int i) {
@@ -68,17 +51,29 @@ public class ThemeUtils {
         iArr[0] = i;
         TypedArray obtainStyledAttributes = context.obtainStyledAttributes((AttributeSet) null, iArr);
         try {
-            if (obtainStyledAttributes.hasValue(0) && (resourceId = obtainStyledAttributes.getResourceId(0, 0)) != 0) {
-                ThreadLocal<TypedValue> threadLocal = AppCompatResources.TL_TYPED_VALUE;
-                colorStateList = context.getColorStateList(resourceId);
-                if (colorStateList != null) {
-                    return colorStateList;
-                }
+            if (!obtainStyledAttributes.hasValue(0) || (resourceId = obtainStyledAttributes.getResourceId(0, 0)) == 0 || (colorStateList = AppCompatResources.getColorStateList(context, resourceId)) == null) {
+                colorStateList = obtainStyledAttributes.getColorStateList(0);
             }
-            colorStateList = obtainStyledAttributes.getColorStateList(0);
             return colorStateList;
         } finally {
             obtainStyledAttributes.recycle();
         }
+    }
+
+    public static int getDisabledThemeAttrColor(Context context, int i) {
+        ColorStateList themeAttrColorStateList = getThemeAttrColorStateList(context, i);
+        if (themeAttrColorStateList != null && themeAttrColorStateList.isStateful()) {
+            return themeAttrColorStateList.getColorForState(DISABLED_STATE_SET, themeAttrColorStateList.getDefaultColor());
+        }
+        ThreadLocal<TypedValue> threadLocal = TL_TYPED_VALUE;
+        TypedValue typedValue = threadLocal.get();
+        if (typedValue == null) {
+            typedValue = new TypedValue();
+            threadLocal.set(typedValue);
+        }
+        context.getTheme().resolveAttribute(16842803, typedValue, true);
+        float f = typedValue.getFloat();
+        int themeAttrColor = getThemeAttrColor(context, i);
+        return ColorUtils.setAlphaComponent(themeAttrColor, Math.round(Color.alpha(themeAttrColor) * f));
     }
 }

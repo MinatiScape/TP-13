@@ -5,20 +5,15 @@ import android.content.pm.PackageInfo;
 import android.content.pm.Signature;
 import android.util.Log;
 /* loaded from: classes.dex */
-public class GoogleSignatureVerifier {
+public final class GoogleSignatureVerifier {
     public static GoogleSignatureVerifier zza;
+
+    public static boolean zza(PackageInfo packageInfo) {
+        return (packageInfo == null || packageInfo.signatures == null || zza(packageInfo, zzi.zza) == null) ? false : true;
+    }
 
     public GoogleSignatureVerifier(Context context) {
         context.getApplicationContext();
-    }
-
-    public static boolean zza(PackageInfo packageInfo, boolean z) {
-        if (!(packageInfo == null || packageInfo.signatures == null)) {
-            if ((z ? zza(packageInfo, zzi.zza) : zza(packageInfo, zzi.zza[0])) != null) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public static zzf zza(PackageInfo packageInfo, zzf... zzfVarArr) {

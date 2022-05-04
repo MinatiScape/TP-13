@@ -19,6 +19,14 @@ public class InputChannelCompat {
     public static class InputEventReceiver {
         private final BatchedInputEventReceiver mReceiver;
 
+        public void dispose() {
+            this.mReceiver.dispose();
+        }
+
+        public void setBatchingEnabled(boolean z) {
+            this.mReceiver.setBatchingEnabled(z);
+        }
+
         public InputEventReceiver(InputChannel inputChannel, Looper looper, Choreographer choreographer, final InputEventListener inputEventListener) {
             this.mReceiver = new BatchedInputEventReceiver(inputChannel, looper, choreographer) { // from class: com.android.systemui.shared.system.InputChannelCompat.InputEventReceiver.1
                 public void onInputEvent(InputEvent inputEvent) {
@@ -26,14 +34,6 @@ public class InputChannelCompat {
                     finishInputEvent(inputEvent, true);
                 }
             };
-        }
-
-        public void dispose() {
-            this.mReceiver.dispose();
-        }
-
-        public void setBatchingEnabled(boolean z) {
-            this.mReceiver.setBatchingEnabled(z);
         }
     }
 

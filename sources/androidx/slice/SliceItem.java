@@ -10,8 +10,10 @@ import android.text.style.AlignmentSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
+import androidx.core.R$attr;
 import androidx.core.util.Pair;
 import androidx.versionedparcelable.CustomVersionedParcelable;
+import java.util.List;
 /* loaded from: classes.dex */
 public final class SliceItem extends CustomVersionedParcelable {
     public String mFormat;
@@ -23,63 +25,60 @@ public final class SliceItem extends CustomVersionedParcelable {
 
     /* loaded from: classes.dex */
     public interface ActionHandler {
-        void onAction(SliceItem item, Context context, Intent intent);
+        void onAction();
     }
 
-    public SliceItem(Object obj, String format, String subType, String[] hints) {
-        this.mHints = Slice.NO_HINTS;
-        this.mFormat = "text";
-        this.mSubType = null;
-        this.mHints = hints;
-        this.mFormat = format;
-        this.mSubType = subType;
+    public SliceItem(Object obj, String str, String str2, String[] strArr) {
+        this.mHints = strArr;
+        this.mFormat = str;
+        this.mSubType = str2;
         this.mObj = obj;
     }
 
-    public static boolean checkSpan(Object span) {
-        return (span instanceof AlignmentSpan) || (span instanceof ForegroundColorSpan) || (span instanceof RelativeSizeSpan) || (span instanceof StyleSpan);
-    }
-
-    public static void fixSpannableText(Spannable text) {
-        Object[] spans;
-        for (Object obj : text.getSpans(0, text.length(), Object.class)) {
-            Object obj2 = checkSpan(obj) ? obj : null;
-            if (obj2 != obj) {
-                if (obj2 != null) {
-                    text.setSpan(obj2, text.getSpanStart(obj), text.getSpanEnd(obj), text.getSpanFlags(obj));
-                }
-                text.removeSpan(obj);
+    public final boolean hasAnyHints(String... strArr) {
+        for (String str : strArr) {
+            if (R$attr.contains(this.mHints, str)) {
+                return true;
             }
         }
+        return false;
     }
 
-    public boolean fireActionInternal(Context context, Intent i) throws PendingIntent.CanceledException {
+    /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
+    /* JADX WARN: Code restructure failed: missing block: B:71:0x01d1, code lost:
+        if (r14.equals("image") == false) goto L84;
+     */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+        To view partially-correct add '--show-bad-code' argument
+    */
+    public final java.lang.String toString(java.lang.String r15) {
+        /*
+            Method dump skipped, instructions count: 638
+            To view this dump add '--comments-level debug' option
+        */
+        throw new UnsupportedOperationException("Method not decompiled: androidx.slice.SliceItem.toString(java.lang.String):java.lang.String");
+    }
+
+    public final boolean fireActionInternal(Context context, Intent intent) throws PendingIntent.CanceledException {
         F f = ((Pair) this.mObj).first;
         if (f instanceof PendingIntent) {
-            ((PendingIntent) f).send(context, 0, i, null, null);
+            ((PendingIntent) f).send(context, 0, intent, null, null);
             return false;
         }
-        ((ActionHandler) f).onAction(this, context, i);
+        ((ActionHandler) f).onAction();
         return true;
     }
 
-    public PendingIntent getAction() {
-        F f = ((Pair) this.mObj).first;
-        if (f instanceof PendingIntent) {
-            return (PendingIntent) f;
-        }
-        return null;
-    }
-
-    public int getInt() {
+    public final int getInt() {
         return ((Integer) this.mObj).intValue();
     }
 
-    public long getLong() {
+    public final long getLong() {
         return ((Long) this.mObj).longValue();
     }
 
-    public CharSequence getSanitizedText() {
+    public final CharSequence getSanitizedText() {
         if (this.mSanitizedText == null) {
             CharSequence charSequence = (CharSequence) this.mObj;
             if (charSequence instanceof Spannable) {
@@ -91,14 +90,19 @@ public final class SliceItem extends CustomVersionedParcelable {
                 int length = spans.length;
                 int i = 0;
                 while (true) {
+                    boolean z2 = true;
                     if (i >= length) {
                         z = true;
                         break;
-                    } else if (!checkSpan(spans[i])) {
-                        break;
-                    } else {
-                        i++;
                     }
+                    Object obj = spans[i];
+                    if (!(obj instanceof AlignmentSpan) && !(obj instanceof ForegroundColorSpan) && !(obj instanceof RelativeSizeSpan) && !(obj instanceof StyleSpan)) {
+                        z2 = false;
+                    }
+                    if (!z2) {
+                        break;
+                    }
+                    i++;
                 }
                 if (!z) {
                     SpannableString spannableString = new SpannableString(charSequence);
@@ -111,44 +115,43 @@ public final class SliceItem extends CustomVersionedParcelable {
         return this.mSanitizedText;
     }
 
-    public Slice getSlice() {
+    public final Slice getSlice() {
         if ("action".equals(this.mFormat)) {
             return (Slice) ((Pair) this.mObj).second;
         }
         return (Slice) this.mObj;
     }
 
-    public boolean hasAnyHints(String... hints) {
-        for (String str : hints) {
-            if (ArrayUtils.contains(this.mHints, str)) {
-                return true;
+    public final boolean hasHint(String str) {
+        return R$attr.contains(this.mHints, str);
+    }
+
+    public static void fixSpannableText(Spannable spannable) {
+        Object[] spans;
+        boolean z;
+        Object obj;
+        for (Object obj2 : spannable.getSpans(0, spannable.length(), Object.class)) {
+            if ((obj2 instanceof AlignmentSpan) || (obj2 instanceof ForegroundColorSpan) || (obj2 instanceof RelativeSizeSpan) || (obj2 instanceof StyleSpan)) {
+                z = true;
+            } else {
+                z = false;
+            }
+            if (z) {
+                obj = obj2;
+            } else {
+                obj = null;
+            }
+            if (obj != obj2) {
+                if (obj != null) {
+                    spannable.setSpan(obj, spannable.getSpanStart(obj2), spannable.getSpanEnd(obj2), spannable.getSpanFlags(obj2));
+                }
+                spannable.removeSpan(obj2);
             }
         }
-        return false;
     }
 
-    public boolean hasHint(String hint) {
-        return ArrayUtils.contains(this.mHints, hint);
-    }
-
-    public String toString() {
-        return toString("");
-    }
-
-    /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
-    /* JADX WARN: Code restructure failed: missing block: B:71:0x01d1, code lost:
-        if (r14.equals("image") == false) goto L84;
-     */
-    /*
-        Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
-    */
-    public java.lang.String toString(java.lang.String r15) {
-        /*
-            Method dump skipped, instructions count: 638
-            To view this dump add '--comments-level debug' option
-        */
-        throw new UnsupportedOperationException("Method not decompiled: androidx.slice.SliceItem.toString(java.lang.String):java.lang.String");
+    public SliceItem(Object obj, String str, String str2, List<String> list) {
+        this(obj, str, str2, (String[]) list.toArray(new String[list.size()]));
     }
 
     public SliceItem() {
@@ -157,7 +160,11 @@ public final class SliceItem extends CustomVersionedParcelable {
         this.mSubType = null;
     }
 
-    public SliceItem(PendingIntent intent, Slice slice, String format, String subType, String[] hints) {
-        this(new Pair(intent, slice), format, null, hints);
+    public SliceItem(PendingIntent pendingIntent, Slice slice, String str, String[] strArr) {
+        this(new Pair(pendingIntent, slice), "action", str, strArr);
+    }
+
+    public final String toString() {
+        return toString("");
     }
 }

@@ -5,42 +5,59 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
 import android.util.Log;
+import androidx.cardview.R$style;
 import androidx.fragment.app.BackStackRecord;
-import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManagerImpl;
 import com.android.systemui.shared.R;
 import com.android.systemui.shared.system.QuickStepContract;
 import com.android.wallpaper.model.ImageWallpaperInfo;
-import com.android.wallpaper.module.InjectorProvider;
 import com.android.wallpaper.module.LargeScreenMultiPanesChecker;
 import com.android.wallpaper.module.UserEventLogger;
 import com.android.wallpaper.picker.AppbarFragment;
 import com.android.wallpaper.util.ActivityUtils;
+import com.google.android.apps.wallpaper.module.CompositeUserEventLogger;
 /* loaded from: classes.dex */
 public class StandalonePreviewActivity extends BasePreviewActivity implements AppbarFragment.AppbarFragmentHost {
     public UserEventLogger mUserEventLogger;
 
-    @Override // com.android.wallpaper.picker.BasePreviewActivity
-    public void enableFullScreen() {
-        super.enableFullScreen();
+    @Override // androidx.fragment.app.FragmentActivity, androidx.activity.ComponentActivity, android.app.Activity
+    public final void onRequestPermissionsResult(int i, String[] strArr, int[] iArr) {
+        boolean z = true;
+        if (i == 1) {
+            if (strArr.length <= 0 || !strArr[0].equals("android.permission.READ_EXTERNAL_STORAGE") || iArr.length <= 0 || iArr[0] != 0) {
+                z = false;
+            }
+            this.mUserEventLogger.logStandalonePreviewStorageDialogApproved(z);
+            if (!z) {
+                finish();
+            }
+            loadPreviewFragment();
+        }
+    }
+
+    public final void enableFullScreen() {
+        getWindow().setDecorFitsSystemWindows(false);
         getWindow().setFlags(QuickStepContract.SYSUI_STATE_STATUS_BAR_KEYGUARD_SHOWING_OCCLUDED, QuickStepContract.SYSUI_STATE_STATUS_BAR_KEYGUARD_SHOWING_OCCLUDED);
     }
 
     @Override // com.android.wallpaper.picker.AppbarFragment.AppbarFragmentHost
-    public boolean isUpArrowSupported() {
+    public final boolean isUpArrowSupported() {
         return getIntent().getBooleanExtra("up_arrow", false);
     }
 
     public final void loadPreviewFragment() {
         Intent intent = getIntent();
         boolean booleanExtra = intent.getBooleanExtra("com.android.wallpaper.picker.testing_mode_enabled", false);
-        Fragment previewFragment = InjectorProvider.getInjector().getPreviewFragment(this, new ImageWallpaperInfo(intent.getData()), 1, true, false, booleanExtra);
-        BackStackRecord backStackRecord = new BackStackRecord(getSupportFragmentManager());
-        backStackRecord.add(R.id.fragment_container, previewFragment);
+        PreviewFragment previewFragment = R$style.getInjector().getPreviewFragment(this, new ImageWallpaperInfo(intent.getData()), 1, true, false, booleanExtra);
+        FragmentManagerImpl supportFragmentManager = getSupportFragmentManager();
+        supportFragmentManager.getClass();
+        BackStackRecord backStackRecord = new BackStackRecord(supportFragmentManager);
+        backStackRecord.doAddOp(R.id.fragment_container, previewFragment, null, 1);
         backStackRecord.commit();
     }
 
     @Override // android.app.Activity, android.view.Window.Callback
-    public void onAttachedToWindow() {
+    public final void onAttachedToWindow() {
         super.onAttachedToWindow();
         if (getSupportFragmentManager().findFragmentById(R.id.fragment_container) == null) {
             loadPreviewFragment();
@@ -48,15 +65,27 @@ public class StandalonePreviewActivity extends BasePreviewActivity implements Ap
     }
 
     @Override // com.android.wallpaper.picker.BasePreviewActivity, androidx.fragment.app.FragmentActivity, androidx.activity.ComponentActivity, androidx.core.app.ComponentActivity, android.app.Activity
-    public void onCreate(Bundle bundle) {
+    public final void onCreate(Bundle bundle) {
+        boolean z;
+        boolean z2;
+        Uri uri;
         super.onCreate(bundle);
         setContentView(R.layout.activity_preview);
         LargeScreenMultiPanesChecker largeScreenMultiPanesChecker = new LargeScreenMultiPanesChecker();
-        boolean z = false;
+        boolean z3 = false;
         if (largeScreenMultiPanesChecker.isMultiPanesEnabled(this)) {
             Intent intent = getIntent();
-            if ((intent != null && intent.getBooleanExtra("is_from_settings_homepage", false)) || ActivityUtils.isLaunchedFromSettingsRelated(intent)) {
-                Uri uri = intent.hasExtra("android.intent.extra.STREAM") ? (Uri) intent.getParcelableExtra("android.intent.extra.STREAM") : null;
+            if (intent == null || !intent.getBooleanExtra("is_from_settings_homepage", false)) {
+                z2 = false;
+            } else {
+                z2 = true;
+            }
+            if (z2 || ActivityUtils.isLaunchedFromSettingsRelated(intent)) {
+                if (intent.hasExtra("android.intent.extra.STREAM")) {
+                    uri = (Uri) intent.getParcelableExtra("android.intent.extra.STREAM");
+                } else {
+                    uri = null;
+                }
                 if (uri != null) {
                     intent.setData(uri);
                 }
@@ -72,7 +101,7 @@ public class StandalonePreviewActivity extends BasePreviewActivity implements Ap
             }
         }
         enableFullScreen();
-        UserEventLogger userEventLogger = InjectorProvider.getInjector().getUserEventLogger(getApplicationContext());
+        CompositeUserEventLogger userEventLogger = R$style.getInjector().getUserEventLogger(getApplicationContext());
         this.mUserEventLogger = userEventLogger;
         userEventLogger.logStandalonePreviewLaunched();
         Uri data2 = getIntent().getData();
@@ -81,35 +110,24 @@ public class StandalonePreviewActivity extends BasePreviewActivity implements Ap
             finish();
             return;
         }
-        boolean z2 = checkUriPermission(data2, Binder.getCallingPid(), Binder.getCallingUid(), 1) == 0;
-        this.mUserEventLogger.logStandalonePreviewImageUriHasReadPermission(z2);
-        if (!z2) {
+        if (checkUriPermission(data2, Binder.getCallingPid(), Binder.getCallingUid(), 1) == 0) {
+            z = true;
+        } else {
+            z = false;
+        }
+        this.mUserEventLogger.logStandalonePreviewImageUriHasReadPermission(z);
+        if (!z) {
             if (getPackageManager().checkPermission("android.permission.READ_EXTERNAL_STORAGE", getPackageName()) == 0) {
-                z = true;
+                z3 = true;
             }
-            if (!z) {
+            if (!z3) {
                 requestPermissions(new String[]{"android.permission.READ_EXTERNAL_STORAGE"}, 1);
             }
         }
     }
 
-    @Override // androidx.fragment.app.FragmentActivity, androidx.activity.ComponentActivity, android.app.Activity
-    public void onRequestPermissionsResult(int i, String[] strArr, int[] iArr) {
-        boolean z = true;
-        if (i == 1) {
-            if (strArr.length <= 0 || !strArr[0].equals("android.permission.READ_EXTERNAL_STORAGE") || iArr.length <= 0 || iArr[0] != 0) {
-                z = false;
-            }
-            this.mUserEventLogger.logStandalonePreviewStorageDialogApproved(z);
-            if (!z) {
-                finish();
-            }
-            loadPreviewFragment();
-        }
-    }
-
     @Override // com.android.wallpaper.picker.AppbarFragment.AppbarFragmentHost
-    public void onUpArrowPressed() {
+    public final void onUpArrowPressed() {
         onBackPressed();
     }
 }

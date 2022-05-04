@@ -5,6 +5,8 @@ import android.os.RemoteException;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.common.api.internal.zzdb;
+/* compiled from: ISignInCallbacks.java */
 /* loaded from: classes.dex */
 public abstract class zzelr extends zzfa implements zzelq {
     public zzelr() {
@@ -12,7 +14,7 @@ public abstract class zzelr extends zzfa implements zzelq {
     }
 
     @Override // android.os.Binder
-    public boolean onTransact(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
+    public final boolean onTransact(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
         if (zza(i, parcel, parcel2, i2)) {
             return true;
         }
@@ -29,7 +31,7 @@ public abstract class zzelr extends zzfa implements zzelq {
         } else if (i != 8) {
             return false;
         } else {
-            zza((zzelx) zzfb.zza(parcel, zzelx.CREATOR));
+            ((zzdb) this).zza((zzelx) zzfb.zza(parcel, zzelx.CREATOR));
         }
         parcel2.writeNoException();
         return true;

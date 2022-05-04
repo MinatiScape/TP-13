@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,17 +23,18 @@ import com.android.customization.model.CustomizationOption;
 import com.android.customization.widget.OptionSelectorController;
 import com.android.internal.util.Preconditions;
 import com.android.systemui.shared.R;
+import com.android.wallpaper.widget.GridPaddingDecoration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 /* loaded from: classes.dex */
-public class OptionSelectorController<T extends CustomizationOption<T>> {
-    public RecyclerView.Adapter<TileViewHolder> mAdapter;
+public final class OptionSelectorController<T extends CustomizationOption<T>> {
+    public AnonymousClass1 mAdapter;
     public T mAppliedOption;
     public final int mCheckmarkStyle;
     public final RecyclerView mContainer;
-    public final Set<OptionSelectedListener> mListeners = new HashSet();
+    public float mLinearLayoutHorizontalDisplayOptionsMax;
+    public final HashSet mListeners = new HashSet();
     public final List<T> mOptions;
     public T mSelectedOption;
     public final boolean mUseGrid;
@@ -42,43 +44,8 @@ public class OptionSelectorController<T extends CustomizationOption<T>> {
     public class AnonymousClass1 extends RecyclerView.Adapter<TileViewHolder> {
         public final /* synthetic */ CustomizationManager val$manager;
 
-        public AnonymousClass1(CustomizationManager customizationManager) {
-            this.val$manager = customizationManager;
-        }
-
-        public final void drawCheckmark(CustomizationOption<?> customizationOption, TileViewHolder tileViewHolder, Drawable drawable, int i, int i2, int i3, boolean z) {
-            Drawable foreground = tileViewHolder.tileView.getForeground();
-            Drawable[] drawableArr = {foreground, drawable};
-            if (foreground == null) {
-                drawableArr = new Drawable[]{drawable};
-            }
-            LayerDrawable layerDrawable = new LayerDrawable(drawableArr);
-            int length = drawableArr.length - 1;
-            layerDrawable.setLayerGravity(length, i);
-            layerDrawable.setLayerWidth(length, i2);
-            layerDrawable.setLayerHeight(length, i2);
-            layerDrawable.setLayerInsetBottom(length, i3);
-            layerDrawable.setLayerInsetRight(length, i3);
-            tileViewHolder.tileView.setForeground(layerDrawable);
-            if (z) {
-                tileViewHolder.setContentDescription(OptionSelectorController.this.mContainer.getContext(), customizationOption, R.string.option_applied_previewed_description);
-            } else {
-                tileViewHolder.setContentDescription(OptionSelectorController.this.mContainer.getContext(), customizationOption, R.string.option_applied_description);
-            }
-        }
-
         @Override // androidx.recyclerview.widget.RecyclerView.Adapter
-        public int getItemCount() {
-            return OptionSelectorController.this.mOptions.size();
-        }
-
-        @Override // androidx.recyclerview.widget.RecyclerView.Adapter
-        public int getItemViewType(int i) {
-            return OptionSelectorController.this.mOptions.get(i).getLayoutResId();
-        }
-
-        @Override // androidx.recyclerview.widget.RecyclerView.Adapter
-        public void onBindViewHolder(TileViewHolder tileViewHolder, int i) {
+        public final void onBindViewHolder(TileViewHolder tileViewHolder, int i) {
             TileViewHolder tileViewHolder2 = tileViewHolder;
             final T t = OptionSelectorController.this.mOptions.get(i);
             if (t.isActive(this.val$manager)) {
@@ -138,31 +105,44 @@ public class OptionSelectorController<T extends CustomizationOption<T>> {
             }
         }
 
-        @Override // androidx.recyclerview.widget.RecyclerView.Adapter
-        public TileViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-            return new TileViewHolder(LayoutInflater.from(viewGroup.getContext()).inflate(i, viewGroup, false));
-        }
-    }
-
-    /* loaded from: classes.dex */
-    public static final class ItemEndHorizontalSpaceItemDecoration extends RecyclerView.ItemDecoration {
-        public final boolean mDirectionLTR;
-        public final int mHorizontalSpacePx;
-
-        public ItemEndHorizontalSpaceItemDecoration(Context context, int i, AnonymousClass1 r3) {
-            this.mDirectionLTR = context.getResources().getConfiguration().getLayoutDirection() == 0;
-            this.mHorizontalSpacePx = i;
+        public AnonymousClass1(CustomizationManager customizationManager) {
+            this.val$manager = customizationManager;
         }
 
-        @Override // androidx.recyclerview.widget.RecyclerView.ItemDecoration
-        public void getItemOffsets(Rect rect, View view, RecyclerView recyclerView, RecyclerView.State state) {
-            if (recyclerView.getAdapter() != null && recyclerView.getChildAdapterPosition(view) != ((RecyclerView.Adapter) Preconditions.checkNotNull(recyclerView.getAdapter())).getItemCount() - 1) {
-                if (this.mDirectionLTR) {
-                    rect.right = this.mHorizontalSpacePx;
-                } else {
-                    rect.left = this.mHorizontalSpacePx;
-                }
+        public final void drawCheckmark(CustomizationOption<?> customizationOption, TileViewHolder tileViewHolder, Drawable drawable, int i, int i2, int i3, boolean z) {
+            Drawable foreground = tileViewHolder.tileView.getForeground();
+            Drawable[] drawableArr = {foreground, drawable};
+            if (foreground == null) {
+                drawableArr = new Drawable[]{drawable};
             }
+            LayerDrawable layerDrawable = new LayerDrawable(drawableArr);
+            int length = drawableArr.length - 1;
+            layerDrawable.setLayerGravity(length, i);
+            layerDrawable.setLayerWidth(length, i2);
+            layerDrawable.setLayerHeight(length, i2);
+            layerDrawable.setLayerInsetBottom(length, i3);
+            layerDrawable.setLayerInsetRight(length, i3);
+            tileViewHolder.tileView.setForeground(layerDrawable);
+            if (z) {
+                tileViewHolder.setContentDescription(OptionSelectorController.this.mContainer.getContext(), customizationOption, R.string.option_applied_previewed_description);
+            } else {
+                tileViewHolder.setContentDescription(OptionSelectorController.this.mContainer.getContext(), customizationOption, R.string.option_applied_description);
+            }
+        }
+
+        @Override // androidx.recyclerview.widget.RecyclerView.Adapter
+        public final int getItemCount() {
+            return OptionSelectorController.this.mOptions.size();
+        }
+
+        @Override // androidx.recyclerview.widget.RecyclerView.Adapter
+        public final int getItemViewType(int i) {
+            return OptionSelectorController.this.mOptions.get(i).getLayoutResId();
+        }
+
+        @Override // androidx.recyclerview.widget.RecyclerView.Adapter
+        public final RecyclerView.ViewHolder onCreateViewHolder(RecyclerView recyclerView, int i) {
+            return new TileViewHolder(LayoutInflater.from(recyclerView.getContext()).inflate(i, (ViewGroup) recyclerView, false));
         }
     }
 
@@ -178,27 +158,61 @@ public class OptionSelectorController<T extends CustomizationOption<T>> {
         }
 
         @Override // androidx.core.view.AccessibilityDelegateCompat
-        public boolean onRequestSendAccessibilityEvent(ViewGroup viewGroup, View view, AccessibilityEvent accessibilityEvent) {
+        public final boolean onRequestSendAccessibilityEvent(ViewGroup viewGroup, View view, AccessibilityEvent accessibilityEvent) {
+            int i;
             if (OptionSelectorController.this.mContainer.getLayoutManager() != null && OptionSelectorController.this.mContainer.getLayoutManager().canScrollHorizontally() && accessibilityEvent.getEventType() == 32768) {
                 int childLayoutPosition = OptionSelectorController.this.mContainer.getChildLayoutPosition(view);
                 int dimensionPixelOffset = (OptionSelectorController.this.mContainer.getContext().getResources().getDimensionPixelOffset(R.dimen.option_tile_margin_horizontal) * 2) + OptionSelectorController.this.mContainer.getContext().getResources().getDimensionPixelOffset(R.dimen.option_tile_width);
                 LinearLayoutManager linearLayoutManager = (LinearLayoutManager) OptionSelectorController.this.mContainer.getLayoutManager();
-                int i = -1;
+                int i2 = -1;
                 View findOneVisibleChild = linearLayoutManager.findOneVisibleChild(linearLayoutManager.getChildCount() - 1, -1, true, false);
-                if (childLayoutPosition >= (findOneVisibleChild == null ? -1 : linearLayoutManager.getPosition(findOneVisibleChild))) {
+                if (findOneVisibleChild == null) {
+                    i = -1;
+                } else {
+                    i = RecyclerView.LayoutManager.getPosition(findOneVisibleChild);
+                }
+                if (childLayoutPosition >= i) {
                     OptionSelectorController.this.mContainer.scrollBy(dimensionPixelOffset, 0);
                 } else {
                     LinearLayoutManager linearLayoutManager2 = (LinearLayoutManager) OptionSelectorController.this.mContainer.getLayoutManager();
                     View findOneVisibleChild2 = linearLayoutManager2.findOneVisibleChild(0, linearLayoutManager2.getChildCount(), true, false);
                     if (findOneVisibleChild2 != null) {
-                        i = linearLayoutManager2.getPosition(findOneVisibleChild2);
+                        i2 = RecyclerView.LayoutManager.getPosition(findOneVisibleChild2);
                     }
-                    if (childLayoutPosition <= i && childLayoutPosition != 0) {
+                    if (childLayoutPosition <= i2 && childLayoutPosition != 0) {
                         OptionSelectorController.this.mContainer.scrollBy(-dimensionPixelOffset, 0);
                     }
                 }
             }
-            return this.mOriginalDelegate.onRequestSendAccessibilityEvent(viewGroup, view, accessibilityEvent);
+            return super.onRequestSendAccessibilityEvent(viewGroup, view, accessibilityEvent);
+        }
+    }
+
+    /* loaded from: classes.dex */
+    public static final class ItemEndHorizontalSpaceItemDecoration extends RecyclerView.ItemDecoration {
+        public final boolean mDirectionLTR;
+        public final int mHorizontalSpacePx;
+
+        public ItemEndHorizontalSpaceItemDecoration(Context context, int i) {
+            boolean z;
+            if (context.getResources().getConfiguration().getLayoutDirection() == 0) {
+                z = true;
+            } else {
+                z = false;
+            }
+            this.mDirectionLTR = z;
+            this.mHorizontalSpacePx = i;
+        }
+
+        @Override // androidx.recyclerview.widget.RecyclerView.ItemDecoration
+        public final void getItemOffsets(Rect rect, View view, RecyclerView recyclerView) {
+            if (recyclerView.getAdapter() != null && recyclerView.getChildAdapterPosition(view) != ((RecyclerView.Adapter) Preconditions.checkNotNull(recyclerView.getAdapter())).getItemCount() - 1) {
+                if (this.mDirectionLTR) {
+                    rect.right = this.mHorizontalSpacePx;
+                } else {
+                    rect.left = this.mHorizontalSpacePx;
+                }
+            }
         }
     }
 
@@ -214,7 +228,7 @@ public class OptionSelectorController<T extends CustomizationOption<T>> {
             this.tileView = view.findViewById(R.id.option_tile);
         }
 
-        public void setContentDescription(Context context, CustomizationOption<?> customizationOption, int i) {
+        public final void setContentDescription(Context context, CustomizationOption<?> customizationOption, int i) {
             View view;
             String title = customizationOption.getTitle();
             this.title = title;
@@ -237,24 +251,18 @@ public class OptionSelectorController<T extends CustomizationOption<T>> {
         }
     }
 
-    public OptionSelectorController(RecyclerView recyclerView, List<T> list, boolean z, int i) {
-        this.mContainer = recyclerView;
-        this.mOptions = list;
-        this.mUseGrid = z;
-        this.mCheckmarkStyle = i;
-    }
-
-    public void initOptions(CustomizationManager<T> customizationManager) {
+    public final void initOptions(CustomizationManager<T> customizationManager) {
         this.mContainer.setAccessibilityDelegateCompat(new OptionSelectorAccessibilityDelegate(this.mContainer));
         this.mAdapter = new AnonymousClass1(customizationManager);
         Resources resources = this.mContainer.getContext().getResources();
         if (this.mUseGrid) {
             RecyclerView recyclerView = this.mContainer;
-            recyclerView.setLayoutManager(new GridLayoutManager(recyclerView.getContext(), resources.getInteger(R.integer.options_grid_num_columns)));
+            recyclerView.getContext();
+            recyclerView.setLayoutManager(new GridLayoutManager(resources.getInteger(R.integer.options_grid_num_columns)));
         } else {
             RecyclerView recyclerView2 = this.mContainer;
             recyclerView2.getContext();
-            recyclerView2.setLayoutManager(new LinearLayoutManager(0, false));
+            recyclerView2.setLayoutManager(new LinearLayoutManager(0));
         }
         this.mContainer.setAdapter(this.mAdapter);
         this.mContainer.measure(0, 0);
@@ -273,6 +281,10 @@ public class OptionSelectorController<T extends CustomizationOption<T>> {
             }
             if (this.mContainer.getLayoutManager() != null) {
                 ((GridLayoutManager) this.mContainer.getLayoutManager()).setSpanCount(integer);
+            }
+            if (this.mContainer.getItemDecorationCount() == 0) {
+                RecyclerView recyclerView3 = this.mContainer;
+                recyclerView3.addItemDecoration(new GridPaddingDecoration(recyclerView3.getContext().getResources().getDimensionPixelSize(R.dimen.option_tile_grid_padding_horizontal), 0));
                 return;
             }
             return;
@@ -281,19 +293,20 @@ public class OptionSelectorController<T extends CustomizationOption<T>> {
         if (i >= 0) {
             this.mContainer.setOverScrollMode(2);
         }
-        if (this.mAdapter.getItemCount() >= 4.35f) {
-            int round = ((dimensionPixelSize - Math.round(dimensionPixelOffset * 4.35f)) - this.mContainer.getPaddingLeft()) / 4;
+        float f = this.mLinearLayoutHorizontalDisplayOptionsMax;
+        if (this.mAdapter.getItemCount() >= f) {
+            int round = ((dimensionPixelSize - Math.round(dimensionPixelOffset * f)) - this.mContainer.getPaddingLeft()) / ((int) this.mLinearLayoutHorizontalDisplayOptionsMax);
             if (round <= 0) {
                 round = resources.getDimensionPixelOffset(R.dimen.option_tile_margin_horizontal);
             }
-            RecyclerView recyclerView3 = this.mContainer;
-            recyclerView3.addItemDecoration(new ItemEndHorizontalSpaceItemDecoration(recyclerView3.getContext(), round, null));
+            RecyclerView recyclerView4 = this.mContainer;
+            recyclerView4.addItemDecoration(new ItemEndHorizontalSpaceItemDecoration(recyclerView4.getContext(), round));
             return;
         }
         this.mContainer.addItemDecoration(new HorizontalSpacerItemDecoration((i / (this.mAdapter.getItemCount() + 1)) / 2));
     }
 
-    public void setSelectedOption(T t) {
+    public final void setSelectedOption(T t) {
         if (this.mOptions.contains(t)) {
             T t2 = this.mSelectedOption;
             this.mSelectedOption = t;
@@ -312,5 +325,15 @@ public class OptionSelectorController<T extends CustomizationOption<T>> {
             return;
         }
         throw new IllegalArgumentException("Invalid option");
+    }
+
+    public OptionSelectorController(RecyclerView recyclerView, List<T> list, boolean z, int i) {
+        this.mContainer = recyclerView;
+        this.mOptions = list;
+        this.mUseGrid = z;
+        this.mCheckmarkStyle = i;
+        TypedValue typedValue = new TypedValue();
+        recyclerView.getResources().getValue(R.dimen.linear_layout_horizontal_display_options_max, typedValue, true);
+        this.mLinearLayoutHorizontalDisplayOptionsMax = typedValue.getFloat();
     }
 }

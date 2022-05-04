@@ -4,15 +4,15 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 /* loaded from: classes.dex */
-public final class FragmentState implements Parcelable {
+final class FragmentState implements Parcelable {
     public static final Parcelable.Creator<FragmentState> CREATOR = new Parcelable.Creator<FragmentState>() { // from class: android.support.v4.app.FragmentState.1
         @Override // android.os.Parcelable.Creator
-        public FragmentState createFromParcel(Parcel parcel) {
+        public final FragmentState createFromParcel(Parcel parcel) {
             return new FragmentState(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public FragmentState[] newArray(int i) {
+        public final FragmentState[] newArray(int i) {
             return new FragmentState[i];
         }
     };
@@ -28,28 +28,13 @@ public final class FragmentState implements Parcelable {
     public Bundle mSavedFragmentState;
     public final String mTag;
 
-    public FragmentState(Parcel parcel) {
-        this.mClassName = parcel.readString();
-        this.mIndex = parcel.readInt();
-        boolean z = true;
-        this.mFromLayout = parcel.readInt() != 0;
-        this.mFragmentId = parcel.readInt();
-        this.mContainerId = parcel.readInt();
-        this.mTag = parcel.readString();
-        this.mRetainInstance = parcel.readInt() != 0;
-        this.mDetached = parcel.readInt() != 0;
-        this.mArguments = parcel.readBundle();
-        this.mHidden = parcel.readInt() == 0 ? false : z;
-        this.mSavedFragmentState = parcel.readBundle();
-    }
-
     @Override // android.os.Parcelable
-    public int describeContents() {
+    public final int describeContents() {
         return 0;
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
+    public final void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(this.mClassName);
         parcel.writeInt(this.mIndex);
         parcel.writeInt(this.mFromLayout ? 1 : 0);
@@ -61,5 +46,38 @@ public final class FragmentState implements Parcelable {
         parcel.writeBundle(this.mArguments);
         parcel.writeInt(this.mHidden ? 1 : 0);
         parcel.writeBundle(this.mSavedFragmentState);
+    }
+
+    public FragmentState(Parcel parcel) {
+        boolean z;
+        boolean z2;
+        boolean z3;
+        this.mClassName = parcel.readString();
+        this.mIndex = parcel.readInt();
+        boolean z4 = true;
+        if (parcel.readInt() != 0) {
+            z = true;
+        } else {
+            z = false;
+        }
+        this.mFromLayout = z;
+        this.mFragmentId = parcel.readInt();
+        this.mContainerId = parcel.readInt();
+        this.mTag = parcel.readString();
+        if (parcel.readInt() != 0) {
+            z2 = true;
+        } else {
+            z2 = false;
+        }
+        this.mRetainInstance = z2;
+        if (parcel.readInt() != 0) {
+            z3 = true;
+        } else {
+            z3 = false;
+        }
+        this.mDetached = z3;
+        this.mArguments = parcel.readBundle();
+        this.mHidden = parcel.readInt() == 0 ? false : z4;
+        this.mSavedFragmentState = parcel.readBundle();
     }
 }

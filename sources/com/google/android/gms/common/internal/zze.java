@@ -3,6 +3,7 @@ package com.google.android.gms.common.internal;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.android.gms.internal.zzbkw;
+/* compiled from: ClientIdentityCreator.java */
 /* loaded from: classes.dex */
 public final class zze implements Parcelable.Creator<ClientIdentity> {
     @Override // android.os.Parcelable.Creator

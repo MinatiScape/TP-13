@@ -6,7 +6,7 @@ import android.content.pm.PackageManager;
 import com.google.android.gms.iid.Rpc;
 import java.util.concurrent.atomic.AtomicInteger;
 /* loaded from: classes.dex */
-public class GoogleCloudMessaging {
+public final class GoogleCloudMessaging {
     static {
         new AtomicInteger(1);
     }

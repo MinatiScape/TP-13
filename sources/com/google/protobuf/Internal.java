@@ -1,11 +1,9 @@
 package com.google.protobuf;
 
-import com.google.protobuf.AbstractMessageLite;
 import com.google.protobuf.GeneratedMessageLite;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.List;
-import java.util.Objects;
 import java.util.RandomAccess;
 /* loaded from: classes.dex */
 public final class Internal {
@@ -31,31 +29,32 @@ public final class Internal {
         ProtobufList<E> mutableCopyWithCapacity(int i);
     }
 
+    public static int hashLong(long j) {
+        return (int) (j ^ (j >>> 32));
+    }
+
     static {
         Charset.forName("ISO-8859-1");
         byte[] bArr = new byte[0];
         EMPTY_BYTE_ARRAY = bArr;
         ByteBuffer.wrap(bArr);
-        CodedInputStream.newInstance(bArr, 0, bArr.length, false);
+        if ((0 - 0) + 0 > Integer.MAX_VALUE) {
+            try {
+                throw InvalidProtocolBufferException.truncatedMessage();
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException(e);
+            }
+        }
     }
 
-    public static int hashBoolean(boolean z) {
-        return z ? 1231 : 1237;
-    }
-
-    public static int hashLong(long j) {
-        return (int) (j ^ (j >>> 32));
-    }
-
-    public static Object mergeMessage(Object obj, Object obj2) {
+    public static GeneratedMessageLite mergeMessage(Object obj, Object obj2) {
+        GeneratedMessageLite.Builder builder$1 = ((MessageLite) obj).toBuilder$1();
         MessageLite messageLite = (MessageLite) obj2;
-        AbstractMessageLite.Builder builder = (AbstractMessageLite.Builder) ((MessageLite) obj).toBuilder();
-        Objects.requireNonNull(builder);
-        GeneratedMessageLite.Builder builder2 = (GeneratedMessageLite.Builder) builder;
-        if (builder2.defaultInstance.getClass().isInstance(messageLite)) {
-            builder2.copyOnWrite();
-            builder2.mergeFromInstance(builder2.instance, (GeneratedMessageLite) ((AbstractMessageLite) messageLite));
-            return builder2.buildPartial();
+        builder$1.getClass();
+        if (builder$1.defaultInstance.getClass().isInstance(messageLite)) {
+            builder$1.copyOnWrite();
+            GeneratedMessageLite.Builder.mergeFromInstance(builder$1.instance, (GeneratedMessageLite) ((AbstractMessageLite) messageLite));
+            return builder$1.buildPartial();
         }
         throw new IllegalArgumentException("mergeFrom(MessageLite) can only merge messages of the same type.");
     }

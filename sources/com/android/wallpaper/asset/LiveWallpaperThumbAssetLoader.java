@@ -10,12 +10,12 @@ import com.bumptech.glide.load.model.ModelLoader;
 import com.bumptech.glide.load.model.ModelLoaderFactory;
 import com.bumptech.glide.load.model.MultiModelLoaderFactory;
 /* loaded from: classes.dex */
-public class LiveWallpaperThumbAssetLoader implements ModelLoader<LiveWallpaperThumbAsset, Drawable> {
+public final class LiveWallpaperThumbAssetLoader implements ModelLoader<LiveWallpaperThumbAsset, Drawable> {
 
     /* loaded from: classes.dex */
     public static class LiveWallpaperThumbAssetLoaderFactory implements ModelLoaderFactory<LiveWallpaperThumbAsset, Drawable> {
         @Override // com.bumptech.glide.load.model.ModelLoaderFactory
-        public ModelLoader<LiveWallpaperThumbAsset, Drawable> build(MultiModelLoaderFactory multiModelLoaderFactory) {
+        public final ModelLoader<LiveWallpaperThumbAsset, Drawable> build(MultiModelLoaderFactory multiModelLoaderFactory) {
             return new LiveWallpaperThumbAssetLoader();
         }
     }
@@ -24,42 +24,42 @@ public class LiveWallpaperThumbAssetLoader implements ModelLoader<LiveWallpaperT
     public static class LiveWallpaperThumbFetcher implements DataFetcher<Drawable> {
         public LiveWallpaperThumbAsset mLiveWallpaperThumbAsset;
 
+        @Override // com.bumptech.glide.load.data.DataFetcher
+        public final void cancel() {
+        }
+
+        @Override // com.bumptech.glide.load.data.DataFetcher
+        public final void cleanup() {
+        }
+
+        @Override // com.bumptech.glide.load.data.DataFetcher
+        public final void loadData(Priority priority, DataFetcher.DataCallback<? super Drawable> dataCallback) {
+            dataCallback.onDataReady(this.mLiveWallpaperThumbAsset.getThumbnailDrawable());
+        }
+
         public LiveWallpaperThumbFetcher(LiveWallpaperThumbAsset liveWallpaperThumbAsset) {
             this.mLiveWallpaperThumbAsset = liveWallpaperThumbAsset;
         }
 
         @Override // com.bumptech.glide.load.data.DataFetcher
-        public void cancel() {
-        }
-
-        @Override // com.bumptech.glide.load.data.DataFetcher
-        public void cleanup() {
-        }
-
-        @Override // com.bumptech.glide.load.data.DataFetcher
-        public Class<Drawable> getDataClass() {
+        public final Class<Drawable> getDataClass() {
             return Drawable.class;
         }
 
         @Override // com.bumptech.glide.load.data.DataFetcher
-        public DataSource getDataSource() {
+        public final DataSource getDataSource() {
             return DataSource.LOCAL;
-        }
-
-        @Override // com.bumptech.glide.load.data.DataFetcher
-        public void loadData(Priority priority, DataFetcher.DataCallback<? super Drawable> dataCallback) {
-            dataCallback.onDataReady(this.mLiveWallpaperThumbAsset.getThumbnailDrawable());
         }
     }
 
     @Override // com.bumptech.glide.load.model.ModelLoader
-    public ModelLoader.LoadData<Drawable> buildLoadData(LiveWallpaperThumbAsset liveWallpaperThumbAsset, int i, int i2, Options options) {
+    public final ModelLoader.LoadData<Drawable> buildLoadData(LiveWallpaperThumbAsset liveWallpaperThumbAsset, int i, int i2, Options options) {
         LiveWallpaperThumbAsset liveWallpaperThumbAsset2 = liveWallpaperThumbAsset;
         return new ModelLoader.LoadData<>(new LiveWallpaperThumbAsset.LiveWallpaperThumbKey(liveWallpaperThumbAsset2.mInfo), new LiveWallpaperThumbFetcher(liveWallpaperThumbAsset2));
     }
 
     @Override // com.bumptech.glide.load.model.ModelLoader
-    public /* bridge */ /* synthetic */ boolean handles(LiveWallpaperThumbAsset liveWallpaperThumbAsset) {
+    public final /* bridge */ /* synthetic */ boolean handles(LiveWallpaperThumbAsset liveWallpaperThumbAsset) {
         return true;
     }
 }

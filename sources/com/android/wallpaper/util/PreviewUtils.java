@@ -11,7 +11,7 @@ import android.text.TextUtils;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 /* loaded from: classes.dex */
-public class PreviewUtils {
+public final class PreviewUtils {
     public static final ExecutorService sExecutorService = Executors.newSingleThreadExecutor();
     public final Context mContext;
     public final String mProviderAuthority;
@@ -21,7 +21,12 @@ public class PreviewUtils {
     public interface WorkspacePreviewCallback {
     }
 
+    public final Uri getUri(String str) {
+        return new Uri.Builder().scheme("content").authority(this.mProviderInfo.authority).appendPath(str).build();
+    }
+
     public PreviewUtils(Context context, String str) {
+        ProviderInfo providerInfo;
         ActivityInfo activityInfo;
         Bundle bundle;
         this.mContext = context;
@@ -31,14 +36,14 @@ public class PreviewUtils {
         } else {
             this.mProviderAuthority = bundle.getString(str);
         }
-        ProviderInfo resolveContentProvider = TextUtils.isEmpty(this.mProviderAuthority) ? null : context.getPackageManager().resolveContentProvider(this.mProviderAuthority, 0);
-        this.mProviderInfo = resolveContentProvider;
-        if (resolveContentProvider != null && !TextUtils.isEmpty(resolveContentProvider.readPermission) && context.checkSelfPermission(this.mProviderInfo.readPermission) != 0) {
+        if (TextUtils.isEmpty(this.mProviderAuthority)) {
+            providerInfo = null;
+        } else {
+            providerInfo = context.getPackageManager().resolveContentProvider(this.mProviderAuthority, 0);
+        }
+        this.mProviderInfo = providerInfo;
+        if (providerInfo != null && !TextUtils.isEmpty(providerInfo.readPermission) && context.checkSelfPermission(this.mProviderInfo.readPermission) != 0) {
             this.mProviderInfo = null;
         }
-    }
-
-    public Uri getUri(String str) {
-        return new Uri.Builder().scheme("content").authority(this.mProviderInfo.authority).appendPath(str).build();
     }
 }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt" android:drawable="@drawable/res_0x7f0800e7_ic_dialog_error_illustration_animated__0">
+    <target android:name="_R_G_L_13_G_D_2_P_0_G_0_T_0" android:animation="@drawable/res_0x7f0800e8_ic_dialog_error_illustration_animated__1"/>
+    <target android:name="_R_G_L_13_G_D_2_P_1_G_0_T_0" android:animation="@drawable/res_0x7f0800f3_ic_dialog_error_illustration_animated__2"/>
+    <target android:name="_R_G_L_13_G" android:animation="@drawable/res_0x7f0800f9_ic_dialog_error_illustration_animated__3"/>
+    <target android:name="_R_G_L_7_G" android:animation="@drawable/res_0x7f0800fa_ic_dialog_error_illustration_animated__4"/>
+    <target android:name="_R_G_L_6_G" android:animation="@drawable/res_0x7f0800fb_ic_dialog_error_illustration_animated__5"/>
+    <target android:name="_R_G_L_5_G" android:animation="@drawable/res_0x7f0800fc_ic_dialog_error_illustration_animated__6"/>
+    <target android:name="_R_G_L_4_G" android:animation="@drawable/res_0x7f0800fd_ic_dialog_error_illustration_animated__7"/>
+    <target android:name="_R_G_L_3_G" android:animation="@drawable/res_0x7f0800fe_ic_dialog_error_illustration_animated__8"/>
+    <target android:name="_R_G_L_2_G" android:animation="@drawable/res_0x7f0800ff_ic_dialog_error_illustration_animated__9"/>
+    <target android:name="_R_G_L_1_G_D_0_P_0" android:animation="@drawable/res_0x7f0800e9_ic_dialog_error_illustration_animated__10"/>
+    <target android:name="_R_G_L_1_G_D_1_P_0" android:animation="@drawable/res_0x7f0800ea_ic_dialog_error_illustration_animated__11"/>
+    <target android:name="_R_G_L_1_G_T_1" android:animation="@drawable/res_0x7f0800eb_ic_dialog_error_illustration_animated__12"/>
+    <target android:name="_R_G_L_1_G_T_1" android:animation="@drawable/res_0x7f0800ec_ic_dialog_error_illustration_animated__13"/>
+    <target android:name="_R_G_L_1_G_T_1" android:animation="@drawable/res_0x7f0800ed_ic_dialog_error_illustration_animated__14"/>
+    <target android:name="_R_G_L_1_G_T_1" android:animation="@drawable/res_0x7f0800ee_ic_dialog_error_illustration_animated__15"/>
+    <target android:name="_R_G_L_1_G_T_1" android:animation="@drawable/res_0x7f0800ef_ic_dialog_error_illustration_animated__16"/>
+    <target android:name="_R_G_L_1_G_T_1" android:animation="@drawable/res_0x7f0800f0_ic_dialog_error_illustration_animated__17"/>
+    <target android:name="_R_G_L_0_G_D_0_P_0" android:animation="@drawable/res_0x7f0800f1_ic_dialog_error_illustration_animated__18"/>
+    <target android:name="_R_G_L_0_G_D_0_P_0" android:animation="@drawable/res_0x7f0800f2_ic_dialog_error_illustration_animated__19"/>
+    <target android:name="_R_G_L_0_G" android:animation="@drawable/res_0x7f0800f4_ic_dialog_error_illustration_animated__20"/>
+    <target android:name="_R_G_L_0_G" android:animation="@drawable/res_0x7f0800f5_ic_dialog_error_illustration_animated__21"/>
+    <target android:name="_R_G_L_0_G" android:animation="@drawable/res_0x7f0800f6_ic_dialog_error_illustration_animated__22"/>
+    <target android:name="_R_G_L_0_G" android:animation="@drawable/res_0x7f0800f7_ic_dialog_error_illustration_animated__23"/>
+    <target android:name="time_group" android:animation="@drawable/res_0x7f0800f8_ic_dialog_error_illustration_animated__24"/>
+</animated-vector>

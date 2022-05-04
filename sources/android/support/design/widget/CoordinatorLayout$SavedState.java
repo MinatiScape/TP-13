@@ -8,21 +8,42 @@ import android.util.SparseArray;
 public class CoordinatorLayout$SavedState extends AbsSavedState {
     public static final Parcelable.Creator<CoordinatorLayout$SavedState> CREATOR = new Parcelable.ClassLoaderCreator<CoordinatorLayout$SavedState>() { // from class: android.support.design.widget.CoordinatorLayout$SavedState.1
         @Override // android.os.Parcelable.ClassLoaderCreator
-        public CoordinatorLayout$SavedState createFromParcel(Parcel parcel, ClassLoader classLoader) {
+        public final CoordinatorLayout$SavedState createFromParcel(Parcel parcel, ClassLoader classLoader) {
             return new CoordinatorLayout$SavedState(parcel, classLoader);
         }
 
         @Override // android.os.Parcelable.Creator
-        public Object[] newArray(int i) {
-            return new CoordinatorLayout$SavedState[i];
+        public final Object createFromParcel(Parcel parcel) {
+            return new CoordinatorLayout$SavedState(parcel, null);
         }
 
         @Override // android.os.Parcelable.Creator
-        public Object createFromParcel(Parcel parcel) {
-            return new CoordinatorLayout$SavedState(parcel, null);
+        public final Object[] newArray(int i) {
+            return new CoordinatorLayout$SavedState[i];
         }
     };
     public SparseArray<Parcelable> behaviorStates;
+
+    @Override // android.support.v4.view.AbsSavedState, android.os.Parcelable
+    public final void writeToParcel(Parcel parcel, int i) {
+        int i2;
+        parcel.writeParcelable(this.mSuperState, i);
+        SparseArray<Parcelable> sparseArray = this.behaviorStates;
+        if (sparseArray != null) {
+            i2 = sparseArray.size();
+        } else {
+            i2 = 0;
+        }
+        parcel.writeInt(i2);
+        int[] iArr = new int[i2];
+        Parcelable[] parcelableArr = new Parcelable[i2];
+        for (int i3 = 0; i3 < i2; i3++) {
+            iArr[i3] = this.behaviorStates.keyAt(i3);
+            parcelableArr[i3] = this.behaviorStates.valueAt(i3);
+        }
+        parcel.writeIntArray(iArr);
+        parcel.writeParcelableArray(parcelableArr, i);
+    }
 
     public CoordinatorLayout$SavedState(Parcel parcel, ClassLoader classLoader) {
         super(parcel, classLoader);
@@ -34,21 +55,5 @@ public class CoordinatorLayout$SavedState extends AbsSavedState {
         for (int i = 0; i < readInt; i++) {
             this.behaviorStates.append(iArr[i], readParcelableArray[i]);
         }
-    }
-
-    @Override // android.support.v4.view.AbsSavedState, android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeParcelable(this.mSuperState, i);
-        SparseArray<Parcelable> sparseArray = this.behaviorStates;
-        int size = sparseArray != null ? sparseArray.size() : 0;
-        parcel.writeInt(size);
-        int[] iArr = new int[size];
-        Parcelable[] parcelableArr = new Parcelable[size];
-        for (int i2 = 0; i2 < size; i2++) {
-            iArr[i2] = this.behaviorStates.keyAt(i2);
-            parcelableArr[i2] = this.behaviorStates.valueAt(i2);
-        }
-        parcel.writeIntArray(iArr);
-        parcel.writeParcelableArray(parcelableArr, i);
     }
 }

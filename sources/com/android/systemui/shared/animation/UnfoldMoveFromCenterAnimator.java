@@ -11,8 +11,12 @@ import java.util.List;
 import kotlin.jvm.internal.DefaultConstructorMarker;
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+/* compiled from: UnfoldMoveFromCenterAnimator.kt */
 /* loaded from: classes.dex */
 public final class UnfoldMoveFromCenterAnimator implements UnfoldTransitionProgressProvider.TransitionProgressListener {
+    @Nullable
+    private final AlphaProvider alphaProvider;
     @NotNull
     private final List<AnimatedView> animatedViews;
     private boolean isVerticalFold;
@@ -26,9 +30,17 @@ public final class UnfoldMoveFromCenterAnimator implements UnfoldTransitionProgr
     @NotNull
     private final WindowManager windowManager;
 
+    /* compiled from: UnfoldMoveFromCenterAnimator.kt */
+    /* loaded from: classes.dex */
+    public interface AlphaProvider {
+        float getAlpha(float f);
+    }
+
+    /* compiled from: UnfoldMoveFromCenterAnimator.kt */
     /* loaded from: classes.dex */
     public interface TranslationApplier {
 
+        /* compiled from: UnfoldMoveFromCenterAnimator.kt */
         /* loaded from: classes.dex */
         public static final class DefaultImpls {
             public static void apply(@NotNull TranslationApplier translationApplier, @NotNull View view, float f, float f2) {
@@ -42,9 +54,11 @@ public final class UnfoldMoveFromCenterAnimator implements UnfoldTransitionProgr
         void apply(@NotNull View view, float f, float f2);
     }
 
+    /* compiled from: UnfoldMoveFromCenterAnimator.kt */
     /* loaded from: classes.dex */
     public interface ViewCenterProvider {
 
+        /* compiled from: UnfoldMoveFromCenterAnimator.kt */
         /* loaded from: classes.dex */
         public static final class DefaultImpls {
             public static void getViewCenter(@NotNull ViewCenterProvider viewCenterProvider, @NotNull View view, @NotNull Point outPoint) {
@@ -65,26 +79,42 @@ public final class UnfoldMoveFromCenterAnimator implements UnfoldTransitionProgr
 
     /* JADX WARN: 'this' call moved to the top of the method (can break code semantics) */
     public UnfoldMoveFromCenterAnimator(@NotNull WindowManager windowManager) {
-        this(windowManager, null, null, 6, null);
+        this(windowManager, null, null, null, 14, null);
         Intrinsics.checkNotNullParameter(windowManager, "windowManager");
     }
 
     /* JADX WARN: 'this' call moved to the top of the method (can break code semantics) */
     public UnfoldMoveFromCenterAnimator(@NotNull WindowManager windowManager, @NotNull TranslationApplier translationApplier) {
-        this(windowManager, translationApplier, null, 4, null);
+        this(windowManager, translationApplier, null, null, 12, null);
         Intrinsics.checkNotNullParameter(windowManager, "windowManager");
         Intrinsics.checkNotNullParameter(translationApplier, "translationApplier");
     }
 
+    /* JADX WARN: 'this' call moved to the top of the method (can break code semantics) */
     public UnfoldMoveFromCenterAnimator(@NotNull WindowManager windowManager, @NotNull TranslationApplier translationApplier, @NotNull ViewCenterProvider viewCenterProvider) {
+        this(windowManager, translationApplier, viewCenterProvider, null, 8, null);
+        Intrinsics.checkNotNullParameter(windowManager, "windowManager");
+        Intrinsics.checkNotNullParameter(translationApplier, "translationApplier");
+        Intrinsics.checkNotNullParameter(viewCenterProvider, "viewCenterProvider");
+    }
+
+    public UnfoldMoveFromCenterAnimator(@NotNull WindowManager windowManager, @NotNull TranslationApplier translationApplier, @NotNull ViewCenterProvider viewCenterProvider, @Nullable AlphaProvider alphaProvider) {
         Intrinsics.checkNotNullParameter(windowManager, "windowManager");
         Intrinsics.checkNotNullParameter(translationApplier, "translationApplier");
         Intrinsics.checkNotNullParameter(viewCenterProvider, "viewCenterProvider");
         this.windowManager = windowManager;
         this.translationApplier = translationApplier;
         this.viewCenterProvider = viewCenterProvider;
+        this.alphaProvider = alphaProvider;
         this.screenSize = new Point();
         this.animatedViews = new ArrayList();
+    }
+
+    private final void applyAlpha(AnimatedView animatedView, float f) {
+        View view;
+        if (this.alphaProvider != null && (view = animatedView.getView().get()) != null) {
+            view.setAlpha(this.alphaProvider.getAlpha(f));
+        }
     }
 
     private final AnimatedView createAnimatedView(View view) {
@@ -112,25 +142,12 @@ public final class UnfoldMoveFromCenterAnimator implements UnfoldTransitionProgr
     }
 
     @Override // com.android.systemui.unfold.UnfoldTransitionProgressProvider.TransitionProgressListener
-    public void onTransitionFinished() {
-        UnfoldTransitionProgressProvider.TransitionProgressListener.DefaultImpls.onTransitionFinished(this);
-    }
-
-    @Override // com.android.systemui.unfold.UnfoldTransitionProgressProvider.TransitionProgressListener
     public void onTransitionProgress(float f) {
         for (AnimatedView animatedView : this.animatedViews) {
-            View view = animatedView.getView().get();
-            if (view != null) {
-                float f2 = 1 - f;
-                this.translationApplier.apply(view, animatedView.getStartTranslationX() * f2, animatedView.getStartTranslationY() * f2);
-            }
+            applyTransition(animatedView, f);
+            applyAlpha(animatedView, f);
         }
         this.lastAnimationProgress = f;
-    }
-
-    @Override // com.android.systemui.unfold.UnfoldTransitionProgressProvider.TransitionProgressListener
-    public void onTransitionStarted() {
-        UnfoldTransitionProgressProvider.TransitionProgressListener.DefaultImpls.onTransitionStarted(this);
     }
 
     public final void registerViewForAnimation(@NotNull View view) {
@@ -139,8 +156,14 @@ public final class UnfoldMoveFromCenterAnimator implements UnfoldTransitionProgr
     }
 
     public final void updateDisplayProperties() {
+        boolean z;
         this.windowManager.getDefaultDisplay().getSize(this.screenSize);
-        this.isVerticalFold = this.windowManager.getDefaultDisplay().getRotation() == 0 || this.windowManager.getDefaultDisplay().getRotation() == 2;
+        if (this.windowManager.getDefaultDisplay().getRotation() == 0 || this.windowManager.getDefaultDisplay().getRotation() == 2) {
+            z = true;
+        } else {
+            z = false;
+        }
+        this.isVerticalFold = z;
     }
 
     public final void updateViewPositions() {
@@ -153,6 +176,15 @@ public final class UnfoldMoveFromCenterAnimator implements UnfoldTransitionProgr
         onTransitionProgress(this.lastAnimationProgress);
     }
 
+    private final void applyTransition(AnimatedView animatedView, float f) {
+        View view = animatedView.getView().get();
+        if (view != null) {
+            float f2 = 1 - f;
+            this.translationApplier.apply(view, animatedView.getStartTranslationX() * f2, animatedView.getStartTranslationY() * f2);
+        }
+    }
+
+    /* compiled from: UnfoldMoveFromCenterAnimator.kt */
     /* loaded from: classes.dex */
     public static final class AnimatedView {
         private float startTranslationX;
@@ -167,6 +199,18 @@ public final class UnfoldMoveFromCenterAnimator implements UnfoldTransitionProgr
             this.startTranslationY = f2;
         }
 
+        public /* synthetic */ AnimatedView(WeakReference weakReference, float f, float f2, int i, DefaultConstructorMarker defaultConstructorMarker) {
+            this(weakReference, (i & 2) != 0 ? 0.0f : f, (i & 4) != 0 ? 0.0f : f2);
+        }
+
+        public final void setStartTranslationX(float f) {
+            this.startTranslationX = f;
+        }
+
+        public final void setStartTranslationY(float f) {
+            this.startTranslationY = f;
+        }
+
         public final float getStartTranslationX() {
             return this.startTranslationX;
         }
@@ -179,21 +223,9 @@ public final class UnfoldMoveFromCenterAnimator implements UnfoldTransitionProgr
         public final WeakReference<View> getView() {
             return this.view;
         }
-
-        public final void setStartTranslationX(float f) {
-            this.startTranslationX = f;
-        }
-
-        public final void setStartTranslationY(float f) {
-            this.startTranslationY = f;
-        }
-
-        public /* synthetic */ AnimatedView(WeakReference weakReference, float f, float f2, int i, DefaultConstructorMarker defaultConstructorMarker) {
-            this(weakReference, (i & 2) != 0 ? 0.0f : f, (i & 4) != 0 ? 0.0f : f2);
-        }
     }
 
-    public /* synthetic */ UnfoldMoveFromCenterAnimator(WindowManager windowManager, TranslationApplier translationApplier, ViewCenterProvider viewCenterProvider, int i, DefaultConstructorMarker defaultConstructorMarker) {
+    public /* synthetic */ UnfoldMoveFromCenterAnimator(WindowManager windowManager, TranslationApplier translationApplier, ViewCenterProvider viewCenterProvider, AlphaProvider alphaProvider, int i, DefaultConstructorMarker defaultConstructorMarker) {
         this(windowManager, (i & 2) != 0 ? new TranslationApplier() { // from class: com.android.systemui.shared.animation.UnfoldMoveFromCenterAnimator.1
             @Override // com.android.systemui.shared.animation.UnfoldMoveFromCenterAnimator.TranslationApplier
             public void apply(@NotNull View view, float f, float f2) {
@@ -204,6 +236,16 @@ public final class UnfoldMoveFromCenterAnimator implements UnfoldTransitionProgr
             public void getViewCenter(@NotNull View view, @NotNull Point point) {
                 ViewCenterProvider.DefaultImpls.getViewCenter(this, view, point);
             }
-        } : viewCenterProvider);
+        } : viewCenterProvider, (i & 8) != 0 ? null : alphaProvider);
+    }
+
+    @Override // com.android.systemui.unfold.UnfoldTransitionProgressProvider.TransitionProgressListener
+    public void onTransitionFinished() {
+        UnfoldTransitionProgressProvider.TransitionProgressListener.DefaultImpls.onTransitionFinished(this);
+    }
+
+    @Override // com.android.systemui.unfold.UnfoldTransitionProgressProvider.TransitionProgressListener
+    public void onTransitionStarted() {
+        UnfoldTransitionProgressProvider.TransitionProgressListener.DefaultImpls.onTransitionStarted(this);
     }
 }

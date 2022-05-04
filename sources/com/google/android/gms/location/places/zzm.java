@@ -3,14 +3,15 @@ package com.google.android.gms.location.places;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.android.gms.internal.zzbkw;
+/* compiled from: PlaceReportCreator.java */
 /* loaded from: classes.dex */
 public final class zzm implements Parcelable.Creator<PlaceReport> {
     @Override // android.os.Parcelable.Creator
     public final /* synthetic */ PlaceReport createFromParcel(Parcel parcel) {
         int zza = zzbkw.zza(parcel);
         String str = null;
-        int i = 0;
         String str2 = null;
+        int i = 0;
         String str3 = null;
         while (parcel.dataPosition() < zza) {
             int readInt = parcel.readInt();

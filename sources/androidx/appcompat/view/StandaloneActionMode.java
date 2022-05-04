@@ -1,7 +1,6 @@
 package androidx.appcompat.view;
 
 import android.content.Context;
-import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -9,9 +8,10 @@ import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.ActionBarContextView;
 import androidx.appcompat.widget.ActionMenuPresenter;
+import androidx.core.view.ViewCompat;
 import java.lang.ref.WeakReference;
 /* loaded from: classes.dex */
-public class StandaloneActionMode extends ActionMode implements MenuBuilder.Callback {
+public final class StandaloneActionMode extends ActionMode implements MenuBuilder.Callback {
     public ActionMode.Callback mCallback;
     public Context mContext;
     public ActionBarContextView mContextView;
@@ -19,7 +19,91 @@ public class StandaloneActionMode extends ActionMode implements MenuBuilder.Call
     public boolean mFinished;
     public MenuBuilder mMenu;
 
-    public StandaloneActionMode(Context context, ActionBarContextView actionBarContextView, ActionMode.Callback callback, boolean z) {
+    @Override // androidx.appcompat.view.ActionMode
+    public final void setSubtitle(CharSequence charSequence) {
+        ActionBarContextView actionBarContextView = this.mContextView;
+        actionBarContextView.mSubtitle = charSequence;
+        actionBarContextView.initTitle();
+    }
+
+    @Override // androidx.appcompat.view.ActionMode
+    public final void setTitle(CharSequence charSequence) {
+        ActionBarContextView actionBarContextView = this.mContextView;
+        actionBarContextView.mTitle = charSequence;
+        actionBarContextView.initTitle();
+        ViewCompat.setAccessibilityPaneTitle(actionBarContextView, charSequence);
+    }
+
+    @Override // androidx.appcompat.view.ActionMode
+    public final void finish() {
+        if (!this.mFinished) {
+            this.mFinished = true;
+            this.mCallback.onDestroyActionMode(this);
+        }
+    }
+
+    @Override // androidx.appcompat.view.ActionMode
+    public final View getCustomView() {
+        WeakReference<View> weakReference = this.mCustomView;
+        if (weakReference != null) {
+            return weakReference.get();
+        }
+        return null;
+    }
+
+    @Override // androidx.appcompat.view.ActionMode
+    public final MenuInflater getMenuInflater() {
+        return new SupportMenuInflater(this.mContextView.getContext());
+    }
+
+    @Override // androidx.appcompat.view.ActionMode
+    public final CharSequence getSubtitle() {
+        return this.mContextView.mSubtitle;
+    }
+
+    @Override // androidx.appcompat.view.ActionMode
+    public final CharSequence getTitle() {
+        return this.mContextView.mTitle;
+    }
+
+    @Override // androidx.appcompat.view.ActionMode
+    public final void invalidate() {
+        this.mCallback.onPrepareActionMode(this, this.mMenu);
+    }
+
+    @Override // androidx.appcompat.view.ActionMode
+    public final boolean isTitleOptional() {
+        return this.mContextView.mTitleOptional;
+    }
+
+    @Override // androidx.appcompat.view.menu.MenuBuilder.Callback
+    public final boolean onMenuItemSelected(MenuBuilder menuBuilder, MenuItem menuItem) {
+        return this.mCallback.onActionItemClicked(this, menuItem);
+    }
+
+    @Override // androidx.appcompat.view.ActionMode
+    public final void setCustomView(View view) {
+        WeakReference<View> weakReference;
+        this.mContextView.setCustomView(view);
+        if (view != null) {
+            weakReference = new WeakReference<>(view);
+        } else {
+            weakReference = null;
+        }
+        this.mCustomView = weakReference;
+    }
+
+    @Override // androidx.appcompat.view.ActionMode
+    public final void setTitleOptionalHint(boolean z) {
+        this.mTitleOptionalHint = z;
+        ActionBarContextView actionBarContextView = this.mContextView;
+        if (z != actionBarContextView.mTitleOptional) {
+            actionBarContextView.requestLayout();
+        }
+        actionBarContextView.mTitleOptional = z;
+    }
+
+    public StandaloneActionMode(Context context, ActionBarContextView actionBarContextView, ActionMode.Callback callback) {
         this.mContext = context;
         this.mContextView = actionBarContextView;
         this.mCallback = callback;
@@ -29,61 +113,8 @@ public class StandaloneActionMode extends ActionMode implements MenuBuilder.Call
         menuBuilder.mCallback = this;
     }
 
-    @Override // androidx.appcompat.view.ActionMode
-    public void finish() {
-        if (!this.mFinished) {
-            this.mFinished = true;
-            this.mContextView.sendAccessibilityEvent(32);
-            this.mCallback.onDestroyActionMode(this);
-        }
-    }
-
-    @Override // androidx.appcompat.view.ActionMode
-    public View getCustomView() {
-        WeakReference<View> weakReference = this.mCustomView;
-        if (weakReference != null) {
-            return weakReference.get();
-        }
-        return null;
-    }
-
-    @Override // androidx.appcompat.view.ActionMode
-    public Menu getMenu() {
-        return this.mMenu;
-    }
-
-    @Override // androidx.appcompat.view.ActionMode
-    public MenuInflater getMenuInflater() {
-        return new SupportMenuInflater(this.mContextView.getContext());
-    }
-
-    @Override // androidx.appcompat.view.ActionMode
-    public CharSequence getSubtitle() {
-        return this.mContextView.mSubtitle;
-    }
-
-    @Override // androidx.appcompat.view.ActionMode
-    public CharSequence getTitle() {
-        return this.mContextView.mTitle;
-    }
-
-    @Override // androidx.appcompat.view.ActionMode
-    public void invalidate() {
-        this.mCallback.onPrepareActionMode(this, this.mMenu);
-    }
-
-    @Override // androidx.appcompat.view.ActionMode
-    public boolean isTitleOptional() {
-        return this.mContextView.mTitleOptional;
-    }
-
     @Override // androidx.appcompat.view.menu.MenuBuilder.Callback
-    public boolean onMenuItemSelected(MenuBuilder menuBuilder, MenuItem menuItem) {
-        return this.mCallback.onActionItemClicked(this, menuItem);
-    }
-
-    @Override // androidx.appcompat.view.menu.MenuBuilder.Callback
-    public void onMenuModeChange(MenuBuilder menuBuilder) {
+    public final void onMenuModeChange(MenuBuilder menuBuilder) {
         invalidate();
         ActionMenuPresenter actionMenuPresenter = this.mContextView.mActionMenuPresenter;
         if (actionMenuPresenter != null) {
@@ -92,48 +123,17 @@ public class StandaloneActionMode extends ActionMode implements MenuBuilder.Call
     }
 
     @Override // androidx.appcompat.view.ActionMode
-    public void setCustomView(View view) {
-        this.mContextView.setCustomView(view);
-        this.mCustomView = view != null ? new WeakReference<>(view) : null;
+    public final void setSubtitle(int i) {
+        setSubtitle(this.mContext.getString(i));
     }
 
     @Override // androidx.appcompat.view.ActionMode
-    public void setSubtitle(CharSequence charSequence) {
-        ActionBarContextView actionBarContextView = this.mContextView;
-        actionBarContextView.mSubtitle = charSequence;
-        actionBarContextView.initTitle();
+    public final void setTitle(int i) {
+        setTitle(this.mContext.getString(i));
     }
 
     @Override // androidx.appcompat.view.ActionMode
-    public void setTitle(CharSequence charSequence) {
-        ActionBarContextView actionBarContextView = this.mContextView;
-        actionBarContextView.mTitle = charSequence;
-        actionBarContextView.initTitle();
-    }
-
-    @Override // androidx.appcompat.view.ActionMode
-    public void setTitleOptionalHint(boolean z) {
-        this.mTitleOptionalHint = z;
-        ActionBarContextView actionBarContextView = this.mContextView;
-        if (z != actionBarContextView.mTitleOptional) {
-            actionBarContextView.requestLayout();
-        }
-        actionBarContextView.mTitleOptional = z;
-    }
-
-    @Override // androidx.appcompat.view.ActionMode
-    public void setSubtitle(int i) {
-        String string = this.mContext.getString(i);
-        ActionBarContextView actionBarContextView = this.mContextView;
-        actionBarContextView.mSubtitle = string;
-        actionBarContextView.initTitle();
-    }
-
-    @Override // androidx.appcompat.view.ActionMode
-    public void setTitle(int i) {
-        String string = this.mContext.getString(i);
-        ActionBarContextView actionBarContextView = this.mContextView;
-        actionBarContextView.mTitle = string;
-        actionBarContextView.initTitle();
+    public final MenuBuilder getMenu() {
+        return this.mMenu;
     }
 }

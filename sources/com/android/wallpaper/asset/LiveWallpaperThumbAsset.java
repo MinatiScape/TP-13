@@ -3,7 +3,6 @@ package com.android.wallpaper.asset;
 import android.app.Activity;
 import android.app.WallpaperInfo;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,30 +12,31 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 import android.util.Log;
 import android.widget.ImageView;
+import androidx.fragment.app.FragmentActivity;
 import com.android.wallpaper.asset.Asset;
+import com.android.wallpaper.picker.WallpaperPreviewBitmapTransformation;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.MultiTransformation;
 import com.bumptech.glide.load.Transformation;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
 import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.BaseRequestOptions;
-import com.bumptech.glide.request.RequestFutureTarget;
 import com.bumptech.glide.request.RequestOptions;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 /* loaded from: classes.dex */
 public class LiveWallpaperThumbAsset extends Asset {
+    public static final ExecutorService sExecutorService = Executors.newCachedThreadPool();
     public final Context mContext;
     public final WallpaperInfo mInfo;
     public Drawable mThumbnailDrawable;
@@ -46,12 +46,8 @@ public class LiveWallpaperThumbAsset extends Asset {
     public static final class LiveWallpaperThumbKey implements Key {
         public WallpaperInfo mInfo;
 
-        public LiveWallpaperThumbKey(WallpaperInfo wallpaperInfo) {
-            this.mInfo = wallpaperInfo;
-        }
-
         @Override // com.bumptech.glide.load.Key
-        public boolean equals(Object obj) {
+        public final boolean equals(Object obj) {
             if (!(obj instanceof LiveWallpaperThumbKey)) {
                 return false;
             }
@@ -67,83 +63,40 @@ public class LiveWallpaperThumbAsset extends Asset {
             return m.toString();
         }
 
+        public LiveWallpaperThumbKey(WallpaperInfo wallpaperInfo) {
+            this.mInfo = wallpaperInfo;
+        }
+
         @Override // com.bumptech.glide.load.Key
-        public int hashCode() {
+        public final int hashCode() {
             return getCacheKey().hashCode();
         }
 
-        public String toString() {
+        public final String toString() {
             return getCacheKey();
         }
 
         @Override // com.bumptech.glide.load.Key
-        public void updateDiskCacheKey(MessageDigest messageDigest) {
+        public final void updateDiskCacheKey(MessageDigest messageDigest) {
             messageDigest.update(getCacheKey().getBytes(Key.CHARSET));
         }
     }
 
-    /* loaded from: classes.dex */
-    public static class LoadThumbnailTask extends AsyncTask<Void, Void, Bitmap> {
-        public WallpaperInfo mInfo;
-        public final PackageManager mPackageManager;
-        public Asset.BitmapReceiver mReceiver;
-
-        public LoadThumbnailTask(Context context, WallpaperInfo wallpaperInfo, Asset.BitmapReceiver bitmapReceiver) {
-            this.mInfo = wallpaperInfo;
-            this.mReceiver = bitmapReceiver;
-            this.mPackageManager = context.getPackageManager();
-        }
-
-        @Override // android.os.AsyncTask
-        public Bitmap doInBackground(Void[] voidArr) {
-            Drawable loadThumbnail = this.mInfo.loadThumbnail(this.mPackageManager);
-            if (loadThumbnail instanceof BitmapDrawable) {
-                return ((BitmapDrawable) loadThumbnail).getBitmap();
-            }
-            Bitmap bitmap = null;
-            if (loadThumbnail != null && loadThumbnail.getIntrinsicWidth() > 0 && loadThumbnail.getIntrinsicHeight() > 0) {
-                bitmap = Bitmap.createBitmap(loadThumbnail.getIntrinsicWidth(), loadThumbnail.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-                Canvas canvas = new Canvas(bitmap);
-                loadThumbnail.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-                loadThumbnail.draw(canvas);
-            }
-            return bitmap;
-        }
-
-        @Override // android.os.AsyncTask
-        public void onPostExecute(Bitmap bitmap) {
-            this.mReceiver.onBitmapDecoded(bitmap);
-        }
-    }
-
-    public LiveWallpaperThumbAsset(Context context, WallpaperInfo wallpaperInfo) {
-        this.mContext = context.getApplicationContext();
-        this.mInfo = wallpaperInfo;
-    }
-
     @Override // com.android.wallpaper.asset.Asset
-    public void decodeBitmap(int i, int i2, Asset.BitmapReceiver bitmapReceiver) {
-        new LoadThumbnailTask(this.mContext, this.mInfo, bitmapReceiver).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Void[0]);
-    }
-
-    @Override // com.android.wallpaper.asset.Asset
-    public void decodeBitmapRegion(Rect rect, int i, int i2, boolean z, Asset.BitmapReceiver bitmapReceiver) {
+    public final void decodeBitmapRegion(Rect rect, int i, int i2, boolean z, Asset.BitmapReceiver bitmapReceiver) {
         bitmapReceiver.onBitmapDecoded(null);
     }
 
     @Override // com.android.wallpaper.asset.Asset
-    public void decodeRawDimensions(Activity activity, Asset.DimensionsReceiver dimensionsReceiver) {
+    public final void decodeRawDimensions(Activity activity, Asset.DimensionsReceiver dimensionsReceiver) {
         dimensionsReceiver.onDimensionsDecoded(null);
     }
 
     @Override // com.android.wallpaper.asset.Asset
-    public Bitmap getLowResBitmap(Context context) {
+    public final Bitmap getLowResBitmap(Context context) {
         Bitmap bitmap;
         try {
-            RequestBuilder<Drawable> asDrawable = Glide.with(context).asDrawable();
-            asDrawable.model = this;
-            asDrawable.isModelSet = true;
-            Drawable drawable = (Drawable) ((RequestFutureTarget) asDrawable.submit()).get(2L, TimeUnit.SECONDS);
+            Drawable drawable = (Drawable) Glide.getRetriever(context).get(context).asDrawable().loadGeneric(this).submit().get(2L, TimeUnit.SECONDS);
             if ((drawable instanceof BitmapDrawable) && (bitmap = ((BitmapDrawable) drawable).getBitmap()) != null) {
                 return bitmap;
             }
@@ -159,6 +112,33 @@ public class LiveWallpaperThumbAsset extends Asset {
             Log.w("LiveWallpaperThumbAsset", "Couldn't obtain low res bitmap", e);
             return null;
         }
+    }
+
+    @Override // com.android.wallpaper.asset.Asset
+    public void decodeBitmap(final int i, final int i2, final Asset.BitmapReceiver bitmapReceiver) {
+        sExecutorService.execute(new Runnable() { // from class: com.android.wallpaper.asset.LiveWallpaperThumbAsset$$ExternalSyntheticLambda0
+            @Override // java.lang.Runnable
+            public final void run() {
+                LiveWallpaperThumbAsset liveWallpaperThumbAsset = LiveWallpaperThumbAsset.this;
+                Asset.BitmapReceiver bitmapReceiver2 = bitmapReceiver;
+                int i3 = i;
+                int i4 = i2;
+                Drawable loadThumbnail = liveWallpaperThumbAsset.mInfo.loadThumbnail(liveWallpaperThumbAsset.mContext.getPackageManager());
+                if (loadThumbnail instanceof BitmapDrawable) {
+                    Asset.decodeBitmapCompleted(bitmapReceiver2, Bitmap.createScaledBitmap(((BitmapDrawable) loadThumbnail).getBitmap(), i3, i4, true));
+                } else if (loadThumbnail == null) {
+                    Asset.decodeBitmapCompleted(bitmapReceiver2, null);
+                } else if (loadThumbnail.getIntrinsicWidth() <= 0 || loadThumbnail.getIntrinsicHeight() <= 0) {
+                    Asset.decodeBitmapCompleted(bitmapReceiver2, null);
+                } else {
+                    Bitmap createBitmap = Bitmap.createBitmap(loadThumbnail.getIntrinsicWidth(), loadThumbnail.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+                    Canvas canvas = new Canvas(createBitmap);
+                    loadThumbnail.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+                    loadThumbnail.draw(canvas);
+                    Asset.decodeBitmapCompleted(bitmapReceiver2, Bitmap.createScaledBitmap(createBitmap, i3, i4, true));
+                }
+            }
+        });
     }
 
     public Drawable getThumbnailDrawable() {
@@ -187,38 +167,30 @@ public class LiveWallpaperThumbAsset extends Asset {
     }
 
     @Override // com.android.wallpaper.asset.Asset
-    public void loadDrawable(Context context, ImageView imageView, int i) {
+    public void loadDrawable(Activity activity, ImageView imageView, int i) {
         RequestOptions requestOptions;
         if (this.mUri != null) {
-            requestOptions = RequestOptions.centerCropTransform().apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE).skipMemoryCache(true)).placeholder(new ColorDrawable(i));
+            requestOptions = (RequestOptions) ((RequestOptions) RequestOptions.centerCropTransform().mo32apply(new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true))).placeholder(new ColorDrawable(i));
         } else {
-            requestOptions = RequestOptions.centerCropTransform().placeholder(new ColorDrawable(i));
+            requestOptions = (RequestOptions) RequestOptions.centerCropTransform().placeholder(new ColorDrawable(i));
         }
-        RequestBuilder<Drawable> asDrawable = Glide.with(context).asDrawable();
-        asDrawable.model = this;
-        asDrawable.isModelSet = true;
-        RequestBuilder<Drawable> apply = asDrawable.apply((BaseRequestOptions<?>) requestOptions);
-        apply.transition(DrawableTransitionOptions.withCrossFade());
-        apply.into(imageView);
+        imageView.setBackgroundColor(i);
+        Glide.getRetriever(activity).get((Context) activity).asDrawable().loadGeneric(this).mo32apply((BaseRequestOptions<?>) requestOptions).transition(DrawableTransitionOptions.withCrossFade()).into(imageView);
     }
 
     @Override // com.android.wallpaper.asset.Asset
-    public void loadLowResDrawable(Activity activity, ImageView imageView, int i, BitmapTransformation bitmapTransformation) {
+    public final void loadLowResDrawable(FragmentActivity fragmentActivity, ImageView imageView, int i, WallpaperPreviewBitmapTransformation wallpaperPreviewBitmapTransformation) {
         Transformation transformation;
-        if (bitmapTransformation == null) {
+        if (wallpaperPreviewBitmapTransformation == null) {
             transformation = new FitCenter();
         } else {
-            transformation = new MultiTransformation(new FitCenter(), bitmapTransformation);
+            transformation = new MultiTransformation(new FitCenter(), wallpaperPreviewBitmapTransformation);
         }
-        RequestBuilder<Drawable> asDrawable = Glide.with(activity).asDrawable();
-        asDrawable.model = this;
-        asDrawable.isModelSet = true;
-        asDrawable.apply((BaseRequestOptions<?>) RequestOptions.bitmapTransform(transformation).placeholder(new ColorDrawable(i))).into(imageView);
+        Glide.getRetriever(fragmentActivity).get((Activity) fragmentActivity).asDrawable().loadGeneric(this).mo32apply((BaseRequestOptions<?>) RequestOptions.bitmapTransform(transformation).placeholder(new ColorDrawable(i))).into(imageView);
     }
 
-    public LiveWallpaperThumbAsset(Context context, WallpaperInfo wallpaperInfo, Uri uri) {
+    public LiveWallpaperThumbAsset(Context context, WallpaperInfo wallpaperInfo) {
         this.mContext = context.getApplicationContext();
         this.mInfo = wallpaperInfo;
-        this.mUri = uri;
     }
 }

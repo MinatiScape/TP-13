@@ -1,7 +1,8 @@
 package com.bumptech.glide.load.model;
 
+import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
+import androidx.collection.ContainerHelpers;
 import androidx.core.util.Pools$Pool;
-import com.adobe.xmp.XMPPathFactory$$ExternalSyntheticOutline0;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.Key;
@@ -12,9 +13,8 @@ import com.bumptech.glide.load.model.ModelLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 /* loaded from: classes.dex */
-public class MultiModelLoader<Model, Data> implements ModelLoader<Model, Data> {
+public final class MultiModelLoader<Model, Data> implements ModelLoader<Model, Data> {
     public final Pools$Pool<List<Throwable>> exceptionListPool;
     public final List<ModelLoader<Model, Data>> modelLoaders;
 
@@ -24,22 +24,12 @@ public class MultiModelLoader<Model, Data> implements ModelLoader<Model, Data> {
         public int currentIndex;
         public List<Throwable> exceptions;
         public final List<DataFetcher<Data>> fetchers;
-        public volatile boolean isCancelled;
+        public boolean isCancelled;
         public Priority priority;
         public final Pools$Pool<List<Throwable>> throwableListPool;
 
-        public MultiFetcher(List<DataFetcher<Data>> fetchers, Pools$Pool<List<Throwable>> throwableListPool) {
-            this.throwableListPool = throwableListPool;
-            if (!fetchers.isEmpty()) {
-                this.fetchers = fetchers;
-                this.currentIndex = 0;
-                return;
-            }
-            throw new IllegalArgumentException("Must not be empty.");
-        }
-
         @Override // com.bumptech.glide.load.data.DataFetcher
-        public void cancel() {
+        public final void cancel() {
             this.isCancelled = true;
             for (DataFetcher<Data> dataFetcher : this.fetchers) {
                 dataFetcher.cancel();
@@ -47,7 +37,7 @@ public class MultiModelLoader<Model, Data> implements ModelLoader<Model, Data> {
         }
 
         @Override // com.bumptech.glide.load.data.DataFetcher
-        public void cleanup() {
+        public final void cleanup() {
             List<Throwable> list = this.exceptions;
             if (list != null) {
                 this.throwableListPool.release(list);
@@ -59,19 +49,19 @@ public class MultiModelLoader<Model, Data> implements ModelLoader<Model, Data> {
         }
 
         @Override // com.bumptech.glide.load.data.DataFetcher
-        public Class<Data> getDataClass() {
+        public final Class<Data> getDataClass() {
             return this.fetchers.get(0).getDataClass();
         }
 
         @Override // com.bumptech.glide.load.data.DataFetcher
-        public DataSource getDataSource() {
+        public final DataSource getDataSource() {
             return this.fetchers.get(0).getDataSource();
         }
 
         @Override // com.bumptech.glide.load.data.DataFetcher
-        public void loadData(Priority priority, DataFetcher.DataCallback<? super Data> callback) {
+        public final void loadData(Priority priority, DataFetcher.DataCallback<? super Data> dataCallback) {
             this.priority = priority;
-            this.callback = callback;
+            this.callback = dataCallback;
             this.exceptions = this.throwableListPool.acquire();
             this.fetchers.get(this.currentIndex).loadData(priority, this);
             if (this.isCancelled) {
@@ -80,7 +70,7 @@ public class MultiModelLoader<Model, Data> implements ModelLoader<Model, Data> {
         }
 
         @Override // com.bumptech.glide.load.data.DataFetcher.DataCallback
-        public void onDataReady(Data data) {
+        public final void onDataReady(Data data) {
             if (data != null) {
                 this.callback.onDataReady(data);
             } else {
@@ -89,10 +79,10 @@ public class MultiModelLoader<Model, Data> implements ModelLoader<Model, Data> {
         }
 
         @Override // com.bumptech.glide.load.data.DataFetcher.DataCallback
-        public void onLoadFailed(Exception e) {
+        public final void onLoadFailed(Exception exc) {
             List<Throwable> list = this.exceptions;
-            Objects.requireNonNull(list, "Argument must not be null");
-            list.add(e);
+            ContainerHelpers.checkNotNull(list);
+            list.add(exc);
             startNextOrFail();
         }
 
@@ -103,26 +93,31 @@ public class MultiModelLoader<Model, Data> implements ModelLoader<Model, Data> {
                     loadData(this.priority, this.callback);
                     return;
                 }
-                Objects.requireNonNull(this.exceptions, "Argument must not be null");
+                ContainerHelpers.checkNotNull(this.exceptions);
                 this.callback.onLoadFailed(new GlideException("Fetch failed", new ArrayList(this.exceptions)));
             }
         }
-    }
 
-    public MultiModelLoader(List<ModelLoader<Model, Data>> modelLoaders, Pools$Pool<List<Throwable>> exceptionListPool) {
-        this.modelLoaders = modelLoaders;
-        this.exceptionListPool = exceptionListPool;
+        public MultiFetcher(ArrayList arrayList, Pools$Pool pools$Pool) {
+            this.throwableListPool = pools$Pool;
+            if (!arrayList.isEmpty()) {
+                this.fetchers = arrayList;
+                this.currentIndex = 0;
+                return;
+            }
+            throw new IllegalArgumentException("Must not be empty.");
+        }
     }
 
     @Override // com.bumptech.glide.load.model.ModelLoader
-    public ModelLoader.LoadData<Data> buildLoadData(Model model, int width, int height, Options options) {
+    public final ModelLoader.LoadData<Data> buildLoadData(Model model, int i, int i2, Options options) {
         ModelLoader.LoadData<Data> buildLoadData;
         int size = this.modelLoaders.size();
         ArrayList arrayList = new ArrayList(size);
         Key key = null;
-        for (int i = 0; i < size; i++) {
-            ModelLoader<Model, Data> modelLoader = this.modelLoaders.get(i);
-            if (modelLoader.handles(model) && (buildLoadData = modelLoader.buildLoadData(model, width, height, options)) != null) {
+        for (int i3 = 0; i3 < size; i3++) {
+            ModelLoader<Model, Data> modelLoader = this.modelLoaders.get(i3);
+            if (modelLoader.handles(model) && (buildLoadData = modelLoader.buildLoadData(model, i, i2, options)) != null) {
                 key = buildLoadData.sourceKey;
                 arrayList.add(buildLoadData.fetcher);
             }
@@ -134,7 +129,7 @@ public class MultiModelLoader<Model, Data> implements ModelLoader<Model, Data> {
     }
 
     @Override // com.bumptech.glide.load.model.ModelLoader
-    public boolean handles(Model model) {
+    public final boolean handles(Model model) {
         for (ModelLoader<Model, Data> modelLoader : this.modelLoaders) {
             if (modelLoader.handles(model)) {
                 return true;
@@ -143,12 +138,15 @@ public class MultiModelLoader<Model, Data> implements ModelLoader<Model, Data> {
         return false;
     }
 
-    public String toString() {
-        String arrays = Arrays.toString(this.modelLoaders.toArray());
-        StringBuilder sb = new StringBuilder(XMPPathFactory$$ExternalSyntheticOutline0.m(arrays, 31));
-        sb.append("MultiModelLoader{modelLoaders=");
-        sb.append(arrays);
-        sb.append('}');
-        return sb.toString();
+    public final String toString() {
+        StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("MultiModelLoader{modelLoaders=");
+        m.append(Arrays.toString(this.modelLoaders.toArray()));
+        m.append('}');
+        return m.toString();
+    }
+
+    public MultiModelLoader(ArrayList arrayList, Pools$Pool pools$Pool) {
+        this.modelLoaders = arrayList;
+        this.exceptionListPool = pools$Pool;
     }
 }

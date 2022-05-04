@@ -1,6 +1,7 @@
 package com.google.android.gms.common;
 
 import java.util.Arrays;
+/* compiled from: GoogleCertificates.java */
 /* loaded from: classes.dex */
 public final class zzg extends zzf {
     public final byte[] zza;

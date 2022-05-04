@@ -10,18 +10,18 @@ import androidx.customview.view.AbsSavedState;
 public class ExtendableSavedState extends AbsSavedState {
     public static final Parcelable.Creator<ExtendableSavedState> CREATOR = new Parcelable.ClassLoaderCreator<ExtendableSavedState>() { // from class: com.google.android.material.stateful.ExtendableSavedState.1
         @Override // android.os.Parcelable.ClassLoaderCreator
-        public ExtendableSavedState createFromParcel(Parcel parcel, ClassLoader classLoader) {
-            return new ExtendableSavedState(parcel, classLoader, null);
+        public final ExtendableSavedState createFromParcel(Parcel parcel, ClassLoader classLoader) {
+            return new ExtendableSavedState(parcel, classLoader);
         }
 
         @Override // android.os.Parcelable.Creator
-        public Object[] newArray(int i) {
+        public final Object createFromParcel(Parcel parcel) {
+            return new ExtendableSavedState(parcel, null);
+        }
+
+        @Override // android.os.Parcelable.Creator
+        public final Object[] newArray(int i) {
             return new ExtendableSavedState[i];
-        }
-
-        @Override // android.os.Parcelable.Creator
-        public Object createFromParcel(Parcel parcel) {
-            return new ExtendableSavedState(parcel, null, null);
         }
     };
     public final SimpleArrayMap<String, Bundle> extendableStates;
@@ -31,7 +31,7 @@ public class ExtendableSavedState extends AbsSavedState {
         this.extendableStates = new SimpleArrayMap<>();
     }
 
-    public String toString() {
+    public final String toString() {
         StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("ExtendableSavedState{");
         m.append(Integer.toHexString(System.identityHashCode(this)));
         m.append(" states=");
@@ -41,7 +41,7 @@ public class ExtendableSavedState extends AbsSavedState {
     }
 
     @Override // androidx.customview.view.AbsSavedState, android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
+    public final void writeToParcel(Parcel parcel, int i) {
         parcel.writeParcelable(this.mSuperState, i);
         int i2 = this.extendableStates.mSize;
         parcel.writeInt(i2);
@@ -55,7 +55,7 @@ public class ExtendableSavedState extends AbsSavedState {
         parcel.writeTypedArray(bundleArr, 0);
     }
 
-    public ExtendableSavedState(Parcel parcel, ClassLoader classLoader, AnonymousClass1 r7) {
+    public ExtendableSavedState(Parcel parcel, ClassLoader classLoader) {
         super(parcel, classLoader);
         int readInt = parcel.readInt();
         String[] strArr = new String[readInt];

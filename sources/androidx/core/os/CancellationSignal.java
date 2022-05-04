@@ -10,7 +10,7 @@ public final class CancellationSignal {
         void onCancel();
     }
 
-    public void cancel() {
+    public final void cancel() {
         synchronized (this) {
             if (!this.mIsCanceled) {
                 this.mIsCanceled = true;
@@ -35,7 +35,7 @@ public final class CancellationSignal {
         }
     }
 
-    public void setOnCancelListener(OnCancelListener listener) {
+    public final void setOnCancelListener(OnCancelListener onCancelListener) {
         synchronized (this) {
             while (this.mCancelInProgress) {
                 try {
@@ -43,10 +43,10 @@ public final class CancellationSignal {
                 } catch (InterruptedException unused) {
                 }
             }
-            if (this.mOnCancelListener != listener) {
-                this.mOnCancelListener = listener;
+            if (this.mOnCancelListener != onCancelListener) {
+                this.mOnCancelListener = onCancelListener;
                 if (this.mIsCanceled) {
-                    listener.onCancel();
+                    onCancelListener.onCancel();
                 }
             }
         }

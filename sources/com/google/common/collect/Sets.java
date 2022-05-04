@@ -7,25 +7,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NavigableSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 /* loaded from: classes.dex */
 public final class Sets {
-
-    /* loaded from: classes.dex */
-    public static abstract class ImprovedAbstractSet<E> extends AbstractSet<E> {
-        @Override // java.util.AbstractSet, java.util.AbstractCollection, java.util.Collection, java.util.Set
-        public boolean removeAll(Collection<?> c) {
-            return Sets.removeAllImpl(this, c);
-        }
-
-        @Override // java.util.AbstractCollection, java.util.Collection, java.util.Set
-        public boolean retainAll(Collection<?> c) {
-            Objects.requireNonNull(c);
-            return super.retainAll(c);
-        }
-    }
 
     /* loaded from: classes.dex */
     public static final class UnmodifiableNavigableSet<E> extends ForwardingSortedSet<E> implements NavigableSet<E>, Serializable {
@@ -34,88 +19,45 @@ public final class Sets {
         public transient UnmodifiableNavigableSet<E> descendingSet;
         private final SortedSet<E> unmodifiableDelegate;
 
-        public UnmodifiableNavigableSet(NavigableSet<E> delegate) {
-            Objects.requireNonNull(delegate);
-            this.delegate = delegate;
-            this.unmodifiableDelegate = Collections.unmodifiableSortedSet(delegate);
-        }
-
-        @Override // java.util.NavigableSet
-        public E ceiling(E e) {
-            return this.delegate.ceiling(e);
-        }
-
-        @Override // com.google.common.collect.ForwardingSortedSet, com.google.common.collect.ForwardingSet, com.google.common.collect.ForwardingCollection, com.google.common.collect.ForwardingObject
+        @Override // com.google.common.collect.ForwardingCollection, com.google.common.collect.ForwardingObject
         /* renamed from: delegate */
-        public Object mo31delegate() {
+        public final Object mo65delegate() {
             return this.unmodifiableDelegate;
         }
 
         @Override // java.util.NavigableSet
-        public Iterator<E> descendingIterator() {
-            final Iterator<E> descendingIterator = this.delegate.descendingIterator();
-            Objects.requireNonNull(descendingIterator);
-            if (descendingIterator instanceof UnmodifiableIterator) {
-                return (UnmodifiableIterator) descendingIterator;
-            }
-            return new UnmodifiableIterator<?>
-            /*  JADX ERROR: Method code generation error
-                jadx.core.utils.exceptions.CodegenException: Error generate insn: 0x0016: RETURN  
-                  (wrap: com.google.common.collect.UnmodifiableIterator<?> : 0x0012: CONSTRUCTOR  (r0v1 com.google.common.collect.UnmodifiableIterator<?> A[REMOVE]) = (r1v2 'descendingIterator' java.util.Iterator<E> A[DONT_INLINE]) call: com.google.common.collect.Iterators.1.<init>(java.util.Iterator):void type: CONSTRUCTOR)
-                 in method: com.google.common.collect.Sets.UnmodifiableNavigableSet.descendingIterator():java.util.Iterator<E>, file: classes.dex
-                	at jadx.core.codegen.InsnGen.makeInsn(InsnGen.java:280)
-                	at jadx.core.codegen.InsnGen.makeInsn(InsnGen.java:243)
-                	at jadx.core.codegen.RegionGen.makeSimpleBlock(RegionGen.java:90)
-                	at jadx.core.dex.nodes.IBlock.generate(IBlock.java:15)
-                	at jadx.core.codegen.RegionGen.makeRegion(RegionGen.java:62)
-                	at jadx.core.dex.regions.Region.generate(Region.java:35)
-                	at jadx.core.codegen.RegionGen.makeRegion(RegionGen.java:62)
-                	at jadx.core.dex.regions.Region.generate(Region.java:35)
-                	at jadx.core.codegen.RegionGen.makeRegion(RegionGen.java:62)
-                	at jadx.core.dex.regions.Region.generate(Region.java:35)
-                	at jadx.core.codegen.RegionGen.makeRegion(RegionGen.java:62)
-                	at jadx.core.codegen.MethodGen.addRegionInsns(MethodGen.java:286)
-                	at jadx.core.codegen.MethodGen.addInstructions(MethodGen.java:265)
-                	at jadx.core.codegen.ClassGen.addMethodCode(ClassGen.java:369)
-                	at jadx.core.codegen.ClassGen.addMethod(ClassGen.java:304)
-                	at jadx.core.codegen.ClassGen.lambda$addInnerClsAndMethods$2(ClassGen.java:270)
-                	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
-                	at java.base/java.util.ArrayList.forEach(ArrayList.java:1541)
-                	at java.base/java.util.stream.SortedOps$RefSortingSink.end(SortedOps.java:395)
-                	at java.base/java.util.stream.Sink$ChainedReference.end(Sink.java:258)
-                Caused by: jadx.core.utils.exceptions.JadxRuntimeException: Method arg registers not loaded: com.google.common.collect.Iterators.1.<init>(java.util.Iterator):void, class status: GENERATED_AND_UNLOADED
-                	at jadx.core.dex.nodes.MethodNode.getArgRegs(MethodNode.java:247)
-                	at jadx.core.codegen.InsnGen.inlineAnonymousConstructor(InsnGen.java:762)
-                	at jadx.core.codegen.InsnGen.makeConstructor(InsnGen.java:690)
-                	at jadx.core.codegen.InsnGen.makeInsnBody(InsnGen.java:388)
-                	at jadx.core.codegen.InsnGen.addWrappedArg(InsnGen.java:142)
-                	at jadx.core.codegen.InsnGen.addArg(InsnGen.java:118)
-                	at jadx.core.codegen.InsnGen.addArg(InsnGen.java:105)
-                	at jadx.core.codegen.InsnGen.makeInsnBody(InsnGen.java:338)
-                	at jadx.core.codegen.InsnGen.makeInsn(InsnGen.java:273)
-                	... 19 more
-                */
-            /*
-                this = this;
-                java.util.NavigableSet<E> r1 = r1.delegate
-                java.util.Iterator r1 = r1.descendingIterator()
-                java.util.Objects.requireNonNull(r1)
-                boolean r0 = r1 instanceof com.google.common.collect.UnmodifiableIterator
-                if (r0 == 0) goto L10
-                com.google.common.collect.UnmodifiableIterator r1 = (com.google.common.collect.UnmodifiableIterator) r1
-                goto L16
-            L10:
-                com.google.common.collect.Iterators$1 r0 = new com.google.common.collect.Iterators$1
-                r0.<init>()
-                r1 = r0
-            L16:
-                return r1
-            */
-            throw new UnsupportedOperationException("Method not decompiled: com.google.common.collect.Sets.UnmodifiableNavigableSet.descendingIterator():java.util.Iterator");
+        public final E ceiling(E e) {
+            return this.delegate.ceiling(e);
+        }
+
+        @Override // com.google.common.collect.ForwardingCollection, com.google.common.collect.ForwardingObject
+        /* renamed from: delegate  reason: collision with other method in class */
+        public final SortedSet mo65delegate() {
+            return this.unmodifiableDelegate;
         }
 
         @Override // java.util.NavigableSet
-        public NavigableSet<E> descendingSet() {
+        public final Iterator<E> descendingIterator() {
+            final Iterator<E> descendingIterator = this.delegate.descendingIterator();
+            descendingIterator.getClass();
+            if (descendingIterator instanceof UnmodifiableIterator) {
+                return (UnmodifiableIterator) descendingIterator;
+            }
+            return new UnmodifiableIterator<Object>() { // from class: com.google.common.collect.Iterators.1
+                @Override // java.util.Iterator
+                public final boolean hasNext() {
+                    return descendingIterator.hasNext();
+                }
+
+                @Override // java.util.Iterator
+                public final Object next() {
+                    return descendingIterator.next();
+                }
+            };
+        }
+
+        @Override // java.util.NavigableSet
+        public final NavigableSet<E> descendingSet() {
             UnmodifiableNavigableSet<E> unmodifiableNavigableSet = this.descendingSet;
             if (unmodifiableNavigableSet != null) {
                 return unmodifiableNavigableSet;
@@ -127,60 +69,58 @@ public final class Sets {
         }
 
         @Override // java.util.NavigableSet
-        public E floor(E e) {
+        public final E floor(E e) {
             return this.delegate.floor(e);
         }
 
         @Override // java.util.NavigableSet
-        public NavigableSet<E> headSet(E toElement, boolean inclusive) {
+        public final NavigableSet<E> headSet(E toElement, boolean inclusive) {
             return Sets.unmodifiableNavigableSet(this.delegate.headSet(toElement, inclusive));
         }
 
         @Override // java.util.NavigableSet
-        public E higher(E e) {
+        public final E higher(E e) {
             return this.delegate.higher(e);
         }
 
         @Override // java.util.NavigableSet
-        public E lower(E e) {
+        public final E lower(E e) {
             return this.delegate.lower(e);
         }
 
         @Override // java.util.NavigableSet
-        public E pollFirst() {
+        public final E pollFirst() {
             throw new UnsupportedOperationException();
         }
 
         @Override // java.util.NavigableSet
-        public E pollLast() {
+        public final E pollLast() {
             throw new UnsupportedOperationException();
         }
 
         @Override // java.util.NavigableSet
-        public NavigableSet<E> subSet(E fromElement, boolean fromInclusive, E toElement, boolean toInclusive) {
+        public final NavigableSet<E> subSet(E fromElement, boolean fromInclusive, E toElement, boolean toInclusive) {
             return Sets.unmodifiableNavigableSet(this.delegate.subSet(fromElement, fromInclusive, toElement, toInclusive));
         }
 
         @Override // java.util.NavigableSet
-        public NavigableSet<E> tailSet(E fromElement, boolean inclusive) {
+        public final NavigableSet<E> tailSet(E fromElement, boolean inclusive) {
             return Sets.unmodifiableNavigableSet(this.delegate.tailSet(fromElement, inclusive));
         }
 
-        @Override // com.google.common.collect.ForwardingSortedSet, com.google.common.collect.ForwardingSet, com.google.common.collect.ForwardingCollection, com.google.common.collect.ForwardingObject
-        /* renamed from: delegate  reason: collision with other method in class */
-        public Collection mo31delegate() {
+        public UnmodifiableNavigableSet(NavigableSet<E> delegate) {
+            delegate.getClass();
+            this.delegate = delegate;
+            this.unmodifiableDelegate = Collections.unmodifiableSortedSet(delegate);
+        }
+
+        @Override // com.google.common.collect.ForwardingSet
+        public final SortedSet delegate$1() {
             return this.unmodifiableDelegate;
         }
 
-        @Override // com.google.common.collect.ForwardingSortedSet, com.google.common.collect.ForwardingSet, com.google.common.collect.ForwardingCollection, com.google.common.collect.ForwardingObject
-        /* renamed from: delegate */
-        public Set mo31delegate() {
-            return this.unmodifiableDelegate;
-        }
-
-        @Override // com.google.common.collect.ForwardingSortedSet, com.google.common.collect.ForwardingSet, com.google.common.collect.ForwardingCollection, com.google.common.collect.ForwardingObject
-        /* renamed from: delegate  reason: collision with other method in class */
-        public SortedSet<E> mo31delegate() {
+        @Override // com.google.common.collect.ForwardingSortedSet
+        public final SortedSet<E> delegate$2() {
             return this.unmodifiableDelegate;
         }
     }
@@ -204,14 +144,18 @@ public final class Sets {
         return false;
     }
 
-    public static int hashCodeImpl(Set<?> s) {
-        Iterator<?> it = s.iterator();
-        int i = 0;
-        while (it.hasNext()) {
-            Object next = it.next();
-            i = ~(~(i + (next != null ? next.hashCode() : 0)));
+    /* loaded from: classes.dex */
+    public static abstract class ImprovedAbstractSet<E> extends AbstractSet<E> {
+        @Override // java.util.AbstractSet, java.util.AbstractCollection, java.util.Collection, java.util.Set
+        public boolean removeAll(Collection<?> c) {
+            return Sets.removeAllImpl(this, c);
         }
-        return i;
+
+        @Override // java.util.AbstractCollection, java.util.Collection, java.util.Set
+        public boolean retainAll(Collection<?> c) {
+            c.getClass();
+            return super.retainAll(c);
+        }
     }
 
     public static <E> HashSet<E> newHashSetWithExpectedSize(int expectedSize) {
@@ -219,39 +163,54 @@ public final class Sets {
         if (expectedSize < 3) {
             CollectPreconditions.checkNonnegative(expectedSize, "expectedSize");
             i = expectedSize + 1;
+        } else if (expectedSize < 1073741824) {
+            i = (int) ((expectedSize / 0.75f) + 1.0f);
         } else {
-            i = expectedSize < 1073741824 ? (int) ((expectedSize / 0.75f) + 1.0f) : Integer.MAX_VALUE;
+            i = Integer.MAX_VALUE;
         }
         return new HashSet<>(i);
     }
 
+    public static <E> NavigableSet<E> unmodifiableNavigableSet(NavigableSet<E> set) {
+        if ((set instanceof ImmutableCollection) || (set instanceof UnmodifiableNavigableSet)) {
+            return set;
+        }
+        return new UnmodifiableNavigableSet(set);
+    }
+
+    public static int hashCodeImpl(Set<?> s) {
+        int i;
+        int i2 = 0;
+        for (Object obj : s) {
+            if (obj != null) {
+                i = obj.hashCode();
+            } else {
+                i = 0;
+            }
+            i2 = ~(~(i2 + i));
+        }
+        return i2;
+    }
+
     public static boolean removeAllImpl(Set<?> set, Collection<?> collection) {
-        Objects.requireNonNull(collection);
+        collection.getClass();
         if (collection instanceof Multiset) {
             collection = ((Multiset) collection).elementSet();
         }
-        if (!(collection instanceof Set) || collection.size() <= set.size()) {
-            return removeAllImpl(set, collection.iterator());
-        }
-        Iterator<?> it = set.iterator();
         boolean z = false;
-        while (it.hasNext()) {
-            if (collection.contains(it.next())) {
-                it.remove();
+        if (!(collection instanceof Set) || collection.size() <= set.size()) {
+            Iterator<?> it = collection.iterator();
+            while (it.hasNext()) {
+                z |= set.remove(it.next());
+            }
+            return z;
+        }
+        Iterator<?> it2 = set.iterator();
+        while (it2.hasNext()) {
+            if (collection.contains(it2.next())) {
+                it2.remove();
                 z = true;
             }
-        }
-        return z;
-    }
-
-    public static <E> NavigableSet<E> unmodifiableNavigableSet(NavigableSet<E> set) {
-        return ((set instanceof ImmutableCollection) || (set instanceof UnmodifiableNavigableSet)) ? set : new UnmodifiableNavigableSet(set);
-    }
-
-    public static boolean removeAllImpl(Set<?> set, Iterator<?> iterator) {
-        boolean z = false;
-        while (iterator.hasNext()) {
-            z |= set.remove(iterator.next());
         }
         return z;
     }

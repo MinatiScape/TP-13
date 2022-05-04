@@ -18,8 +18,8 @@ public class ApiException extends Exception {
         L7:
             java.lang.String r1 = ""
         L9:
-            int r2 = r1.length()
-            int r2 = r2 + 13
+            r2 = 13
+            int r2 = com.adobe.xmp.impl.ParseRDF$$ExternalSyntheticOutline0.m(r1, r2)
             java.lang.StringBuilder r3 = new java.lang.StringBuilder
             r3.<init>(r2)
             r3.append(r0)

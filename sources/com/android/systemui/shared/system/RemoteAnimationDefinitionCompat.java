@@ -9,11 +9,11 @@ public class RemoteAnimationDefinitionCompat {
         this.mWrapped.addRemoteAnimation(i, remoteAnimationAdapterCompat.getWrapped());
     }
 
-    public RemoteAnimationDefinition getWrapped() {
-        return this.mWrapped;
-    }
-
     public void addRemoteAnimation(int i, int i2, RemoteAnimationAdapterCompat remoteAnimationAdapterCompat) {
         this.mWrapped.addRemoteAnimation(i, i2, remoteAnimationAdapterCompat.getWrapped());
+    }
+
+    public RemoteAnimationDefinition getWrapped() {
+        return this.mWrapped;
     }
 }

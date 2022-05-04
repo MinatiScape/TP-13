@@ -13,7 +13,7 @@ public class NavigationMenuView extends RecyclerView implements MenuView {
     }
 
     @Override // androidx.appcompat.view.menu.MenuView
-    public void initialize(MenuBuilder menuBuilder) {
+    public final void initialize(MenuBuilder menuBuilder) {
     }
 
     public NavigationMenuView(Context context, AttributeSet attributeSet) {
@@ -22,6 +22,6 @@ public class NavigationMenuView extends RecyclerView implements MenuView {
 
     public NavigationMenuView(Context context, AttributeSet attributeSet, int i) {
         super(context, attributeSet, i);
-        setLayoutManager(new LinearLayoutManager(1, false));
+        setLayoutManager(new LinearLayoutManager(1));
     }
 }

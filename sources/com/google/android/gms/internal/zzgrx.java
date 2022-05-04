@@ -1,29 +1,10 @@
 package com.google.android.gms.internal;
 
 import java.nio.charset.Charset;
-import java.util.Arrays;
+/* compiled from: InternalNano.java */
 /* loaded from: classes.dex */
 public final class zzgrx {
     public static final Object zzb = new Object();
-
-    static {
-        Charset.forName("UTF-8");
-        Charset.forName("ISO-8859-1");
-    }
-
-    public static boolean zza(int[] iArr, int[] iArr2) {
-        if (iArr == null || iArr.length == 0) {
-            return iArr2 == null || iArr2.length == 0;
-        }
-        return Arrays.equals(iArr, iArr2);
-    }
-
-    public static boolean zza(long[] jArr, long[] jArr2) {
-        if (jArr == null || jArr.length == 0) {
-            return jArr2 == null || jArr2.length == 0;
-        }
-        return Arrays.equals(jArr, jArr2);
-    }
 
     public static boolean zza(Object[] objArr, Object[] objArr2) {
         int i;
@@ -54,6 +35,11 @@ public final class zzgrx {
                 i2++;
             }
         }
+    }
+
+    static {
+        Charset.forName("UTF-8");
+        Charset.forName("ISO-8859-1");
     }
 
     public static int zza(Object[] objArr) {

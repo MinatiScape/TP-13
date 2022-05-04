@@ -3,7 +3,7 @@ package androidx.recyclerview.widget;
 import android.view.View;
 import com.android.systemui.shared.R;
 /* loaded from: classes.dex */
-public class ViewBoundsCheck {
+public final class ViewBoundsCheck {
     public BoundFlags mBoundFlags = new BoundFlags();
     public final Callback mCallback;
 
@@ -15,34 +15,73 @@ public class ViewBoundsCheck {
         public int mRvEnd;
         public int mRvStart;
 
-        public boolean boundsMatch() {
-            int i = this.mBoundFlags;
-            if ((i & 7) != 0 && (i & (compare(this.mChildStart, this.mRvStart) << 0)) == 0) {
-                return false;
-            }
-            int i2 = this.mBoundFlags;
-            if ((i2 & R.styleable.AppCompatTheme_toolbarNavigationButtonStyle) != 0 && (i2 & (compare(this.mChildStart, this.mRvEnd) << 4)) == 0) {
-                return false;
-            }
-            int i3 = this.mBoundFlags;
-            if ((i3 & 1792) != 0 && (i3 & (compare(this.mChildEnd, this.mRvStart) << 8)) == 0) {
-                return false;
-            }
+        public final boolean boundsMatch() {
+            int i;
+            int i2;
+            int i3;
             int i4 = this.mBoundFlags;
-            return (i4 & 28672) == 0 || ((compare(this.mChildEnd, this.mRvEnd) << 12) & i4) != 0;
-        }
-
-        public int compare(int x, int y) {
-            if (x > y) {
-                return 1;
+            int i5 = 2;
+            if ((i4 & 7) != 0) {
+                int i6 = this.mChildStart;
+                int i7 = this.mRvStart;
+                if (i6 > i7) {
+                    i3 = 1;
+                } else if (i6 == i7) {
+                    i3 = 2;
+                } else {
+                    i3 = 4;
+                }
+                if (((i3 << 0) & i4) == 0) {
+                    return false;
+                }
             }
-            return x == y ? 2 : 4;
+            if ((i4 & R.styleable.AppCompatTheme_toolbarNavigationButtonStyle) != 0) {
+                int i8 = this.mChildStart;
+                int i9 = this.mRvEnd;
+                if (i8 > i9) {
+                    i2 = 1;
+                } else if (i8 == i9) {
+                    i2 = 2;
+                } else {
+                    i2 = 4;
+                }
+                if (((i2 << 4) & i4) == 0) {
+                    return false;
+                }
+            }
+            if ((i4 & 1792) != 0) {
+                int i10 = this.mChildEnd;
+                int i11 = this.mRvStart;
+                if (i10 > i11) {
+                    i = 1;
+                } else if (i10 == i11) {
+                    i = 2;
+                } else {
+                    i = 4;
+                }
+                if (((i << 8) & i4) == 0) {
+                    return false;
+                }
+            }
+            if ((i4 & 28672) != 0) {
+                int i12 = this.mChildEnd;
+                int i13 = this.mRvEnd;
+                if (i12 > i13) {
+                    i5 = 1;
+                } else if (i12 != i13) {
+                    i5 = 4;
+                }
+                if (((i5 << 12) & i4) == 0) {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 
     /* loaded from: classes.dex */
     public interface Callback {
-        View getChildAt(int index);
+        View getChildAt(int i);
 
         int getChildEnd(View view);
 
@@ -53,17 +92,18 @@ public class ViewBoundsCheck {
         int getParentStart();
     }
 
-    public ViewBoundsCheck(Callback callback) {
-        this.mCallback = callback;
-    }
-
-    public View findOneViewWithinBoundFlags(int fromIndex, int toIndex, int preferredBoundFlags, int acceptableBoundFlags) {
+    public final View findOneViewWithinBoundFlags(int i, int i2, int i3, int i4) {
+        int i5;
         int parentStart = this.mCallback.getParentStart();
         int parentEnd = this.mCallback.getParentEnd();
-        int i = toIndex > fromIndex ? 1 : -1;
+        if (i2 > i) {
+            i5 = 1;
+        } else {
+            i5 = -1;
+        }
         View view = null;
-        while (fromIndex != toIndex) {
-            View childAt = this.mCallback.getChildAt(fromIndex);
+        while (i != i2) {
+            View childAt = this.mCallback.getChildAt(i);
             int childStart = this.mCallback.getChildStart(childAt);
             int childEnd = this.mCallback.getChildEnd(childAt);
             BoundFlags boundFlags = this.mBoundFlags;
@@ -71,42 +111,40 @@ public class ViewBoundsCheck {
             boundFlags.mRvEnd = parentEnd;
             boundFlags.mChildStart = childStart;
             boundFlags.mChildEnd = childEnd;
-            if (preferredBoundFlags != 0) {
-                boundFlags.mBoundFlags = 0;
-                boundFlags.mBoundFlags = preferredBoundFlags | 0;
+            if (i3 != 0) {
+                boundFlags.mBoundFlags = i3 | 0;
                 if (boundFlags.boundsMatch()) {
                     return childAt;
                 }
             }
-            if (acceptableBoundFlags != 0) {
+            if (i4 != 0) {
                 BoundFlags boundFlags2 = this.mBoundFlags;
-                boundFlags2.mBoundFlags = 0;
-                boundFlags2.mBoundFlags = acceptableBoundFlags | 0;
+                boundFlags2.mBoundFlags = i4 | 0;
                 if (boundFlags2.boundsMatch()) {
                     view = childAt;
                 }
             }
-            fromIndex += i;
+            i += i5;
         }
         return view;
     }
 
-    public boolean isViewWithinBoundFlags(View child, int boundsFlags) {
+    public final boolean isViewWithinBoundFlags(View view) {
         BoundFlags boundFlags = this.mBoundFlags;
         int parentStart = this.mCallback.getParentStart();
         int parentEnd = this.mCallback.getParentEnd();
-        int childStart = this.mCallback.getChildStart(child);
-        int childEnd = this.mCallback.getChildEnd(child);
+        int childStart = this.mCallback.getChildStart(view);
+        int childEnd = this.mCallback.getChildEnd(view);
         boundFlags.mRvStart = parentStart;
         boundFlags.mRvEnd = parentEnd;
         boundFlags.mChildStart = childStart;
         boundFlags.mChildEnd = childEnd;
-        if (boundsFlags == 0) {
-            return false;
-        }
         BoundFlags boundFlags2 = this.mBoundFlags;
-        boundFlags2.mBoundFlags = 0;
-        boundFlags2.mBoundFlags = 0 | boundsFlags;
+        boundFlags2.mBoundFlags = 24579 | 0;
         return boundFlags2.boundsMatch();
+    }
+
+    public ViewBoundsCheck(Callback callback) {
+        this.mCallback = callback;
     }
 }

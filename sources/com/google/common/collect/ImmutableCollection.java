@@ -2,34 +2,19 @@ package com.google.common.collect;
 
 import com.google.common.collect.ImmutableList;
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.AbstractCollection;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public abstract class ImmutableCollection<E> extends AbstractCollection<E> implements Serializable {
     public static final Object[] EMPTY_ARRAY = new Object[0];
 
     /* loaded from: classes.dex */
     public static abstract class ArrayBasedBuilder<E> extends Builder<E> {
-        public Object[] contents;
         public boolean forceCopy;
+        public Object[] contents = new Object[4];
         public int size = 0;
-
-        public ArrayBasedBuilder(int initialCapacity) {
-            CollectPreconditions.checkNonnegative(initialCapacity, "initialCapacity");
-            this.contents = new Object[initialCapacity];
-        }
-
-        public ArrayBasedBuilder<E> add(E element) {
-            Objects.requireNonNull(element);
-            getReadyToExpandTo(this.size + 1);
-            Object[] objArr = this.contents;
-            int i = this.size;
-            this.size = i + 1;
-            objArr[i] = element;
-            return this;
-        }
 
         public final void getReadyToExpandTo(int minCapacity) {
             Object[] objArr = this.contents;
@@ -40,6 +25,19 @@ public abstract class ImmutableCollection<E> extends AbstractCollection<E> imple
                 this.contents = (Object[]) objArr.clone();
                 this.forceCopy = false;
             }
+        }
+
+        public ArrayBasedBuilder() {
+            CollectPreconditions.checkNonnegative(4, "initialCapacity");
+        }
+
+        public final void add(Object element) {
+            element.getClass();
+            getReadyToExpandTo(this.size + 1);
+            Object[] objArr = this.contents;
+            int i = this.size;
+            this.size = i + 1;
+            objArr[i] = element;
         }
     }
 
@@ -61,6 +59,23 @@ public abstract class ImmutableCollection<E> extends AbstractCollection<E> imple
     }
 
     @Override // java.util.AbstractCollection, java.util.Collection
+    public abstract boolean contains(Object object);
+
+    public Object[] internalArray() {
+        return null;
+    }
+
+    public abstract boolean isPartialView();
+
+    @Override // java.util.AbstractCollection, java.util.Collection, java.lang.Iterable
+    public abstract UnmodifiableIterator<E> iterator();
+
+    @Override // java.util.AbstractCollection, java.util.Collection
+    public final Object[] toArray() {
+        return toArray(EMPTY_ARRAY);
+    }
+
+    @Override // java.util.AbstractCollection, java.util.Collection
     @Deprecated
     public final boolean add(E e) {
         throw new UnsupportedOperationException();
@@ -78,22 +93,6 @@ public abstract class ImmutableCollection<E> extends AbstractCollection<E> imple
         throw new UnsupportedOperationException();
     }
 
-    @Override // java.util.AbstractCollection, java.util.Collection
-    public abstract boolean contains(Object object);
-
-    public int copyIntoArray(Object[] dst, int offset) {
-        UnmodifiableIterator<E> it = iterator();
-        while (it.hasNext()) {
-            offset++;
-            dst[offset] = it.next();
-        }
-        return offset;
-    }
-
-    public Object[] internalArray() {
-        return null;
-    }
-
     public int internalArrayEnd() {
         throw new UnsupportedOperationException();
     }
@@ -101,11 +100,6 @@ public abstract class ImmutableCollection<E> extends AbstractCollection<E> imple
     public int internalArrayStart() {
         throw new UnsupportedOperationException();
     }
-
-    public abstract boolean isPartialView();
-
-    @Override // java.util.AbstractCollection, java.util.Collection, java.lang.Iterable
-    public abstract UnmodifiableIterator<E> iterator();
 
     @Override // java.util.AbstractCollection, java.util.Collection
     @Deprecated
@@ -126,28 +120,33 @@ public abstract class ImmutableCollection<E> extends AbstractCollection<E> imple
     }
 
     @Override // java.util.AbstractCollection, java.util.Collection
-    public final Object[] toArray() {
-        return toArray(EMPTY_ARRAY);
-    }
-
-    Object writeReplace() {
-        return new ImmutableList.SerializedForm(toArray());
-    }
-
-    @Override // java.util.AbstractCollection, java.util.Collection
     public final <T> T[] toArray(T[] other) {
-        Objects.requireNonNull(other);
+        other.getClass();
         int size = size();
         if (other.length < size) {
             Object[] internalArray = internalArray();
             if (internalArray != null) {
                 return (T[]) Arrays.copyOfRange(internalArray, internalArrayStart(), internalArrayEnd(), other.getClass());
             }
-            other = (T[]) ObjectArrays.newArray(other, size);
+            other = (T[]) ((Object[]) Array.newInstance(other.getClass().getComponentType(), size));
         } else if (other.length > size) {
             other[size] = null;
         }
-        copyIntoArray(other, 0);
+        copyIntoArray(other);
         return other;
+    }
+
+    Object writeReplace() {
+        return new ImmutableList.SerializedForm(toArray());
+    }
+
+    public int copyIntoArray(Object[] objArr) {
+        UnmodifiableIterator<E> it = iterator();
+        int i = 0;
+        while (it.hasNext()) {
+            objArr[i] = it.next();
+            i++;
+        }
+        return i;
     }
 }

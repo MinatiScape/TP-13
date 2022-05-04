@@ -4,18 +4,12 @@ import androidx.core.R$id;
 import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.Api.ApiOptions;
 import java.util.Arrays;
+/* compiled from: ApiKey.java */
 /* loaded from: classes.dex */
 public final class zzi<O extends Api.ApiOptions> {
-    public final boolean zza = false;
     public final int zzb;
     public final Api<O> zzc;
-    public final O zzd;
-
-    public zzi(Api<O> api, O o) {
-        this.zzc = api;
-        this.zzd = o;
-        this.zzb = Arrays.hashCode(new Object[]{api, o});
-    }
+    public final O zzd = null;
 
     public final boolean equals(Object obj) {
         if (obj == this) {
@@ -25,7 +19,13 @@ public final class zzi<O extends Api.ApiOptions> {
             return false;
         }
         zzi zziVar = (zzi) obj;
-        return !this.zza && !zziVar.zza && R$id.zza(this.zzc, zziVar.zzc) && R$id.zza(this.zzd, zziVar.zzd);
+        zziVar.getClass();
+        return R$id.zza(this.zzc, zziVar.zzc) && R$id.zza(this.zzd, zziVar.zzd);
+    }
+
+    public zzi(Api api) {
+        this.zzc = api;
+        this.zzb = Arrays.hashCode(new Object[]{api, null});
     }
 
     public final int hashCode() {

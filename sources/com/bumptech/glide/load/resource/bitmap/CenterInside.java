@@ -7,37 +7,37 @@ import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import java.security.MessageDigest;
 /* loaded from: classes.dex */
-public class CenterInside extends BitmapTransformation {
+public final class CenterInside extends BitmapTransformation {
     public static final byte[] ID_BYTES = "com.bumptech.glide.load.resource.bitmap.CenterInside".getBytes(Key.CHARSET);
 
     @Override // com.bumptech.glide.load.Key
-    public boolean equals(Object o) {
-        return o instanceof CenterInside;
-    }
-
-    @Override // com.bumptech.glide.load.Key
-    public int hashCode() {
+    public final int hashCode() {
         return -670243078;
     }
 
     @Override // com.bumptech.glide.load.resource.bitmap.BitmapTransformation
-    public Bitmap transform(BitmapPool pool, Bitmap toTransform, int outWidth, int outHeight) {
+    public final Bitmap transform(BitmapPool bitmapPool, Bitmap bitmap, int i, int i2) {
         Paint paint = TransformationUtils.DEFAULT_PAINT;
-        if (toTransform.getWidth() > outWidth || toTransform.getHeight() > outHeight) {
+        if (bitmap.getWidth() > i || bitmap.getHeight() > i2) {
             if (Log.isLoggable("TransformationUtils", 2)) {
                 Log.v("TransformationUtils", "requested target size too big for input, fit centering instead");
             }
-            return TransformationUtils.fitCenter(pool, toTransform, outWidth, outHeight);
+            return TransformationUtils.fitCenter(bitmapPool, bitmap, i, i2);
         } else if (!Log.isLoggable("TransformationUtils", 2)) {
-            return toTransform;
+            return bitmap;
         } else {
             Log.v("TransformationUtils", "requested target size larger or equal to input, returning input");
-            return toTransform;
+            return bitmap;
         }
     }
 
     @Override // com.bumptech.glide.load.Key
-    public void updateDiskCacheKey(MessageDigest messageDigest) {
+    public final void updateDiskCacheKey(MessageDigest messageDigest) {
         messageDigest.update(ID_BYTES);
+    }
+
+    @Override // com.bumptech.glide.load.Key
+    public final boolean equals(Object obj) {
+        return obj instanceof CenterInside;
     }
 }

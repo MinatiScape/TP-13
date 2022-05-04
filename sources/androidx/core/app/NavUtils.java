@@ -10,19 +10,19 @@ import android.os.Bundle;
 import android.util.Log;
 /* loaded from: classes.dex */
 public final class NavUtils {
-    public static Intent getParentActivityIntent(Activity sourceActivity) {
-        Intent parentActivityIntent = sourceActivity.getParentActivityIntent();
+    public static Intent getParentActivityIntent(Activity activity) {
+        Intent parentActivityIntent = activity.getParentActivityIntent();
         if (parentActivityIntent != null) {
             return parentActivityIntent;
         }
         try {
-            String parentActivityName = getParentActivityName(sourceActivity, sourceActivity.getComponentName());
+            String parentActivityName = getParentActivityName(activity, activity.getComponentName());
             if (parentActivityName == null) {
                 return null;
             }
-            ComponentName componentName = new ComponentName(sourceActivity, parentActivityName);
+            ComponentName componentName = new ComponentName(activity, parentActivityName);
             try {
-                if (getParentActivityName(sourceActivity, componentName) == null) {
+                if (getParentActivityName(activity, componentName) == null) {
                     return Intent.makeMainActivity(componentName);
                 }
                 return new Intent().setComponent(componentName);

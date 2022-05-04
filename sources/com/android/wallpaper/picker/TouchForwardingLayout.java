@@ -10,17 +10,17 @@ public class TouchForwardingLayout extends FrameLayout {
     public boolean mForwardingEnabled;
     public View mView;
 
-    public TouchForwardingLayout(Context context, AttributeSet attributeSet) {
-        super(context, attributeSet);
-    }
-
     @Override // android.view.ViewGroup, android.view.View
-    public boolean dispatchTouchEvent(MotionEvent motionEvent) {
+    public final boolean dispatchTouchEvent(MotionEvent motionEvent) {
         View view = this.mView;
         if (view == null || !this.mForwardingEnabled) {
             return true;
         }
         view.dispatchTouchEvent(motionEvent);
         return true;
+    }
+
+    public TouchForwardingLayout(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet);
     }
 }

@@ -3,7 +3,6 @@ package com.android.volley.toolbox;
 import com.android.systemui.shared.system.QuickStepContract;
 import com.android.systemui.shared.system.SysUiStatsLog;
 import com.android.volley.Cache;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Header;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
@@ -17,21 +16,15 @@ import java.util.Map;
 import java.util.TreeSet;
 /* loaded from: classes.dex */
 public final class NetworkUtility {
-    public static void attemptRetryOnException(String str, Request<?> request, VolleyError volleyError) throws VolleyError {
-        DefaultRetryPolicy defaultRetryPolicy = request.mRetryPolicy;
-        int i = defaultRetryPolicy.mCurrentTimeoutMs;
-        try {
-            int i2 = defaultRetryPolicy.mCurrentRetryCount + 1;
-            defaultRetryPolicy.mCurrentRetryCount = i2;
-            defaultRetryPolicy.mCurrentTimeoutMs = ((int) (i * defaultRetryPolicy.mBackoffMultiplier)) + i;
-            if (i2 <= defaultRetryPolicy.mMaxNumRetries) {
-                request.addMarker(String.format("%s-retry [timeout=%s]", str, Integer.valueOf(i)));
-                return;
-            }
-            throw volleyError;
-        } catch (VolleyError e) {
-            request.addMarker(String.format("%s-timeout-giveup [timeout=%s]", str, Integer.valueOf(i)));
-            throw e;
+
+    /* loaded from: classes.dex */
+    public static class RetryInfo {
+        public final VolleyError errorToRetry;
+        public final String logPrefix;
+
+        public RetryInfo(String str, VolleyError volleyError) {
+            this.logPrefix = str;
+            this.errorToRetry = volleyError;
         }
     }
 
@@ -107,11 +100,17 @@ public final class NetworkUtility {
     }
 
     public static void logSlowRequests(long j, Request<?> request, byte[] bArr, int i) {
+        Object obj;
         if (VolleyLog.DEBUG || j > 3000) {
             Object[] objArr = new Object[5];
             objArr[0] = request;
             objArr[1] = Long.valueOf(j);
-            objArr[2] = bArr != null ? Integer.valueOf(bArr.length) : "null";
+            if (bArr != null) {
+                obj = Integer.valueOf(bArr.length);
+            } else {
+                obj = "null";
+            }
+            objArr[2] = obj;
             objArr[3] = Integer.valueOf(i);
             objArr[4] = Integer.valueOf(request.mRetryPolicy.mCurrentRetryCount);
             VolleyLog.d("HTTP response for request=<%s> [lifetime=%d], [size=%s], [rc=%d], [retryCount=%s]", objArr);

@@ -1,39 +1,66 @@
 package kotlin.jvm;
 
-import com.android.systemui.flags.FlagManager;
 import kotlin.jvm.internal.ClassBasedDeclarationContainer;
 import kotlin.jvm.internal.Intrinsics;
 import kotlin.reflect.KClass;
 import org.jetbrains.annotations.NotNull;
+/* compiled from: JvmClassMapping.kt */
 /* loaded from: classes.dex */
 public final class JvmClassMappingKt {
     @NotNull
-    public static final <T> Class<T> getJavaObjectType(@NotNull KClass<T> javaObjectType) {
-        Intrinsics.checkNotNullParameter(javaObjectType, "$this$javaObjectType");
-        Class<T> cls = (Class<T>) ((ClassBasedDeclarationContainer) javaObjectType).getJClass();
+    public static final <T> Class<T> getJavaObjectType(@NotNull KClass<T> kClass) {
+        Intrinsics.checkNotNullParameter(kClass, "<this>");
+        Class<T> cls = (Class<T>) ((ClassBasedDeclarationContainer) kClass).getJClass();
         if (!cls.isPrimitive()) {
             return cls;
         }
         String name = cls.getName();
         switch (name.hashCode()) {
             case -1325958191:
-                return name.equals("double") ? Double.class : cls;
+                if (!name.equals("double")) {
+                    return cls;
+                }
+                return Double.class;
             case 104431:
-                return name.equals("int") ? Integer.class : cls;
+                if (!name.equals("int")) {
+                    return cls;
+                }
+                return Integer.class;
             case 3039496:
-                return name.equals("byte") ? Byte.class : cls;
+                if (!name.equals("byte")) {
+                    return cls;
+                }
+                return Byte.class;
             case 3052374:
-                return name.equals("char") ? Character.class : cls;
+                if (!name.equals("char")) {
+                    return cls;
+                }
+                return Character.class;
             case 3327612:
-                return name.equals("long") ? Long.class : cls;
+                if (!name.equals("long")) {
+                    return cls;
+                }
+                return Long.class;
             case 3625364:
-                return name.equals("void") ? Void.class : cls;
+                if (!name.equals("void")) {
+                    return cls;
+                }
+                return Void.class;
             case 64711720:
-                return name.equals(FlagManager.TYPE_BOOLEAN) ? Boolean.class : cls;
+                if (!name.equals("boolean")) {
+                    return cls;
+                }
+                return Boolean.class;
             case 97526364:
-                return name.equals("float") ? Float.class : cls;
+                if (!name.equals("float")) {
+                    return cls;
+                }
+                return Float.class;
             case 109413500:
-                return name.equals("short") ? Short.class : cls;
+                if (!name.equals("short")) {
+                    return cls;
+                }
+                return Short.class;
             default:
                 return cls;
         }

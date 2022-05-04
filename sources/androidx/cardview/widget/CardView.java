@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 import androidx.cardview.R$styleable;
+import androidx.core.util.Preconditions;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.ViewPropertyAnimatorCompat;
 import com.android.systemui.shared.R;
@@ -18,28 +19,26 @@ import java.util.WeakHashMap;
 /* loaded from: classes.dex */
 public class CardView extends FrameLayout {
     public static final int[] COLOR_BACKGROUND_ATTR = {16842801};
-    public static final CardViewImpl IMPL = new CardViewApi21Impl();
-    public final CardViewDelegate mCardViewDelegate;
+    public static final Preconditions IMPL = new Preconditions();
+    public final AnonymousClass1 mCardViewDelegate;
     public boolean mCompatPadding;
     public final Rect mContentPadding;
     public boolean mPreventCornerOverlap;
     public final Rect mShadowBounds;
-    public int mUserSetMinHeight;
-    public int mUserSetMinWidth;
 
     /* renamed from: androidx.cardview.widget.CardView$1  reason: invalid class name */
     /* loaded from: classes.dex */
-    public class AnonymousClass1 implements CardViewDelegate {
+    public class AnonymousClass1 {
         public Drawable mCardBackground;
 
         public AnonymousClass1() {
         }
 
-        public void setShadowPadding(int left, int top, int right, int bottom) {
-            CardView.this.mShadowBounds.set(left, top, right, bottom);
+        public final void setShadowPadding(int i, int i2, int i3, int i4) {
+            CardView.this.mShadowBounds.set(i, i2, i3, i4);
             CardView cardView = CardView.this;
             Rect rect = cardView.mContentPadding;
-            CardView.super.setPadding(left + rect.left, top + rect.top, right + rect.right, bottom + rect.bottom);
+            CardView.super.setPadding(i + rect.left, i2 + rect.top, i3 + rect.right, i4 + rect.bottom);
         }
     }
 
@@ -47,57 +46,41 @@ public class CardView extends FrameLayout {
         this(context, null);
     }
 
-    @Override // android.widget.FrameLayout, android.view.View
-    public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    @Override // android.view.View
+    public final void setPadding(int i, int i2, int i3, int i4) {
     }
 
     @Override // android.view.View
-    public void setMinimumHeight(int minHeight) {
-        this.mUserSetMinHeight = minHeight;
-        super.setMinimumHeight(minHeight);
+    public final void setPaddingRelative(int i, int i2, int i3, int i4) {
     }
 
-    @Override // android.view.View
-    public void setMinimumWidth(int minWidth) {
-        this.mUserSetMinWidth = minWidth;
-        super.setMinimumWidth(minWidth);
+    public CardView(Context context, AttributeSet attributeSet) {
+        this(context, attributeSet, R.attr.cardViewStyle);
     }
 
-    @Override // android.view.View
-    public void setPadding(int left, int top, int right, int bottom) {
-    }
-
-    @Override // android.view.View
-    public void setPaddingRelative(int start, int top, int end, int bottom) {
-    }
-
-    public void setRadius(float radius) {
-        RoundRectDrawable cardBackground = ((CardViewApi21Impl) IMPL).getCardBackground(this.mCardViewDelegate);
-        if (radius != cardBackground.mRadius) {
-            cardBackground.mRadius = radius;
-            cardBackground.updateBounds(null);
-            cardBackground.invalidateSelf();
+    public final void setRadius(float f) {
+        RoundRectDrawable roundRectDrawable = (RoundRectDrawable) this.mCardViewDelegate.mCardBackground;
+        if (f != roundRectDrawable.mRadius) {
+            roundRectDrawable.mRadius = f;
+            roundRectDrawable.updateBounds(null);
+            roundRectDrawable.invalidateSelf();
         }
     }
 
-    public CardView(Context context, AttributeSet attrs) {
-        this(context, attrs, R.attr.cardViewStyle);
-    }
-
-    public CardView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+    public CardView(Context context, AttributeSet attributeSet, int i) {
+        super(context, attributeSet, i);
         ColorStateList colorStateList;
-        int i;
+        float f;
+        int i2;
         Rect rect = new Rect();
         this.mContentPadding = rect;
         this.mShadowBounds = new Rect();
         AnonymousClass1 r1 = new AnonymousClass1();
         this.mCardViewDelegate = r1;
         int[] iArr = R$styleable.CardView;
-        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attrs, iArr, defStyleAttr, R.style.CardView);
+        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, iArr, i, R.style.CardView);
         WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-        ViewCompat.Api29Impl.saveAttributeDataForStyleable(this, context, iArr, attrs, obtainStyledAttributes, defStyleAttr, R.style.CardView);
+        ViewCompat.Api29Impl.saveAttributeDataForStyleable(this, context, iArr, attributeSet, obtainStyledAttributes, i, R.style.CardView);
         if (obtainStyledAttributes.hasValue(2)) {
             colorStateList = obtainStyledAttributes.getColorStateList(2);
         } else {
@@ -107,11 +90,11 @@ public class CardView extends FrameLayout {
             float[] fArr = new float[3];
             Color.colorToHSV(color, fArr);
             if (fArr[2] > 0.5f) {
-                i = getResources().getColor(R.color.cardview_light_background);
+                i2 = getResources().getColor(R.color.cardview_light_background);
             } else {
-                i = getResources().getColor(R.color.cardview_dark_background);
+                i2 = getResources().getColor(R.color.cardview_dark_background);
             }
-            colorStateList = ColorStateList.valueOf(i);
+            colorStateList = ColorStateList.valueOf(i2);
         }
         float dimension = obtainStyledAttributes.getDimension(3, HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
         float dimension2 = obtainStyledAttributes.getDimension(4, HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
@@ -124,36 +107,54 @@ public class CardView extends FrameLayout {
         rect.right = obtainStyledAttributes.getDimensionPixelSize(11, dimensionPixelSize);
         rect.bottom = obtainStyledAttributes.getDimensionPixelSize(9, dimensionPixelSize);
         dimension3 = dimension2 > dimension3 ? dimension2 : dimension3;
-        this.mUserSetMinWidth = obtainStyledAttributes.getDimensionPixelSize(0, 0);
-        this.mUserSetMinHeight = obtainStyledAttributes.getDimensionPixelSize(1, 0);
+        obtainStyledAttributes.getDimensionPixelSize(0, 0);
+        obtainStyledAttributes.getDimensionPixelSize(1, 0);
         obtainStyledAttributes.recycle();
-        CardViewApi21Impl cardViewApi21Impl = (CardViewApi21Impl) IMPL;
         RoundRectDrawable roundRectDrawable = new RoundRectDrawable(colorStateList, dimension);
-        AnonymousClass1 r11 = r1;
-        r11.mCardBackground = roundRectDrawable;
-        CardView.this.setBackgroundDrawable(roundRectDrawable);
-        CardView cardView = CardView.this;
-        cardView.setClipToOutline(true);
-        cardView.setElevation(dimension2);
-        RoundRectDrawable cardBackground = cardViewApi21Impl.getCardBackground(r1);
-        CardView cardView2 = CardView.this;
-        boolean z = cardView2.mCompatPadding;
-        boolean z2 = cardView2.mPreventCornerOverlap;
-        if (!(dimension3 == cardBackground.mPadding && cardBackground.mInsetForPadding == z && cardBackground.mInsetForRadius == z2)) {
-            cardBackground.mPadding = dimension3;
-            cardBackground.mInsetForPadding = z;
-            cardBackground.mInsetForRadius = z2;
-            cardBackground.updateBounds(null);
-            cardBackground.invalidateSelf();
+        r1.mCardBackground = roundRectDrawable;
+        setBackgroundDrawable(roundRectDrawable);
+        setClipToOutline(true);
+        setElevation(dimension2);
+        RoundRectDrawable roundRectDrawable2 = (RoundRectDrawable) r1.mCardBackground;
+        boolean z = this.mCompatPadding;
+        boolean z2 = this.mPreventCornerOverlap;
+        if (!(dimension3 == roundRectDrawable2.mPadding && roundRectDrawable2.mInsetForPadding == z && roundRectDrawable2.mInsetForRadius == z2)) {
+            roundRectDrawable2.mPadding = dimension3;
+            roundRectDrawable2.mInsetForPadding = z;
+            roundRectDrawable2.mInsetForRadius = z2;
+            roundRectDrawable2.updateBounds(null);
+            roundRectDrawable2.invalidateSelf();
         }
-        if (!CardView.this.mCompatPadding) {
-            r11.setShadowPadding(0, 0, 0, 0);
+        if (!this.mCompatPadding) {
+            r1.setShadowPadding(0, 0, 0, 0);
             return;
         }
-        float f = cardViewApi21Impl.getCardBackground(r1).mPadding;
-        float f2 = cardViewApi21Impl.getCardBackground(r1).mRadius;
-        int ceil = (int) Math.ceil(RoundRectDrawableWithShadow.calculateHorizontalPadding(f, f2, CardView.this.mPreventCornerOverlap));
-        int ceil2 = (int) Math.ceil(RoundRectDrawableWithShadow.calculateVerticalPadding(f, f2, CardView.this.mPreventCornerOverlap));
-        r11.setShadowPadding(ceil, ceil2, ceil, ceil2);
+        Drawable drawable = r1.mCardBackground;
+        float f2 = ((RoundRectDrawable) drawable).mPadding;
+        float f3 = ((RoundRectDrawable) drawable).mRadius;
+        if (this.mPreventCornerOverlap) {
+            f = (float) (((1.0d - RoundRectDrawableWithShadow.COS_45) * f3) + f2);
+        } else {
+            int i3 = RoundRectDrawableWithShadow.$r8$clinit;
+            f = f2;
+        }
+        int ceil = (int) Math.ceil(f);
+        int ceil2 = (int) Math.ceil(RoundRectDrawableWithShadow.calculateVerticalPadding(f2, f3, this.mPreventCornerOverlap));
+        r1.setShadowPadding(ceil, ceil2, ceil, ceil2);
+    }
+
+    @Override // android.widget.FrameLayout, android.view.View
+    public final void onMeasure(int i, int i2) {
+        super.onMeasure(i, i2);
+    }
+
+    @Override // android.view.View
+    public final void setMinimumHeight(int i) {
+        super.setMinimumHeight(i);
+    }
+
+    @Override // android.view.View
+    public final void setMinimumWidth(int i) {
+        super.setMinimumWidth(i);
     }
 }

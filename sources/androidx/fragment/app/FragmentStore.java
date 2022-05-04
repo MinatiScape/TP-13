@@ -6,12 +6,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 /* loaded from: classes.dex */
-public class FragmentStore {
+public final class FragmentStore {
     public FragmentManagerViewModel mNonConfig;
     public final ArrayList<Fragment> mAdded = new ArrayList<>();
     public final HashMap<String, FragmentStateManager> mActive = new HashMap<>();
+    public final HashMap<String, FragmentState> mSavedState = new HashMap<>();
 
-    public void addFragment(Fragment fragment) {
+    public final void addFragment(Fragment fragment) {
         if (!this.mAdded.contains(fragment)) {
             synchronized (this.mAdded) {
                 this.mAdded.add(fragment);
@@ -22,15 +23,7 @@ public class FragmentStore {
         throw new IllegalStateException("Fragment already added: " + fragment);
     }
 
-    public void burpActive() {
-        this.mActive.values().removeAll(Collections.singleton(null));
-    }
-
-    public boolean containsActiveFragment(String str) {
-        return this.mActive.get(str) != null;
-    }
-
-    public Fragment findActiveFragment(String str) {
+    public final Fragment findActiveFragment(String str) {
         FragmentStateManager fragmentStateManager = this.mActive.get(str);
         if (fragmentStateManager != null) {
             return fragmentStateManager.mFragment;
@@ -38,7 +31,7 @@ public class FragmentStore {
         return null;
     }
 
-    public Fragment findFragmentByWho(String str) {
+    public final Fragment findFragmentByWho(String str) {
         for (FragmentStateManager fragmentStateManager : this.mActive.values()) {
             if (fragmentStateManager != null) {
                 Fragment fragment = fragmentStateManager.mFragment;
@@ -53,7 +46,7 @@ public class FragmentStore {
         return null;
     }
 
-    public List<FragmentStateManager> getActiveFragmentStateManagers() {
+    public final ArrayList getActiveFragmentStateManagers() {
         ArrayList arrayList = new ArrayList();
         for (FragmentStateManager fragmentStateManager : this.mActive.values()) {
             if (fragmentStateManager != null) {
@@ -63,23 +56,7 @@ public class FragmentStore {
         return arrayList;
     }
 
-    public List<Fragment> getActiveFragments() {
-        ArrayList arrayList = new ArrayList();
-        for (FragmentStateManager fragmentStateManager : this.mActive.values()) {
-            if (fragmentStateManager != null) {
-                arrayList.add(fragmentStateManager.mFragment);
-            } else {
-                arrayList.add(null);
-            }
-        }
-        return arrayList;
-    }
-
-    public FragmentStateManager getFragmentStateManager(String str) {
-        return this.mActive.get(str);
-    }
-
-    public List<Fragment> getFragments() {
+    public final List<Fragment> getFragments() {
         ArrayList arrayList;
         if (this.mAdded.isEmpty()) {
             return Collections.emptyList();
@@ -90,9 +67,15 @@ public class FragmentStore {
         return arrayList;
     }
 
-    public void makeActive(FragmentStateManager fragmentStateManager) {
+    public final void makeActive(FragmentStateManager fragmentStateManager) {
+        boolean z;
         Fragment fragment = fragmentStateManager.mFragment;
-        if (!containsActiveFragment(fragment.mWho)) {
+        if (this.mActive.get(fragment.mWho) != null) {
+            z = true;
+        } else {
+            z = false;
+        }
+        if (!z) {
             this.mActive.put(fragment.mWho, fragmentStateManager);
             if (fragment.mRetainInstanceChangedWhileDetached) {
                 if (fragment.mRetainInstance) {
@@ -108,7 +91,7 @@ public class FragmentStore {
         }
     }
 
-    public void makeInactive(FragmentStateManager fragmentStateManager) {
+    public final void makeInactive(FragmentStateManager fragmentStateManager) {
         Fragment fragment = fragmentStateManager.mFragment;
         if (fragment.mRetainInstance) {
             this.mNonConfig.removeRetainedFragment(fragment);
@@ -118,10 +101,10 @@ public class FragmentStore {
         }
     }
 
-    public void removeFragment(Fragment fragment) {
-        synchronized (this.mAdded) {
-            this.mAdded.remove(fragment);
+    public final FragmentState setSavedState(String str, FragmentState fragmentState) {
+        if (fragmentState != null) {
+            return this.mSavedState.put(str, fragmentState);
         }
-        fragment.mAdded = false;
+        return this.mSavedState.remove(str);
     }
 }

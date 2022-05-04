@@ -6,5 +6,5 @@ public interface Transition<R> {
     public interface ViewAdapter {
     }
 
-    boolean transition(R current, ViewAdapter adapter);
+    boolean transition(R r, ViewAdapter viewAdapter);
 }

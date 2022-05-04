@@ -6,7 +6,7 @@ import java.security.MessageDigest;
 public interface Key {
     public static final Charset CHARSET = Charset.forName("UTF-8");
 
-    boolean equals(Object o);
+    boolean equals(Object obj);
 
     int hashCode();
 

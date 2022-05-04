@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="200000201" android:versionName="12" android:compileSdkVersion="32" android:compileSdkVersionCodename="12" package="com.google.android.apps.wallpaper" platformBuildVersionCode="32" platformBuildVersionName="12">
-    <uses-sdk android:minSdkVersion="32" android:targetSdkVersion="31"/>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="200000201" android:versionName="Tiramisu" android:compileSdkVersion="32" android:compileSdkVersionCodename="Tiramisu" package="com.google.android.apps.wallpaper" platformBuildVersionCode="32" platformBuildVersionName="Tiramisu">
+    <uses-sdk android:minSdkVersion="Tiramisu" android:targetSdkVersion="31"/>
     <permission android:name="com.google.android.apps.wallpaper.NOTIFY_ROTATING_WALLPAPER_CHANGED" android:protectionLevel="signature"/>
     <permission android:name="com.google.android.apps.wallpaper.CHANGE_DOCKED_CLOCK_FACE" android:protectionLevel="system|signature"/>
     <queries>
@@ -68,33 +68,14 @@
     <uses-permission android:name="com.google.pixel.livewallpaper.permission.DOWNLOAD_LIVE_WALLPAPER"/>
     <uses-permission android:name="com.breel.wallpapers19.APPLY_SETTINGS"/>
     <uses-permission android:name="android.permission.MODIFY_DAY_NIGHT_MODE"/>
+    <uses-permission android:name="com.google.android.wallpaper.effects.GENERATE_EFFECT"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <queries>
-        <intent>
-            <action android:name="android.intent.action.SET_WALLPAPER"/>
-        </intent>
-        <intent>
-            <action android:name="android.intent.action.GET_CONTENT"/>
-            <data android:mimeType="image/*"/>
-        </intent>
-        <intent>
-            <action android:name="android.intent.action.VIEW"/>
-            <data android:scheme="http"/>
-        </intent>
-        <intent>
-            <action android:name="android.service.wallpaper.WallpaperService"/>
-        </intent>
-        <intent>
-            <action android:name="com.android.launcher3.action.PARTNER_CUSTOMIZATION"/>
-        </intent>
-    </queries>
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
     <application android:label="@string/app_name" android:icon="@drawable/ic_home" android:name="com.google.android.apps.wallpaper.picker.WallpapersApplication" android:backupAgent="com.google.android.apps.wallpaper.backup.WallpapersBackupAgentHelper" android:allowBackup="true" android:restoreAnyVersion="true" android:hardwareAccelerated="true" android:supportsRtl="true" android:requiredForAllUsers="true" android:extractNativeLibs="false" android:usesNonSdkApi="true">
         <uses-library android:name="org.apache.http.legacy" android:required="false"/>
         <meta-data android:name="com.android.wallpaper.asset.WallpaperGlideModule" android:value="GlideModule"/>
         <meta-data android:name="com.motorola.allow_activities_on_small_external_display" android:value="false"/>
-        <activity android:theme="@style/WallpaperTheme_NoBackground" android:label="@string/wallpaper_app_name" android:name="com.android.wallpaper.picker.TopLevelPickerActivity" android:screenOrientation="portrait" android:resizeableActivity="false"/>
         <activity android:theme="@style/CustomizationTheme_NoActionBar" android:label="@string/app_name" android:icon="@drawable/ic_home" android:name="com.android.wallpaper.picker.CustomizationPickerActivity" android:exported="false" android:screenOrientation="portrait" android:relinquishTaskIdentity="true" android:resizeableActivity="false"/>
         <activity-alias android:label="@string/app_name" android:name="com.google.android.apps.wallpaper.picker.CategoryPickerActivity" android:exported="true" android:targetActivity="com.android.wallpaper.picker.CustomizationPickerActivity">
             <intent-filter>
@@ -115,7 +96,6 @@
                 <data android:scheme="https" android:host="g.co" android:pathPrefix="/wallpaper"/>
             </intent-filter>
         </activity>
-        <activity android:theme="@style/WallpaperTheme" android:label="@string/app_name" android:name="com.android.wallpaper.picker.individual.IndividualPickerActivity" android:screenOrientation="portrait" android:parentActivityName="com.android.wallpaper.picker.TopLevelPickerActivity" android:resizeableActivity="false"/>
         <activity android:theme="@style/CustomizationTheme_NoActionBar" android:name="com.android.wallpaper.picker.PreviewActivity" android:screenOrientation="portrait" android:resizeableActivity="false"/>
         <activity android:theme="@style/CustomizationTheme_NoActionBar" android:name="com.android.wallpaper.picker.FullPreviewActivity" android:taskAffinity="@string/full_screen_task_affinity" android:resizeableActivity="false"/>
         <activity android:theme="@style/CustomizationTheme_NoActionBar" android:name="com.android.wallpaper.picker.StandalonePreviewActivity" android:exported="true" android:screenOrientation="portrait" android:relinquishTaskIdentity="true" android:resizeableActivity="false">
@@ -135,8 +115,6 @@
         </service>
         <service android:name="com.google.android.apps.wallpaper.backdrop.BackdropRotationJobService" android:permission="android.permission.BIND_JOB_SERVICE" android:exported="true"/>
         <service android:name="com.android.wallpaper.backup.MissingHashCodeGeneratorJobService" android:permission="android.permission.BIND_JOB_SERVICE" android:exported="true"/>
-        <service android:name="com.google.android.apps.wallpaper.sync.ArcRemoteDataSyncJobService" android:permission="android.permission.BIND_JOB_SERVICE" android:exported="true"/>
-        <service android:name="com.google.android.apps.wallpaper.sync.ArcSyncDataProcessorJobService" android:permission="android.permission.BIND_JOB_SERVICE" android:exported="true"/>
         <receiver android:name="com.google.android.apps.wallpaper.backdrop.BackdropAlarmReceiver"/>
         <receiver android:name="com.google.android.apps.wallpaper.module.BackdropAlarmReceiver"/>
         <receiver android:name="com.android.wallpaper.module.DailyLoggingAlarmReceiver"/>
@@ -164,15 +142,14 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
             </intent-filter>
         </receiver>
+        <receiver android:name="com.google.android.apps.wallpaper.module.DownloadableRestorer" android:permission="com.google.pixel.livewallpaper.permission.DOWNLOAD_LIVE_WALLPAPER" android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.apps.wallpaper.action.RESTORE_DOWNLOADABLE"/>
+            </intent-filter>
+        </receiver>
         <receiver android:name="com.android.wallpaper.backup.MissingHashCodeGenerator" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
-            </intent-filter>
-        </receiver>
-        <receiver android:name="com.google.android.apps.wallpaper.sync.ArcSyncReceiver" android:exported="true">
-            <intent-filter>
-                <data android:scheme="content"/>
-                <action android:name="org.chromium.arc.intent_helper.ACTION_SYNC_SYSTEM_APP_DATA"/>
             </intent-filter>
         </receiver>
         <receiver android:name="com.google.android.apps.wallpaper.clock.DockedClockReceiver" android:permission="com.google.android.apps.wallpaper.CHANGE_DOCKED_CLOCK_FACE" android:exported="true">
@@ -180,7 +157,6 @@
                 <action android:name="com.google.android.apps.wallpaper.SET_DOCKED_CLOCK_FACE"/>
             </intent-filter>
         </receiver>
-        <provider android:name="com.google.android.apps.wallpaper.sync.SyncDataProvider" android:readPermission="org.chromium.arc.intent_helper.permission.SYNC_SYSTEM_APP_DATA" android:exported="true" android:authorities="com.google.android.apps.wallpaper.sync"/>
         <provider android:name="com.android.wallpaper.picker.MicropaperProvider" android:exported="true" android:authorities="com.android.wallpaper.picker.micropaperprovider"/>
         <provider android:name="com.google.android.apps.wallpaper.provider.RecentWallpapersProvider" android:permission="android.permission.MONITOR_INPUT" android:exported="true" android:authorities="com.google.android.apps.wallpaper.recents"/>
     </application>

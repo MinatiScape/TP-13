@@ -30,7 +30,6 @@
     <string name="abc_slice_more">Meira</string>
     <string name="abc_slice_more_content">+ %1$d</string>
     <string name="abc_slice_permission_allow">Leyfa</string>
-    <string name="abc_slice_permission_checkbox">Leyfa %1$s að sýna sneiðar úr hvaða forriti sem er</string>
     <string name="abc_slice_permission_deny">Hafna</string>
     <string name="abc_slice_permission_text_1">- Það getur lesið upplýsingar úr %1$s</string>
     <string name="abc_slice_permission_text_2">- Það getur gripið til aðgerða í %1$s</string>
@@ -49,7 +48,7 @@
     <string name="accessibility_info_hidden">Upplýsingar faldar</string>
     <string name="accessibility_info_shown">Upplýsingar sýndar</string>
     <string name="accessibility_preview_pager">Síða %1$d af %2$d</string>
-    <string name="adaptive_color_title">Kvikt</string>
+    <string name="adaptive_color_title">Breytilegt</string>
     <string name="app_name">Veggfóður og stíll</string>
     <string name="app_not_found">Forritið er ekki uppsett.</string>
     <string name="applied_clock_msg">Klukka var stillt</string>
@@ -72,6 +71,7 @@
     <string name="center_wallpaper_position">Miðja</string>
     <string name="character_counter_content_description">Innslegnir stafir %1$d af %2$d</string>
     <string name="character_counter_overflowed_content_description">Yfir hámarksstafafjölda, %1$d af %2$d</string>
+    <string name="cinematic_effects_toogle">Þrívíddarveggfóður</string>
     <string name="clear_text_end_icon_content_description">Hreinsa texta</string>
     <string name="clock_preview_content_description">%1$s forskoðun klukku</string>
     <string name="clock_title">Klukka</string>
@@ -117,6 +117,8 @@
     <string name="delete_live_wallpaper">Eyða</string>
     <string name="delete_wallpaper_confirmation">Viltu eyða þessu veggfóðri úr símanum?</string>
     <string name="edit_custom_theme_lbl">Ýttu til að breyta</string>
+    <string name="effect_error_dialog_body">Ekki tókst að nota áhrifin.\nPrófaðu með annarri mynd.</string>
+    <string name="effect_error_dialog_title">Ó, nei!</string>
     <string name="error_icon_content_description">Villa</string>
     <string name="expand_button_title">Ítarlegt</string>
     <string name="explore">Skoða</string>
@@ -199,6 +201,7 @@
     <string name="mtrl_picker_toggle_to_day_selection">Ýttu til að skipta yfir í að velja dag</string>
     <string name="mtrl_picker_toggle_to_text_input_mode">Skipta yfir í innfærsluaðferð fyrir texta</string>
     <string name="mtrl_picker_toggle_to_year_selection">Ýttu til að skipta yfir í að velja ár</string>
+    <string name="my_photos">Mínar myndir</string>
     <string name="my_photos_category_title">Myndirnar mínar</string>
     <string name="my_photos_generic_wallpaper_title">Mín mynd</string>
     <string name="name_component_title">Gefðu stílnum heiti</string>
@@ -236,7 +239,7 @@
     <string name="search_menu_title">Leit</string>
     <string name="select_wallpaper_label">Veggfóðursflokkar</string>
     <string name="set_theme_wallpaper_dialog_message">Velja stíl veggfóðurs</string>
-    <string name="set_wallpaper_both_destination">Heima- og lásskjár</string>
+    <string name="set_wallpaper_both_destination">Heima- og lásskjáir</string>
     <string name="set_wallpaper_button_text">Velja veggfóður</string>
     <string name="set_wallpaper_dialog_message">Velja veggfóður á</string>
     <string name="set_wallpaper_error_message">Ekki hægt að vista sem veggfóður.</string>
@@ -244,6 +247,8 @@
     <string name="set_wallpaper_lock_screen_destination">Lásskjár</string>
     <string name="set_wallpaper_progress_message">Vistar sem veggfóður…</string>
     <string name="settings_button_label">Stillingar</string>
+    <string name="settings_snackbar_description">Virkjaðu skrár og margmiðlunarefni í stillingum.</string>
+    <string name="settings_snackbar_enable">Virkja</string>
     <string name="shape_component_title">Velja form</string>
     <string name="shape_preview_content_description">Forskoðun lögunar</string>
     <string name="show_ui_preview_text">Sýna forskoðun notendaviðmóts</string>
@@ -261,6 +266,7 @@
     <string name="style_info_description">Forskoðun leturgerðar, tákna, lögunar forrits og litar</string>
     <string name="summary_collapsed_preference_list">%1$s, %2$s</string>
     <string name="tab_customize">Sérsníða</string>
+    <string name="tab_effects">Áhrif</string>
     <string name="tab_info">Upplýsingar</string>
     <string name="theme_description">Leturgerð: %1$s, tákn: %2$s, form: %3$s, litur: %4$s</string>
     <string name="theme_preview_card_content_description">Forskoðun stíls</string>
@@ -280,6 +286,8 @@
     <string name="wallpaper_destination_both">Heima- og lásskjár</string>
     <string name="wallpaper_disabled_by_administrator_message">Kerfisstjóri hefur slökkt á breytingu á veggfóðri</string>
     <string name="wallpaper_disabled_message">Slökkt er á breytingu á veggfóðri í þessu tæki</string>
+    <string name="wallpaper_effects_subtitle">Breyttu myndinni í þrívíddarveggfóður sem hreyfist með símanum</string>
+    <string name="wallpaper_effects_title">Þrívíddarveggfóður</string>
     <string name="wallpaper_picker_entry_title">Skipta um veggfóður</string>
     <string name="wallpaper_preview_card_content_description">Forskoðun veggfóðurs</string>
     <string name="wallpaper_set_successfully_message">Veggfóður er valið</string>

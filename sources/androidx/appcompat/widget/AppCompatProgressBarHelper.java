@@ -19,12 +19,8 @@ public class AppCompatProgressBarHelper {
     public Bitmap mSampleTile;
     public final ProgressBar mView;
 
-    public AppCompatProgressBarHelper(ProgressBar progressBar) {
-        this.mView = progressBar;
-    }
-
     public void loadFromAttributes(AttributeSet attributeSet, int i) {
-        TintTypedArray obtainStyledAttributes = TintTypedArray.obtainStyledAttributes(this.mView.getContext(), attributeSet, TINT_ATTRS, i, 0);
+        TintTypedArray obtainStyledAttributes = TintTypedArray.obtainStyledAttributes(this.mView.getContext(), attributeSet, TINT_ATTRS, i);
         Drawable drawableIfKnown = obtainStyledAttributes.getDrawableIfKnown(0);
         if (drawableIfKnown != null) {
             ProgressBar progressBar = this.mView;
@@ -47,10 +43,11 @@ public class AppCompatProgressBarHelper {
         if (drawableIfKnown2 != null) {
             this.mView.setProgressDrawable(tileify(drawableIfKnown2, false));
         }
-        obtainStyledAttributes.mWrapped.recycle();
+        obtainStyledAttributes.recycle();
     }
 
     public final Drawable tileify(Drawable drawable, boolean z) {
+        boolean z2;
         if (drawable instanceof WrappedDrawable) {
             WrappedDrawable wrappedDrawable = (WrappedDrawable) drawable;
             Drawable wrappedDrawable2 = wrappedDrawable.getWrappedDrawable();
@@ -63,7 +60,13 @@ public class AppCompatProgressBarHelper {
             Drawable[] drawableArr = new Drawable[numberOfLayers];
             for (int i = 0; i < numberOfLayers; i++) {
                 int id = layerDrawable.getId(i);
-                drawableArr[i] = tileify(layerDrawable.getDrawable(i), id == 16908301 || id == 16908303);
+                Drawable drawable2 = layerDrawable.getDrawable(i);
+                if (id == 16908301 || id == 16908303) {
+                    z2 = true;
+                } else {
+                    z2 = false;
+                }
+                drawableArr[i] = tileify(drawable2, z2);
             }
             LayerDrawable layerDrawable2 = new LayerDrawable(drawableArr);
             for (int i2 = 0; i2 < numberOfLayers; i2++) {
@@ -79,8 +82,15 @@ public class AppCompatProgressBarHelper {
             ShapeDrawable shapeDrawable = new ShapeDrawable(new RoundRectShape(new float[]{5.0f, 5.0f, 5.0f, 5.0f, 5.0f, 5.0f, 5.0f, 5.0f}, null, null));
             shapeDrawable.getPaint().setShader(new BitmapShader(bitmap, Shader.TileMode.REPEAT, Shader.TileMode.CLAMP));
             shapeDrawable.getPaint().setColorFilter(bitmapDrawable.getPaint().getColorFilter());
-            return z ? new ClipDrawable(shapeDrawable, 3, 1) : shapeDrawable;
+            if (z) {
+                return new ClipDrawable(shapeDrawable, 3, 1);
+            }
+            return shapeDrawable;
         }
         return drawable;
+    }
+
+    public AppCompatProgressBarHelper(ProgressBar progressBar) {
+        this.mView = progressBar;
     }
 }

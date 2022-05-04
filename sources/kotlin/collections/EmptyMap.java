@@ -7,77 +7,40 @@ import java.util.Set;
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: Maps.kt */
 /* loaded from: classes.dex */
-public final class EmptyMap implements Map, Serializable {
+final class EmptyMap implements Map, Serializable {
     @NotNull
     public static final EmptyMap INSTANCE = new EmptyMap();
     private static final long serialVersionUID = 8246714829545688274L;
 
-    private final Object readResolve() {
-        return INSTANCE;
-    }
-
     @Override // java.util.Map
-    public void clear() {
+    public final void clear() {
         throw new UnsupportedOperationException("Operation is not supported for read-only collection");
     }
 
     @Override // java.util.Map
-    public boolean containsKey(@Nullable Object obj) {
+    public final boolean containsKey(@Nullable Object obj) {
         return false;
     }
 
     @Override // java.util.Map
-    public final boolean containsValue(Object obj) {
-        if (obj instanceof Void) {
-            Void value = (Void) obj;
-            Intrinsics.checkNotNullParameter(value, "value");
-        }
-        return false;
-    }
-
-    @Override // java.util.Map
-    public final Set<Map.Entry> entrySet() {
-        return EmptySet.INSTANCE;
-    }
-
-    @Override // java.util.Map
-    public boolean equals(@Nullable Object obj) {
-        return (obj instanceof Map) && ((Map) obj).isEmpty();
-    }
-
-    @Override // java.util.Map
-    public final /* bridge */ Object get(Object obj) {
+    public final /* bridge */ /* synthetic */ Object get(Object obj) {
         return null;
     }
 
     @Override // java.util.Map
-    public int hashCode() {
+    public final int hashCode() {
         return 0;
     }
 
     @Override // java.util.Map
-    public boolean isEmpty() {
+    public final boolean isEmpty() {
         return true;
     }
 
     @Override // java.util.Map
-    public final Set<Object> keySet() {
-        return EmptySet.INSTANCE;
-    }
-
-    @Override // java.util.Map
-    public /* synthetic */ Object put(Object obj, Object obj2) {
-        throw new UnsupportedOperationException("Operation is not supported for read-only collection");
-    }
-
-    @Override // java.util.Map
-    public void putAll(Map map) {
-        throw new UnsupportedOperationException("Operation is not supported for read-only collection");
-    }
-
-    @Override // java.util.Map
-    public Object remove(Object obj) {
+    public final void putAll(Map map) {
         throw new UnsupportedOperationException("Operation is not supported for read-only collection");
     }
 
@@ -87,8 +50,54 @@ public final class EmptyMap implements Map, Serializable {
     }
 
     @NotNull
-    public String toString() {
+    public final String toString() {
         return "{}";
+    }
+
+    @Override // java.util.Map
+    public final boolean containsValue(Object obj) {
+        if (!(obj instanceof Void)) {
+            return false;
+        }
+        Void value = (Void) obj;
+        Intrinsics.checkNotNullParameter(value, "value");
+        return false;
+    }
+
+    @Override // java.util.Map
+    public final boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof Map) || !((Map) obj).isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override // java.util.Map
+    public final Object put(Object obj, Object obj2) {
+        Void r2 = (Void) obj2;
+        throw new UnsupportedOperationException("Operation is not supported for read-only collection");
+    }
+
+    @Override // java.util.Map
+    public final Object remove(Object obj) {
+        throw new UnsupportedOperationException("Operation is not supported for read-only collection");
+    }
+
+    private EmptyMap() {
+    }
+
+    private final Object readResolve() {
+        return INSTANCE;
+    }
+
+    @Override // java.util.Map
+    public final Set<Map.Entry> entrySet() {
+        return EmptySet.INSTANCE;
+    }
+
+    @Override // java.util.Map
+    public final Set<Object> keySet() {
+        return EmptySet.INSTANCE;
     }
 
     @Override // java.util.Map

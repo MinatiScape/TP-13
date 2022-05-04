@@ -7,7 +7,7 @@ import android.util.TypedValue;
 import android.widget.FrameLayout;
 import androidx.appcompat.app.AppCompatDelegateImpl;
 import androidx.appcompat.view.menu.MenuBuilder;
-import java.util.Objects;
+import androidx.core.view.ViewPropertyAnimatorCompat;
 /* loaded from: classes.dex */
 public class ContentFrameLayout extends FrameLayout {
     public OnAttachListener mAttachListener;
@@ -27,17 +27,26 @@ public class ContentFrameLayout extends FrameLayout {
         this(context, null);
     }
 
+    public ContentFrameLayout(Context context, AttributeSet attributeSet) {
+        this(context, attributeSet, 0);
+    }
+
+    public ContentFrameLayout(Context context, AttributeSet attributeSet, int i) {
+        super(context, attributeSet, i);
+        this.mDecorPadding = new Rect();
+    }
+
     @Override // android.view.ViewGroup, android.view.View
-    public void onAttachedToWindow() {
+    public final void onAttachedToWindow() {
         super.onAttachedToWindow();
         OnAttachListener onAttachListener = this.mAttachListener;
         if (onAttachListener != null) {
-            Objects.requireNonNull(onAttachListener);
+            onAttachListener.getClass();
         }
     }
 
     @Override // android.view.ViewGroup, android.view.View
-    public void onDetachedFromWindow() {
+    public final void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         OnAttachListener onAttachListener = this.mAttachListener;
         if (onAttachListener != null) {
@@ -56,7 +65,10 @@ public class ContentFrameLayout extends FrameLayout {
                 }
                 appCompatDelegateImpl.mActionModePopup = null;
             }
-            appCompatDelegateImpl.endOnGoingFadeAnimation();
+            ViewPropertyAnimatorCompat viewPropertyAnimatorCompat = appCompatDelegateImpl.mFadeAnim;
+            if (viewPropertyAnimatorCompat != null) {
+                viewPropertyAnimatorCompat.cancel();
+            }
             MenuBuilder menuBuilder = appCompatDelegateImpl.getPanelState(0).menu;
             if (menuBuilder != null) {
                 menuBuilder.close(true);
@@ -80,20 +92,11 @@ public class ContentFrameLayout extends FrameLayout {
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public void onMeasure(int r14, int r15) {
+    public final void onMeasure(int r14, int r15) {
         /*
             Method dump skipped, instructions count: 226
             To view this dump add '--comments-level debug' option
         */
         throw new UnsupportedOperationException("Method not decompiled: androidx.appcompat.widget.ContentFrameLayout.onMeasure(int, int):void");
-    }
-
-    public ContentFrameLayout(Context context, AttributeSet attributeSet) {
-        this(context, attributeSet, 0);
-    }
-
-    public ContentFrameLayout(Context context, AttributeSet attributeSet, int i) {
-        super(context, attributeSet, i);
-        this.mDecorPadding = new Rect();
     }
 }

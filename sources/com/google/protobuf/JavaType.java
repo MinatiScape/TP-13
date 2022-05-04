@@ -1,6 +1,7 @@
 package com.google.protobuf;
 
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
+import java.io.Serializable;
 /* JADX WARN: Init of enum ENUM can be incorrect */
 /* JADX WARN: Init of enum INT can be incorrect */
 /* loaded from: classes.dex */
@@ -24,13 +25,13 @@ public enum JavaType {
         Class cls = Integer.TYPE;
     }
 
-    JavaType(Class cls, Class cls2, Object obj) {
+    JavaType(Class cls, Class cls2, Serializable serializable) {
         this.type = cls;
         this.boxedType = cls2;
-        this.defaultDefault = obj;
+        this.defaultDefault = serializable;
     }
 
-    public Class<?> getBoxedType() {
+    public final Class<?> getBoxedType() {
         return this.boxedType;
     }
 }

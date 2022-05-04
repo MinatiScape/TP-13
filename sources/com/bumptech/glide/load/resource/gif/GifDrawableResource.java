@@ -3,31 +3,21 @@ package com.bumptech.glide.load.resource.gif;
 import android.graphics.Bitmap;
 import com.bumptech.glide.load.resource.drawable.DrawableResource;
 import com.bumptech.glide.load.resource.gif.GifFrameLoader;
-import com.bumptech.glide.util.Util;
 /* loaded from: classes.dex */
-public class GifDrawableResource extends DrawableResource<GifDrawable> {
-    public GifDrawableResource(GifDrawable drawable) {
-        super(drawable);
-    }
-
+public final class GifDrawableResource extends DrawableResource<GifDrawable> {
     @Override // com.bumptech.glide.load.engine.Resource
-    public Class<GifDrawable> getResourceClass() {
-        return GifDrawable.class;
-    }
-
-    @Override // com.bumptech.glide.load.engine.Resource
-    public int getSize() {
+    public final int getSize() {
         GifFrameLoader gifFrameLoader = ((GifDrawable) this.drawable).state.frameLoader;
-        return Util.getBitmapByteSize(gifFrameLoader.getCurrentFrame().getWidth(), gifFrameLoader.getCurrentFrame().getHeight(), gifFrameLoader.getCurrentFrame().getConfig()) + gifFrameLoader.gifDecoder.getByteSize();
+        return gifFrameLoader.gifDecoder.getByteSize() + gifFrameLoader.firstFrameSize;
     }
 
     @Override // com.bumptech.glide.load.resource.drawable.DrawableResource, com.bumptech.glide.load.engine.Initializable
-    public void initialize() {
-        ((GifDrawable) this.drawable).getFirstFrame().prepareToDraw();
+    public final void initialize() {
+        ((GifDrawable) this.drawable).state.frameLoader.firstFrame.prepareToDraw();
     }
 
     @Override // com.bumptech.glide.load.engine.Resource
-    public void recycle() {
+    public final void recycle() {
         ((GifDrawable) this.drawable).stop();
         GifDrawable gifDrawable = (GifDrawable) this.drawable;
         gifDrawable.isRecycled = true;
@@ -56,5 +46,14 @@ public class GifDrawableResource extends DrawableResource<GifDrawable> {
         }
         gifFrameLoader.gifDecoder.clear();
         gifFrameLoader.isCleared = true;
+    }
+
+    public GifDrawableResource(GifDrawable gifDrawable) {
+        super(gifDrawable);
+    }
+
+    @Override // com.bumptech.glide.load.engine.Resource
+    public final Class<GifDrawable> getResourceClass() {
+        return GifDrawable.class;
     }
 }

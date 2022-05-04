@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt" android:ordering="together">
+    <objectAnimator android:interpolator="@drawable/res_0x7f080004_ic_dialog_error_illustration_animated__11__0" android:duration="4750" android:startOffset="0" android:valueFrom="0" android:valueTo="0" android:valueType="floatType" android:propertyName="strokeAlpha"/>
+    <objectAnimator android:interpolator="@drawable/res_0x7f080005_ic_dialog_error_illustration_animated__11__1" android:duration="67" android:startOffset="4750" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" android:propertyName="strokeAlpha"/>
+    <objectAnimator android:interpolator="@drawable/res_0x7f080006_ic_dialog_error_illustration_animated__11__2" android:duration="3600" android:startOffset="4817" android:valueFrom="1" android:valueTo="1" android:valueType="floatType" android:propertyName="strokeAlpha"/>
+    <objectAnimator android:interpolator="@drawable/res_0x7f080007_ic_dialog_error_illustration_animated__11__3" android:duration="83" android:startOffset="8417" android:valueFrom="1" android:valueTo="0" android:valueType="floatType" android:propertyName="strokeAlpha"/>
+</set>

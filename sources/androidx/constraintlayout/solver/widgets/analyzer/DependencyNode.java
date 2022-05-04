@@ -1,21 +1,21 @@
 package androidx.constraintlayout.solver.widgets.analyzer;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
 /* loaded from: classes.dex */
 public class DependencyNode implements Dependency {
     public int margin;
     public WidgetRun run;
     public int value;
-    public Dependency updateDelegate = null;
+    public WidgetRun updateDelegate = null;
     public boolean delegateToWidgetRun = false;
     public boolean readyToSolve = false;
     public Type type = Type.UNKNOWN;
     public int marginFactor = 1;
     public DimensionDependency marginDependency = null;
     public boolean resolved = false;
-    public List<Dependency> dependencies = new ArrayList();
-    public List<DependencyNode> targets = new ArrayList();
+    public ArrayList dependencies = new ArrayList();
+    public ArrayList targets = new ArrayList();
 
     /* loaded from: classes.dex */
     public enum Type {
@@ -29,11 +29,14 @@ public class DependencyNode implements Dependency {
         BASELINE
     }
 
-    public DependencyNode(WidgetRun widgetRun) {
-        this.run = widgetRun;
+    public final void addDependency(Dependency dependency) {
+        this.dependencies.add(dependency);
+        if (this.resolved) {
+            dependency.update(dependency);
+        }
     }
 
-    public void clear() {
+    public final void clear() {
         this.targets.clear();
         this.dependencies.clear();
         this.resolved = false;
@@ -46,19 +49,27 @@ public class DependencyNode implements Dependency {
         if (!this.resolved) {
             this.resolved = true;
             this.value = i;
-            for (Dependency dependency : this.dependencies) {
+            Iterator it = this.dependencies.iterator();
+            while (it.hasNext()) {
+                Dependency dependency = (Dependency) it.next();
                 dependency.update(dependency);
             }
         }
     }
 
-    public String toString() {
+    public final String toString() {
+        Object obj;
         StringBuilder sb = new StringBuilder();
         sb.append(this.run.widget.mDebugName);
         sb.append(":");
         sb.append(this.type);
         sb.append("(");
-        sb.append(this.resolved ? Integer.valueOf(this.value) : "unresolved");
+        if (this.resolved) {
+            obj = Integer.valueOf(this.value);
+        } else {
+            obj = "unresolved";
+        }
+        sb.append(obj);
         sb.append(") <t=");
         sb.append(this.targets.size());
         sb.append(":d=");
@@ -68,30 +79,33 @@ public class DependencyNode implements Dependency {
     }
 
     @Override // androidx.constraintlayout.solver.widgets.analyzer.Dependency
-    public void update(Dependency dependency) {
-        for (DependencyNode dependencyNode : this.targets) {
-            if (!dependencyNode.resolved) {
+    public final void update(Dependency dependency) {
+        Iterator it = this.targets.iterator();
+        while (it.hasNext()) {
+            if (!((DependencyNode) it.next()).resolved) {
                 return;
             }
         }
         this.readyToSolve = true;
-        Dependency dependency2 = this.updateDelegate;
-        if (dependency2 != null) {
-            dependency2.update(this);
+        WidgetRun widgetRun = this.updateDelegate;
+        if (widgetRun != null) {
+            widgetRun.update(this);
         }
         if (this.delegateToWidgetRun) {
             this.run.update(this);
             return;
         }
-        DependencyNode dependencyNode2 = null;
+        DependencyNode dependencyNode = null;
         int i = 0;
-        for (DependencyNode dependencyNode3 : this.targets) {
-            if (!(dependencyNode3 instanceof DimensionDependency)) {
+        Iterator it2 = this.targets.iterator();
+        while (it2.hasNext()) {
+            DependencyNode dependencyNode2 = (DependencyNode) it2.next();
+            if (!(dependencyNode2 instanceof DimensionDependency)) {
                 i++;
-                dependencyNode2 = dependencyNode3;
+                dependencyNode = dependencyNode2;
             }
         }
-        if (dependencyNode2 != null && i == 1 && dependencyNode2.resolved) {
+        if (dependencyNode != null && i == 1 && dependencyNode.resolved) {
             DimensionDependency dimensionDependency = this.marginDependency;
             if (dimensionDependency != null) {
                 if (dimensionDependency.resolved) {
@@ -100,11 +114,15 @@ public class DependencyNode implements Dependency {
                     return;
                 }
             }
-            resolve(dependencyNode2.value + this.margin);
+            resolve(dependencyNode.value + this.margin);
         }
-        Dependency dependency3 = this.updateDelegate;
-        if (dependency3 != null) {
-            dependency3.update(this);
+        WidgetRun widgetRun2 = this.updateDelegate;
+        if (widgetRun2 != null) {
+            widgetRun2.update(this);
         }
+    }
+
+    public DependencyNode(WidgetRun widgetRun) {
+        this.run = widgetRun;
     }
 }

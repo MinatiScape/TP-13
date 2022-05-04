@@ -1,6 +1,5 @@
 package com.bumptech.glide.load;
 
-import com.android.systemui.shared.system.QuickStepContract;
 import com.bumptech.glide.load.ImageHeaderParser;
 import com.bumptech.glide.load.engine.bitmap_recycle.ArrayPool;
 import com.bumptech.glide.load.resource.bitmap.RecyclableBufferedInputStream;
@@ -9,47 +8,48 @@ import java.io.InputStream;
 import java.util.List;
 /* loaded from: classes.dex */
 public final class ImageHeaderParserUtils {
-    public static int getOrientation(List<ImageHeaderParser> parsers, InputStream is, ArrayPool byteArrayPool) throws IOException {
-        if (is == null) {
+    public static int getOrientation(List<ImageHeaderParser> list, InputStream inputStream, ArrayPool arrayPool) throws IOException {
+        if (inputStream == null) {
             return -1;
         }
-        if (!is.markSupported()) {
-            is = new RecyclableBufferedInputStream(is, byteArrayPool, QuickStepContract.SYSUI_STATE_ONE_HANDED_ACTIVE);
+        if (!inputStream.markSupported()) {
+            inputStream = new RecyclableBufferedInputStream(inputStream, arrayPool);
         }
-        is.mark(5242880);
-        int size = parsers.size();
+        inputStream.mark(5242880);
+        int size = list.size();
         for (int i = 0; i < size; i++) {
             try {
-                int orientation = parsers.get(i).getOrientation(is, byteArrayPool);
+                int orientation = list.get(i).getOrientation(inputStream, arrayPool);
                 if (orientation != -1) {
                     return orientation;
                 }
-                is.reset();
             } finally {
-                is.reset();
+                inputStream.reset();
             }
         }
         return -1;
     }
 
-    public static ImageHeaderParser.ImageType getType(List<ImageHeaderParser> parsers, InputStream is, ArrayPool byteArrayPool) throws IOException {
-        if (is == null) {
+    /* JADX WARN: Finally extract failed */
+    public static ImageHeaderParser.ImageType getType(List<ImageHeaderParser> list, InputStream inputStream, ArrayPool arrayPool) throws IOException {
+        if (inputStream == null) {
             return ImageHeaderParser.ImageType.UNKNOWN;
         }
-        if (!is.markSupported()) {
-            is = new RecyclableBufferedInputStream(is, byteArrayPool, QuickStepContract.SYSUI_STATE_ONE_HANDED_ACTIVE);
+        if (!inputStream.markSupported()) {
+            inputStream = new RecyclableBufferedInputStream(inputStream, arrayPool);
         }
-        is.mark(5242880);
-        int size = parsers.size();
+        inputStream.mark(5242880);
+        int size = list.size();
         for (int i = 0; i < size; i++) {
             try {
-                ImageHeaderParser.ImageType type = parsers.get(i).getType(is);
+                ImageHeaderParser.ImageType type = list.get(i).getType(inputStream);
+                inputStream.reset();
                 if (type != ImageHeaderParser.ImageType.UNKNOWN) {
                     return type;
                 }
-                is.reset();
-            } finally {
-                is.reset();
+            } catch (Throwable th) {
+                inputStream.reset();
+                throw th;
             }
         }
         return ImageHeaderParser.ImageType.UNKNOWN;

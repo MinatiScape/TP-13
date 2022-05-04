@@ -6,6 +6,7 @@ import android.os.Looper;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.Api.ApiOptions;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.internal.zzbt;
 import com.google.android.gms.common.internal.BaseGmsClient;
 import com.google.android.gms.common.internal.ClientSettings;
 import com.google.android.gms.common.internal.IAccountAccessor;
@@ -14,7 +15,7 @@ import java.util.Set;
 public final class Api<O extends ApiOptions> {
     public final zza<?, O> zza;
     public final ClientKey<?> zzc;
-    public final String zze;
+    public final String zze = "ClearcutLogger.API";
 
     /* loaded from: classes.dex */
     public interface ApiOptions {
@@ -31,7 +32,7 @@ public final class Api<O extends ApiOptions> {
     }
 
     /* loaded from: classes.dex */
-    public interface Client extends zzb {
+    public interface Client {
         void connect(BaseGmsClient.ConnectionProgressReportCallbacks connectionProgressReportCallbacks);
 
         void disconnect();
@@ -42,15 +43,15 @@ public final class Api<O extends ApiOptions> {
 
         boolean isConnecting();
 
-        void onUserSignOut(BaseGmsClient.SignOutCallbacks signOutCallbacks);
+        void onUserSignOut(zzbt zzbtVar);
 
-        boolean requiresGooglePlayServices();
+        void requiresGooglePlayServices();
 
         boolean requiresSignIn();
 
-        int zza();
+        void zza();
 
-        String zzab();
+        void zzab();
     }
 
     /* loaded from: classes.dex */
@@ -59,33 +60,19 @@ public final class Api<O extends ApiOptions> {
 
     /* loaded from: classes.dex */
     public static abstract class zza<T extends Client, O> extends zzd<T, O> {
-        public abstract T zza(Context context, Looper looper, ClientSettings clientSettings, O o, GoogleApiClient.ConnectionCallbacks connectionCallbacks, GoogleApiClient.OnConnectionFailedListener onConnectionFailedListener);
+        public abstract Client zza(Context context, Looper looper, ClientSettings clientSettings, ApiOptions apiOptions, GoogleApiClient.ConnectionCallbacks connectionCallbacks, GoogleApiClient.OnConnectionFailedListener onConnectionFailedListener);
     }
 
     /* loaded from: classes.dex */
-    public interface zzb {
+    public static class zzc<C> {
     }
 
     /* loaded from: classes.dex */
-    public static class zzc<C extends zzb> {
+    public static abstract class zzd<T, O> {
     }
 
-    /* loaded from: classes.dex */
-    public static abstract class zzd<T extends zzb, O> {
-    }
-
-    /* JADX WARN: Multi-variable type inference failed */
-    public <C extends Client> Api(String str, zza<C, O> zzaVar, ClientKey<C> clientKey) {
-        this.zze = str;
-        this.zza = zzaVar;
+    public Api(com.google.android.gms.clearcut.zzd zzdVar, ClientKey clientKey) {
+        this.zza = zzdVar;
         this.zzc = clientKey;
-    }
-
-    public final zzc<?> zzc() {
-        ClientKey<?> clientKey = this.zzc;
-        if (clientKey != null) {
-            return clientKey;
-        }
-        throw new IllegalStateException("This API was constructed with null client keys. This should not be possible.");
     }
 }

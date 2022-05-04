@@ -4,21 +4,21 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import androidx.appcompat.R$bool;
 import androidx.appcompat.widget.AppCompatRadioButton;
 import com.android.systemui.shared.R;
-import com.android.wallpaper.util.SizeCalculator;
 import com.google.android.material.R$styleable;
 import com.google.android.material.internal.ThemeEnforcement;
 import com.google.android.material.resources.MaterialResources;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 /* loaded from: classes.dex */
-public class MaterialRadioButton extends AppCompatRadioButton {
+public final class MaterialRadioButton extends AppCompatRadioButton {
     public static final int[][] ENABLED_CHECKED_STATES = {new int[]{16842910, 16842912}, new int[]{16842910, -16842912}, new int[]{-16842910, 16842912}, new int[]{-16842910, -16842912}};
     public ColorStateList materialThemeColorsTintList;
     public boolean useMaterialThemeColors;
 
     public MaterialRadioButton(Context context, AttributeSet attributeSet) {
-        super(MaterialThemeOverlay.wrap(context, attributeSet, R.attr.radioButtonStyle, R.style.Widget_MaterialComponents_CompoundButton_RadioButton), attributeSet, R.attr.radioButtonStyle);
+        super(MaterialThemeOverlay.wrap(context, attributeSet, R.attr.radioButtonStyle, R.style.Widget_MaterialComponents_CompoundButton_RadioButton), attributeSet);
         Context context2 = getContext();
         TypedArray obtainStyledAttributes = ThemeEnforcement.obtainStyledAttributes(context2, attributeSet, R$styleable.MaterialRadioButton, R.attr.radioButtonStyle, R.style.Widget_MaterialComponents_CompoundButton_RadioButton, new int[0]);
         if (obtainStyledAttributes.hasValue(0)) {
@@ -29,21 +29,15 @@ public class MaterialRadioButton extends AppCompatRadioButton {
     }
 
     @Override // android.widget.TextView, android.view.View
-    public void onAttachedToWindow() {
+    public final void onAttachedToWindow() {
         super.onAttachedToWindow();
         if (this.useMaterialThemeColors && getButtonTintList() == null) {
             this.useMaterialThemeColors = true;
             if (this.materialThemeColorsTintList == null) {
-                int color = SizeCalculator.getColor(this, R.attr.colorControlActivated);
-                int color2 = SizeCalculator.getColor(this, R.attr.colorOnSurface);
-                int color3 = SizeCalculator.getColor(this, R.attr.colorSurface);
-                int[][] iArr = ENABLED_CHECKED_STATES;
-                int[] iArr2 = new int[iArr.length];
-                iArr2[0] = SizeCalculator.layer(color3, color, 1.0f);
-                iArr2[1] = SizeCalculator.layer(color3, color2, 0.54f);
-                iArr2[2] = SizeCalculator.layer(color3, color2, 0.38f);
-                iArr2[3] = SizeCalculator.layer(color3, color2, 0.38f);
-                this.materialThemeColorsTintList = new ColorStateList(iArr, iArr2);
+                int color = R$bool.getColor(this, R.attr.colorControlActivated);
+                int color2 = R$bool.getColor(this, R.attr.colorOnSurface);
+                int color3 = R$bool.getColor(this, R.attr.colorSurface);
+                this.materialThemeColorsTintList = new ColorStateList(ENABLED_CHECKED_STATES, new int[]{R$bool.layer(color3, color, 1.0f), R$bool.layer(color3, color2, 0.54f), R$bool.layer(color3, color2, 0.38f), R$bool.layer(color3, color2, 0.38f)});
             }
             setButtonTintList(this.materialThemeColorsTintList);
         }

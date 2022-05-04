@@ -25,15 +25,15 @@ public final class InteractionJankMonitorWrapper {
         InteractionJankMonitor.getInstance().begin(view, i);
     }
 
+    public static void begin(View view, int i, long j) {
+        InteractionJankMonitor.getInstance().begin(InteractionJankMonitor.Configuration.Builder.withView(i, view).setTimeout(j));
+    }
+
     public static void cancel(int i) {
         InteractionJankMonitor.getInstance().cancel(i);
     }
 
     public static void end(int i) {
         InteractionJankMonitor.getInstance().end(i);
-    }
-
-    public static void begin(View view, int i, long j) {
-        InteractionJankMonitor.getInstance().begin(InteractionJankMonitor.Configuration.Builder.withView(i, view).setTimeout(j));
     }
 }

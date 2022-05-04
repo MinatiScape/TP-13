@@ -1,6 +1,6 @@
 package com.google.common.collect;
 
-import androidx.constraintlayout.solver.SolverVariable$Type$r8$EnumUnboxingUtility;
+import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Cut;
 import com.google.common.collect.Iterators;
 import com.google.common.primitives.Ints;
@@ -10,34 +10,51 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NavigableMap;
-import java.util.Objects;
 /* loaded from: classes.dex */
-public final class TreeRangeSet$RangesByUpperBound<C extends Comparable<?>> extends AbstractNavigableMap<Cut<C>, Range<C>> {
+final class TreeRangeSet$RangesByUpperBound<C extends Comparable<?>> extends AbstractNavigableMap<Cut<C>, Range<C>> {
     public final NavigableMap<Cut<C>, Range<C>> rangesByLowerBound;
     public final Range<Cut<C>> upperBoundWindow;
 
-    public TreeRangeSet$RangesByUpperBound(NavigableMap<Cut<C>, Range<C>> rangesByLowerBound, Range<Cut<C>> upperBoundWindow) {
-        this.rangesByLowerBound = rangesByLowerBound;
-        this.upperBoundWindow = upperBoundWindow;
+    @Override // java.util.NavigableMap
+    public final NavigableMap subMap(Object fromKey, boolean fromInclusive, Object toKey, boolean toInclusive) {
+        Cut cut;
+        Cut cut2;
+        BoundType boundType = BoundType.CLOSED;
+        BoundType boundType2 = BoundType.OPEN;
+        Cut cut3 = (Cut) fromKey;
+        Cut cut4 = (Cut) toKey;
+        BoundType boundType3 = fromInclusive ? boundType : boundType2;
+        if (!toInclusive) {
+            boundType = boundType2;
+        }
+        Range<Comparable> range = Range.ALL;
+        if (boundType3 == boundType2) {
+            cut = new Cut.AboveValue(cut3);
+        } else {
+            cut = new Cut.BelowValue(cut3);
+        }
+        if (boundType == boundType2) {
+            cut2 = new Cut.BelowValue(cut4);
+        } else {
+            cut2 = new Cut.AboveValue(cut4);
+        }
+        return subMap(new Range<>(cut, cut2));
     }
 
-    @Override // java.util.SortedMap
-    public Comparator<? super Cut<C>> comparator() {
-        return NaturalOrdering.INSTANCE;
-    }
-
-    @Override // java.util.AbstractMap, java.util.Map
-    public boolean containsKey(Object key) {
-        return get(key) != null;
-    }
-
+    /* JADX WARN: Type inference failed for: r1v4, types: [com.google.common.collect.TreeRangeSet$RangesByUpperBound$2] */
     /* JADX WARN: Type inference failed for: r3v3, types: [E, java.lang.Object] */
     @Override // com.google.common.collect.AbstractNavigableMap
-    public Iterator<Map.Entry<Cut<C>, Range<C>>> descendingEntryIterator() {
+    public final AnonymousClass2 descendingEntryIterator() {
+        boolean z;
         Collection<Range<C>> collection;
         final Iterators.PeekingImpl peekingImpl;
         Cut<Cut<C>> cut = this.upperBoundWindow.upperBound;
         if (cut != Cut.AboveAll.INSTANCE) {
+            z = true;
+        } else {
+            z = false;
+        }
+        if (z) {
             collection = this.rangesByLowerBound.headMap(cut.endpoint(), false).descendingMap().values();
         } else {
             collection = this.rangesByLowerBound.descendingMap().values();
@@ -58,28 +75,36 @@ public final class TreeRangeSet$RangesByUpperBound<C extends Comparable<?>> exte
                 peekingImpl.next();
             }
         }
-        return new AbstractIterator<Map.Entry<Cut<C>, Range<C>>>() { // from class: com.google.common.collect.TreeRangeSet$RangesByUpperBound.2
+        return new AbstractIterator<Map.Entry<Cut<Comparable<?>>, Range<Comparable<?>>>>() { // from class: com.google.common.collect.TreeRangeSet$RangesByUpperBound.2
             @Override // com.google.common.collect.AbstractIterator
-            public Object computeNext() {
+            public final Map.Entry<Cut<Comparable<?>>, Range<Comparable<?>>> computeNext() {
+                AbstractIterator.State state = AbstractIterator.State.DONE;
                 if (!((Iterators.PeekingImpl) peekingImpl).hasNext()) {
-                    endOfData();
-                    return null;
+                    this.state = state;
+                } else {
+                    Range range = (Range) ((Iterators.PeekingImpl) peekingImpl).next();
+                    if (TreeRangeSet$RangesByUpperBound.this.upperBoundWindow.lowerBound.isLessThan(range.upperBound)) {
+                        return new ImmutableEntry(range.upperBound, range);
+                    }
+                    this.state = state;
                 }
-                Range range = (Range) ((Iterators.PeekingImpl) peekingImpl).next();
-                if (TreeRangeSet$RangesByUpperBound.this.upperBoundWindow.lowerBound.isLessThan(range.upperBound)) {
-                    return new ImmutableEntry(range.upperBound, range);
-                }
-                endOfData();
                 return null;
             }
         };
     }
 
+    /* JADX WARN: Type inference failed for: r1v2, types: [com.google.common.collect.TreeRangeSet$RangesByUpperBound$1] */
     @Override // com.google.common.collect.Maps.IteratorBasedAbstractMap
-    public Iterator<Map.Entry<Cut<C>, Range<C>>> entryIterator() {
+    public final AnonymousClass1 entryIterator() {
+        boolean z;
         final Iterator<Range<C>> it;
         Cut<Cut<C>> cut = this.upperBoundWindow.lowerBound;
-        if (!(cut != Cut.BelowAll.INSTANCE)) {
+        if (cut != Cut.BelowAll.INSTANCE) {
+            z = true;
+        } else {
+            z = false;
+        }
+        if (!z) {
             it = this.rangesByLowerBound.values().iterator();
         } else {
             Map.Entry<Cut<C>, Range<C>> lowerEntry = this.rangesByLowerBound.lowerEntry(cut.endpoint());
@@ -91,33 +116,57 @@ public final class TreeRangeSet$RangesByUpperBound<C extends Comparable<?>> exte
                 it = this.rangesByLowerBound.tailMap(this.upperBoundWindow.lowerBound.endpoint(), true).values().iterator();
             }
         }
-        return new AbstractIterator<Map.Entry<Cut<C>, Range<C>>>() { // from class: com.google.common.collect.TreeRangeSet$RangesByUpperBound.1
+        return new AbstractIterator<Map.Entry<Cut<Comparable<?>>, Range<Comparable<?>>>>() { // from class: com.google.common.collect.TreeRangeSet$RangesByUpperBound.1
             @Override // com.google.common.collect.AbstractIterator
-            public Object computeNext() {
+            public final Map.Entry<Cut<Comparable<?>>, Range<Comparable<?>>> computeNext() {
+                AbstractIterator.State state = AbstractIterator.State.DONE;
                 if (!it.hasNext()) {
-                    endOfData();
-                    return null;
+                    this.state = state;
+                } else {
+                    Range range = (Range) it.next();
+                    if (!TreeRangeSet$RangesByUpperBound.this.upperBoundWindow.upperBound.isLessThan(range.upperBound)) {
+                        return new ImmutableEntry(range.upperBound, range);
+                    }
+                    this.state = state;
                 }
-                Range range = (Range) it.next();
-                if (!TreeRangeSet$RangesByUpperBound.this.upperBoundWindow.upperBound.isLessThan(range.upperBound)) {
-                    return new ImmutableEntry(range.upperBound, range);
-                }
-                endOfData();
                 return null;
             }
         };
     }
 
+    @Override // java.util.AbstractMap, java.util.Map
+    public final Range<C> get(Object key) {
+        Map.Entry<Cut<C>, Range<C>> lowerEntry;
+        if (key instanceof Cut) {
+            try {
+                Cut<C> cut = (Cut) key;
+                Range<Cut<C>> range = this.upperBoundWindow;
+                range.getClass();
+                cut.getClass();
+                if ((range.lowerBound.isLessThan(cut) && !range.upperBound.isLessThan(cut)) && (lowerEntry = this.rangesByLowerBound.lowerEntry(cut)) != null && lowerEntry.getValue().upperBound.equals(cut)) {
+                    return lowerEntry.getValue();
+                }
+            } catch (ClassCastException unused) {
+            }
+        }
+        return null;
+    }
+
     @Override // java.util.NavigableMap
-    public NavigableMap headMap(Object toKey, boolean inclusive) {
+    public final NavigableMap headMap(Object toKey, boolean inclusive) {
+        BoundType boundType;
         Range<Cut<C>> range;
         Cut cut = (Cut) toKey;
-        int com$google$common$collect$BoundType$s$forBoolean = SolverVariable$Type$r8$EnumUnboxingUtility.com$google$common$collect$BoundType$s$forBoolean(inclusive);
+        if (inclusive) {
+            boundType = BoundType.CLOSED;
+        } else {
+            boundType = BoundType.OPEN;
+        }
         Range<Comparable> range2 = Range.ALL;
-        int $enumboxing$ordinal = SolverVariable$Type$r8$EnumUnboxingUtility.$enumboxing$ordinal(com$google$common$collect$BoundType$s$forBoolean);
-        if ($enumboxing$ordinal == 0) {
+        int ordinal = boundType.ordinal();
+        if (ordinal == 0) {
             range = new Range<>(Cut.BelowAll.INSTANCE, new Cut.BelowValue(cut));
-        } else if ($enumboxing$ordinal == 1) {
+        } else if (ordinal == 1) {
             range = new Range<>(Cut.BelowAll.INSTANCE, new Cut.AboveValue(cut));
         } else {
             throw new AssertionError();
@@ -126,62 +175,45 @@ public final class TreeRangeSet$RangesByUpperBound<C extends Comparable<?>> exte
     }
 
     @Override // java.util.AbstractMap, java.util.Map
-    public boolean isEmpty() {
+    public final boolean isEmpty() {
         if (this.upperBoundWindow.equals(Range.ALL)) {
             return this.rangesByLowerBound.isEmpty();
         }
-        return !((AbstractIterator) entryIterator()).hasNext();
+        if (!entryIterator().hasNext()) {
+            return true;
+        }
+        return false;
     }
 
     @Override // java.util.AbstractMap, java.util.Map
-    public int size() {
+    public final int size() {
         if (this.upperBoundWindow.equals(Range.ALL)) {
             return this.rangesByLowerBound.size();
         }
-        Iterator<Map.Entry<Cut<C>, Range<C>>> entryIterator = entryIterator();
+        AnonymousClass1 entryIterator = entryIterator();
         long j = 0;
-        while (true) {
-            AbstractIterator abstractIterator = (AbstractIterator) entryIterator;
-            if (!abstractIterator.hasNext()) {
-                return Ints.saturatedCast(j);
-            }
-            abstractIterator.next();
+        while (entryIterator.hasNext()) {
+            entryIterator.next();
             j++;
         }
+        return Ints.saturatedCast(j);
     }
 
     @Override // java.util.NavigableMap
-    public NavigableMap subMap(Object fromKey, boolean fromInclusive, Object toKey, boolean toInclusive) {
-        Cut cut;
-        Cut cut2;
-        Cut cut3 = (Cut) fromKey;
-        Cut cut4 = (Cut) toKey;
-        int com$google$common$collect$BoundType$s$forBoolean = SolverVariable$Type$r8$EnumUnboxingUtility.com$google$common$collect$BoundType$s$forBoolean(fromInclusive);
-        int com$google$common$collect$BoundType$s$forBoolean2 = SolverVariable$Type$r8$EnumUnboxingUtility.com$google$common$collect$BoundType$s$forBoolean(toInclusive);
-        Range<Comparable> range = Range.ALL;
-        if (com$google$common$collect$BoundType$s$forBoolean == 1) {
-            cut = new Cut.AboveValue(cut3);
-        } else {
-            cut = new Cut.BelowValue(cut3);
-        }
-        if (com$google$common$collect$BoundType$s$forBoolean2 == 1) {
-            cut2 = new Cut.BelowValue(cut4);
-        } else {
-            cut2 = new Cut.AboveValue(cut4);
-        }
-        return subMap(new Range<>(cut, cut2));
-    }
-
-    @Override // java.util.NavigableMap
-    public NavigableMap tailMap(Object fromKey, boolean inclusive) {
+    public final NavigableMap tailMap(Object fromKey, boolean inclusive) {
+        BoundType boundType;
         Range<Cut<C>> range;
         Cut cut = (Cut) fromKey;
-        int com$google$common$collect$BoundType$s$forBoolean = SolverVariable$Type$r8$EnumUnboxingUtility.com$google$common$collect$BoundType$s$forBoolean(inclusive);
+        if (inclusive) {
+            boundType = BoundType.CLOSED;
+        } else {
+            boundType = BoundType.OPEN;
+        }
         Range<Comparable> range2 = Range.ALL;
-        int $enumboxing$ordinal = SolverVariable$Type$r8$EnumUnboxingUtility.$enumboxing$ordinal(com$google$common$collect$BoundType$s$forBoolean);
-        if ($enumboxing$ordinal == 0) {
+        int ordinal = boundType.ordinal();
+        if (ordinal == 0) {
             range = new Range<>(new Cut.AboveValue(cut), Cut.AboveAll.INSTANCE);
-        } else if ($enumboxing$ordinal == 1) {
+        } else if (ordinal == 1) {
             range = new Range<>(new Cut.BelowValue(cut), Cut.AboveAll.INSTANCE);
         } else {
             throw new AssertionError();
@@ -189,22 +221,17 @@ public final class TreeRangeSet$RangesByUpperBound<C extends Comparable<?>> exte
         return subMap(range);
     }
 
+    public TreeRangeSet$RangesByUpperBound(NavigableMap<Cut<C>, Range<C>> rangesByLowerBound, Range<Cut<C>> upperBoundWindow) {
+        this.rangesByLowerBound = rangesByLowerBound;
+        this.upperBoundWindow = upperBoundWindow;
+    }
+
     @Override // java.util.AbstractMap, java.util.Map
-    public Range<C> get(Object key) {
-        Map.Entry<Cut<C>, Range<C>> lowerEntry;
-        if (key instanceof Cut) {
-            try {
-                Cut<C> cut = (Cut) key;
-                Range<Cut<C>> range = this.upperBoundWindow;
-                Objects.requireNonNull(range);
-                Objects.requireNonNull(cut);
-                if ((range.lowerBound.isLessThan(cut) && !range.upperBound.isLessThan(cut)) && (lowerEntry = this.rangesByLowerBound.lowerEntry(cut)) != null && lowerEntry.getValue().upperBound.equals(cut)) {
-                    return lowerEntry.getValue();
-                }
-            } catch (ClassCastException unused) {
-            }
+    public final boolean containsKey(Object key) {
+        if (get(key) != null) {
+            return true;
         }
-        return null;
+        return false;
     }
 
     public final NavigableMap<Cut<C>, Range<C>> subMap(Range<Cut<C>> window) {
@@ -224,5 +251,10 @@ public final class TreeRangeSet$RangesByUpperBound<C extends Comparable<?>> exte
             }
         }
         return new TreeRangeSet$RangesByUpperBound(navigableMap, window);
+    }
+
+    @Override // java.util.SortedMap
+    public final Comparator<? super Cut<C>> comparator() {
+        return NaturalOrdering.INSTANCE;
     }
 }

@@ -3,6 +3,7 @@ package com.google.android.gms.common.server;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.android.gms.internal.zzbkw;
+/* compiled from: FavaDiagnosticsEntityCreator.java */
 /* loaded from: classes.dex */
 public final class zza implements Parcelable.Creator<FavaDiagnosticsEntity> {
     @Override // android.os.Parcelable.Creator

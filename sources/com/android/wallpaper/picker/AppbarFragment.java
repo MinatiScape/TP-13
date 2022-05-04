@@ -8,8 +8,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toolbar;
+import androidx.appcompat.R$bool;
 import androidx.fragment.app.FragmentActivity;
-import androidx.transition.R$id;
 import com.android.systemui.shared.R;
 import com.android.wallpaper.widget.BottomActionBar;
 /* loaded from: classes.dex */
@@ -31,24 +31,11 @@ public abstract class AppbarFragment extends BottomActionBarFragment implements 
     }
 
     public int getToolbarColorId() {
-        return R.color.settingslib_colorSurfaceHeader;
+        return R.color.toolbar_color;
     }
 
     public int getToolbarId() {
         return R.id.toolbar;
-    }
-
-    @Override // androidx.fragment.app.Fragment
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        this.mHost = (AppbarFragmentHost) context;
-    }
-
-    @Override // com.android.wallpaper.picker.BottomActionBarFragment
-    public void onBottomActionBarReady(BottomActionBar bottomActionBar) {
-        bottomActionBar.findViewById(R.id.action_back).setVisibility((!this.mUpArrowEnabled || !this.mHost.isUpArrowSupported()) ? 0 : 8);
-        this.mBottomActionBar = bottomActionBar;
-        bottomActionBar.findViewById(R.id.action_back).setOnClickListener(new AppbarFragment$$ExternalSyntheticLambda0(getActivity()));
     }
 
     @Override // android.widget.Toolbar.OnMenuItemClickListener
@@ -56,7 +43,19 @@ public abstract class AppbarFragment extends BottomActionBarFragment implements 
         return false;
     }
 
-    public void setTitle(CharSequence charSequence) {
+    @Override // com.android.wallpaper.picker.BottomActionBarFragment
+    public void onBottomActionBarReady(BottomActionBar bottomActionBar) {
+        int i;
+        if (!this.mUpArrowEnabled || !this.mHost.isUpArrowSupported()) {
+            i = 0;
+        } else {
+            i = 8;
+        }
+        bottomActionBar.findViewById(R.id.action_back).setVisibility(i);
+        super.onBottomActionBarReady(bottomActionBar);
+    }
+
+    public final void setTitle(CharSequence charSequence) {
         Toolbar toolbar = this.mToolbar;
         if (toolbar != null) {
             if (this.mTitleView != null) {
@@ -75,7 +74,7 @@ public abstract class AppbarFragment extends BottomActionBarFragment implements 
         }
     }
 
-    public void setUpToolbar(View view, boolean z) {
+    public final void setUpToolbar(View view, boolean z) {
         CharSequence charSequence;
         this.mUpArrowEnabled = z;
         Toolbar toolbar = (Toolbar) view.findViewById(getToolbarId());
@@ -95,15 +94,16 @@ public abstract class AppbarFragment extends BottomActionBarFragment implements 
         if (z && this.mHost.isUpArrowSupported()) {
             Drawable mutate = getResources().getDrawable(R.drawable.material_ic_arrow_back_black_24, null).mutate();
             mutate.setAutoMirrored(true);
-            mutate.setTint(R$id.getColorAttr(getActivity(), 16842806));
+            mutate.setTint(R$bool.getColorAttr(getActivity(), 16842806));
             this.mToolbar.setNavigationIcon(mutate);
             this.mToolbar.setNavigationContentDescription(R.string.bottom_action_bar_back);
-            this.mToolbar.setNavigationOnClickListener(new AppbarFragment$$ExternalSyntheticLambda0(this));
+            this.mToolbar.setNavigationOnClickListener(new AppbarFragment$$ExternalSyntheticLambda0(this, 0));
         }
     }
 
-    public void setUpToolbarMenu(int i) {
-        this.mToolbar.inflateMenu(i);
-        this.mToolbar.setOnMenuItemClickListener(this);
+    @Override // androidx.fragment.app.Fragment
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        this.mHost = (AppbarFragmentHost) context;
     }
 }

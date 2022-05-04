@@ -3,12 +3,10 @@ package androidx.constraintlayout.solver.widgets.analyzer;
 import androidx.constraintlayout.solver.widgets.ConstraintWidget;
 import androidx.constraintlayout.solver.widgets.Guideline;
 /* loaded from: classes.dex */
-public class GuidelineReference extends WidgetRun {
-    public GuidelineReference(ConstraintWidget constraintWidget) {
-        super(constraintWidget);
-        constraintWidget.horizontalRun.clear();
-        constraintWidget.verticalRun.clear();
-        this.orientation = ((Guideline) constraintWidget).mOrientation;
+public final class GuidelineReference extends WidgetRun {
+    @Override // androidx.constraintlayout.solver.widgets.analyzer.WidgetRun
+    public final boolean supportsWrapComputation() {
+        return false;
     }
 
     public final void addDependency(DependencyNode dependencyNode) {
@@ -17,7 +15,7 @@ public class GuidelineReference extends WidgetRun {
     }
 
     @Override // androidx.constraintlayout.solver.widgets.analyzer.WidgetRun
-    public void apply() {
+    public final void apply() {
         ConstraintWidget constraintWidget = this.widget;
         Guideline guideline = (Guideline) constraintWidget;
         int i = guideline.mRelativeBegin;
@@ -60,7 +58,7 @@ public class GuidelineReference extends WidgetRun {
     }
 
     @Override // androidx.constraintlayout.solver.widgets.analyzer.WidgetRun
-    public void applyToWidget() {
+    public final void applyToWidget() {
         ConstraintWidget constraintWidget = this.widget;
         if (((Guideline) constraintWidget).mOrientation == 1) {
             constraintWidget.mX = this.start.value;
@@ -70,20 +68,22 @@ public class GuidelineReference extends WidgetRun {
     }
 
     @Override // androidx.constraintlayout.solver.widgets.analyzer.WidgetRun
-    public void clear() {
+    public final void clear() {
         this.start.clear();
     }
 
-    @Override // androidx.constraintlayout.solver.widgets.analyzer.WidgetRun
-    public boolean supportsWrapComputation() {
-        return false;
-    }
-
     @Override // androidx.constraintlayout.solver.widgets.analyzer.WidgetRun, androidx.constraintlayout.solver.widgets.analyzer.Dependency
-    public void update(Dependency dependency) {
+    public final void update(Dependency dependency) {
         DependencyNode dependencyNode = this.start;
         if (dependencyNode.readyToSolve && !dependencyNode.resolved) {
-            this.start.resolve((int) ((dependencyNode.targets.get(0).value * ((Guideline) this.widget).mRelativePercent) + 0.5f));
+            this.start.resolve((int) ((((DependencyNode) dependencyNode.targets.get(0)).value * ((Guideline) this.widget).mRelativePercent) + 0.5f));
         }
+    }
+
+    public GuidelineReference(ConstraintWidget constraintWidget) {
+        super(constraintWidget);
+        constraintWidget.horizontalRun.clear();
+        constraintWidget.verticalRun.clear();
+        this.orientation = ((Guideline) constraintWidget).mOrientation;
     }
 }

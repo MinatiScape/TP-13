@@ -34,7 +34,31 @@ public abstract class SliceChildView extends FrameLayout {
         return null;
     }
 
-    public int getMode() {
+    public abstract void resetView();
+
+    public void setActionLoading(SliceItem sliceItem) {
+    }
+
+    public void setAllowTwoLines(boolean z) {
+    }
+
+    public void setLoadingActions(Set<SliceItem> set) {
+    }
+
+    public void setSliceActionListener() {
+        this.mObserver = null;
+    }
+
+    public void setSliceActions(List<SliceAction> list) {
+    }
+
+    public void setSliceContent(ListContent listContent) {
+    }
+
+    public void setSliceItem(SliceContent sliceContent, boolean z, int i, int i2, SliceView.OnSliceActionListener onSliceActionListener) {
+    }
+
+    public final int getMode() {
         SliceViewPolicy sliceViewPolicy = this.mViewPolicy;
         if (sliceViewPolicy != null) {
             return sliceViewPolicy.mMode;
@@ -42,59 +66,35 @@ public abstract class SliceChildView extends FrameLayout {
         return 2;
     }
 
-    public abstract void resetView();
-
-    public void setActionLoading(SliceItem item) {
+    public void setInsets(int i, int i2, int i3, int i4) {
+        this.mInsetStart = i;
+        this.mInsetTop = i2;
+        this.mInsetEnd = i3;
+        this.mInsetBottom = i4;
     }
 
-    public void setAllowTwoLines(boolean allowTwoLines) {
-    }
-
-    public void setInsets(int l, int t, int r, int b) {
-        this.mInsetStart = l;
-        this.mInsetTop = t;
-        this.mInsetEnd = r;
-        this.mInsetBottom = b;
-    }
-
-    public void setLastUpdated(long lastUpdated) {
-        this.mLastUpdated = lastUpdated;
-    }
-
-    public void setLoadingActions(Set<SliceItem> loadingActions) {
-    }
-
-    public void setPolicy(SliceViewPolicy policy) {
-        this.mViewPolicy = policy;
-    }
-
-    public void setShowLastUpdated(boolean showLastUpdated) {
-        this.mShowLastUpdated = showLastUpdated;
-    }
-
-    public void setSliceActionListener(SliceView.OnSliceActionListener observer) {
-        this.mObserver = null;
-    }
-
-    public void setSliceActions(List<SliceAction> actions) {
-    }
-
-    public void setSliceContent(ListContent content) {
-    }
-
-    public void setSliceItem(SliceContent slice, boolean isHeader, int rowIndex, int rowCount, SliceView.OnSliceActionListener observer) {
-    }
-
-    public void setStyle(SliceStyle styles, RowStyle rowStyle) {
-        this.mSliceStyle = styles;
+    public void setStyle(SliceStyle sliceStyle, RowStyle rowStyle) {
+        this.mSliceStyle = sliceStyle;
         this.mRowStyle = rowStyle;
-    }
-
-    public void setTint(int tintColor) {
-        this.mTintColor = tintColor;
     }
 
     public SliceChildView(Context context, AttributeSet attributeSet) {
         this(context);
+    }
+
+    public void setLastUpdated(long j) {
+        this.mLastUpdated = j;
+    }
+
+    public void setPolicy(SliceViewPolicy sliceViewPolicy) {
+        this.mViewPolicy = sliceViewPolicy;
+    }
+
+    public void setShowLastUpdated(boolean z) {
+        this.mShowLastUpdated = z;
+    }
+
+    public void setTint(int i) {
+        this.mTintColor = i;
     }
 }

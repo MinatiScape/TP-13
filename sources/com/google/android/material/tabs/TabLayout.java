@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.database.DataSetObserver;
 import android.graphics.Canvas;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -27,14 +26,13 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import androidx.appcompat.R$layout;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.core.util.Pools$Pool;
+import androidx.core.util.Pools$SimplePool;
 import androidx.core.util.Pools$SynchronizedPool;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.ViewPropertyAnimatorCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
-import androidx.recyclerview.R$attr;
-import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import com.android.systemui.shared.R;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
@@ -45,21 +43,17 @@ import com.google.android.material.shape.MaterialShapeDrawable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
 import java.util.WeakHashMap;
 @ViewPager.DecorView
 /* loaded from: classes.dex */
 public class TabLayout extends HorizontalScrollView {
-    public static final Pools$Pool<Tab> tabPool = new Pools$SynchronizedPool(16);
+    public static final Pools$SynchronizedPool tabPool = new Pools$SynchronizedPool(16);
     public AdapterChangeListener adapterChangeListener;
     public int contentInsetStart;
-    public BaseOnTabSelectedListener currentVpSelectedListener;
+    public ViewPagerOnTabSelectedListener currentVpSelectedListener;
     public boolean inlineLabel;
     public int mode;
     public TabLayoutOnPageChangeListener pageChangeListener;
-    public PagerAdapter pagerAdapter;
-    public DataSetObserver pagerAdapterObserver;
     public final int requestedTabMaxWidth;
     public final int requestedTabMinWidth;
     public ValueAnimator scrollAnimator;
@@ -75,6 +69,7 @@ public class TabLayout extends HorizontalScrollView {
     public int tabIndicatorAnimationDuration;
     public boolean tabIndicatorFullWidth;
     public int tabIndicatorGravity;
+    public int tabIndicatorHeight;
     public TabIndicatorInterpolator tabIndicatorInterpolator;
     public int tabMaxWidth;
     public int tabPaddingBottom;
@@ -88,51 +83,27 @@ public class TabLayout extends HorizontalScrollView {
     public ColorStateList tabTextColors;
     public float tabTextMultiLineSize;
     public float tabTextSize;
-    public final Pools$Pool<TabView> tabViewPool;
+    public final Pools$SimplePool tabViewPool;
     public final ArrayList<Tab> tabs;
     public boolean unboundedRipple;
     public ViewPager viewPager;
 
     /* loaded from: classes.dex */
-    public class AdapterChangeListener implements ViewPager.OnAdapterChangeListener {
-        public boolean autoRefresh;
-
-        public AdapterChangeListener() {
-        }
-
-        @Override // androidx.viewpager.widget.ViewPager.OnAdapterChangeListener
-        public void onAdapterChanged(ViewPager viewPager, PagerAdapter pagerAdapter, PagerAdapter pagerAdapter2) {
-            TabLayout tabLayout = TabLayout.this;
-            if (tabLayout.viewPager == viewPager) {
-                tabLayout.setPagerAdapter(pagerAdapter2, this.autoRefresh);
-            }
-        }
+    public class AdapterChangeListener {
     }
 
     @Deprecated
     /* loaded from: classes.dex */
     public interface BaseOnTabSelectedListener<T extends Tab> {
-        void onTabReselected(T t);
+        void onTabReselected();
 
         void onTabSelected(T t);
 
-        void onTabUnselected(T t);
+        void onTabUnselected();
     }
 
     /* loaded from: classes.dex */
-    public class PagerAdapterObserver extends DataSetObserver {
-        public PagerAdapterObserver() {
-        }
-
-        @Override // android.database.DataSetObserver
-        public void onChanged() {
-            TabLayout.this.populateFromPagerAdapter();
-        }
-
-        @Override // android.database.DataSetObserver
-        public void onInvalidated() {
-            TabLayout.this.populateFromPagerAdapter();
-        }
+    public interface OnTabSelectedListener extends BaseOnTabSelectedListener<Tab> {
     }
 
     /* loaded from: classes.dex */
@@ -147,7 +118,7 @@ public class TabLayout extends HorizontalScrollView {
         }
 
         @Override // android.view.View
-        public void draw(Canvas canvas) {
+        public final void draw(Canvas canvas) {
             int height = TabLayout.this.tabSelectedIndicator.getBounds().height();
             if (height < 0) {
                 height = TabLayout.this.tabSelectedIndicator.getIntrinsicHeight();
@@ -161,7 +132,11 @@ public class TabLayout extends HorizontalScrollView {
                 i2 = (getHeight() - height) / 2;
                 height = (getHeight() + height) / 2;
             } else if (i != 2) {
-                height = i != 3 ? 0 : getHeight();
+                if (i != 3) {
+                    height = 0;
+                } else {
+                    height = getHeight();
+                }
             }
             if (TabLayout.this.tabSelectedIndicator.getBounds().width() > 0) {
                 Rect bounds = TabLayout.this.tabSelectedIndicator.getBounds();
@@ -171,6 +146,8 @@ public class TabLayout extends HorizontalScrollView {
                 int i3 = tabLayout.tabSelectedIndicatorColor;
                 if (i3 != 0) {
                     drawable.setTint(i3);
+                } else {
+                    drawable.setTintList(null);
                 }
                 drawable.draw(canvas);
             }
@@ -182,13 +159,69 @@ public class TabLayout extends HorizontalScrollView {
             TabLayout tabLayout = TabLayout.this;
             TabIndicatorInterpolator tabIndicatorInterpolator = tabLayout.tabIndicatorInterpolator;
             Drawable drawable = tabLayout.tabSelectedIndicator;
-            Objects.requireNonNull(tabIndicatorInterpolator);
+            tabIndicatorInterpolator.getClass();
             RectF calculateIndicatorWidthForTab = TabIndicatorInterpolator.calculateIndicatorWidthForTab(tabLayout, childAt);
             drawable.setBounds((int) calculateIndicatorWidthForTab.left, drawable.getBounds().top, (int) calculateIndicatorWidthForTab.right, drawable.getBounds().bottom);
         }
 
+        public final void tweenIndicatorPosition(View view, View view2, float f) {
+            boolean z;
+            if (view == null || view.getWidth() <= 0) {
+                z = false;
+            } else {
+                z = true;
+            }
+            if (z) {
+                TabLayout tabLayout = TabLayout.this;
+                tabLayout.tabIndicatorInterpolator.updateIndicatorForOffset(tabLayout, view, view2, f, tabLayout.tabSelectedIndicator);
+            } else {
+                Drawable drawable = TabLayout.this.tabSelectedIndicator;
+                drawable.setBounds(-1, drawable.getBounds().top, -1, TabLayout.this.tabSelectedIndicator.getBounds().bottom);
+            }
+            WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
+            ViewCompat.Api16Impl.postInvalidateOnAnimation(this);
+        }
+
+        public final void updateOrRecreateIndicatorAnimation(boolean z, final int i, int i2) {
+            final View childAt = getChildAt(this.selectedPosition);
+            final View childAt2 = getChildAt(i);
+            if (childAt2 == null) {
+                jumpIndicatorToSelectedPosition();
+                return;
+            }
+            ValueAnimator.AnimatorUpdateListener animatorUpdateListener = new ValueAnimator.AnimatorUpdateListener() { // from class: com.google.android.material.tabs.TabLayout.SlidingTabIndicator.1
+                @Override // android.animation.ValueAnimator.AnimatorUpdateListener
+                public final void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    SlidingTabIndicator.this.tweenIndicatorPosition(childAt, childAt2, valueAnimator.getAnimatedFraction());
+                }
+            };
+            if (z) {
+                ValueAnimator valueAnimator = new ValueAnimator();
+                this.indicatorAnimator = valueAnimator;
+                valueAnimator.setInterpolator(AnimationUtils.FAST_OUT_SLOW_IN_INTERPOLATOR);
+                valueAnimator.setDuration(i2);
+                valueAnimator.setFloatValues(HingeAngleProviderKt.FULLY_CLOSED_DEGREES, 1.0f);
+                valueAnimator.addUpdateListener(animatorUpdateListener);
+                valueAnimator.addListener(new AnimatorListenerAdapter() { // from class: com.google.android.material.tabs.TabLayout.SlidingTabIndicator.2
+                    @Override // android.animation.AnimatorListenerAdapter, android.animation.Animator.AnimatorListener
+                    public final void onAnimationEnd(Animator animator) {
+                        SlidingTabIndicator.this.selectedPosition = i;
+                    }
+
+                    @Override // android.animation.AnimatorListenerAdapter, android.animation.Animator.AnimatorListener
+                    public final void onAnimationStart(Animator animator) {
+                        SlidingTabIndicator.this.selectedPosition = i;
+                    }
+                });
+                valueAnimator.start();
+                return;
+            }
+            this.indicatorAnimator.removeAllUpdateListeners();
+            this.indicatorAnimator.addUpdateListener(animatorUpdateListener);
+        }
+
         @Override // android.widget.LinearLayout, android.view.ViewGroup, android.view.View
-        public void onLayout(boolean z, int i, int i2, int i3, int i4) {
+        public final void onLayout(boolean z, int i, int i2, int i3, int i4) {
             super.onLayout(z, i, i2, i3, i4);
             ValueAnimator valueAnimator = this.indicatorAnimator;
             if (valueAnimator == null || !valueAnimator.isRunning()) {
@@ -199,7 +232,7 @@ public class TabLayout extends HorizontalScrollView {
         }
 
         @Override // android.widget.LinearLayout, android.view.View
-        public void onMeasure(int i, int i2) {
+        public final void onMeasure(int i, int i2) {
             super.onMeasure(i, i2);
             if (View.MeasureSpec.getMode(i) == 1073741824) {
                 TabLayout tabLayout = TabLayout.this;
@@ -239,58 +272,47 @@ public class TabLayout extends HorizontalScrollView {
         }
 
         @Override // android.widget.LinearLayout, android.view.View
-        public void onRtlPropertiesChanged(int i) {
+        public final void onRtlPropertiesChanged(int i) {
             super.onRtlPropertiesChanged(i);
         }
+    }
 
-        public final void tweenIndicatorPosition(View view, View view2, float f) {
-            if (view != null && view.getWidth() > 0) {
-                TabLayout tabLayout = TabLayout.this;
-                tabLayout.tabIndicatorInterpolator.setIndicatorBoundsForOffset(tabLayout, view, view2, f, tabLayout.tabSelectedIndicator);
-            } else {
-                Drawable drawable = TabLayout.this.tabSelectedIndicator;
-                drawable.setBounds(-1, drawable.getBounds().top, -1, TabLayout.this.tabSelectedIndicator.getBounds().bottom);
+    /* loaded from: classes.dex */
+    public static class Tab {
+        public CharSequence contentDesc;
+        public View customView;
+        public Drawable icon;
+        public TabLayout parent;
+        public CharSequence text;
+        public TabView view;
+        public int position = -1;
+        public int id = -1;
+
+        public final void select() {
+            TabLayout tabLayout = this.parent;
+            if (tabLayout != null) {
+                tabLayout.selectTab(this, true);
+                return;
             }
-            WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-            postInvalidateOnAnimation();
+            throw new IllegalArgumentException("Tab not attached to a TabLayout");
         }
 
-        public final void updateOrRecreateIndicatorAnimation(boolean z, final int i, int i2) {
-            final View childAt = getChildAt(this.selectedPosition);
-            final View childAt2 = getChildAt(i);
-            if (childAt2 == null) {
-                jumpIndicatorToSelectedPosition();
-                return;
-            }
-            ValueAnimator.AnimatorUpdateListener animatorUpdateListener = new ValueAnimator.AnimatorUpdateListener() { // from class: com.google.android.material.tabs.TabLayout.SlidingTabIndicator.1
-                @Override // android.animation.ValueAnimator.AnimatorUpdateListener
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    SlidingTabIndicator.this.tweenIndicatorPosition(childAt, childAt2, valueAnimator.getAnimatedFraction());
+        public final void setText(int i) {
+            TabLayout tabLayout = this.parent;
+            if (tabLayout != null) {
+                CharSequence text = tabLayout.getResources().getText(i);
+                if (TextUtils.isEmpty(this.contentDesc) && !TextUtils.isEmpty(text)) {
+                    this.view.setContentDescription(text);
                 }
-            };
-            if (z) {
-                ValueAnimator valueAnimator = new ValueAnimator();
-                this.indicatorAnimator = valueAnimator;
-                valueAnimator.setInterpolator(AnimationUtils.FAST_OUT_SLOW_IN_INTERPOLATOR);
-                valueAnimator.setDuration(i2);
-                valueAnimator.setFloatValues(HingeAngleProviderKt.FULLY_CLOSED_DEGREES, 1.0f);
-                valueAnimator.addUpdateListener(animatorUpdateListener);
-                valueAnimator.addListener(new AnimatorListenerAdapter() { // from class: com.google.android.material.tabs.TabLayout.SlidingTabIndicator.2
-                    @Override // android.animation.AnimatorListenerAdapter, android.animation.Animator.AnimatorListener
-                    public void onAnimationEnd(Animator animator) {
-                        SlidingTabIndicator.this.selectedPosition = i;
-                    }
-
-                    @Override // android.animation.AnimatorListenerAdapter, android.animation.Animator.AnimatorListener
-                    public void onAnimationStart(Animator animator) {
-                        SlidingTabIndicator.this.selectedPosition = i;
-                    }
-                });
-                valueAnimator.start();
+                this.text = text;
+                TabView tabView = this.view;
+                if (tabView != null) {
+                    tabView.update();
+                    return;
+                }
                 return;
             }
-            this.indicatorAnimator.removeAllUpdateListeners();
-            this.indicatorAnimator.addUpdateListener(animatorUpdateListener);
+            throw new IllegalArgumentException("Tab not attached to a TabLayout");
         }
     }
 
@@ -300,37 +322,33 @@ public class TabLayout extends HorizontalScrollView {
         public int scrollState;
         public final WeakReference<TabLayout> tabLayoutRef;
 
-        public TabLayoutOnPageChangeListener(TabLayout tabLayout) {
-            this.tabLayoutRef = new WeakReference<>(tabLayout);
-        }
-
         @Override // androidx.viewpager.widget.ViewPager.OnPageChangeListener
-        public void onPageScrollStateChanged(int i) {
+        public final void onPageScrollStateChanged(int i) {
             this.previousScrollState = this.scrollState;
             this.scrollState = i;
         }
 
         @Override // androidx.viewpager.widget.ViewPager.OnPageChangeListener
-        public void onPageScrolled(int i, float f, int i2) {
+        public final void onPageScrolled(int i, float f) {
+            boolean z;
             TabLayout tabLayout = this.tabLayoutRef.get();
             if (tabLayout != null) {
-                int i3 = this.scrollState;
-                boolean z = false;
-                boolean z2 = i3 != 2 || this.previousScrollState == 1;
-                if (!(i3 == 2 && this.previousScrollState == 0)) {
+                int i2 = this.scrollState;
+                boolean z2 = false;
+                if (i2 != 2 || this.previousScrollState == 1) {
                     z = true;
+                } else {
+                    z = false;
                 }
-                tabLayout.setScrollPosition(i, f, z2, z);
+                if (!(i2 == 2 && this.previousScrollState == 0)) {
+                    z2 = true;
+                }
+                tabLayout.setScrollPosition(i, f, z, z2);
             }
         }
 
-        @Override // androidx.viewpager.widget.ViewPager.OnPageChangeListener
-        public void onPageSelected(int i) {
-            TabLayout tabLayout = this.tabLayoutRef.get();
-            if (tabLayout != null && tabLayout.getSelectedTabPosition() != i && i < tabLayout.getTabCount()) {
-                int i2 = this.scrollState;
-                tabLayout.selectTab(tabLayout.getTabAt(i), i2 == 0 || (i2 == 2 && this.previousScrollState == 0));
-            }
+        public TabLayoutOnPageChangeListener(TabLayout tabLayout) {
+            this.tabLayoutRef = new WeakReference<>(tabLayout);
         }
     }
 
@@ -347,7 +365,6 @@ public class TabLayout extends HorizontalScrollView {
 
         /* JADX WARN: Multi-variable type inference failed */
         /* JADX WARN: Type inference failed for: r0v4, types: [android.graphics.drawable.RippleDrawable] */
-        /* JADX WARN: Type inference failed for: r8v0, types: [android.widget.LinearLayout, android.view.View, com.google.android.material.tabs.TabLayout$TabView] */
         public TabView(Context context) {
             super(context);
             int i = TabLayout.this.tabBackgroundResId;
@@ -373,17 +390,212 @@ public class TabLayout extends HorizontalScrollView {
                 gradientDrawable2 = new RippleDrawable(colorStateList2, z ? null : gradientDrawable2, !z ? gradientDrawable3 : gradientDrawable);
             }
             WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-            setBackground(gradientDrawable2);
+            ViewCompat.Api16Impl.setBackground(this, gradientDrawable2);
             TabLayout.this.invalidate();
-            setPaddingRelative(TabLayout.this.tabPaddingStart, TabLayout.this.tabPaddingTop, TabLayout.this.tabPaddingEnd, TabLayout.this.tabPaddingBottom);
+            ViewCompat.Api17Impl.setPaddingRelative(this, TabLayout.this.tabPaddingStart, TabLayout.this.tabPaddingTop, TabLayout.this.tabPaddingEnd, TabLayout.this.tabPaddingBottom);
             setGravity(17);
             setOrientation(!TabLayout.this.inlineLabel ? 1 : 0);
             setClickable(true);
-            setPointerIcon(PointerIcon.getSystemIcon(getContext(), 1002));
+            ViewCompat.Api24Impl.setPointerIcon(this, PointerIcon.getSystemIcon(getContext(), 1002));
+        }
+
+        public final void update() {
+            View view;
+            int i;
+            boolean z;
+            Tab tab = this.tab;
+            if (tab != null) {
+                view = tab.customView;
+            } else {
+                view = null;
+            }
+            if (view != null) {
+                ViewParent parent = view.getParent();
+                if (parent != this) {
+                    if (parent != null) {
+                        ((ViewGroup) parent).removeView(view);
+                    }
+                    addView(view);
+                }
+                this.customView = view;
+                TextView textView = this.textView;
+                if (textView != null) {
+                    textView.setVisibility(8);
+                }
+                ImageView imageView = this.iconView;
+                if (imageView != null) {
+                    imageView.setVisibility(8);
+                    this.iconView.setImageDrawable(null);
+                }
+                TextView textView2 = (TextView) view.findViewById(16908308);
+                this.customTextView = textView2;
+                if (textView2 != null) {
+                    this.defaultMaxLines = textView2.getMaxLines();
+                }
+                this.customIconView = (ImageView) view.findViewById(16908294);
+            } else {
+                View view2 = this.customView;
+                if (view2 != null) {
+                    removeView(view2);
+                    this.customView = null;
+                }
+                this.customTextView = null;
+                this.customIconView = null;
+            }
+            boolean z2 = false;
+            if (this.customView == null) {
+                if (this.iconView == null) {
+                    ImageView imageView2 = (ImageView) LayoutInflater.from(getContext()).inflate(R.layout.design_layout_tab_icon, (ViewGroup) this, false);
+                    this.iconView = imageView2;
+                    addView(imageView2, 0);
+                }
+                if (this.textView == null) {
+                    TextView textView3 = (TextView) LayoutInflater.from(getContext()).inflate(R.layout.design_layout_tab_text, (ViewGroup) this, false);
+                    this.textView = textView3;
+                    addView(textView3);
+                    this.defaultMaxLines = this.textView.getMaxLines();
+                }
+                this.textView.setTextAppearance(TabLayout.this.tabTextAppearance);
+                ColorStateList colorStateList = TabLayout.this.tabTextColors;
+                if (colorStateList != null) {
+                    this.textView.setTextColor(colorStateList);
+                }
+                updateTextAndIcon(this.textView, this.iconView);
+                final ImageView imageView3 = this.iconView;
+                if (imageView3 != null) {
+                    imageView3.addOnLayoutChangeListener(new View.OnLayoutChangeListener() { // from class: com.google.android.material.tabs.TabLayout.TabView.1
+                        @Override // android.view.View.OnLayoutChangeListener
+                        public final void onLayoutChange(View view3, int i2, int i3, int i4, int i5, int i6, int i7, int i8, int i9) {
+                            if (imageView3.getVisibility() == 0) {
+                                TabView.this.getClass();
+                            }
+                        }
+                    });
+                }
+                final TextView textView4 = this.textView;
+                if (textView4 != null) {
+                    textView4.addOnLayoutChangeListener(new View.OnLayoutChangeListener() { // from class: com.google.android.material.tabs.TabLayout.TabView.1
+                        @Override // android.view.View.OnLayoutChangeListener
+                        public final void onLayoutChange(View view3, int i2, int i3, int i4, int i5, int i6, int i7, int i8, int i9) {
+                            if (textView4.getVisibility() == 0) {
+                                TabView.this.getClass();
+                            }
+                        }
+                    });
+                }
+            } else {
+                TextView textView5 = this.customTextView;
+                if (!(textView5 == null && this.customIconView == null)) {
+                    updateTextAndIcon(textView5, this.customIconView);
+                }
+            }
+            if (tab != null && !TextUtils.isEmpty(tab.contentDesc)) {
+                setContentDescription(tab.contentDesc);
+            }
+            if (tab != null) {
+                TabLayout tabLayout = tab.parent;
+                if (tabLayout != null) {
+                    Tab tab2 = tabLayout.selectedTab;
+                    if (tab2 != null) {
+                        i = tab2.position;
+                    } else {
+                        i = -1;
+                    }
+                    if (i == -1 || i != tab.position) {
+                        z = false;
+                    } else {
+                        z = true;
+                    }
+                    if (z) {
+                        z2 = true;
+                    }
+                } else {
+                    throw new IllegalArgumentException("Tab not attached to a TabLayout");
+                }
+            }
+            setSelected(z2);
+        }
+
+        public final void updateTextAndIcon(TextView textView, ImageView imageView) {
+            Drawable drawable;
+            CharSequence charSequence;
+            int i;
+            Drawable drawable2;
+            Tab tab = this.tab;
+            CharSequence charSequence2 = null;
+            if (tab == null || (drawable2 = tab.icon) == null) {
+                drawable = null;
+            } else {
+                drawable = drawable2.mutate();
+            }
+            if (drawable != null) {
+                drawable.setTintList(TabLayout.this.tabIconTint);
+                PorterDuff.Mode mode = TabLayout.this.tabIconTintMode;
+                if (mode != null) {
+                    drawable.setTintMode(mode);
+                }
+            }
+            Tab tab2 = this.tab;
+            if (tab2 != null) {
+                charSequence = tab2.text;
+            } else {
+                charSequence = null;
+            }
+            if (imageView != null) {
+                if (drawable != null) {
+                    imageView.setImageDrawable(drawable);
+                    imageView.setVisibility(0);
+                    setVisibility(0);
+                } else {
+                    imageView.setVisibility(8);
+                    imageView.setImageDrawable(null);
+                }
+            }
+            boolean z = !TextUtils.isEmpty(charSequence);
+            if (textView != null) {
+                if (z) {
+                    textView.setText(charSequence);
+                    this.tab.getClass();
+                    textView.setVisibility(0);
+                    setVisibility(0);
+                } else {
+                    textView.setVisibility(8);
+                    textView.setText((CharSequence) null);
+                }
+            }
+            if (imageView != null) {
+                ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) imageView.getLayoutParams();
+                if (!z || imageView.getVisibility() != 0) {
+                    i = 0;
+                } else {
+                    i = (int) ViewUtils.dpToPx(getContext(), 8);
+                }
+                if (TabLayout.this.inlineLabel) {
+                    if (i != marginLayoutParams.getMarginEnd()) {
+                        marginLayoutParams.setMarginEnd(i);
+                        marginLayoutParams.bottomMargin = 0;
+                        imageView.setLayoutParams(marginLayoutParams);
+                        imageView.requestLayout();
+                    }
+                } else if (i != marginLayoutParams.bottomMargin) {
+                    marginLayoutParams.bottomMargin = i;
+                    marginLayoutParams.setMarginEnd(0);
+                    imageView.setLayoutParams(marginLayoutParams);
+                    imageView.requestLayout();
+                }
+            }
+            Tab tab3 = this.tab;
+            if (tab3 != null) {
+                charSequence2 = tab3.contentDesc;
+            }
+            if (!z) {
+                charSequence = charSequence2;
+            }
+            setTooltipText(charSequence);
         }
 
         @Override // android.view.ViewGroup, android.view.View
-        public void drawableStateChanged() {
+        public final void drawableStateChanged() {
             super.drawableStateChanged();
             int[] drawableState = getDrawableState();
             Drawable drawable = this.baseBackgroundDrawable;
@@ -398,9 +610,9 @@ public class TabLayout extends HorizontalScrollView {
         }
 
         @Override // android.view.View
-        public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo accessibilityNodeInfo) {
+        public final void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo accessibilityNodeInfo) {
             super.onInitializeAccessibilityNodeInfo(accessibilityNodeInfo);
-            accessibilityNodeInfo.setCollectionItemInfo((AccessibilityNodeInfo.CollectionItemInfo) AccessibilityNodeInfoCompat.CollectionItemInfoCompat.obtain(0, 1, this.tab.position, 1, false, isSelected()).mInfo);
+            accessibilityNodeInfo.setCollectionItemInfo((AccessibilityNodeInfo.CollectionItemInfo) AccessibilityNodeInfoCompat.CollectionItemInfoCompat.obtain(0, 1, this.tab.position, 1, isSelected()).mInfo);
             if (isSelected()) {
                 accessibilityNodeInfo.setClickable(false);
                 accessibilityNodeInfo.removeAction((AccessibilityNodeInfo.AccessibilityAction) AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_CLICK.mAction);
@@ -416,7 +628,7 @@ public class TabLayout extends HorizontalScrollView {
             Code decompiled incorrectly, please refer to instructions dump.
             To view partially-correct add '--show-bad-code' argument
         */
-        public void onMeasure(int r8, int r9) {
+        public final void onMeasure(int r8, int r9) {
             /*
                 r7 = this;
                 int r0 = android.view.View.MeasureSpec.getSize(r8)
@@ -500,7 +712,7 @@ public class TabLayout extends HorizontalScrollView {
         }
 
         @Override // android.view.View
-        public boolean performClick() {
+        public final boolean performClick() {
             boolean performClick = super.performClick();
             if (this.tab == null) {
                 return performClick;
@@ -513,7 +725,7 @@ public class TabLayout extends HorizontalScrollView {
         }
 
         @Override // android.view.View
-        public void setSelected(boolean z) {
+        public final void setSelected(boolean z) {
             if (isSelected() != z) {
             }
             super.setSelected(z);
@@ -530,194 +742,29 @@ public class TabLayout extends HorizontalScrollView {
                 view.setSelected(z);
             }
         }
-
-        public final void update() {
-            Drawable drawable;
-            Tab tab = this.tab;
-            Drawable drawable2 = null;
-            View view = tab != null ? tab.customView : null;
-            if (view != null) {
-                ViewParent parent = view.getParent();
-                if (parent != this) {
-                    if (parent != null) {
-                        ((ViewGroup) parent).removeView(view);
-                    }
-                    addView(view);
-                }
-                this.customView = view;
-                TextView textView = this.textView;
-                if (textView != null) {
-                    textView.setVisibility(8);
-                }
-                ImageView imageView = this.iconView;
-                if (imageView != null) {
-                    imageView.setVisibility(8);
-                    this.iconView.setImageDrawable(null);
-                }
-                TextView textView2 = (TextView) view.findViewById(16908308);
-                this.customTextView = textView2;
-                if (textView2 != null) {
-                    this.defaultMaxLines = textView2.getMaxLines();
-                }
-                this.customIconView = (ImageView) view.findViewById(16908294);
-            } else {
-                View view2 = this.customView;
-                if (view2 != null) {
-                    removeView(view2);
-                    this.customView = null;
-                }
-                this.customTextView = null;
-                this.customIconView = null;
-            }
-            boolean z = false;
-            if (this.customView == null) {
-                if (this.iconView == null) {
-                    ImageView imageView2 = (ImageView) LayoutInflater.from(getContext()).inflate(R.layout.design_layout_tab_icon, (ViewGroup) this, false);
-                    this.iconView = imageView2;
-                    addView(imageView2, 0);
-                }
-                if (!(tab == null || (drawable = tab.icon) == null)) {
-                    drawable2 = drawable.mutate();
-                }
-                if (drawable2 != null) {
-                    drawable2.setTintList(TabLayout.this.tabIconTint);
-                    PorterDuff.Mode mode = TabLayout.this.tabIconTintMode;
-                    if (mode != null) {
-                        drawable2.setTintMode(mode);
-                    }
-                }
-                if (this.textView == null) {
-                    TextView textView3 = (TextView) LayoutInflater.from(getContext()).inflate(R.layout.design_layout_tab_text, (ViewGroup) this, false);
-                    this.textView = textView3;
-                    addView(textView3);
-                    this.defaultMaxLines = this.textView.getMaxLines();
-                }
-                this.textView.setTextAppearance(TabLayout.this.tabTextAppearance);
-                ColorStateList colorStateList = TabLayout.this.tabTextColors;
-                if (colorStateList != null) {
-                    this.textView.setTextColor(colorStateList);
-                }
-                updateTextAndIcon(this.textView, this.iconView);
-                final ImageView imageView3 = this.iconView;
-                if (imageView3 != null) {
-                    imageView3.addOnLayoutChangeListener(new View.OnLayoutChangeListener() { // from class: com.google.android.material.tabs.TabLayout.TabView.1
-                        @Override // android.view.View.OnLayoutChangeListener
-                        public void onLayoutChange(View view3, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8) {
-                            if (imageView3.getVisibility() == 0) {
-                                Objects.requireNonNull(TabView.this);
-                            }
-                        }
-                    });
-                }
-                final TextView textView4 = this.textView;
-                if (textView4 != null) {
-                    textView4.addOnLayoutChangeListener(new View.OnLayoutChangeListener() { // from class: com.google.android.material.tabs.TabLayout.TabView.1
-                        @Override // android.view.View.OnLayoutChangeListener
-                        public void onLayoutChange(View view3, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8) {
-                            if (textView4.getVisibility() == 0) {
-                                Objects.requireNonNull(TabView.this);
-                            }
-                        }
-                    });
-                }
-            } else {
-                TextView textView5 = this.customTextView;
-                if (!(textView5 == null && this.customIconView == null)) {
-                    updateTextAndIcon(textView5, this.customIconView);
-                }
-            }
-            if (tab != null && !TextUtils.isEmpty(tab.contentDesc)) {
-                setContentDescription(tab.contentDesc);
-            }
-            if (tab != null) {
-                TabLayout tabLayout = tab.parent;
-                if (tabLayout != null) {
-                    if (tabLayout.getSelectedTabPosition() == tab.position) {
-                        z = true;
-                    }
-                } else {
-                    throw new IllegalArgumentException("Tab not attached to a TabLayout");
-                }
-            }
-            setSelected(z);
-        }
-
-        public final void updateTextAndIcon(TextView textView, ImageView imageView) {
-            Drawable drawable;
-            Tab tab = this.tab;
-            CharSequence charSequence = null;
-            Drawable mutate = (tab == null || (drawable = tab.icon) == null) ? null : drawable.mutate();
-            Tab tab2 = this.tab;
-            CharSequence charSequence2 = tab2 != null ? tab2.text : null;
-            if (imageView != null) {
-                if (mutate != null) {
-                    imageView.setImageDrawable(mutate);
-                    imageView.setVisibility(0);
-                    setVisibility(0);
-                } else {
-                    imageView.setVisibility(8);
-                    imageView.setImageDrawable(null);
-                }
-            }
-            boolean z = !TextUtils.isEmpty(charSequence2);
-            if (textView != null) {
-                if (z) {
-                    textView.setText(charSequence2);
-                    Objects.requireNonNull(this.tab);
-                    textView.setVisibility(0);
-                    setVisibility(0);
-                } else {
-                    textView.setVisibility(8);
-                    textView.setText((CharSequence) null);
-                }
-            }
-            if (imageView != null) {
-                ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) imageView.getLayoutParams();
-                int dpToPx = (!z || imageView.getVisibility() != 0) ? 0 : (int) ViewUtils.dpToPx(getContext(), 8);
-                if (TabLayout.this.inlineLabel) {
-                    if (dpToPx != marginLayoutParams.getMarginEnd()) {
-                        marginLayoutParams.setMarginEnd(dpToPx);
-                        marginLayoutParams.bottomMargin = 0;
-                        imageView.setLayoutParams(marginLayoutParams);
-                        imageView.requestLayout();
-                    }
-                } else if (dpToPx != marginLayoutParams.bottomMargin) {
-                    marginLayoutParams.bottomMargin = dpToPx;
-                    marginLayoutParams.setMarginEnd(0);
-                    imageView.setLayoutParams(marginLayoutParams);
-                    imageView.requestLayout();
-                }
-            }
-            Tab tab3 = this.tab;
-            if (tab3 != null) {
-                charSequence = tab3.contentDesc;
-            }
-            if (!z) {
-                charSequence2 = charSequence;
-            }
-            setTooltipText(charSequence2);
-        }
     }
 
     /* loaded from: classes.dex */
-    public static class ViewPagerOnTabSelectedListener implements BaseOnTabSelectedListener {
+    public static class ViewPagerOnTabSelectedListener implements OnTabSelectedListener {
         public final ViewPager viewPager;
+
+        @Override // com.google.android.material.tabs.TabLayout.BaseOnTabSelectedListener
+        public final void onTabReselected() {
+        }
+
+        @Override // com.google.android.material.tabs.TabLayout.BaseOnTabSelectedListener
+        public final void onTabUnselected() {
+        }
+
+        @Override // com.google.android.material.tabs.TabLayout.BaseOnTabSelectedListener
+        public final void onTabSelected(Tab tab) {
+            ViewPager viewPager = this.viewPager;
+            int i = tab.position;
+            viewPager.setScrollingCacheEnabled(false);
+        }
 
         public ViewPagerOnTabSelectedListener(ViewPager viewPager) {
             this.viewPager = viewPager;
-        }
-
-        @Override // com.google.android.material.tabs.TabLayout.BaseOnTabSelectedListener
-        public void onTabReselected(Tab tab) {
-        }
-
-        @Override // com.google.android.material.tabs.TabLayout.BaseOnTabSelectedListener
-        public void onTabSelected(Tab tab) {
-            this.viewPager.setCurrentItem(tab.position);
-        }
-
-        @Override // com.google.android.material.tabs.TabLayout.BaseOnTabSelectedListener
-        public void onTabUnselected(Tab tab) {
         }
     }
 
@@ -725,28 +772,9 @@ public class TabLayout extends HorizontalScrollView {
         this(context, null);
     }
 
-    public void addTab(Tab tab) {
-        addTab(tab, this.tabs.size(), this.tabs.isEmpty());
-    }
-
     @Override // android.widget.HorizontalScrollView, android.view.ViewGroup
-    public void addView(View view) {
+    public final void addView(View view) {
         addViewInternal(view);
-    }
-
-    public final void addViewInternal(View view) {
-        if (view instanceof TabItem) {
-            TabItem tabItem = (TabItem) view;
-            Tab newTab = newTab();
-            Objects.requireNonNull(tabItem);
-            if (!TextUtils.isEmpty(tabItem.getContentDescription())) {
-                newTab.contentDesc = tabItem.getContentDescription();
-                newTab.updateView();
-            }
-            addTab(newTab);
-            return;
-        }
-        throw new IllegalArgumentException("Only TabItem instances can be added to TabLayout");
     }
 
     public final void animateToTab(int i) {
@@ -754,7 +782,7 @@ public class TabLayout extends HorizontalScrollView {
         if (i != -1) {
             if (getWindowToken() != null) {
                 WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-                if (isLaidOut()) {
+                if (ViewCompat.Api19Impl.isLaidOut(this)) {
                     SlidingTabIndicator slidingTabIndicator = this.slidingTabIndicator;
                     int childCount = slidingTabIndicator.getChildCount();
                     int i2 = 0;
@@ -780,7 +808,7 @@ public class TabLayout extends HorizontalScrollView {
                                 this.scrollAnimator.setDuration(this.tabIndicatorAnimationDuration);
                                 this.scrollAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() { // from class: com.google.android.material.tabs.TabLayout.1
                                     @Override // android.animation.ValueAnimator.AnimatorUpdateListener
-                                    public void onAnimationUpdate(ValueAnimator valueAnimator2) {
+                                    public final void onAnimationUpdate(ValueAnimator valueAnimator2) {
                                         TabLayout.this.scrollTo(((Integer) valueAnimator2.getAnimatedValue()).intValue(), 0);
                                     }
                                 });
@@ -803,112 +831,8 @@ public class TabLayout extends HorizontalScrollView {
         }
     }
 
-    public final int calculateScrollXForTab(int i, float f) {
-        int i2 = this.mode;
-        int i3 = 0;
-        if (i2 != 0 && i2 != 2) {
-            return 0;
-        }
-        View childAt = this.slidingTabIndicator.getChildAt(i);
-        int i4 = i + 1;
-        View childAt2 = i4 < this.slidingTabIndicator.getChildCount() ? this.slidingTabIndicator.getChildAt(i4) : null;
-        int width = childAt != null ? childAt.getWidth() : 0;
-        if (childAt2 != null) {
-            i3 = childAt2.getWidth();
-        }
-        int left = ((width / 2) + childAt.getLeft()) - (getWidth() / 2);
-        int i5 = (int) ((width + i3) * 0.5f * f);
-        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-        return getLayoutDirection() == 0 ? left + i5 : left - i5;
-    }
-
-    public int getSelectedTabPosition() {
-        Tab tab = this.selectedTab;
-        if (tab != null) {
-            return tab.position;
-        }
-        return -1;
-    }
-
-    public Tab getTabAt(int i) {
-        if (i < 0 || i >= getTabCount()) {
-            return null;
-        }
-        return this.tabs.get(i);
-    }
-
-    public int getTabCount() {
-        return this.tabs.size();
-    }
-
-    public final int getTabMinWidth() {
-        int i = this.requestedTabMinWidth;
-        if (i != -1) {
-            return i;
-        }
-        int i2 = this.mode;
-        if (i2 == 0 || i2 == 2) {
-            return this.scrollableTabMinWidth;
-        }
-        return 0;
-    }
-
-    public Tab newTab() {
-        Tab tab = (Tab) ((Pools$SynchronizedPool) tabPool).acquire();
-        if (tab == null) {
-            tab = new Tab();
-        }
-        tab.parent = this;
-        Pools$Pool<TabView> pools$Pool = this.tabViewPool;
-        TabView acquire = pools$Pool != null ? pools$Pool.acquire() : null;
-        if (acquire == null) {
-            acquire = new TabView(getContext());
-        }
-        if (tab != acquire.tab) {
-            acquire.tab = tab;
-            acquire.update();
-        }
-        acquire.setFocusable(true);
-        acquire.setMinimumWidth(getTabMinWidth());
-        if (TextUtils.isEmpty(tab.contentDesc)) {
-            acquire.setContentDescription(tab.text);
-        } else {
-            acquire.setContentDescription(tab.contentDesc);
-        }
-        tab.view = acquire;
-        int i = tab.id;
-        if (i != -1) {
-            acquire.setId(i);
-        }
-        return tab;
-    }
-
-    @Override // android.view.ViewGroup, android.view.View
-    public void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        Drawable background = getBackground();
-        if (background instanceof MaterialShapeDrawable) {
-            R$attr.setParentAbsoluteElevation(this, (MaterialShapeDrawable) background);
-        }
-        if (this.viewPager == null) {
-            ViewParent parent = getParent();
-            if (parent instanceof ViewPager) {
-                setupWithViewPager((ViewPager) parent, true, true);
-            }
-        }
-    }
-
-    @Override // android.view.ViewGroup, android.view.View
-    public void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        if (this.setupViewPagerImplicitly) {
-            setupWithViewPager(null, true, false);
-            this.setupViewPagerImplicitly = false;
-        }
-    }
-
     @Override // android.view.View
-    public void onDraw(Canvas canvas) {
+    public final void onDraw(Canvas canvas) {
         TabView tabView;
         Drawable drawable;
         for (int i = 0; i < this.slidingTabIndicator.getChildCount(); i++) {
@@ -921,10 +845,415 @@ public class TabLayout extends HorizontalScrollView {
         super.onDraw(canvas);
     }
 
+    public final void setScrollPosition(int i, float f, boolean z, boolean z2) {
+        int i2;
+        int round = Math.round(i + f);
+        if (round >= 0 && round < this.slidingTabIndicator.getChildCount()) {
+            if (z2) {
+                SlidingTabIndicator slidingTabIndicator = this.slidingTabIndicator;
+                ValueAnimator valueAnimator = slidingTabIndicator.indicatorAnimator;
+                if (valueAnimator != null && valueAnimator.isRunning()) {
+                    slidingTabIndicator.indicatorAnimator.cancel();
+                }
+                slidingTabIndicator.selectedPosition = i;
+                slidingTabIndicator.selectionOffset = f;
+                slidingTabIndicator.tweenIndicatorPosition(slidingTabIndicator.getChildAt(i), slidingTabIndicator.getChildAt(slidingTabIndicator.selectedPosition + 1), slidingTabIndicator.selectionOffset);
+            }
+            ValueAnimator valueAnimator2 = this.scrollAnimator;
+            if (valueAnimator2 != null && valueAnimator2.isRunning()) {
+                this.scrollAnimator.cancel();
+            }
+            if (i < 0) {
+                i2 = 0;
+            } else {
+                i2 = calculateScrollXForTab(i, f);
+            }
+            scrollTo(i2, 0);
+            if (z) {
+                setSelectedTabView(round);
+            }
+        }
+    }
+
+    public final void updateTabViews(boolean z) {
+        for (int i = 0; i < this.slidingTabIndicator.getChildCount(); i++) {
+            View childAt = this.slidingTabIndicator.getChildAt(i);
+            int i2 = this.requestedTabMinWidth;
+            if (i2 == -1) {
+                int i3 = this.mode;
+                if (i3 == 0 || i3 == 2) {
+                    i2 = this.scrollableTabMinWidth;
+                } else {
+                    i2 = 0;
+                }
+            }
+            childAt.setMinimumWidth(i2);
+            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) childAt.getLayoutParams();
+            if (this.mode == 1 && this.tabGravity == 0) {
+                layoutParams.width = 0;
+                layoutParams.weight = 1.0f;
+            } else {
+                layoutParams.width = -2;
+                layoutParams.weight = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
+            }
+            if (z) {
+                childAt.requestLayout();
+            }
+        }
+    }
+
+    public TabLayout(Context context, AttributeSet attributeSet) {
+        this(context, attributeSet, R.attr.tabStyle);
+    }
+
+    @Deprecated
+    public final void addOnTabSelectedListener(OnTabSelectedListener onTabSelectedListener) {
+        if (!this.selectedListeners.contains(onTabSelectedListener)) {
+            this.selectedListeners.add(onTabSelectedListener);
+        }
+    }
+
+    public final void addTab(Tab tab, int i, boolean z) {
+        if (tab.parent == this) {
+            tab.position = i;
+            this.tabs.add(i, tab);
+            int size = this.tabs.size();
+            while (true) {
+                i++;
+                if (i >= size) {
+                    break;
+                }
+                this.tabs.get(i).position = i;
+            }
+            TabView tabView = tab.view;
+            tabView.setSelected(false);
+            tabView.setActivated(false);
+            SlidingTabIndicator slidingTabIndicator = this.slidingTabIndicator;
+            int i2 = tab.position;
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(-2, -1);
+            if (this.mode == 1 && this.tabGravity == 0) {
+                layoutParams.width = 0;
+                layoutParams.weight = 1.0f;
+            } else {
+                layoutParams.width = -2;
+                layoutParams.weight = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
+            }
+            slidingTabIndicator.addView(tabView, i2, layoutParams);
+            if (z) {
+                tab.select();
+                return;
+            }
+            return;
+        }
+        throw new IllegalArgumentException("Tab belongs to a different TabLayout.");
+    }
+
+    @Override // android.widget.HorizontalScrollView, android.view.ViewGroup
+    public final void addView(View view, int i) {
+        addViewInternal(view);
+    }
+
+    public final void addViewInternal(View view) {
+        if (view instanceof TabItem) {
+            TabItem tabItem = (TabItem) view;
+            Tab newTab = newTab();
+            tabItem.getClass();
+            if (!TextUtils.isEmpty(tabItem.getContentDescription())) {
+                newTab.contentDesc = tabItem.getContentDescription();
+                TabView tabView = newTab.view;
+                if (tabView != null) {
+                    tabView.update();
+                }
+            }
+            addTab(newTab, this.tabs.size(), this.tabs.isEmpty());
+            return;
+        }
+        throw new IllegalArgumentException("Only TabItem instances can be added to TabLayout");
+    }
+
+    public final int calculateScrollXForTab(int i, float f) {
+        View childAt;
+        View view;
+        int i2 = this.mode;
+        int i3 = 0;
+        if ((i2 != 0 && i2 != 2) || (childAt = this.slidingTabIndicator.getChildAt(i)) == null) {
+            return 0;
+        }
+        int i4 = i + 1;
+        if (i4 < this.slidingTabIndicator.getChildCount()) {
+            view = this.slidingTabIndicator.getChildAt(i4);
+        } else {
+            view = null;
+        }
+        int width = childAt.getWidth();
+        if (view != null) {
+            i3 = view.getWidth();
+        }
+        int left = ((width / 2) + childAt.getLeft()) - (getWidth() / 2);
+        int i5 = (int) ((width + i3) * 0.5f * f);
+        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
+        if (ViewCompat.Api17Impl.getLayoutDirection(this) == 0) {
+            return left + i5;
+        }
+        return left - i5;
+    }
+
+    @Override // android.widget.FrameLayout, android.view.ViewGroup
+    public final FrameLayout.LayoutParams generateLayoutParams(AttributeSet attributeSet) {
+        return generateDefaultLayoutParams();
+    }
+
+    public final Tab getTabAt(int i) {
+        if (i < 0 || i >= this.tabs.size()) {
+            return null;
+        }
+        return this.tabs.get(i);
+    }
+
+    public Tab newTab() {
+        TabView tabView;
+        int i;
+        Tab tab = (Tab) tabPool.acquire();
+        if (tab == null) {
+            tab = new Tab();
+        }
+        tab.parent = this;
+        Pools$SimplePool pools$SimplePool = this.tabViewPool;
+        if (pools$SimplePool != null) {
+            tabView = (TabView) pools$SimplePool.acquire();
+        } else {
+            tabView = null;
+        }
+        if (tabView == null) {
+            tabView = new TabView(getContext());
+        }
+        if (tab != tabView.tab) {
+            tabView.tab = tab;
+            tabView.update();
+        }
+        tabView.setFocusable(true);
+        int i2 = this.requestedTabMinWidth;
+        if (i2 == -1) {
+            int i3 = this.mode;
+            if (i3 == 0 || i3 == 2) {
+                i = this.scrollableTabMinWidth;
+            } else {
+                i = 0;
+            }
+            i2 = i;
+        }
+        tabView.setMinimumWidth(i2);
+        if (TextUtils.isEmpty(tab.contentDesc)) {
+            tabView.setContentDescription(tab.text);
+        } else {
+            tabView.setContentDescription(tab.contentDesc);
+        }
+        tab.view = tabView;
+        int i4 = tab.id;
+        if (i4 != -1) {
+            tabView.setId(i4);
+        }
+        return tab;
+    }
+
+    public final void populateFromPagerAdapter() {
+        for (int childCount = this.slidingTabIndicator.getChildCount() - 1; childCount >= 0; childCount--) {
+            TabView tabView = (TabView) this.slidingTabIndicator.getChildAt(childCount);
+            this.slidingTabIndicator.removeViewAt(childCount);
+            if (tabView != null) {
+                if (tabView.tab != null) {
+                    tabView.tab = null;
+                    tabView.update();
+                }
+                tabView.setSelected(false);
+                this.tabViewPool.release(tabView);
+            }
+            requestLayout();
+        }
+        Iterator<Tab> it = this.tabs.iterator();
+        while (it.hasNext()) {
+            Tab next = it.next();
+            it.remove();
+            next.parent = null;
+            next.view = null;
+            next.icon = null;
+            next.id = -1;
+            next.text = null;
+            next.contentDesc = null;
+            next.position = -1;
+            next.customView = null;
+            tabPool.release(next);
+        }
+        this.selectedTab = null;
+    }
+
+    public final void selectTab(Tab tab, boolean z) {
+        int i;
+        Tab tab2 = this.selectedTab;
+        if (tab2 != tab) {
+            if (tab != null) {
+                i = tab.position;
+            } else {
+                i = -1;
+            }
+            if (z) {
+                if ((tab2 == null || tab2.position == -1) && i != -1) {
+                    setScrollPosition(i, HingeAngleProviderKt.FULLY_CLOSED_DEGREES, true, true);
+                } else {
+                    animateToTab(i);
+                }
+                if (i != -1) {
+                    setSelectedTabView(i);
+                }
+            }
+            this.selectedTab = tab;
+            if (tab2 != null) {
+                for (int size = this.selectedListeners.size() - 1; size >= 0; size--) {
+                    this.selectedListeners.get(size).onTabUnselected();
+                }
+            }
+            if (tab != null) {
+                for (int size2 = this.selectedListeners.size() - 1; size2 >= 0; size2--) {
+                    this.selectedListeners.get(size2).onTabSelected(tab);
+                }
+            }
+        } else if (tab2 != null) {
+            for (int size3 = this.selectedListeners.size() - 1; size3 >= 0; size3--) {
+                this.selectedListeners.get(size3).onTabReselected();
+            }
+            animateToTab(tab.position);
+        }
+    }
+
+    public final void setSelectedTabView(int i) {
+        boolean z;
+        int childCount = this.slidingTabIndicator.getChildCount();
+        if (i < childCount) {
+            for (int i2 = 0; i2 < childCount; i2++) {
+                View childAt = this.slidingTabIndicator.getChildAt(i2);
+                boolean z2 = true;
+                if (i2 == i) {
+                    z = true;
+                } else {
+                    z = false;
+                }
+                childAt.setSelected(z);
+                if (i2 != i) {
+                    z2 = false;
+                }
+                childAt.setActivated(z2);
+            }
+        }
+    }
+
+    public final void setupWithViewPager(ViewPager viewPager, boolean z) {
+        ArrayList arrayList;
+        ArrayList arrayList2;
+        ViewPager viewPager2 = this.viewPager;
+        if (viewPager2 != null) {
+            TabLayoutOnPageChangeListener tabLayoutOnPageChangeListener = this.pageChangeListener;
+            if (!(tabLayoutOnPageChangeListener == null || (arrayList2 = viewPager2.mOnPageChangeListeners) == null)) {
+                arrayList2.remove(tabLayoutOnPageChangeListener);
+            }
+            AdapterChangeListener adapterChangeListener = this.adapterChangeListener;
+            if (!(adapterChangeListener == null || (arrayList = this.viewPager.mAdapterChangeListeners) == null)) {
+                arrayList.remove(adapterChangeListener);
+            }
+        }
+        ViewPagerOnTabSelectedListener viewPagerOnTabSelectedListener = this.currentVpSelectedListener;
+        if (viewPagerOnTabSelectedListener != null) {
+            this.selectedListeners.remove(viewPagerOnTabSelectedListener);
+            this.currentVpSelectedListener = null;
+        }
+        if (viewPager != null) {
+            this.viewPager = viewPager;
+            if (this.pageChangeListener == null) {
+                this.pageChangeListener = new TabLayoutOnPageChangeListener(this);
+            }
+            TabLayoutOnPageChangeListener tabLayoutOnPageChangeListener2 = this.pageChangeListener;
+            tabLayoutOnPageChangeListener2.scrollState = 0;
+            tabLayoutOnPageChangeListener2.previousScrollState = 0;
+            if (viewPager.mOnPageChangeListeners == null) {
+                viewPager.mOnPageChangeListeners = new ArrayList();
+            }
+            viewPager.mOnPageChangeListeners.add(tabLayoutOnPageChangeListener2);
+            ViewPagerOnTabSelectedListener viewPagerOnTabSelectedListener2 = new ViewPagerOnTabSelectedListener(viewPager);
+            this.currentVpSelectedListener = viewPagerOnTabSelectedListener2;
+            addOnTabSelectedListener(viewPagerOnTabSelectedListener2);
+            if (this.adapterChangeListener == null) {
+                this.adapterChangeListener = new AdapterChangeListener();
+            }
+            this.adapterChangeListener.getClass();
+            AdapterChangeListener adapterChangeListener2 = this.adapterChangeListener;
+            if (viewPager.mAdapterChangeListeners == null) {
+                viewPager.mAdapterChangeListeners = new ArrayList();
+            }
+            viewPager.mAdapterChangeListeners.add(adapterChangeListener2);
+            setScrollPosition(viewPager.mCurItem, HingeAngleProviderKt.FULLY_CLOSED_DEGREES, true, true);
+        } else {
+            this.viewPager = null;
+            populateFromPagerAdapter();
+        }
+        this.setupViewPagerImplicitly = z;
+    }
+
+    @Override // android.widget.HorizontalScrollView, android.widget.FrameLayout, android.view.ViewGroup
+    public final boolean shouldDelayChildPressedState() {
+        if (Math.max(0, ((this.slidingTabIndicator.getWidth() - getWidth()) - getPaddingLeft()) - getPaddingRight()) > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    /* JADX WARN: Code restructure failed: missing block: B:49:0x0269, code lost:
+        if (r13 != 2) goto L53;
+     */
+    /* JADX WARN: Finally extract failed */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+        To view partially-correct add '--show-bad-code' argument
+    */
+    public TabLayout(android.content.Context r13, android.util.AttributeSet r14, int r15) {
+        /*
+            Method dump skipped, instructions count: 644
+            To view this dump add '--comments-level debug' option
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.google.android.material.tabs.TabLayout.<init>(android.content.Context, android.util.AttributeSet, int):void");
+    }
+
+    @Override // android.widget.HorizontalScrollView, android.view.ViewGroup, android.view.ViewManager
+    public final void addView(View view, ViewGroup.LayoutParams layoutParams) {
+        addViewInternal(view);
+    }
+
+    @Override // android.view.ViewGroup, android.view.View
+    public final void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        Drawable background = getBackground();
+        if (background instanceof MaterialShapeDrawable) {
+            R$layout.setParentAbsoluteElevation(this, (MaterialShapeDrawable) background);
+        }
+        if (this.viewPager == null) {
+            ViewParent parent = getParent();
+            if (parent instanceof ViewPager) {
+                setupWithViewPager((ViewPager) parent, true);
+            }
+        }
+    }
+
+    @Override // android.view.ViewGroup, android.view.View
+    public final void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if (this.setupViewPagerImplicitly) {
+            setupWithViewPager(null, false);
+            this.setupViewPagerImplicitly = false;
+        }
+    }
+
     @Override // android.view.View
-    public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo accessibilityNodeInfo) {
+    public final void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo accessibilityNodeInfo) {
         super.onInitializeAccessibilityNodeInfo(accessibilityNodeInfo);
-        accessibilityNodeInfo.setCollectionInfo((AccessibilityNodeInfo.CollectionInfo) AccessibilityNodeInfoCompat.CollectionInfoCompat.obtain(1, getTabCount(), false, 1).mInfo);
+        accessibilityNodeInfo.setCollectionInfo((AccessibilityNodeInfo.CollectionInfo) AccessibilityNodeInfoCompat.CollectionInfoCompat.obtain(1, this.tabs.size(), 1).mInfo);
     }
 
     /* JADX WARN: Code restructure failed: missing block: B:40:0x009f, code lost:
@@ -944,7 +1273,7 @@ public class TabLayout extends HorizontalScrollView {
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public void onMeasure(int r8, int r9) {
+    public final void onMeasure(int r8, int r9) {
         /*
             r7 = this;
             android.content.Context r0 = r7.getContext()
@@ -1048,7 +1377,7 @@ public class TabLayout extends HorizontalScrollView {
             int r1 = r1 + r0
             android.view.ViewGroup$LayoutParams r0 = r8.getLayoutParams()
             int r0 = r0.height
-            int r9 = android.widget.HorizontalScrollView.getChildMeasureSpec(r9, r1, r0)
+            int r9 = android.view.ViewGroup.getChildMeasureSpec(r9, r1, r0)
             int r7 = r7.getMeasuredWidth()
             int r7 = android.view.View.MeasureSpec.makeMeasureSpec(r7, r5)
             r8.measure(r7, r9)
@@ -1058,354 +1387,17 @@ public class TabLayout extends HorizontalScrollView {
         throw new UnsupportedOperationException("Method not decompiled: com.google.android.material.tabs.TabLayout.onMeasure(int, int):void");
     }
 
-    public void populateFromPagerAdapter() {
-        int i;
-        removeAllTabs();
-        PagerAdapter pagerAdapter = this.pagerAdapter;
-        if (pagerAdapter != null) {
-            int count = pagerAdapter.getCount();
-            for (int i2 = 0; i2 < count; i2++) {
-                Tab newTab = newTab();
-                Objects.requireNonNull(this.pagerAdapter);
-                newTab.setText((CharSequence) null);
-                addTab(newTab, this.tabs.size(), false);
-            }
-            ViewPager viewPager = this.viewPager;
-            if (viewPager != null && count > 0 && (i = viewPager.mCurItem) != getSelectedTabPosition() && i < getTabCount()) {
-                selectTab(getTabAt(i), true);
-            }
-        }
-    }
-
-    public void removeAllTabs() {
-        int childCount = this.slidingTabIndicator.getChildCount();
-        while (true) {
-            childCount--;
-            if (childCount < 0) {
-                break;
-            }
-            TabView tabView = (TabView) this.slidingTabIndicator.getChildAt(childCount);
-            this.slidingTabIndicator.removeViewAt(childCount);
-            if (tabView != null) {
-                if (tabView.tab != null) {
-                    tabView.tab = null;
-                    tabView.update();
-                }
-                tabView.setSelected(false);
-                this.tabViewPool.release(tabView);
-            }
-            requestLayout();
-        }
-        Iterator<Tab> it = this.tabs.iterator();
-        while (it.hasNext()) {
-            Tab next = it.next();
-            it.remove();
-            next.parent = null;
-            next.view = null;
-            next.tag = null;
-            next.icon = null;
-            next.id = -1;
-            next.text = null;
-            next.contentDesc = null;
-            next.position = -1;
-            next.customView = null;
-            ((Pools$SynchronizedPool) tabPool).release(next);
-        }
-        this.selectedTab = null;
-    }
-
-    public void selectTab(Tab tab, boolean z) {
-        Tab tab2 = this.selectedTab;
-        if (tab2 != tab) {
-            int i = tab != null ? tab.position : -1;
-            if (z) {
-                if ((tab2 == null || tab2.position == -1) && i != -1) {
-                    setScrollPosition(i, HingeAngleProviderKt.FULLY_CLOSED_DEGREES, true, true);
-                } else {
-                    animateToTab(i);
-                }
-                if (i != -1) {
-                    setSelectedTabView(i);
-                }
-            }
-            this.selectedTab = tab;
-            if (tab2 != null) {
-                for (int size = this.selectedListeners.size() - 1; size >= 0; size--) {
-                    this.selectedListeners.get(size).onTabUnselected(tab2);
-                }
-            }
-            if (tab != null) {
-                for (int size2 = this.selectedListeners.size() - 1; size2 >= 0; size2--) {
-                    this.selectedListeners.get(size2).onTabSelected(tab);
-                }
-            }
-        } else if (tab2 != null) {
-            for (int size3 = this.selectedListeners.size() - 1; size3 >= 0; size3--) {
-                this.selectedListeners.get(size3).onTabReselected(tab);
-            }
-            animateToTab(tab.position);
-        }
-    }
-
     @Override // android.view.View
-    public void setElevation(float f) {
+    public final void setElevation(float f) {
         super.setElevation(f);
-        R$attr.setElevation(this, f);
-    }
-
-    public void setPagerAdapter(PagerAdapter pagerAdapter, boolean z) {
-        DataSetObserver dataSetObserver;
-        PagerAdapter pagerAdapter2 = this.pagerAdapter;
-        if (!(pagerAdapter2 == null || (dataSetObserver = this.pagerAdapterObserver) == null)) {
-            pagerAdapter2.mObservable.unregisterObserver(dataSetObserver);
-        }
-        this.pagerAdapter = pagerAdapter;
-        if (z && pagerAdapter != null) {
-            if (this.pagerAdapterObserver == null) {
-                this.pagerAdapterObserver = new PagerAdapterObserver();
-            }
-            pagerAdapter.mObservable.registerObserver(this.pagerAdapterObserver);
-        }
-        populateFromPagerAdapter();
-    }
-
-    public void setScrollPosition(int i, float f, boolean z, boolean z2) {
-        int round = Math.round(i + f);
-        if (round >= 0 && round < this.slidingTabIndicator.getChildCount()) {
-            if (z2) {
-                SlidingTabIndicator slidingTabIndicator = this.slidingTabIndicator;
-                ValueAnimator valueAnimator = slidingTabIndicator.indicatorAnimator;
-                if (valueAnimator != null && valueAnimator.isRunning()) {
-                    slidingTabIndicator.indicatorAnimator.cancel();
-                }
-                slidingTabIndicator.selectedPosition = i;
-                slidingTabIndicator.selectionOffset = f;
-                slidingTabIndicator.tweenIndicatorPosition(slidingTabIndicator.getChildAt(i), slidingTabIndicator.getChildAt(slidingTabIndicator.selectedPosition + 1), slidingTabIndicator.selectionOffset);
-            }
-            ValueAnimator valueAnimator2 = this.scrollAnimator;
-            if (valueAnimator2 != null && valueAnimator2.isRunning()) {
-                this.scrollAnimator.cancel();
-            }
-            scrollTo(calculateScrollXForTab(i, f), 0);
-            if (z) {
-                setSelectedTabView(round);
-            }
-        }
-    }
-
-    public final void setSelectedTabView(int i) {
-        int childCount = this.slidingTabIndicator.getChildCount();
-        if (i < childCount) {
-            int i2 = 0;
-            while (i2 < childCount) {
-                View childAt = this.slidingTabIndicator.getChildAt(i2);
-                boolean z = true;
-                childAt.setSelected(i2 == i);
-                if (i2 != i) {
-                    z = false;
-                }
-                childAt.setActivated(z);
-                i2++;
-            }
-        }
-    }
-
-    public final void setupWithViewPager(ViewPager viewPager, boolean z, boolean z2) {
-        List<ViewPager.OnAdapterChangeListener> list;
-        List<ViewPager.OnPageChangeListener> list2;
-        ViewPager viewPager2 = this.viewPager;
-        if (viewPager2 != null) {
-            TabLayoutOnPageChangeListener tabLayoutOnPageChangeListener = this.pageChangeListener;
-            if (!(tabLayoutOnPageChangeListener == null || (list2 = viewPager2.mOnPageChangeListeners) == null)) {
-                list2.remove(tabLayoutOnPageChangeListener);
-            }
-            AdapterChangeListener adapterChangeListener = this.adapterChangeListener;
-            if (!(adapterChangeListener == null || (list = this.viewPager.mAdapterChangeListeners) == null)) {
-                list.remove(adapterChangeListener);
-            }
-        }
-        BaseOnTabSelectedListener baseOnTabSelectedListener = this.currentVpSelectedListener;
-        if (baseOnTabSelectedListener != null) {
-            this.selectedListeners.remove(baseOnTabSelectedListener);
-            this.currentVpSelectedListener = null;
-        }
-        if (viewPager != null) {
-            this.viewPager = viewPager;
-            if (this.pageChangeListener == null) {
-                this.pageChangeListener = new TabLayoutOnPageChangeListener(this);
-            }
-            TabLayoutOnPageChangeListener tabLayoutOnPageChangeListener2 = this.pageChangeListener;
-            tabLayoutOnPageChangeListener2.scrollState = 0;
-            tabLayoutOnPageChangeListener2.previousScrollState = 0;
-            if (viewPager.mOnPageChangeListeners == null) {
-                viewPager.mOnPageChangeListeners = new ArrayList();
-            }
-            viewPager.mOnPageChangeListeners.add(tabLayoutOnPageChangeListener2);
-            ViewPagerOnTabSelectedListener viewPagerOnTabSelectedListener = new ViewPagerOnTabSelectedListener(viewPager);
-            this.currentVpSelectedListener = viewPagerOnTabSelectedListener;
-            if (!this.selectedListeners.contains(viewPagerOnTabSelectedListener)) {
-                this.selectedListeners.add(viewPagerOnTabSelectedListener);
-            }
-            PagerAdapter pagerAdapter = viewPager.mAdapter;
-            if (pagerAdapter != null) {
-                setPagerAdapter(pagerAdapter, z);
-            }
-            if (this.adapterChangeListener == null) {
-                this.adapterChangeListener = new AdapterChangeListener();
-            }
-            AdapterChangeListener adapterChangeListener2 = this.adapterChangeListener;
-            adapterChangeListener2.autoRefresh = z;
-            if (viewPager.mAdapterChangeListeners == null) {
-                viewPager.mAdapterChangeListeners = new ArrayList();
-            }
-            viewPager.mAdapterChangeListeners.add(adapterChangeListener2);
-            setScrollPosition(viewPager.mCurItem, HingeAngleProviderKt.FULLY_CLOSED_DEGREES, true, true);
-        } else {
-            this.viewPager = null;
-            setPagerAdapter(null, false);
-        }
-        this.setupViewPagerImplicitly = z2;
-    }
-
-    @Override // android.widget.HorizontalScrollView, android.widget.FrameLayout, android.view.ViewGroup
-    public boolean shouldDelayChildPressedState() {
-        return Math.max(0, ((this.slidingTabIndicator.getWidth() - getWidth()) - getPaddingLeft()) - getPaddingRight()) > 0;
-    }
-
-    public final void updateTabViewLayoutParams(LinearLayout.LayoutParams layoutParams) {
-        if (this.mode == 1 && this.tabGravity == 0) {
-            layoutParams.width = 0;
-            layoutParams.weight = 1.0f;
-            return;
-        }
-        layoutParams.width = -2;
-        layoutParams.weight = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
-    }
-
-    public void updateTabViews(boolean z) {
-        for (int i = 0; i < this.slidingTabIndicator.getChildCount(); i++) {
-            View childAt = this.slidingTabIndicator.getChildAt(i);
-            childAt.setMinimumWidth(getTabMinWidth());
-            updateTabViewLayoutParams((LinearLayout.LayoutParams) childAt.getLayoutParams());
-            if (z) {
-                childAt.requestLayout();
-            }
-        }
-    }
-
-    public TabLayout(Context context, AttributeSet attributeSet) {
-        this(context, attributeSet, R.attr.tabStyle);
-    }
-
-    @Override // android.widget.HorizontalScrollView, android.view.ViewGroup
-    public void addView(View view, int i) {
-        addViewInternal(view);
-    }
-
-    @Override // android.widget.FrameLayout, android.view.ViewGroup
-    public FrameLayout.LayoutParams generateLayoutParams(AttributeSet attributeSet) {
-        return generateDefaultLayoutParams();
-    }
-
-    /* JADX WARN: Code restructure failed: missing block: B:44:0x0245, code lost:
-        if (r13 != 2) goto L48;
-     */
-    /* JADX WARN: Finally extract failed */
-    /*
-        Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
-    */
-    public TabLayout(android.content.Context r13, android.util.AttributeSet r14, int r15) {
-        /*
-            Method dump skipped, instructions count: 608
-            To view this dump add '--comments-level debug' option
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.google.android.material.tabs.TabLayout.<init>(android.content.Context, android.util.AttributeSet, int):void");
-    }
-
-    public void addTab(Tab tab, int i, boolean z) {
-        if (tab.parent == this) {
-            tab.position = i;
-            this.tabs.add(i, tab);
-            int size = this.tabs.size();
-            while (true) {
-                i++;
-                if (i >= size) {
-                    break;
-                }
-                this.tabs.get(i).position = i;
-            }
-            TabView tabView = tab.view;
-            tabView.setSelected(false);
-            tabView.setActivated(false);
-            SlidingTabIndicator slidingTabIndicator = this.slidingTabIndicator;
-            int i2 = tab.position;
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(-2, -1);
-            updateTabViewLayoutParams(layoutParams);
-            slidingTabIndicator.addView(tabView, i2, layoutParams);
-            if (z) {
-                tab.select();
-                return;
-            }
-            return;
-        }
-        throw new IllegalArgumentException("Tab belongs to a different TabLayout.");
-    }
-
-    @Override // android.widget.HorizontalScrollView, android.view.ViewGroup, android.view.ViewManager
-    public void addView(View view, ViewGroup.LayoutParams layoutParams) {
-        addViewInternal(view);
-    }
-
-    /* loaded from: classes.dex */
-    public static class Tab {
-        public CharSequence contentDesc;
-        public View customView;
-        public Drawable icon;
-        public TabLayout parent;
-        public Object tag;
-        public CharSequence text;
-        public TabView view;
-        public int position = -1;
-        public int id = -1;
-
-        public void select() {
-            TabLayout tabLayout = this.parent;
-            if (tabLayout != null) {
-                tabLayout.selectTab(this, true);
-                return;
-            }
-            throw new IllegalArgumentException("Tab not attached to a TabLayout");
-        }
-
-        public Tab setText(CharSequence charSequence) {
-            if (TextUtils.isEmpty(this.contentDesc) && !TextUtils.isEmpty(charSequence)) {
-                this.view.setContentDescription(charSequence);
-            }
-            this.text = charSequence;
-            updateView();
-            return this;
-        }
-
-        public void updateView() {
-            TabView tabView = this.view;
-            if (tabView != null) {
-                tabView.update();
-            }
-        }
-
-        public Tab setText(int i) {
-            TabLayout tabLayout = this.parent;
-            if (tabLayout != null) {
-                setText(tabLayout.getResources().getText(i));
-                return this;
-            }
-            throw new IllegalArgumentException("Tab not attached to a TabLayout");
+        Drawable background = getBackground();
+        if (background instanceof MaterialShapeDrawable) {
+            ((MaterialShapeDrawable) background).setElevation(f);
         }
     }
 
     @Override // android.widget.HorizontalScrollView, android.view.ViewGroup
-    public void addView(View view, int i, ViewGroup.LayoutParams layoutParams) {
+    public final void addView(View view, int i, ViewGroup.LayoutParams layoutParams) {
         addViewInternal(view);
     }
 }

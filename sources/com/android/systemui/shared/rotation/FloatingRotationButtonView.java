@@ -23,11 +23,13 @@ public class FloatingRotationButtonView extends ImageView {
         this(context, attributeSet, 0);
     }
 
-    @Override // android.view.View
-    public void draw(Canvas canvas) {
-        float min = Math.min(getWidth(), getHeight());
-        canvas.drawOval(HingeAngleProviderKt.FULLY_CLOSED_DEGREES, HingeAngleProviderKt.FULLY_CLOSED_DEGREES, min, min, this.mOvalBgPaint);
-        super.draw(canvas);
+    public FloatingRotationButtonView(Context context, AttributeSet attributeSet, int i) {
+        super(context, attributeSet, i);
+        this.mOvalBgPaint = new Paint(3);
+        this.mLastConfiguration = getResources().getConfiguration();
+        setClickable(true);
+        setWillNotDraw(false);
+        forceHasOverlappingRendering(false);
     }
 
     @Override // android.view.View
@@ -37,6 +39,23 @@ public class FloatingRotationButtonView extends ImageView {
         if (((updateFrom & QuickStepContract.SYSUI_STATE_SEARCH_DISABLED) != 0 || (updateFrom & QuickStepContract.SYSUI_STATE_TRACING_ENABLED) != 0) && (keyButtonRipple = this.mRipple) != null) {
             keyButtonRipple.updateResources();
         }
+    }
+
+    public void setDarkIntensity(float f) {
+        this.mRipple.setDarkIntensity(f);
+    }
+
+    public void setRipple(int i) {
+        KeyButtonRipple keyButtonRipple = new KeyButtonRipple(getContext(), this, i);
+        this.mRipple = keyButtonRipple;
+        setBackground(keyButtonRipple);
+    }
+
+    @Override // android.view.View
+    public void draw(Canvas canvas) {
+        float min = Math.min(getWidth(), getHeight());
+        canvas.drawOval(HingeAngleProviderKt.FULLY_CLOSED_DEGREES, HingeAngleProviderKt.FULLY_CLOSED_DEGREES, min, min, this.mOvalBgPaint);
+        super.draw(canvas);
     }
 
     @Override // android.view.View
@@ -51,24 +70,5 @@ public class FloatingRotationButtonView extends ImageView {
         getDrawable().setColorFilter(new PorterDuffColorFilter(i, PorterDuff.Mode.SRC_IN));
         this.mOvalBgPaint.setColor(Color.valueOf(Color.red(i2), Color.green(i2), Color.blue(i2), BACKGROUND_ALPHA).toArgb());
         this.mRipple.setType(KeyButtonRipple.Type.OVAL);
-    }
-
-    public void setDarkIntensity(float f) {
-        this.mRipple.setDarkIntensity(f);
-    }
-
-    public void setRipple(int i) {
-        KeyButtonRipple keyButtonRipple = new KeyButtonRipple(getContext(), this, i);
-        this.mRipple = keyButtonRipple;
-        setBackground(keyButtonRipple);
-    }
-
-    public FloatingRotationButtonView(Context context, AttributeSet attributeSet, int i) {
-        super(context, attributeSet, i);
-        this.mOvalBgPaint = new Paint(3);
-        this.mLastConfiguration = getResources().getConfiguration();
-        setClickable(true);
-        setWillNotDraw(false);
-        forceHasOverlappingRendering(false);
     }
 }

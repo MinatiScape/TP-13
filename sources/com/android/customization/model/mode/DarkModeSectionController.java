@@ -7,21 +7,23 @@ import android.os.PowerManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import androidx.activity.ComponentActivity$$ExternalSyntheticLambda2;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.LifecycleRegistry;
 import androidx.lifecycle.OnLifecycleEvent;
 import com.android.customization.picker.mode.DarkModeSectionView;
 import com.android.systemui.shared.R;
 import com.android.wallpaper.model.CustomizationSectionController;
-import com.android.wallpaper.widget.PreviewPager$$ExternalSyntheticLambda1;
+import com.android.wallpaper.widget.LockScreenPreviewer$$ExternalSyntheticLambda1;
+import com.android.wallpaper.widget.PreviewPager$$ExternalSyntheticLambda2;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 /* loaded from: classes.dex */
 public class DarkModeSectionController implements CustomizationSectionController<DarkModeSectionView>, LifecycleObserver {
     public static final ExecutorService sExecutorService = Executors.newSingleThreadExecutor();
-    public final BatterySaverStateReceiver mBatterySaverStateReceiver = new BatterySaverStateReceiver(null);
+    public final BatterySaverStateReceiver mBatterySaverStateReceiver = new BatterySaverStateReceiver();
     public Context mContext;
     public DarkModeSectionView mDarkModeSectionView;
     public final Lifecycle mLifecycle;
@@ -29,11 +31,11 @@ public class DarkModeSectionController implements CustomizationSectionController
 
     /* loaded from: classes.dex */
     public class BatterySaverStateReceiver extends BroadcastReceiver {
-        public BatterySaverStateReceiver(AnonymousClass1 r2) {
+        public BatterySaverStateReceiver() {
         }
 
         @Override // android.content.BroadcastReceiver
-        public void onReceive(Context context, Intent intent) {
+        public final void onReceive(Context context, Intent intent) {
             DarkModeSectionController darkModeSectionController;
             DarkModeSectionView darkModeSectionView;
             if (TextUtils.equals(intent.getAction(), "android.os.action.POWER_SAVE_MODE_CHANGED") && (darkModeSectionView = (darkModeSectionController = DarkModeSectionController.this).mDarkModeSectionView) != null) {
@@ -42,42 +44,40 @@ public class DarkModeSectionController implements CustomizationSectionController
         }
     }
 
-    public DarkModeSectionController(Context context, Lifecycle lifecycle) {
-        this.mContext = context;
-        this.mLifecycle = lifecycle;
-        this.mPowerManager = (PowerManager) context.getSystemService(PowerManager.class);
-        lifecycle.addObserver(this);
-    }
-
     @Override // com.android.wallpaper.model.CustomizationSectionController
-    public DarkModeSectionView createView(Context context) {
-        DarkModeSectionView darkModeSectionView = (DarkModeSectionView) LayoutInflater.from(context).inflate(R.layout.dark_mode_section_view, (ViewGroup) null);
-        this.mDarkModeSectionView = darkModeSectionView;
-        darkModeSectionView.mSectionViewListener = new PreviewPager$$ExternalSyntheticLambda1(this);
-        this.mDarkModeSectionView.setEnabled(!((PowerManager) context.getSystemService(PowerManager.class)).isPowerSaveMode());
-        return this.mDarkModeSectionView;
-    }
-
-    @Override // com.android.wallpaper.model.CustomizationSectionController
-    public boolean isAvailable(Context context) {
+    public final boolean isAvailable(Context context) {
         return context != null && ContextCompat.checkSelfPermission(context, "android.permission.MODIFY_DAY_NIGHT_MODE") == 0;
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     public void onStart() {
-        sExecutorService.submit(new DarkModeSectionController$$ExternalSyntheticLambda0(this, 0));
+        sExecutorService.submit(new ComponentActivity$$ExternalSyntheticLambda2(this, 1));
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     public void onStop() {
-        sExecutorService.submit(new DarkModeSectionController$$ExternalSyntheticLambda0(this, 1));
+        sExecutorService.submit(new LockScreenPreviewer$$ExternalSyntheticLambda1(this, 1));
     }
 
     @Override // com.android.wallpaper.model.CustomizationSectionController
-    public void release() {
-        LifecycleRegistry lifecycleRegistry = (LifecycleRegistry) this.mLifecycle;
-        lifecycleRegistry.enforceMainThreadIfNeeded("removeObserver");
-        lifecycleRegistry.mObserverMap.remove(this);
+    public final void release() {
+        this.mLifecycle.removeObserver(this);
         this.mContext = null;
+    }
+
+    public DarkModeSectionController(FragmentActivity fragmentActivity, Lifecycle lifecycle) {
+        this.mContext = fragmentActivity;
+        this.mLifecycle = lifecycle;
+        this.mPowerManager = (PowerManager) fragmentActivity.getSystemService(PowerManager.class);
+        lifecycle.addObserver(this);
+    }
+
+    @Override // com.android.wallpaper.model.CustomizationSectionController
+    public final DarkModeSectionView createView(Context context) {
+        DarkModeSectionView darkModeSectionView = (DarkModeSectionView) LayoutInflater.from(context).inflate(R.layout.dark_mode_section_view, (ViewGroup) null);
+        this.mDarkModeSectionView = darkModeSectionView;
+        darkModeSectionView.mSectionViewListener = new PreviewPager$$ExternalSyntheticLambda2(this);
+        this.mDarkModeSectionView.setEnabled(!((PowerManager) context.getSystemService(PowerManager.class)).isPowerSaveMode());
+        return this.mDarkModeSectionView;
     }
 }

@@ -1,41 +1,40 @@
 package com.bumptech.glide.signature;
 
+import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
+import androidx.collection.ContainerHelpers;
 import com.bumptech.glide.load.Key;
 import java.security.MessageDigest;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public final class ObjectKey implements Key {
     public final Object object;
 
-    public ObjectKey(Object object) {
-        Objects.requireNonNull(object, "Argument must not be null");
-        this.object = object;
-    }
-
     @Override // com.bumptech.glide.load.Key
-    public boolean equals(Object o) {
-        if (o instanceof ObjectKey) {
-            return this.object.equals(((ObjectKey) o).object);
+    public final boolean equals(Object obj) {
+        if (obj instanceof ObjectKey) {
+            return this.object.equals(((ObjectKey) obj).object);
         }
         return false;
     }
 
     @Override // com.bumptech.glide.load.Key
-    public int hashCode() {
+    public final int hashCode() {
         return this.object.hashCode();
     }
 
-    public String toString() {
-        String valueOf = String.valueOf(this.object);
-        StringBuilder sb = new StringBuilder(valueOf.length() + 18);
-        sb.append("ObjectKey{object=");
-        sb.append(valueOf);
-        sb.append('}');
-        return sb.toString();
+    public final String toString() {
+        StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("ObjectKey{object=");
+        m.append(this.object);
+        m.append('}');
+        return m.toString();
     }
 
     @Override // com.bumptech.glide.load.Key
-    public void updateDiskCacheKey(MessageDigest messageDigest) {
+    public final void updateDiskCacheKey(MessageDigest messageDigest) {
         messageDigest.update(this.object.toString().getBytes(Key.CHARSET));
+    }
+
+    public ObjectKey(Object obj) {
+        ContainerHelpers.checkNotNull(obj);
+        this.object = obj;
     }
 }

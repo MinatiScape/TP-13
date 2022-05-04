@@ -1,21 +1,22 @@
 package kotlin;
 
 import kotlin.Result;
-import kotlin.internal.PlatformImplementationsKt;
+import kotlin.jvm.functions.Function0;
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
+/* compiled from: Result.kt */
 /* loaded from: classes.dex */
-public final class ResultKt {
-    public static final void addSuppressed(@NotNull Throwable th, @NotNull Throwable th2) {
-        if (th != th2) {
-            PlatformImplementationsKt.IMPLEMENTATIONS.addSuppressed(th, th2);
-        }
+public class ResultKt {
+    @NotNull
+    public static final Result.Failure createFailure(@NotNull Throwable exception) {
+        Intrinsics.checkNotNullParameter(exception, "exception");
+        return new Result.Failure(exception);
     }
 
     @NotNull
-    public static final Object createFailure(@NotNull Throwable exception) {
-        Intrinsics.checkNotNullParameter(exception, "exception");
-        return new Result.Failure(exception);
+    public static final Lazy lazy(@NotNull Function0 initializer) {
+        Intrinsics.checkNotNullParameter(initializer, "initializer");
+        return new SynchronizedLazyImpl(initializer);
     }
 
     public static final void throwOnFailure(@NotNull Object obj) {

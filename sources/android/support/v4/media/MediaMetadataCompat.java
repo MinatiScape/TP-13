@@ -8,16 +8,21 @@ import android.support.v4.util.ArrayMap;
 public final class MediaMetadataCompat implements Parcelable {
     public static final Parcelable.Creator<MediaMetadataCompat> CREATOR = new Parcelable.Creator<MediaMetadataCompat>() { // from class: android.support.v4.media.MediaMetadataCompat.1
         @Override // android.os.Parcelable.Creator
-        public MediaMetadataCompat createFromParcel(Parcel parcel) {
+        public final MediaMetadataCompat createFromParcel(Parcel parcel) {
             return new MediaMetadataCompat(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public MediaMetadataCompat[] newArray(int i) {
+        public final MediaMetadataCompat[] newArray(int i) {
             return new MediaMetadataCompat[i];
         }
     };
     public final Bundle mBundle;
+
+    @Override // android.os.Parcelable
+    public final int describeContents() {
+        return 0;
+    }
 
     static {
         ArrayMap arrayMap = new ArrayMap();
@@ -54,19 +59,14 @@ public final class MediaMetadataCompat implements Parcelable {
         arrayMap.put("android.media.metadata.DOWNLOAD_STATUS", 0);
     }
 
+    @Override // android.os.Parcelable
+    public final void writeToParcel(Parcel parcel, int i) {
+        parcel.writeBundle(this.mBundle);
+    }
+
     public MediaMetadataCompat(Parcel parcel) {
         Bundle readBundle = parcel.readBundle();
         this.mBundle = readBundle;
         readBundle.setClassLoader(MediaMetadataCompat.class.getClassLoader());
-    }
-
-    @Override // android.os.Parcelable
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeBundle(this.mBundle);
     }
 }

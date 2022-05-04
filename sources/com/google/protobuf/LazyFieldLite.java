@@ -4,8 +4,12 @@ public class LazyFieldLite {
     public volatile ByteString memoizedBytes;
     public volatile MessageLite value;
 
-    static {
-        ExtensionRegistryLite.getEmptyRegistry();
+    public LazyFieldLite() {
+        throw null;
+    }
+
+    public int hashCode() {
+        return 1;
     }
 
     public boolean equals(Object obj) {
@@ -25,12 +29,12 @@ public class LazyFieldLite {
             return messageLite.equals(messageLite2);
         }
         if (messageLite != null) {
-            return messageLite.equals(lazyFieldLite.getValue(messageLite.getDefaultInstanceForType()));
+            return messageLite.equals(lazyFieldLite.getValue(messageLite.getDefaultInstanceForType$1()));
         }
-        return getValue(messageLite2.getDefaultInstanceForType()).equals(messageLite2);
+        return getValue(messageLite2.getDefaultInstanceForType$1()).equals(messageLite2);
     }
 
-    public MessageLite getValue(MessageLite messageLite) {
+    public final MessageLite getValue(MessageLite messageLite) {
         if (this.value == null) {
             synchronized (this) {
                 if (this.value == null) {
@@ -47,11 +51,7 @@ public class LazyFieldLite {
         return this.value;
     }
 
-    public int hashCode() {
-        return 1;
-    }
-
-    public ByteString toByteString() {
+    public final ByteString toByteString() {
         if (this.memoizedBytes != null) {
             return this.memoizedBytes;
         }
@@ -66,5 +66,9 @@ public class LazyFieldLite {
             }
             return this.memoizedBytes;
         }
+    }
+
+    static {
+        ExtensionRegistryLite.getEmptyRegistry();
     }
 }

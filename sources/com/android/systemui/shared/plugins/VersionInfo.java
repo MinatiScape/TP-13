@@ -13,6 +13,45 @@ public class VersionInfo {
     private Class<?> mDefault;
     private final ArrayMap<Class<?>, Version> mVersions = new ArrayMap<>();
 
+    public VersionInfo addClass(Class<?> cls) {
+        if (this.mDefault == null) {
+            this.mDefault = cls;
+        }
+        addClass(cls, false);
+        return this;
+    }
+
+    /* loaded from: classes.dex */
+    public static class InvalidVersionException extends RuntimeException {
+        private int mActual;
+        private int mExpected;
+        private final boolean mTooNew;
+
+        public InvalidVersionException(String str, boolean z) {
+            super(str);
+            this.mTooNew = z;
+        }
+
+        public InvalidVersionException(Class<?> cls, boolean z, int i, int i2) {
+            super(cls.getSimpleName() + " expected version " + i + " but had " + i2);
+            this.mTooNew = z;
+            this.mExpected = i;
+            this.mActual = i2;
+        }
+
+        public int getActualVersion() {
+            return this.mActual;
+        }
+
+        public int getExpectedVersion() {
+            return this.mExpected;
+        }
+
+        public boolean isTooNew() {
+            return this.mTooNew;
+        }
+    }
+
     /* loaded from: classes.dex */
     public static class Version {
         private final boolean mRequired;
@@ -31,14 +70,6 @@ public class VersionInfo {
             return new Version(providesInterface.version(), false);
         }
         return null;
-    }
-
-    public VersionInfo addClass(Class<?> cls) {
-        if (this.mDefault == null) {
-            this.mDefault = cls;
-        }
-        addClass(cls, false);
-        return this;
     }
 
     public void checkVersion(VersionInfo versionInfo) throws InvalidVersionException {
@@ -81,37 +112,6 @@ public class VersionInfo {
 
     public boolean hasVersionInfo() {
         return !this.mVersions.isEmpty();
-    }
-
-    /* loaded from: classes.dex */
-    public static class InvalidVersionException extends RuntimeException {
-        private int mActual;
-        private int mExpected;
-        private final boolean mTooNew;
-
-        public InvalidVersionException(String str, boolean z) {
-            super(str);
-            this.mTooNew = z;
-        }
-
-        public int getActualVersion() {
-            return this.mActual;
-        }
-
-        public int getExpectedVersion() {
-            return this.mExpected;
-        }
-
-        public boolean isTooNew() {
-            return this.mTooNew;
-        }
-
-        public InvalidVersionException(Class<?> cls, boolean z, int i, int i2) {
-            super(cls.getSimpleName() + " expected version " + i + " but had " + i2);
-            this.mTooNew = z;
-            this.mExpected = i;
-            this.mActual = i2;
-        }
     }
 
     private void addClass(Class<?> cls, boolean z) {

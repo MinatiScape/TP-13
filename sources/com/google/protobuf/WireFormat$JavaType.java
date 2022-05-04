@@ -1,6 +1,7 @@
 package com.google.protobuf;
 
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
+import java.io.Serializable;
 /* loaded from: classes.dex */
 public enum WireFormat$JavaType {
     INT(0),
@@ -15,7 +16,7 @@ public enum WireFormat$JavaType {
     
     private final Object defaultDefault;
 
-    WireFormat$JavaType(Object obj) {
-        this.defaultDefault = obj;
+    WireFormat$JavaType(Serializable serializable) {
+        this.defaultDefault = serializable;
     }
 }

@@ -1,10 +1,9 @@
 package com.bumptech.glide.request.transition;
 
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 /* loaded from: classes.dex */
-public class BitmapTransitionFactory extends BitmapContainerTransitionFactory<Bitmap> {
-    public BitmapTransitionFactory(TransitionFactory<Drawable> realFactory) {
-        super(realFactory);
+public final class BitmapTransitionFactory extends BitmapContainerTransitionFactory<Bitmap> {
+    public BitmapTransitionFactory(DrawableCrossFadeFactory drawableCrossFadeFactory) {
+        super(drawableCrossFadeFactory);
     }
 }

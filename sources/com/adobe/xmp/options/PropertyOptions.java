@@ -1,6 +1,5 @@
 package com.adobe.xmp.options;
 
-import androidx.recyclerview.widget.RecyclerView;
 import com.adobe.xmp.XMPException;
 import com.android.systemui.shared.system.QuickStepContract;
 /* loaded from: classes.dex */
@@ -9,7 +8,16 @@ public final class PropertyOptions extends Options {
     }
 
     @Override // com.adobe.xmp.options.Options
-    public void assertConsistency(int options) throws XMPException {
+    public final int getValidOptions() {
+        return -2147475470;
+    }
+
+    public PropertyOptions(int options) throws XMPException {
+        super(options);
+    }
+
+    @Override // com.adobe.xmp.options.Options
+    public final void assertConsistency(int options) throws XMPException {
         if ((options & 256) > 0 && (options & QuickStepContract.SYSUI_STATE_STATUS_BAR_KEYGUARD_SHOWING_OCCLUDED) > 0) {
             throw new XMPException("IsStruct and IsArray options are mutually exclusive", 103);
         } else if ((options & 2) > 0 && (options & 768) > 0) {
@@ -17,48 +25,26 @@ public final class PropertyOptions extends Options {
         }
     }
 
-    public boolean getHasLanguage() {
+    public final boolean getHasLanguage() {
         return getOption(64);
     }
 
-    @Override // com.adobe.xmp.options.Options
-    public int getValidOptions() {
-        return -2147475470;
-    }
-
-    public boolean isArray() {
+    public final boolean isArray() {
         return getOption(QuickStepContract.SYSUI_STATE_STATUS_BAR_KEYGUARD_SHOWING_OCCLUDED);
     }
 
-    public boolean isArrayAltText() {
+    public final boolean isArrayAltText() {
         return getOption(QuickStepContract.SYSUI_STATE_TRACING_ENABLED);
     }
 
-    public boolean isArrayAlternate() {
-        return getOption(QuickStepContract.SYSUI_STATE_QUICK_SETTINGS_EXPANDED);
-    }
-
-    public boolean isCompositeProperty() {
-        return (this.options & 768) > 0;
-    }
-
-    public boolean isSchemaNode() {
-        return getOption(RecyclerView.UNDEFINED_DURATION);
-    }
-
-    public boolean isStruct() {
-        return getOption(256);
-    }
-
-    public void mergeWith(PropertyOptions options) throws XMPException {
-        if (options != null) {
-            int i = options.options | this.options;
-            assertOptionsValid(i);
-            this.options = i;
+    public final boolean isCompositeProperty() {
+        if ((this.options & 768) > 0) {
+            return true;
         }
+        return false;
     }
 
-    public PropertyOptions(int options) throws XMPException {
-        super(options);
+    public final void setStruct(boolean value) {
+        setOption(256, value);
     }
 }

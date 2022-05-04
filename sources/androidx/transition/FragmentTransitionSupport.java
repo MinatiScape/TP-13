@@ -5,46 +5,57 @@ import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.core.os.CancellationSignal;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.ViewPropertyAnimatorCompat;
-import androidx.fragment.app.Fragment;
+import androidx.fragment.app.DefaultSpecialEffectsController;
 import androidx.fragment.app.FragmentTransitionImpl;
 import androidx.transition.Transition;
-import androidx.transition.TransitionManager;
-import com.android.systemui.shared.R;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.WeakHashMap;
 @SuppressLint({"RestrictedApi"})
 /* loaded from: classes.dex */
 public class FragmentTransitionSupport extends FragmentTransitionImpl {
-    public static boolean hasSimpleTarget(Transition transition) {
-        return !FragmentTransitionImpl.isNullOrEmpty(transition.mTargetIds) || !FragmentTransitionImpl.isNullOrEmpty(null) || !FragmentTransitionImpl.isNullOrEmpty(null);
-    }
-
     @Override // androidx.fragment.app.FragmentTransitionImpl
-    public void addTarget(Object obj, View view) {
-        if (obj != null) {
-            ((Transition) obj).addTarget(view);
+    public final void setEpicenter(Object obj, View view) {
+        if (view != null) {
+            FragmentTransitionImpl.getBoundsOnScreen(view, new Rect());
+            ((Transition) obj).setEpicenterCallback(new Transition.EpicenterCallback() { // from class: androidx.transition.FragmentTransitionSupport.1
+            });
         }
     }
 
     @Override // androidx.fragment.app.FragmentTransitionImpl
-    public void addTargets(Object obj, ArrayList<View> arrayList) {
-        Transition transition = (Transition) obj;
-        if (transition != null) {
+    public final void addTarget(Object obj, View view) {
+        ((Transition) obj).addTarget(view);
+    }
+
+    @Override // androidx.fragment.app.FragmentTransitionImpl
+    public final void addTargets(Object obj, ArrayList<View> arrayList) {
+        boolean z;
+        Transition transition;
+        Transition transition2 = (Transition) obj;
+        if (transition2 != null) {
             int i = 0;
-            if (transition instanceof TransitionSet) {
-                TransitionSet transitionSet = (TransitionSet) transition;
+            if (transition2 instanceof TransitionSet) {
+                TransitionSet transitionSet = (TransitionSet) transition2;
                 int size = transitionSet.mTransitions.size();
                 while (i < size) {
-                    addTargets(transitionSet.getTransitionAt(i), arrayList);
+                    if (i < 0 || i >= transitionSet.mTransitions.size()) {
+                        transition = null;
+                    } else {
+                        transition = transitionSet.mTransitions.get(i);
+                    }
+                    addTargets(transition, arrayList);
                     i++;
                 }
-            } else if (!hasSimpleTarget(transition) && FragmentTransitionImpl.isNullOrEmpty(transition.mTargets)) {
+                return;
+            }
+            if (!FragmentTransitionImpl.isNullOrEmpty(transition2.mTargetIds) || !FragmentTransitionImpl.isNullOrEmpty(null) || !FragmentTransitionImpl.isNullOrEmpty(null)) {
+                z = true;
+            } else {
+                z = false;
+            }
+            if (!z && FragmentTransitionImpl.isNullOrEmpty(transition2.mTargets)) {
                 int size2 = arrayList.size();
                 while (i < size2) {
-                    transition.addTarget(arrayList.get(i));
+                    transition2.addTarget(arrayList.get(i));
                     i++;
                 }
             }
@@ -52,48 +63,12 @@ public class FragmentTransitionSupport extends FragmentTransitionImpl {
     }
 
     @Override // androidx.fragment.app.FragmentTransitionImpl
-    public void beginDelayedTransition(ViewGroup viewGroup, Object obj) {
-        Transition transition = (Transition) obj;
-        if (!TransitionManager.sPendingTransitions.contains(viewGroup)) {
-            WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-            if (viewGroup.isLaidOut()) {
-                TransitionManager.sPendingTransitions.add(viewGroup);
-                if (transition == null) {
-                    transition = TransitionManager.sDefaultTransition;
-                }
-                Transition clone = transition.clone();
-                ArrayList<Transition> orDefault = TransitionManager.getRunningTransitions().getOrDefault(viewGroup, null);
-                if (orDefault != null && orDefault.size() > 0) {
-                    Iterator<Transition> it = orDefault.iterator();
-                    while (it.hasNext()) {
-                        it.next().pause(viewGroup);
-                    }
-                }
-                if (clone != null) {
-                    clone.captureValues(viewGroup, true);
-                }
-                if (((Scene) viewGroup.getTag(R.id.transition_current_scene)) == null) {
-                    viewGroup.setTag(R.id.transition_current_scene, null);
-                    if (clone != null) {
-                        TransitionManager.MultiListener multiListener = new TransitionManager.MultiListener(clone, viewGroup);
-                        viewGroup.addOnAttachStateChangeListener(multiListener);
-                        viewGroup.getViewTreeObserver().addOnPreDrawListener(multiListener);
-                        return;
-                    }
-                    return;
-                }
-                throw null;
-            }
-        }
+    public final void beginDelayedTransition(ViewGroup viewGroup, Object obj) {
+        TransitionManager.beginDelayedTransition(viewGroup, (Transition) obj);
     }
 
     @Override // androidx.fragment.app.FragmentTransitionImpl
-    public boolean canHandle(Object obj) {
-        return obj instanceof Transition;
-    }
-
-    @Override // androidx.fragment.app.FragmentTransitionImpl
-    public Object cloneTransition(Object obj) {
+    public final Object cloneTransition(Object obj) {
         if (obj != null) {
             return ((Transition) obj).clone();
         }
@@ -101,7 +76,7 @@ public class FragmentTransitionSupport extends FragmentTransitionImpl {
     }
 
     @Override // androidx.fragment.app.FragmentTransitionImpl
-    public Object mergeTransitionsInSequence(Object obj, Object obj2, Object obj3) {
+    public final Object mergeTransitionsInSequence(Object obj, Object obj2, Object obj3) {
         Transition transition = (Transition) obj;
         Transition transition2 = (Transition) obj2;
         Transition transition3 = (Transition) obj3;
@@ -109,10 +84,14 @@ public class FragmentTransitionSupport extends FragmentTransitionImpl {
             TransitionSet transitionSet = new TransitionSet();
             transitionSet.addTransition(transition);
             transitionSet.addTransition(transition2);
-            transitionSet.setOrdering(1);
+            transitionSet.mPlayTogether = false;
             transition = transitionSet;
         } else if (transition == null) {
-            transition = transition2 != null ? transition2 : null;
+            if (transition2 != null) {
+                transition = transition2;
+            } else {
+                transition = null;
+            }
         }
         if (transition3 == null) {
             return transition;
@@ -126,51 +105,57 @@ public class FragmentTransitionSupport extends FragmentTransitionImpl {
     }
 
     @Override // androidx.fragment.app.FragmentTransitionImpl
-    public Object mergeTransitionsTogether(Object obj, Object obj2, Object obj3) {
+    public final Object mergeTransitionsTogether(Object obj, Object obj2) {
         TransitionSet transitionSet = new TransitionSet();
         if (obj != null) {
             transitionSet.addTransition((Transition) obj);
         }
-        if (obj2 != null) {
-            transitionSet.addTransition((Transition) obj2);
-        }
-        if (obj3 != null) {
-            transitionSet.addTransition((Transition) obj3);
-        }
+        transitionSet.addTransition((Transition) obj2);
         return transitionSet;
     }
 
-    @Override // androidx.fragment.app.FragmentTransitionImpl
-    public void removeTarget(Object obj, View view) {
-        if (obj != null) {
-            ((Transition) obj).removeTarget(view);
-        }
-    }
-
-    @Override // androidx.fragment.app.FragmentTransitionImpl
-    public void replaceTargets(Object obj, ArrayList<View> arrayList, ArrayList<View> arrayList2) {
-        Transition transition = (Transition) obj;
-        int i = 0;
-        if (transition instanceof TransitionSet) {
-            TransitionSet transitionSet = (TransitionSet) transition;
+    public final void replaceTargets(Object obj, ArrayList<View> arrayList, ArrayList<View> arrayList2) {
+        boolean z;
+        int i;
+        Transition transition;
+        Transition transition2 = (Transition) obj;
+        int i2 = 0;
+        if (transition2 instanceof TransitionSet) {
+            TransitionSet transitionSet = (TransitionSet) transition2;
             int size = transitionSet.mTransitions.size();
-            while (i < size) {
-                replaceTargets(transitionSet.getTransitionAt(i), arrayList, arrayList2);
-                i++;
-            }
-        } else if (!hasSimpleTarget(transition)) {
-            ArrayList<View> arrayList3 = transition.mTargets;
-            if (arrayList3.size() == arrayList.size() && arrayList3.containsAll(arrayList)) {
-                int size2 = arrayList2 == null ? 0 : arrayList2.size();
-                while (i < size2) {
-                    transition.addTarget(arrayList2.get(i));
-                    i++;
+            while (i2 < size) {
+                if (i2 < 0 || i2 >= transitionSet.mTransitions.size()) {
+                    transition = null;
+                } else {
+                    transition = transitionSet.mTransitions.get(i2);
                 }
-                int size3 = arrayList.size();
+                replaceTargets(transition, arrayList, arrayList2);
+                i2++;
+            }
+            return;
+        }
+        if (!FragmentTransitionImpl.isNullOrEmpty(transition2.mTargetIds) || !FragmentTransitionImpl.isNullOrEmpty(null) || !FragmentTransitionImpl.isNullOrEmpty(null)) {
+            z = true;
+        } else {
+            z = false;
+        }
+        if (!z) {
+            ArrayList<View> arrayList3 = transition2.mTargets;
+            if (arrayList3.size() == arrayList.size() && arrayList3.containsAll(arrayList)) {
+                if (arrayList2 == null) {
+                    i = 0;
+                } else {
+                    i = arrayList2.size();
+                }
+                while (i2 < i) {
+                    transition2.addTarget(arrayList2.get(i2));
+                    i2++;
+                }
+                int size2 = arrayList.size();
                 while (true) {
-                    size3--;
-                    if (size3 >= 0) {
-                        transition.removeTarget(arrayList.get(size3));
+                    size2--;
+                    if (size2 >= 0) {
+                        transition2.removeTarget(arrayList.get(size2));
                     } else {
                         return;
                     }
@@ -180,14 +165,22 @@ public class FragmentTransitionSupport extends FragmentTransitionImpl {
     }
 
     @Override // androidx.fragment.app.FragmentTransitionImpl
-    public void scheduleHideFragmentView(Object obj, final View view, final ArrayList<View> arrayList) {
-        ((Transition) obj).addListener(new Transition.TransitionListener(this) { // from class: androidx.transition.FragmentTransitionSupport.2
+    public final void scheduleHideFragmentView(Object obj, final View view, final ArrayList<View> arrayList) {
+        ((Transition) obj).addListener(new Transition.TransitionListener() { // from class: androidx.transition.FragmentTransitionSupport.2
             @Override // androidx.transition.Transition.TransitionListener
-            public void onTransitionCancel(Transition transition) {
+            public final void onTransitionCancel() {
             }
 
             @Override // androidx.transition.Transition.TransitionListener
-            public void onTransitionEnd(Transition transition) {
+            public final void onTransitionPause() {
+            }
+
+            @Override // androidx.transition.Transition.TransitionListener
+            public final void onTransitionResume() {
+            }
+
+            @Override // androidx.transition.Transition.TransitionListener
+            public final void onTransitionEnd(Transition transition) {
                 transition.removeListener(this);
                 view.setVisibility(8);
                 int size = arrayList.size();
@@ -197,15 +190,7 @@ public class FragmentTransitionSupport extends FragmentTransitionImpl {
             }
 
             @Override // androidx.transition.Transition.TransitionListener
-            public void onTransitionPause(Transition transition) {
-            }
-
-            @Override // androidx.transition.Transition.TransitionListener
-            public void onTransitionResume(Transition transition) {
-            }
-
-            @Override // androidx.transition.Transition.TransitionListener
-            public void onTransitionStart(Transition transition) {
+            public final void onTransitionStart(Transition transition) {
                 transition.removeListener(this);
                 transition.addListener(this);
             }
@@ -213,76 +198,69 @@ public class FragmentTransitionSupport extends FragmentTransitionImpl {
     }
 
     @Override // androidx.fragment.app.FragmentTransitionImpl
-    public void scheduleRemoveTargets(Object obj, final Object obj2, final ArrayList<View> arrayList, final Object obj3, final ArrayList<View> arrayList2, final Object obj4, final ArrayList<View> arrayList3) {
+    public final void scheduleRemoveTargets(Object obj, final Object obj2, final ArrayList arrayList, final Object obj3, final ArrayList arrayList2) {
         ((Transition) obj).addListener(new TransitionListenerAdapter() { // from class: androidx.transition.FragmentTransitionSupport.3
-            @Override // androidx.transition.Transition.TransitionListener
-            public void onTransitionEnd(Transition transition) {
-                transition.removeListener(this);
-            }
+            public final /* synthetic */ Object val$exitTransition = null;
+            public final /* synthetic */ ArrayList val$exitingViews = null;
 
             @Override // androidx.transition.TransitionListenerAdapter, androidx.transition.Transition.TransitionListener
-            public void onTransitionStart(Transition transition) {
-                Object obj5 = obj2;
+            public final void onTransitionStart(Transition transition) {
+                Object obj4 = obj2;
+                if (obj4 != null) {
+                    FragmentTransitionSupport.this.replaceTargets(obj4, arrayList, null);
+                }
+                Object obj5 = this.val$exitTransition;
                 if (obj5 != null) {
-                    FragmentTransitionSupport.this.replaceTargets(obj5, arrayList, null);
+                    FragmentTransitionSupport.this.replaceTargets(obj5, this.val$exitingViews, null);
                 }
                 Object obj6 = obj3;
                 if (obj6 != null) {
                     FragmentTransitionSupport.this.replaceTargets(obj6, arrayList2, null);
                 }
-                Object obj7 = obj4;
-                if (obj7 != null) {
-                    FragmentTransitionSupport.this.replaceTargets(obj7, arrayList3, null);
-                }
+            }
+
+            @Override // androidx.transition.Transition.TransitionListener
+            public final void onTransitionEnd(Transition transition) {
+                transition.removeListener(this);
             }
         });
     }
 
     @Override // androidx.fragment.app.FragmentTransitionImpl
-    public void setEpicenter(Object obj, View view) {
-        if (view != null) {
-            Rect rect = new Rect();
-            getBoundsOnScreen(view, rect);
-            ((Transition) obj).setEpicenterCallback(new Transition.EpicenterCallback(this, rect) { // from class: androidx.transition.FragmentTransitionSupport.1
-            });
-        }
-    }
-
-    @Override // androidx.fragment.app.FragmentTransitionImpl
-    public void setListenerForTransitionEnd(Fragment fragment, Object obj, CancellationSignal cancellationSignal, final Runnable runnable) {
+    public final void setListenerForTransitionEnd(Object obj, CancellationSignal cancellationSignal, final DefaultSpecialEffectsController.AnonymousClass9 r3) {
         final Transition transition = (Transition) obj;
-        cancellationSignal.setOnCancelListener(new CancellationSignal.OnCancelListener(this) { // from class: androidx.transition.FragmentTransitionSupport.4
+        cancellationSignal.setOnCancelListener(new CancellationSignal.OnCancelListener() { // from class: androidx.transition.FragmentTransitionSupport.4
             @Override // androidx.core.os.CancellationSignal.OnCancelListener
-            public void onCancel() {
-                transition.cancel();
+            public final void onCancel() {
+                Transition.this.cancel();
             }
         });
-        transition.addListener(new Transition.TransitionListener(this) { // from class: androidx.transition.FragmentTransitionSupport.5
+        transition.addListener(new Transition.TransitionListener() { // from class: androidx.transition.FragmentTransitionSupport.5
             @Override // androidx.transition.Transition.TransitionListener
-            public void onTransitionCancel(Transition transition2) {
+            public final void onTransitionCancel() {
             }
 
             @Override // androidx.transition.Transition.TransitionListener
-            public void onTransitionEnd(Transition transition2) {
-                runnable.run();
+            public final void onTransitionPause() {
             }
 
             @Override // androidx.transition.Transition.TransitionListener
-            public void onTransitionPause(Transition transition2) {
+            public final void onTransitionResume() {
             }
 
             @Override // androidx.transition.Transition.TransitionListener
-            public void onTransitionResume(Transition transition2) {
+            public final void onTransitionStart(Transition transition2) {
             }
 
             @Override // androidx.transition.Transition.TransitionListener
-            public void onTransitionStart(Transition transition2) {
+            public final void onTransitionEnd(Transition transition2) {
+                r3.run();
             }
         });
     }
 
     @Override // androidx.fragment.app.FragmentTransitionImpl
-    public void setSharedElementTargets(Object obj, View view, ArrayList<View> arrayList) {
+    public final void setSharedElementTargets(Object obj, View view, ArrayList<View> arrayList) {
         TransitionSet transitionSet = (TransitionSet) obj;
         ArrayList<View> arrayList2 = transitionSet.mTargets;
         arrayList2.clear();
@@ -296,7 +274,7 @@ public class FragmentTransitionSupport extends FragmentTransitionImpl {
     }
 
     @Override // androidx.fragment.app.FragmentTransitionImpl
-    public void swapSharedElementTargets(Object obj, ArrayList<View> arrayList, ArrayList<View> arrayList2) {
+    public final void swapSharedElementTargets(Object obj, ArrayList<View> arrayList, ArrayList<View> arrayList2) {
         TransitionSet transitionSet = (TransitionSet) obj;
         if (transitionSet != null) {
             transitionSet.mTargets.clear();
@@ -306,7 +284,7 @@ public class FragmentTransitionSupport extends FragmentTransitionImpl {
     }
 
     @Override // androidx.fragment.app.FragmentTransitionImpl
-    public Object wrapTransitionInSet(Object obj) {
+    public final Object wrapTransitionInSet(Object obj) {
         if (obj == null) {
             return null;
         }
@@ -316,10 +294,13 @@ public class FragmentTransitionSupport extends FragmentTransitionImpl {
     }
 
     @Override // androidx.fragment.app.FragmentTransitionImpl
-    public void setEpicenter(Object obj, Rect rect) {
-        if (obj != null) {
-            ((Transition) obj).setEpicenterCallback(new Transition.EpicenterCallback(this, rect) { // from class: androidx.transition.FragmentTransitionSupport.6
-            });
-        }
+    public final void setEpicenter(Object obj, Rect rect) {
+        ((Transition) obj).setEpicenterCallback(new Transition.EpicenterCallback() { // from class: androidx.transition.FragmentTransitionSupport.6
+        });
+    }
+
+    @Override // androidx.fragment.app.FragmentTransitionImpl
+    public final boolean canHandle(Object obj) {
+        return obj instanceof Transition;
     }
 }

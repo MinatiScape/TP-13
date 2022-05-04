@@ -7,8 +7,9 @@ import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
+/* compiled from: Gservices.java */
 /* loaded from: classes.dex */
-public class zzfib {
+public final class zzfib {
     public static HashMap<String, String> zzf;
     public static Object zzk;
     public static boolean zzl;
@@ -22,6 +23,10 @@ public class zzfib {
     public static final HashMap<String, Long> zzi = new HashMap<>();
     public static final HashMap<String, Float> zzj = new HashMap<>();
     public static String[] zzm = new String[0];
+
+    public zzfib() {
+        throw null;
+    }
 
     public static void zza(ContentResolver contentResolver) {
         if (zzf == null) {
@@ -87,7 +92,11 @@ public class zzfib {
                         if (string != null && string.equals(null)) {
                             string = null;
                         }
-                        zza(obj, str, string);
+                        synchronized (zzfib.class) {
+                            if (obj == zzk) {
+                                zzf.put(str, string);
+                            }
+                        }
                         if (string != null) {
                             str2 = string;
                         }
@@ -100,38 +109,15 @@ public class zzfib {
                     }
                 }
             }
-            zza(obj, str, (String) null);
+            synchronized (zzfib.class) {
+                if (obj == zzk) {
+                    zzf.put(str, null);
+                }
+            }
+            if (query2 != null) {
+                query2.close();
+            }
             return null;
-        }
-    }
-
-    public static void zza(Object obj, String str, String str2) {
-        synchronized (zzfib.class) {
-            if (obj == zzk) {
-                zzf.put(str, str2);
-            }
-        }
-    }
-
-    public static <T> T zza(HashMap<String, T> hashMap, String str, T t) {
-        synchronized (zzfib.class) {
-            if (!hashMap.containsKey(str)) {
-                return null;
-            }
-            T t2 = hashMap.get(str);
-            if (t2 != null) {
-                t = t2;
-            }
-            return t;
-        }
-    }
-
-    public static <T> void zza(Object obj, HashMap<String, T> hashMap, String str, T t) {
-        synchronized (zzfib.class) {
-            if (obj == zzk) {
-                hashMap.put(str, t);
-                zzf.remove(str);
-            }
         }
     }
 }

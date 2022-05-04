@@ -3,6 +3,7 @@ package com.android.systemui.unfold.updates;
 import android.content.Context;
 import android.hardware.devicestate.DeviceStateManager;
 import android.os.Handler;
+import com.android.systemui.dagger.qualifiers.Main;
 import com.android.systemui.unfold.updates.FoldStateProvider;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProvider;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
@@ -14,6 +15,7 @@ import java.util.function.Consumer;
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: DeviceFoldStateProvider.kt */
 /* loaded from: classes.dex */
 public final class DeviceFoldStateProvider implements FoldStateProvider {
     @NotNull
@@ -42,16 +44,17 @@ public final class DeviceFoldStateProvider implements FoldStateProvider {
     private final TimeoutRunnable timeoutRunnable = new TimeoutRunnable(this);
     private boolean isUnfoldHandled = true;
 
+    /* compiled from: DeviceFoldStateProvider.kt */
     /* loaded from: classes.dex */
     public final class FoldStateListener extends DeviceStateManager.FoldStateListener {
         public final /* synthetic */ DeviceFoldStateProvider this$0;
 
         /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
         public FoldStateListener(@NotNull final DeviceFoldStateProvider this$0, Context context) {
-            super(context, new Consumer<Boolean>() { // from class: com.android.systemui.unfold.updates.DeviceFoldStateProvider.FoldStateListener.1
+            super(context, new Consumer() { // from class: com.android.systemui.unfold.updates.DeviceFoldStateProvider.FoldStateListener.1
                 @Override // java.util.function.Consumer
-                public /* bridge */ /* synthetic */ void accept(Boolean bool) {
-                    accept(bool.booleanValue());
+                public /* bridge */ /* synthetic */ void accept(Object obj) {
+                    accept(((Boolean) obj).booleanValue());
                 }
 
                 public final void accept(boolean z) {
@@ -59,7 +62,7 @@ public final class DeviceFoldStateProvider implements FoldStateProvider {
                     DeviceFoldStateProvider.this.lastHingeAngle = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
                     if (z) {
                         DeviceFoldStateProvider.this.hingeAngleProvider.stop();
-                        DeviceFoldStateProvider.this.notifyFoldUpdate(7);
+                        DeviceFoldStateProvider.this.notifyFoldUpdate(5);
                         DeviceFoldStateProvider.this.cancelTimeout();
                         DeviceFoldStateProvider.this.isUnfoldHandled = false;
                         return;
@@ -75,18 +78,19 @@ public final class DeviceFoldStateProvider implements FoldStateProvider {
         }
     }
 
+    /* compiled from: DeviceFoldStateProvider.kt */
     /* loaded from: classes.dex */
     public final class HingeAngleListener implements androidx.core.util.Consumer<Float> {
         public final /* synthetic */ DeviceFoldStateProvider this$0;
 
-        public HingeAngleListener(DeviceFoldStateProvider this$0) {
-            Intrinsics.checkNotNullParameter(this$0, "this$0");
-            this.this$0 = this$0;
-        }
-
         @Override // androidx.core.util.Consumer
         public /* bridge */ /* synthetic */ void accept(Float f) {
             accept(f.floatValue());
+        }
+
+        public HingeAngleListener(DeviceFoldStateProvider this$0) {
+            Intrinsics.checkNotNullParameter(this$0, "this$0");
+            this.this$0 = this$0;
         }
 
         public void accept(float f) {
@@ -94,6 +98,7 @@ public final class DeviceFoldStateProvider implements FoldStateProvider {
         }
     }
 
+    /* compiled from: DeviceFoldStateProvider.kt */
     /* loaded from: classes.dex */
     public final class ScreenStatusListener implements ScreenStatusProvider.ScreenListener {
         public final /* synthetic */ DeviceFoldStateProvider this$0;
@@ -107,13 +112,14 @@ public final class DeviceFoldStateProvider implements FoldStateProvider {
         public void onScreenTurnedOn() {
             if (!(this.this$0.isFolded || this.this$0.isUnfoldHandled)) {
                 for (FoldStateProvider.FoldUpdatesListener foldUpdatesListener : this.this$0.outputListeners) {
-                    foldUpdatesListener.onFoldUpdate(4);
+                    foldUpdatesListener.onFoldUpdate(2);
                 }
                 this.this$0.isUnfoldHandled = true;
             }
         }
     }
 
+    /* compiled from: DeviceFoldStateProvider.kt */
     /* loaded from: classes.dex */
     public final class TimeoutRunnable implements Runnable {
         public final /* synthetic */ DeviceFoldStateProvider this$0;
@@ -129,7 +135,10 @@ public final class DeviceFoldStateProvider implements FoldStateProvider {
         }
     }
 
-    public DeviceFoldStateProvider(@NotNull Context context, @NotNull HingeAngleProvider hingeAngleProvider, @NotNull ScreenStatusProvider screenStatusProvider, @NotNull DeviceStateManager deviceStateManager, @NotNull Executor mainExecutor, @NotNull Handler handler) {
+    private static /* synthetic */ void getLastFoldUpdate$annotations() {
+    }
+
+    public DeviceFoldStateProvider(@NotNull Context context, @NotNull HingeAngleProvider hingeAngleProvider, @NotNull ScreenStatusProvider screenStatusProvider, @NotNull DeviceStateManager deviceStateManager, @Main @NotNull Executor mainExecutor, @Main @NotNull Handler handler) {
         Intrinsics.checkNotNullParameter(context, "context");
         Intrinsics.checkNotNullParameter(hingeAngleProvider, "hingeAngleProvider");
         Intrinsics.checkNotNullParameter(screenStatusProvider, "screenStatusProvider");
@@ -149,13 +158,16 @@ public final class DeviceFoldStateProvider implements FoldStateProvider {
         this.handler.removeCallbacks(this.timeoutRunnable);
     }
 
-    private static /* synthetic */ void getLastFoldUpdate$annotations() {
-    }
-
     private final boolean isTransitionInProgess() {
-        Integer num;
+        Integer num = this.lastFoldUpdate;
+        if (num != null && num.intValue() == 0) {
+            return true;
+        }
         Integer num2 = this.lastFoldUpdate;
-        return (num2 != null && num2.intValue() == 0) || ((num = this.lastFoldUpdate) != null && num.intValue() == 2);
+        if (num2 != null && num2.intValue() == 1) {
+            return true;
+        }
+        return false;
     }
 
     /* JADX INFO: Access modifiers changed from: private */
@@ -168,19 +180,29 @@ public final class DeviceFoldStateProvider implements FoldStateProvider {
 
     /* JADX INFO: Access modifiers changed from: private */
     public final void onHingeAngle(float f) {
-        boolean z = true;
-        boolean z2 = f < this.lastHingeAngle;
-        boolean z3 = 180.0f - f < 15.0f;
-        Integer num = this.lastFoldUpdate;
-        if (num == null || num.intValue() != 2) {
+        boolean z;
+        boolean z2;
+        boolean z3 = false;
+        if (f < this.lastHingeAngle) {
+            z = true;
+        } else {
             z = false;
         }
-        if (z2 && !z && !z3) {
-            notifyFoldUpdate(2);
+        if (180.0f - f < 15.0f) {
+            z2 = true;
+        } else {
+            z2 = false;
+        }
+        Integer num = this.lastFoldUpdate;
+        if (num != null && num.intValue() == 1) {
+            z3 = true;
+        }
+        if (z && !z3 && !z2) {
+            notifyFoldUpdate(1);
         }
         if (isTransitionInProgess()) {
-            if (z3) {
-                notifyFoldUpdate(6);
+            if (z2) {
+                notifyFoldUpdate(4);
                 cancelTimeout();
             } else {
                 rescheduleAbortAnimationTimeout();
@@ -192,18 +214,23 @@ public final class DeviceFoldStateProvider implements FoldStateProvider {
         }
     }
 
-    /* JADX INFO: Access modifiers changed from: private */
-    public final void rescheduleAbortAnimationTimeout() {
-        if (isTransitionInProgess()) {
-            cancelTimeout();
-        }
-        this.handler.postDelayed(this.timeoutRunnable, 1000L);
+    public void addCallback(@NotNull FoldStateProvider.FoldUpdatesListener listener) {
+        Intrinsics.checkNotNullParameter(listener, "listener");
+        this.outputListeners.add(listener);
     }
 
     @Override // com.android.systemui.unfold.updates.FoldStateProvider
     public boolean isFullyOpened() {
         Integer num;
-        return !this.isFolded && (num = this.lastFoldUpdate) != null && num.intValue() == 6;
+        if (this.isFolded || (num = this.lastFoldUpdate) == null || num.intValue() != 4) {
+            return false;
+        }
+        return true;
+    }
+
+    public void removeCallback(@NotNull FoldStateProvider.FoldUpdatesListener listener) {
+        Intrinsics.checkNotNullParameter(listener, "listener");
+        this.outputListeners.remove(listener);
     }
 
     @Override // com.android.systemui.unfold.updates.FoldStateProvider
@@ -221,13 +248,11 @@ public final class DeviceFoldStateProvider implements FoldStateProvider {
         this.hingeAngleProvider.stop();
     }
 
-    public void addCallback(@NotNull FoldStateProvider.FoldUpdatesListener listener) {
-        Intrinsics.checkNotNullParameter(listener, "listener");
-        this.outputListeners.add(listener);
-    }
-
-    public void removeCallback(@NotNull FoldStateProvider.FoldUpdatesListener listener) {
-        Intrinsics.checkNotNullParameter(listener, "listener");
-        this.outputListeners.remove(listener);
+    /* JADX INFO: Access modifiers changed from: private */
+    public final void rescheduleAbortAnimationTimeout() {
+        if (isTransitionInProgess()) {
+            cancelTimeout();
+        }
+        this.handler.postDelayed(this.timeoutRunnable, 1000L);
     }
 }

@@ -3,15 +3,17 @@ package androidx.appcompat.widget;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.text.InputFilter;
 import android.util.AttributeSet;
 import android.view.ActionMode;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Button;
+import androidx.core.widget.TextViewCompat;
 import com.android.systemui.shared.R;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public class AppCompatButton extends Button {
+    public AppCompatEmojiTextHelper mAppCompatEmojiTextHelper;
     public final AppCompatBackgroundHelper mBackgroundTintHelper;
     public final AppCompatTextHelper mTextHelper;
 
@@ -19,8 +21,38 @@ public class AppCompatButton extends Button {
         this(context, null);
     }
 
+    public AppCompatButton(Context context, AttributeSet attributeSet) {
+        this(context, attributeSet, R.attr.buttonStyle);
+    }
+
+    @Override // android.widget.TextView
+    public final void setFilters(InputFilter[] inputFilterArr) {
+        if (this.mAppCompatEmojiTextHelper == null) {
+            this.mAppCompatEmojiTextHelper = new AppCompatEmojiTextHelper(this);
+        }
+        super.setFilters(this.mAppCompatEmojiTextHelper.getFilters(inputFilterArr));
+    }
+
+    /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+    public AppCompatButton(Context context, AttributeSet attributeSet, int i) {
+        super(context, attributeSet, i);
+        TintContextWrapper.wrap(context);
+        ThemeUtils.checkAppCompatTheme(this, getContext());
+        AppCompatBackgroundHelper appCompatBackgroundHelper = new AppCompatBackgroundHelper(this);
+        this.mBackgroundTintHelper = appCompatBackgroundHelper;
+        appCompatBackgroundHelper.loadFromAttributes(attributeSet, i);
+        AppCompatTextHelper appCompatTextHelper = new AppCompatTextHelper(this);
+        this.mTextHelper = appCompatTextHelper;
+        appCompatTextHelper.loadFromAttributes(attributeSet, i);
+        appCompatTextHelper.applyCompoundDrawablesTints();
+        if (this.mAppCompatEmojiTextHelper == null) {
+            this.mAppCompatEmojiTextHelper = new AppCompatEmojiTextHelper(this);
+        }
+        this.mAppCompatEmojiTextHelper.loadFromAttributes(attributeSet, i);
+    }
+
     @Override // android.widget.TextView, android.view.View
-    public void drawableStateChanged() {
+    public final void drawableStateChanged() {
         super.drawableStateChanged();
         AppCompatBackgroundHelper appCompatBackgroundHelper = this.mBackgroundTintHelper;
         if (appCompatBackgroundHelper != null) {
@@ -33,29 +65,37 @@ public class AppCompatButton extends Button {
     }
 
     @Override // android.widget.TextView
-    public int getAutoSizeMaxTextSize() {
+    public final int getAutoSizeMaxTextSize() {
         return super.getAutoSizeMaxTextSize();
     }
 
     @Override // android.widget.TextView
-    public int getAutoSizeMinTextSize() {
+    public final int getAutoSizeMinTextSize() {
         return super.getAutoSizeMinTextSize();
     }
 
     @Override // android.widget.TextView
-    public int getAutoSizeStepGranularity() {
+    public final int getAutoSizeStepGranularity() {
         return super.getAutoSizeStepGranularity();
     }
 
     @Override // android.widget.TextView
-    public int[] getAutoSizeTextAvailableSizes() {
+    public final int[] getAutoSizeTextAvailableSizes() {
         return super.getAutoSizeTextAvailableSizes();
     }
 
     @Override // android.widget.TextView
     @SuppressLint({"WrongConstant"})
-    public int getAutoSizeTextType() {
-        return super.getAutoSizeTextType() == 1 ? 1 : 0;
+    public final int getAutoSizeTextType() {
+        if (super.getAutoSizeTextType() == 1) {
+            return 1;
+        }
+        return 0;
+    }
+
+    @Override // android.widget.TextView
+    public final ActionMode.Callback getCustomSelectionActionModeCallback() {
+        return TextViewCompat.unwrapCustomSelectionActionModeCallback(super.getCustomSelectionActionModeCallback());
     }
 
     @Override // android.view.View
@@ -75,28 +115,17 @@ public class AppCompatButton extends Button {
         super.onLayout(z, i, i2, i3, i4);
         AppCompatTextHelper appCompatTextHelper = this.mTextHelper;
         if (appCompatTextHelper != null) {
-            Objects.requireNonNull(appCompatTextHelper);
+            appCompatTextHelper.getClass();
         }
     }
 
     @Override // android.widget.TextView
-    public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-        super.onTextChanged(charSequence, i, i2, i3);
-    }
-
-    @Override // android.widget.TextView
-    public void setAutoSizeTextTypeUniformWithConfiguration(int i, int i2, int i3, int i4) throws IllegalArgumentException {
-        super.setAutoSizeTextTypeUniformWithConfiguration(i, i2, i3, i4);
-    }
-
-    @Override // android.widget.TextView
-    public void setAutoSizeTextTypeUniformWithPresetSizes(int[] iArr, int i) throws IllegalArgumentException {
-        super.setAutoSizeTextTypeUniformWithPresetSizes(iArr, i);
-    }
-
-    @Override // android.widget.TextView
-    public void setAutoSizeTextTypeWithDefaults(int i) {
-        super.setAutoSizeTextTypeWithDefaults(i);
+    public final void setAllCaps(boolean z) {
+        super.setAllCaps(z);
+        if (this.mAppCompatEmojiTextHelper == null) {
+            this.mAppCompatEmojiTextHelper = new AppCompatEmojiTextHelper(this);
+        }
+        this.mAppCompatEmojiTextHelper.setAllCaps(z);
     }
 
     @Override // android.view.View
@@ -118,12 +147,7 @@ public class AppCompatButton extends Button {
     }
 
     @Override // android.widget.TextView
-    public void setCustomSelectionActionModeCallback(ActionMode.Callback callback) {
-        super.setCustomSelectionActionModeCallback(callback);
-    }
-
-    @Override // android.widget.TextView
-    public void setTextAppearance(Context context, int i) {
+    public final void setTextAppearance(Context context, int i) {
         super.setTextAppearance(context, i);
         AppCompatTextHelper appCompatTextHelper = this.mTextHelper;
         if (appCompatTextHelper != null) {
@@ -132,25 +156,32 @@ public class AppCompatButton extends Button {
     }
 
     @Override // android.widget.TextView
-    public void setTextSize(int i, float f) {
+    public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+        super.onTextChanged(charSequence, i, i2, i3);
+    }
+
+    @Override // android.widget.TextView
+    public final void setAutoSizeTextTypeUniformWithConfiguration(int i, int i2, int i3, int i4) throws IllegalArgumentException {
+        super.setAutoSizeTextTypeUniformWithConfiguration(i, i2, i3, i4);
+    }
+
+    @Override // android.widget.TextView
+    public final void setAutoSizeTextTypeUniformWithPresetSizes(int[] iArr, int i) throws IllegalArgumentException {
+        super.setAutoSizeTextTypeUniformWithPresetSizes(iArr, i);
+    }
+
+    @Override // android.widget.TextView
+    public final void setTextSize(int i, float f) {
         super.setTextSize(i, f);
     }
 
-    public AppCompatButton(Context context, AttributeSet attributeSet) {
-        this(context, attributeSet, R.attr.buttonStyle);
+    @Override // android.widget.TextView
+    public final void setAutoSizeTextTypeWithDefaults(int i) {
+        super.setAutoSizeTextTypeWithDefaults(i);
     }
 
-    /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
-    public AppCompatButton(Context context, AttributeSet attributeSet, int i) {
-        super(context, attributeSet, i);
-        TintContextWrapper.wrap(context);
-        ThemeUtils.checkAppCompatTheme(this, getContext());
-        AppCompatBackgroundHelper appCompatBackgroundHelper = new AppCompatBackgroundHelper(this);
-        this.mBackgroundTintHelper = appCompatBackgroundHelper;
-        appCompatBackgroundHelper.loadFromAttributes(attributeSet, i);
-        AppCompatTextHelper appCompatTextHelper = new AppCompatTextHelper(this);
-        this.mTextHelper = appCompatTextHelper;
-        appCompatTextHelper.loadFromAttributes(attributeSet, i);
-        appCompatTextHelper.applyCompoundDrawablesTints();
+    @Override // android.widget.TextView
+    public final void setCustomSelectionActionModeCallback(ActionMode.Callback callback) {
+        super.setCustomSelectionActionModeCallback(callback);
     }
 }

@@ -6,16 +6,16 @@ import java.util.Collections;
 import java.util.List;
 /* loaded from: classes.dex */
 public abstract class ListFieldSchema {
-    public static final ListFieldSchema FULL_INSTANCE = new ListFieldSchemaFull(null);
-    public static final ListFieldSchema LITE_INSTANCE = new ListFieldSchemaLite(null);
+    public static final ListFieldSchemaFull FULL_INSTANCE = new ListFieldSchemaFull();
+    public static final ListFieldSchemaLite LITE_INSTANCE = new ListFieldSchemaLite();
+
+    public abstract void makeImmutableListAt(Object obj, long j);
+
+    public abstract <L> void mergeListsAt(Object obj, Object obj2, long j);
 
     /* loaded from: classes.dex */
     public static final class ListFieldSchemaFull extends ListFieldSchema {
         public static final Class<?> UNMODIFIABLE_LIST_CLASS = Collections.unmodifiableList(Collections.emptyList()).getClass();
-
-        public ListFieldSchemaFull(AnonymousClass1 r1) {
-            super(null);
-        }
 
         /* JADX WARN: Multi-variable type inference failed */
         public static <L> List<L> mutableListAt(Object obj, long j, int i) {
@@ -40,7 +40,7 @@ public abstract class ListFieldSchema {
                 lazyStringArrayList = arrayList;
             } else if (list2 instanceof UnmodifiableLazyStringList) {
                 LazyStringArrayList lazyStringArrayList2 = new LazyStringArrayList(list2.size() + i);
-                lazyStringArrayList2.addAll(lazyStringArrayList2.size(), (UnmodifiableLazyStringList) list2);
+                lazyStringArrayList2.addAll((UnmodifiableLazyStringList) list2);
                 UnsafeUtil.putObject(obj, j, lazyStringArrayList2);
                 lazyStringArrayList = lazyStringArrayList2;
             } else if (!(list2 instanceof PrimitiveNonBoxingCollection) || !(list2 instanceof Internal.ProtobufList)) {
@@ -58,7 +58,7 @@ public abstract class ListFieldSchema {
         }
 
         @Override // com.google.protobuf.ListFieldSchema
-        public void makeImmutableListAt(Object obj, long j) {
+        public final void makeImmutableListAt(Object obj, long j) {
             Object obj2;
             List list = (List) UnsafeUtil.getObject(obj, j);
             if (list instanceof LazyStringList) {
@@ -81,7 +81,7 @@ public abstract class ListFieldSchema {
         }
 
         @Override // com.google.protobuf.ListFieldSchema
-        public <E> void mergeListsAt(Object obj, Object obj2, long j) {
+        public final <E> void mergeListsAt(Object obj, Object obj2, long j) {
             List list = (List) UnsafeUtil.getObject(obj2, j);
             List mutableListAt = mutableListAt(obj, j, list.size());
             int size = mutableListAt.size();
@@ -98,25 +98,17 @@ public abstract class ListFieldSchema {
 
     /* loaded from: classes.dex */
     public static final class ListFieldSchemaLite extends ListFieldSchema {
-        public ListFieldSchemaLite(AnonymousClass1 r1) {
-            super(null);
-        }
-
-        public static <E> Internal.ProtobufList<E> getProtobufList(Object obj, long j) {
-            return (Internal.ProtobufList) UnsafeUtil.getObject(obj, j);
-        }
-
         @Override // com.google.protobuf.ListFieldSchema
-        public void makeImmutableListAt(Object obj, long j) {
-            getProtobufList(obj, j).makeImmutable();
+        public final void makeImmutableListAt(Object obj, long j) {
+            ((Internal.ProtobufList) UnsafeUtil.getObject(obj, j)).makeImmutable();
         }
 
         /* JADX WARN: Multi-variable type inference failed */
-        /* JADX WARN: Type inference failed for: r3v3, types: [java.util.List] */
+        /* JADX WARN: Type inference failed for: r3v4, types: [java.util.List] */
         @Override // com.google.protobuf.ListFieldSchema
-        public <E> void mergeListsAt(Object obj, Object obj2, long j) {
-            Internal.ProtobufList<E> protobufList = getProtobufList(obj, j);
-            Internal.ProtobufList<E> protobufList2 = getProtobufList(obj2, j);
+        public final <E> void mergeListsAt(Object obj, Object obj2, long j) {
+            Internal.ProtobufList<E> protobufList = (Internal.ProtobufList) UnsafeUtil.getObject(obj, j);
+            Internal.ProtobufList<E> protobufList2 = (Internal.ProtobufList) UnsafeUtil.getObject(obj2, j);
             int size = protobufList.size();
             int size2 = protobufList2.size();
             Internal.ProtobufList<E> protobufList3 = protobufList;
@@ -136,11 +128,4 @@ public abstract class ListFieldSchema {
             UnsafeUtil.putObject(obj, j, protobufList2);
         }
     }
-
-    public ListFieldSchema(AnonymousClass1 r1) {
-    }
-
-    public abstract void makeImmutableListAt(Object obj, long j);
-
-    public abstract <L> void mergeListsAt(Object obj, Object obj2, long j);
 }

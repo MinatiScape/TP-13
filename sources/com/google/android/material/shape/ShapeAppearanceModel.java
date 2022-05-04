@@ -6,26 +6,97 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
-import androidx.recyclerview.R$attr;
+import androidx.appcompat.R$layout;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
+import com.bumptech.glide.manager.ApplicationLifecycle;
+import com.google.android.gms.common.util.zzh;
 import com.google.android.material.R$styleable;
-import java.util.Objects;
 /* loaded from: classes.dex */
-public class ShapeAppearanceModel {
-    public EdgeTreatment bottomEdge;
-    public CornerTreatment bottomLeftCorner;
+public final class ShapeAppearanceModel {
+    public zzh bottomEdge;
+    public ApplicationLifecycle bottomLeftCorner;
     public CornerSize bottomLeftCornerSize;
-    public CornerTreatment bottomRightCorner;
+    public ApplicationLifecycle bottomRightCorner;
     public CornerSize bottomRightCornerSize;
-    public EdgeTreatment leftEdge;
-    public EdgeTreatment rightEdge;
-    public EdgeTreatment topEdge;
-    public CornerTreatment topLeftCorner;
+    public zzh leftEdge;
+    public zzh rightEdge;
+    public zzh topEdge;
+    public ApplicationLifecycle topLeftCorner;
     public CornerSize topLeftCornerSize;
-    public CornerTreatment topRightCorner;
+    public ApplicationLifecycle topRightCorner;
     public CornerSize topRightCornerSize;
 
-    public ShapeAppearanceModel(Builder builder, AnonymousClass1 r2) {
+    /* loaded from: classes.dex */
+    public static final class Builder {
+        public zzh bottomEdge;
+        public ApplicationLifecycle bottomLeftCorner;
+        public CornerSize bottomLeftCornerSize;
+        public ApplicationLifecycle bottomRightCorner;
+        public CornerSize bottomRightCornerSize;
+        public zzh leftEdge;
+        public zzh rightEdge;
+        public zzh topEdge;
+        public ApplicationLifecycle topLeftCorner;
+        public CornerSize topLeftCornerSize;
+        public ApplicationLifecycle topRightCorner;
+        public CornerSize topRightCornerSize;
+
+        public Builder() {
+            this.topLeftCorner = new RoundedCornerTreatment();
+            this.topRightCorner = new RoundedCornerTreatment();
+            this.bottomRightCorner = new RoundedCornerTreatment();
+            this.bottomLeftCorner = new RoundedCornerTreatment();
+            this.topLeftCornerSize = new AbsoluteCornerSize(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
+            this.topRightCornerSize = new AbsoluteCornerSize(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
+            this.bottomRightCornerSize = new AbsoluteCornerSize(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
+            this.bottomLeftCornerSize = new AbsoluteCornerSize(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
+            this.topEdge = new zzh();
+            this.rightEdge = new zzh();
+            this.bottomEdge = new zzh();
+            this.leftEdge = new zzh();
+        }
+
+        public static void compatCornerTreatmentSize(ApplicationLifecycle applicationLifecycle) {
+            if (applicationLifecycle instanceof RoundedCornerTreatment) {
+                RoundedCornerTreatment roundedCornerTreatment = (RoundedCornerTreatment) applicationLifecycle;
+            } else if (applicationLifecycle instanceof CutCornerTreatment) {
+                CutCornerTreatment cutCornerTreatment = (CutCornerTreatment) applicationLifecycle;
+            }
+        }
+
+        public final ShapeAppearanceModel build() {
+            return new ShapeAppearanceModel(this);
+        }
+
+        public Builder(ShapeAppearanceModel shapeAppearanceModel) {
+            this.topLeftCorner = new RoundedCornerTreatment();
+            this.topRightCorner = new RoundedCornerTreatment();
+            this.bottomRightCorner = new RoundedCornerTreatment();
+            this.bottomLeftCorner = new RoundedCornerTreatment();
+            this.topLeftCornerSize = new AbsoluteCornerSize(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
+            this.topRightCornerSize = new AbsoluteCornerSize(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
+            this.bottomRightCornerSize = new AbsoluteCornerSize(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
+            this.bottomLeftCornerSize = new AbsoluteCornerSize(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
+            this.topEdge = new zzh();
+            this.rightEdge = new zzh();
+            this.bottomEdge = new zzh();
+            this.leftEdge = new zzh();
+            this.topLeftCorner = shapeAppearanceModel.topLeftCorner;
+            this.topRightCorner = shapeAppearanceModel.topRightCorner;
+            this.bottomRightCorner = shapeAppearanceModel.bottomRightCorner;
+            this.bottomLeftCorner = shapeAppearanceModel.bottomLeftCorner;
+            this.topLeftCornerSize = shapeAppearanceModel.topLeftCornerSize;
+            this.topRightCornerSize = shapeAppearanceModel.topRightCornerSize;
+            this.bottomRightCornerSize = shapeAppearanceModel.bottomRightCornerSize;
+            this.bottomLeftCornerSize = shapeAppearanceModel.bottomLeftCornerSize;
+            this.topEdge = shapeAppearanceModel.topEdge;
+            this.rightEdge = shapeAppearanceModel.rightEdge;
+            this.bottomEdge = shapeAppearanceModel.bottomEdge;
+            this.leftEdge = shapeAppearanceModel.leftEdge;
+        }
+    }
+
+    public ShapeAppearanceModel(Builder builder) {
         this.topLeftCorner = builder.topLeftCorner;
         this.topRightCorner = builder.topRightCorner;
         this.bottomRightCorner = builder.bottomRightCorner;
@@ -49,6 +120,32 @@ public class ShapeAppearanceModel {
         return builder(context, resourceId, resourceId2, absoluteCornerSize);
     }
 
+    public final boolean isRoundRect(RectF rectF) {
+        boolean z;
+        boolean z2;
+        boolean z3;
+        if (!this.leftEdge.getClass().equals(zzh.class) || !this.rightEdge.getClass().equals(zzh.class) || !this.topEdge.getClass().equals(zzh.class) || !this.bottomEdge.getClass().equals(zzh.class)) {
+            z = false;
+        } else {
+            z = true;
+        }
+        float cornerSize = this.topLeftCornerSize.getCornerSize(rectF);
+        if (this.topRightCornerSize.getCornerSize(rectF) == cornerSize && this.bottomLeftCornerSize.getCornerSize(rectF) == cornerSize && this.bottomRightCornerSize.getCornerSize(rectF) == cornerSize) {
+            z2 = true;
+        } else {
+            z2 = false;
+        }
+        if (!(this.topRightCorner instanceof RoundedCornerTreatment) || !(this.topLeftCorner instanceof RoundedCornerTreatment) || !(this.bottomRightCorner instanceof RoundedCornerTreatment) || !(this.bottomLeftCorner instanceof RoundedCornerTreatment)) {
+            z3 = false;
+        } else {
+            z3 = true;
+        }
+        if (!z || !z2 || !z3) {
+            return false;
+        }
+        return true;
+    }
+
     public static CornerSize getCornerSize(TypedArray typedArray, int i, CornerSize cornerSize) {
         TypedValue peekValue = typedArray.peekValue(i);
         if (peekValue == null) {
@@ -58,16 +155,13 @@ public class ShapeAppearanceModel {
         if (i2 == 5) {
             return new AbsoluteCornerSize(TypedValue.complexToDimensionPixelSize(peekValue.data, typedArray.getResources().getDisplayMetrics()));
         }
-        return i2 == 6 ? new RelativeCornerSize(peekValue.getFraction(1.0f, 1.0f)) : cornerSize;
+        if (i2 == 6) {
+            return new RelativeCornerSize(peekValue.getFraction(1.0f, 1.0f));
+        }
+        return cornerSize;
     }
 
-    public boolean isRoundRect(RectF rectF) {
-        boolean z = this.leftEdge.getClass().equals(EdgeTreatment.class) && this.rightEdge.getClass().equals(EdgeTreatment.class) && this.topEdge.getClass().equals(EdgeTreatment.class) && this.bottomEdge.getClass().equals(EdgeTreatment.class);
-        float cornerSize = this.topLeftCornerSize.getCornerSize(rectF);
-        return z && ((this.topRightCornerSize.getCornerSize(rectF) > cornerSize ? 1 : (this.topRightCornerSize.getCornerSize(rectF) == cornerSize ? 0 : -1)) == 0 && (this.bottomLeftCornerSize.getCornerSize(rectF) > cornerSize ? 1 : (this.bottomLeftCornerSize.getCornerSize(rectF) == cornerSize ? 0 : -1)) == 0 && (this.bottomRightCornerSize.getCornerSize(rectF) > cornerSize ? 1 : (this.bottomRightCornerSize.getCornerSize(rectF) == cornerSize ? 0 : -1)) == 0) && ((this.topRightCorner instanceof RoundedCornerTreatment) && (this.topLeftCorner instanceof RoundedCornerTreatment) && (this.bottomRightCorner instanceof RoundedCornerTreatment) && (this.bottomLeftCorner instanceof RoundedCornerTreatment));
-    }
-
-    public static Builder builder(Context context, int i, int i2, CornerSize cornerSize) {
+    public static Builder builder(Context context, int i, int i2, AbsoluteCornerSize absoluteCornerSize) {
         if (i2 != 0) {
             ContextThemeWrapper contextThemeWrapper = new ContextThemeWrapper(context, i);
             i = i2;
@@ -80,132 +174,31 @@ public class ShapeAppearanceModel {
             int i5 = obtainStyledAttributes.getInt(4, i3);
             int i6 = obtainStyledAttributes.getInt(2, i3);
             int i7 = obtainStyledAttributes.getInt(1, i3);
-            CornerSize cornerSize2 = getCornerSize(obtainStyledAttributes, 5, cornerSize);
-            CornerSize cornerSize3 = getCornerSize(obtainStyledAttributes, 8, cornerSize2);
-            CornerSize cornerSize4 = getCornerSize(obtainStyledAttributes, 9, cornerSize2);
-            CornerSize cornerSize5 = getCornerSize(obtainStyledAttributes, 7, cornerSize2);
-            CornerSize cornerSize6 = getCornerSize(obtainStyledAttributes, 6, cornerSize2);
+            CornerSize cornerSize = getCornerSize(obtainStyledAttributes, 5, absoluteCornerSize);
+            CornerSize cornerSize2 = getCornerSize(obtainStyledAttributes, 8, cornerSize);
+            CornerSize cornerSize3 = getCornerSize(obtainStyledAttributes, 9, cornerSize);
+            CornerSize cornerSize4 = getCornerSize(obtainStyledAttributes, 7, cornerSize);
+            CornerSize cornerSize5 = getCornerSize(obtainStyledAttributes, 6, cornerSize);
             Builder builder = new Builder();
-            CornerTreatment createCornerTreatment = R$attr.createCornerTreatment(i4);
+            ApplicationLifecycle createCornerTreatment = R$layout.createCornerTreatment(i4);
             builder.topLeftCorner = createCornerTreatment;
             Builder.compatCornerTreatmentSize(createCornerTreatment);
-            builder.topLeftCornerSize = cornerSize3;
-            CornerTreatment createCornerTreatment2 = R$attr.createCornerTreatment(i5);
+            builder.topLeftCornerSize = cornerSize2;
+            ApplicationLifecycle createCornerTreatment2 = R$layout.createCornerTreatment(i5);
             builder.topRightCorner = createCornerTreatment2;
             Builder.compatCornerTreatmentSize(createCornerTreatment2);
-            builder.topRightCornerSize = cornerSize4;
-            CornerTreatment createCornerTreatment3 = R$attr.createCornerTreatment(i6);
+            builder.topRightCornerSize = cornerSize3;
+            ApplicationLifecycle createCornerTreatment3 = R$layout.createCornerTreatment(i6);
             builder.bottomRightCorner = createCornerTreatment3;
             Builder.compatCornerTreatmentSize(createCornerTreatment3);
-            builder.bottomRightCornerSize = cornerSize5;
-            CornerTreatment createCornerTreatment4 = R$attr.createCornerTreatment(i7);
+            builder.bottomRightCornerSize = cornerSize4;
+            ApplicationLifecycle createCornerTreatment4 = R$layout.createCornerTreatment(i7);
             builder.bottomLeftCorner = createCornerTreatment4;
             Builder.compatCornerTreatmentSize(createCornerTreatment4);
-            builder.bottomLeftCornerSize = cornerSize6;
+            builder.bottomLeftCornerSize = cornerSize5;
             return builder;
         } finally {
             obtainStyledAttributes.recycle();
-        }
-    }
-
-    /* loaded from: classes.dex */
-    public static final class Builder {
-        public EdgeTreatment bottomEdge;
-        public CornerTreatment bottomLeftCorner;
-        public CornerSize bottomLeftCornerSize;
-        public CornerTreatment bottomRightCorner;
-        public CornerSize bottomRightCornerSize;
-        public EdgeTreatment leftEdge;
-        public EdgeTreatment rightEdge;
-        public EdgeTreatment topEdge;
-        public CornerTreatment topLeftCorner;
-        public CornerSize topLeftCornerSize;
-        public CornerTreatment topRightCorner;
-        public CornerSize topRightCornerSize;
-
-        public Builder() {
-            this.topLeftCorner = new RoundedCornerTreatment();
-            this.topRightCorner = new RoundedCornerTreatment();
-            this.bottomRightCorner = new RoundedCornerTreatment();
-            this.bottomLeftCorner = new RoundedCornerTreatment();
-            this.topLeftCornerSize = new AbsoluteCornerSize(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
-            this.topRightCornerSize = new AbsoluteCornerSize(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
-            this.bottomRightCornerSize = new AbsoluteCornerSize(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
-            this.bottomLeftCornerSize = new AbsoluteCornerSize(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
-            this.topEdge = R$attr.createDefaultEdgeTreatment();
-            this.rightEdge = R$attr.createDefaultEdgeTreatment();
-            this.bottomEdge = R$attr.createDefaultEdgeTreatment();
-            this.leftEdge = R$attr.createDefaultEdgeTreatment();
-        }
-
-        public static float compatCornerTreatmentSize(CornerTreatment cornerTreatment) {
-            if (cornerTreatment instanceof RoundedCornerTreatment) {
-                Objects.requireNonNull((RoundedCornerTreatment) cornerTreatment);
-                return -1.0f;
-            }
-            if (cornerTreatment instanceof CutCornerTreatment) {
-                Objects.requireNonNull((CutCornerTreatment) cornerTreatment);
-            }
-            return -1.0f;
-        }
-
-        public ShapeAppearanceModel build() {
-            return new ShapeAppearanceModel(this, null);
-        }
-
-        public Builder setAllCornerSizes(float f) {
-            this.topLeftCornerSize = new AbsoluteCornerSize(f);
-            this.topRightCornerSize = new AbsoluteCornerSize(f);
-            this.bottomRightCornerSize = new AbsoluteCornerSize(f);
-            this.bottomLeftCornerSize = new AbsoluteCornerSize(f);
-            return this;
-        }
-
-        public Builder setBottomLeftCornerSize(float f) {
-            this.bottomLeftCornerSize = new AbsoluteCornerSize(f);
-            return this;
-        }
-
-        public Builder setBottomRightCornerSize(float f) {
-            this.bottomRightCornerSize = new AbsoluteCornerSize(f);
-            return this;
-        }
-
-        public Builder setTopLeftCornerSize(float f) {
-            this.topLeftCornerSize = new AbsoluteCornerSize(f);
-            return this;
-        }
-
-        public Builder setTopRightCornerSize(float f) {
-            this.topRightCornerSize = new AbsoluteCornerSize(f);
-            return this;
-        }
-
-        public Builder(ShapeAppearanceModel shapeAppearanceModel) {
-            this.topLeftCorner = new RoundedCornerTreatment();
-            this.topRightCorner = new RoundedCornerTreatment();
-            this.bottomRightCorner = new RoundedCornerTreatment();
-            this.bottomLeftCorner = new RoundedCornerTreatment();
-            this.topLeftCornerSize = new AbsoluteCornerSize(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
-            this.topRightCornerSize = new AbsoluteCornerSize(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
-            this.bottomRightCornerSize = new AbsoluteCornerSize(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
-            this.bottomLeftCornerSize = new AbsoluteCornerSize(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
-            this.topEdge = R$attr.createDefaultEdgeTreatment();
-            this.rightEdge = R$attr.createDefaultEdgeTreatment();
-            this.bottomEdge = R$attr.createDefaultEdgeTreatment();
-            this.leftEdge = R$attr.createDefaultEdgeTreatment();
-            this.topLeftCorner = shapeAppearanceModel.topLeftCorner;
-            this.topRightCorner = shapeAppearanceModel.topRightCorner;
-            this.bottomRightCorner = shapeAppearanceModel.bottomRightCorner;
-            this.bottomLeftCorner = shapeAppearanceModel.bottomLeftCorner;
-            this.topLeftCornerSize = shapeAppearanceModel.topLeftCornerSize;
-            this.topRightCornerSize = shapeAppearanceModel.topRightCornerSize;
-            this.bottomRightCornerSize = shapeAppearanceModel.bottomRightCornerSize;
-            this.bottomLeftCornerSize = shapeAppearanceModel.bottomLeftCornerSize;
-            this.topEdge = shapeAppearanceModel.topEdge;
-            this.rightEdge = shapeAppearanceModel.rightEdge;
-            this.bottomEdge = shapeAppearanceModel.bottomEdge;
-            this.leftEdge = shapeAppearanceModel.leftEdge;
         }
     }
 
@@ -218,9 +211,9 @@ public class ShapeAppearanceModel {
         this.topRightCornerSize = new AbsoluteCornerSize(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
         this.bottomRightCornerSize = new AbsoluteCornerSize(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
         this.bottomLeftCornerSize = new AbsoluteCornerSize(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
-        this.topEdge = R$attr.createDefaultEdgeTreatment();
-        this.rightEdge = R$attr.createDefaultEdgeTreatment();
-        this.bottomEdge = R$attr.createDefaultEdgeTreatment();
-        this.leftEdge = R$attr.createDefaultEdgeTreatment();
+        this.topEdge = new zzh();
+        this.rightEdge = new zzh();
+        this.bottomEdge = new zzh();
+        this.leftEdge = new zzh();
     }
 }

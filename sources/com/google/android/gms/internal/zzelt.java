@@ -3,6 +3,7 @@ package com.google.android.gms.internal;
 import android.os.IBinder;
 import android.os.Parcel;
 import android.os.RemoteException;
+/* compiled from: ISignInService.java */
 /* loaded from: classes.dex */
 public final class zzelt extends zzez implements zzels {
     public zzelt(IBinder iBinder) {
@@ -15,7 +16,11 @@ public final class zzelt extends zzez implements zzels {
         int i = zzfb.$r8$clinit;
         a_.writeInt(1);
         zzelvVar.writeToParcel(a_, 0);
-        zzfb.zza(a_, zzelqVar);
+        if (zzelqVar == null) {
+            a_.writeStrongBinder(null);
+        } else {
+            a_.writeStrongBinder((zzfa) zzelqVar);
+        }
         zzb(12, a_);
     }
 }

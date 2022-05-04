@@ -3,6 +3,7 @@ package com.google.android.gms.common;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.android.gms.internal.zzbkw;
+/* compiled from: FeatureCreator.java */
 /* loaded from: classes.dex */
 public final class zzc implements Parcelable.Creator<Feature> {
     @Override // android.os.Parcelable.Creator

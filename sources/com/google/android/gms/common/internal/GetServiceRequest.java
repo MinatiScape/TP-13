@@ -9,7 +9,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.RemoteException;
 import android.util.Log;
-import androidx.slice.view.R$layout;
+import androidx.core.R$id;
 import com.google.android.gms.common.Feature;
 import com.google.android.gms.common.GoogleApiAvailabilityLight;
 import com.google.android.gms.common.api.Scope;
@@ -34,24 +34,29 @@ public class GetServiceRequest extends zzbkv {
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
-        int zzb = R$layout.zzb(parcel, 20293);
+    public final void writeToParcel(Parcel parcel, int i) {
+        int zzb = R$id.zzb(parcel, 20293);
         int i2 = this.zza;
-        R$layout.zzb(parcel, 1, 4);
+        R$id.zzb(parcel, 1, 4);
         parcel.writeInt(i2);
         int i3 = this.zzb;
-        R$layout.zzb(parcel, 2, 4);
+        R$id.zzb(parcel, 2, 4);
         parcel.writeInt(i3);
         int i4 = this.zzc;
-        R$layout.zzb(parcel, 3, 4);
+        R$id.zzb(parcel, 3, 4);
         parcel.writeInt(i4);
-        R$layout.zza(parcel, 4, this.zzd, false);
-        R$layout.zza(parcel, 5, this.zze);
-        R$layout.zza(parcel, 6, this.zzf, i);
-        R$layout.zza(parcel, 7, this.zzg, false);
-        R$layout.zza(parcel, 8, this.zzh, i, false);
-        R$layout.zza(parcel, 10, this.zzi, i);
-        R$layout.zzc(parcel, zzb);
+        R$id.zza(parcel, 4, this.zzd);
+        IBinder iBinder = this.zze;
+        if (iBinder != null) {
+            int zzb2 = R$id.zzb(parcel, 5);
+            parcel.writeStrongBinder(iBinder);
+            R$id.zzc(parcel, zzb2);
+        }
+        R$id.zza(parcel, 6, this.zzf, i);
+        R$id.zza(parcel, 7, this.zzg);
+        R$id.zza(parcel, 8, this.zzh, i);
+        R$id.zza(parcel, 10, this.zzi, i);
+        R$id.zzc(parcel, zzb);
     }
 
     public GetServiceRequest(int i, int i2, int i3, String str, IBinder iBinder, Scope[] scopeArr, Bundle bundle, Account account, Feature[] featureArr) {

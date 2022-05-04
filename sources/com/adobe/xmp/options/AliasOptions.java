@@ -7,7 +7,7 @@ public final class AliasOptions extends Options {
     }
 
     @Override // com.adobe.xmp.options.Options
-    public int getValidOptions() {
+    public final int getValidOptions() {
         return 7680;
     }
 

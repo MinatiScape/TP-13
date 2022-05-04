@@ -6,6 +6,7 @@ import android.os.Parcel;
 import android.os.RemoteException;
 import com.google.android.gms.internal.zzez;
 import com.google.android.gms.internal.zzfb;
+/* compiled from: IAccountAccessor.java */
 /* loaded from: classes.dex */
 public final class zzw extends zzez implements IAccountAccessor {
     public zzw(IBinder iBinder) {

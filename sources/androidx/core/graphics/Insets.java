@@ -9,44 +9,37 @@ public final class Insets {
     public final int right;
     public final int top;
 
-    public Insets(int left, int top, int right, int bottom) {
-        this.left = left;
-        this.top = top;
-        this.right = right;
-        this.bottom = bottom;
+    public final boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || Insets.class != obj.getClass()) {
+            return false;
+        }
+        Insets insets = (Insets) obj;
+        return this.bottom == insets.bottom && this.left == insets.left && this.right == insets.right && this.top == insets.top;
     }
 
-    public static Insets of(int left, int top, int right, int bottom) {
-        if (left == 0 && top == 0 && right == 0 && bottom == 0) {
+    public static Insets of(int i, int i2, int i3, int i4) {
+        if (i == 0 && i2 == 0 && i3 == 0 && i4 == 0) {
             return NONE;
         }
-        return new Insets(left, top, right, bottom);
+        return new Insets(i, i2, i3, i4);
     }
 
     public static Insets toCompatInsets(android.graphics.Insets insets) {
         return of(insets.left, insets.top, insets.right, insets.bottom);
     }
 
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || Insets.class != o.getClass()) {
-            return false;
-        }
-        Insets insets = (Insets) o;
-        return this.bottom == insets.bottom && this.left == insets.left && this.right == insets.right && this.top == insets.top;
-    }
-
-    public int hashCode() {
+    public final int hashCode() {
         return (((((this.left * 31) + this.top) * 31) + this.right) * 31) + this.bottom;
     }
 
-    public android.graphics.Insets toPlatformInsets() {
+    public final android.graphics.Insets toPlatformInsets() {
         return android.graphics.Insets.of(this.left, this.top, this.right, this.bottom);
     }
 
-    public String toString() {
+    public final String toString() {
         StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Insets{left=");
         m.append(this.left);
         m.append(", top=");
@@ -57,5 +50,12 @@ public final class Insets {
         m.append(this.bottom);
         m.append('}');
         return m.toString();
+    }
+
+    public Insets(int i, int i2, int i3, int i4) {
+        this.left = i;
+        this.top = i2;
+        this.right = i3;
+        this.bottom = i4;
     }
 }

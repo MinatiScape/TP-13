@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 /* JADX WARN: Method from annotation default annotation not found: i */
 /* JADX WARN: Method from annotation default annotation not found: n */
 /* JADX WARN: Method from annotation default annotation not found: s */
+/* compiled from: DebugMetadata.kt */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 /* loaded from: classes.dex */

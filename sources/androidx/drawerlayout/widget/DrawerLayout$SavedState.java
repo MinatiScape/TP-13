@@ -7,18 +7,18 @@ import androidx.customview.view.AbsSavedState;
 public class DrawerLayout$SavedState extends AbsSavedState {
     public static final Parcelable.Creator<DrawerLayout$SavedState> CREATOR = new Parcelable.ClassLoaderCreator<DrawerLayout$SavedState>() { // from class: androidx.drawerlayout.widget.DrawerLayout$SavedState.1
         @Override // android.os.Parcelable.ClassLoaderCreator
-        public DrawerLayout$SavedState createFromParcel(Parcel in, ClassLoader loader) {
-            return new DrawerLayout$SavedState(in, loader);
+        public final DrawerLayout$SavedState createFromParcel(Parcel parcel, ClassLoader classLoader) {
+            return new DrawerLayout$SavedState(parcel, classLoader);
         }
 
         @Override // android.os.Parcelable.Creator
-        public Object[] newArray(int size) {
-            return new DrawerLayout$SavedState[size];
+        public final Object createFromParcel(Parcel parcel) {
+            return new DrawerLayout$SavedState(parcel, null);
         }
 
         @Override // android.os.Parcelable.Creator
-        public Object createFromParcel(Parcel in) {
-            return new DrawerLayout$SavedState(in, null);
+        public final Object[] newArray(int i) {
+            return new DrawerLayout$SavedState[i];
         }
     };
     public int lockModeEnd;
@@ -27,23 +27,23 @@ public class DrawerLayout$SavedState extends AbsSavedState {
     public int lockModeStart;
     public int openDrawerGravity;
 
-    public DrawerLayout$SavedState(Parcel in, ClassLoader loader) {
-        super(in, loader);
-        this.openDrawerGravity = 0;
-        this.openDrawerGravity = in.readInt();
-        this.lockModeLeft = in.readInt();
-        this.lockModeRight = in.readInt();
-        this.lockModeStart = in.readInt();
-        this.lockModeEnd = in.readInt();
+    @Override // androidx.customview.view.AbsSavedState, android.os.Parcelable
+    public final void writeToParcel(Parcel parcel, int i) {
+        parcel.writeParcelable(this.mSuperState, i);
+        parcel.writeInt(this.openDrawerGravity);
+        parcel.writeInt(this.lockModeLeft);
+        parcel.writeInt(this.lockModeRight);
+        parcel.writeInt(this.lockModeStart);
+        parcel.writeInt(this.lockModeEnd);
     }
 
-    @Override // androidx.customview.view.AbsSavedState, android.os.Parcelable
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(this.mSuperState, flags);
-        dest.writeInt(this.openDrawerGravity);
-        dest.writeInt(this.lockModeLeft);
-        dest.writeInt(this.lockModeRight);
-        dest.writeInt(this.lockModeStart);
-        dest.writeInt(this.lockModeEnd);
+    public DrawerLayout$SavedState(Parcel parcel, ClassLoader classLoader) {
+        super(parcel, classLoader);
+        this.openDrawerGravity = 0;
+        this.openDrawerGravity = parcel.readInt();
+        this.lockModeLeft = parcel.readInt();
+        this.lockModeRight = parcel.readInt();
+        this.lockModeStart = parcel.readInt();
+        this.lockModeEnd = parcel.readInt();
     }
 }

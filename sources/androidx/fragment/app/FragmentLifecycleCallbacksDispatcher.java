@@ -1,13 +1,10 @@
 package androidx.fragment.app;
 
 import android.content.Context;
-import android.os.Bundle;
-import android.view.View;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 /* loaded from: classes.dex */
-public class FragmentLifecycleCallbacksDispatcher {
+public final class FragmentLifecycleCallbacksDispatcher {
     public final FragmentManager mFragmentManager;
     public final CopyOnWriteArrayList<FragmentLifecycleCallbacksHolder> mLifecycleCallbacks = new CopyOnWriteArrayList<>();
 
@@ -15,249 +12,249 @@ public class FragmentLifecycleCallbacksDispatcher {
     public static final class FragmentLifecycleCallbacksHolder {
     }
 
+    public final void dispatchOnFragmentActivityCreated(boolean z) {
+        Fragment fragment = this.mFragmentManager.mParent;
+        if (fragment != null) {
+            fragment.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentActivityCreated(true);
+        }
+        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
+        while (it.hasNext()) {
+            FragmentLifecycleCallbacksHolder next = it.next();
+            if (z) {
+                next.getClass();
+            } else {
+                next.getClass();
+                throw null;
+            }
+        }
+    }
+
+    public final void dispatchOnFragmentAttached(boolean z) {
+        FragmentManager fragmentManager = this.mFragmentManager;
+        Context context = fragmentManager.mHost.mContext;
+        Fragment fragment = fragmentManager.mParent;
+        if (fragment != null) {
+            fragment.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentAttached(true);
+        }
+        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
+        while (it.hasNext()) {
+            FragmentLifecycleCallbacksHolder next = it.next();
+            if (z) {
+                next.getClass();
+            } else {
+                next.getClass();
+                throw null;
+            }
+        }
+    }
+
+    public final void dispatchOnFragmentCreated(boolean z) {
+        Fragment fragment = this.mFragmentManager.mParent;
+        if (fragment != null) {
+            fragment.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentCreated(true);
+        }
+        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
+        while (it.hasNext()) {
+            FragmentLifecycleCallbacksHolder next = it.next();
+            if (z) {
+                next.getClass();
+            } else {
+                next.getClass();
+                throw null;
+            }
+        }
+    }
+
+    public final void dispatchOnFragmentDestroyed(boolean z) {
+        Fragment fragment = this.mFragmentManager.mParent;
+        if (fragment != null) {
+            fragment.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentDestroyed(true);
+        }
+        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
+        while (it.hasNext()) {
+            FragmentLifecycleCallbacksHolder next = it.next();
+            if (z) {
+                next.getClass();
+            } else {
+                next.getClass();
+                throw null;
+            }
+        }
+    }
+
+    public final void dispatchOnFragmentDetached(boolean z) {
+        Fragment fragment = this.mFragmentManager.mParent;
+        if (fragment != null) {
+            fragment.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentDetached(true);
+        }
+        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
+        while (it.hasNext()) {
+            FragmentLifecycleCallbacksHolder next = it.next();
+            if (z) {
+                next.getClass();
+            } else {
+                next.getClass();
+                throw null;
+            }
+        }
+    }
+
+    public final void dispatchOnFragmentPaused(boolean z) {
+        Fragment fragment = this.mFragmentManager.mParent;
+        if (fragment != null) {
+            fragment.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentPaused(true);
+        }
+        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
+        while (it.hasNext()) {
+            FragmentLifecycleCallbacksHolder next = it.next();
+            if (z) {
+                next.getClass();
+            } else {
+                next.getClass();
+                throw null;
+            }
+        }
+    }
+
+    public final void dispatchOnFragmentPreAttached(boolean z) {
+        FragmentManager fragmentManager = this.mFragmentManager;
+        Context context = fragmentManager.mHost.mContext;
+        Fragment fragment = fragmentManager.mParent;
+        if (fragment != null) {
+            fragment.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentPreAttached(true);
+        }
+        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
+        while (it.hasNext()) {
+            FragmentLifecycleCallbacksHolder next = it.next();
+            if (z) {
+                next.getClass();
+            } else {
+                next.getClass();
+                throw null;
+            }
+        }
+    }
+
+    public final void dispatchOnFragmentPreCreated(boolean z) {
+        Fragment fragment = this.mFragmentManager.mParent;
+        if (fragment != null) {
+            fragment.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentPreCreated(true);
+        }
+        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
+        while (it.hasNext()) {
+            FragmentLifecycleCallbacksHolder next = it.next();
+            if (z) {
+                next.getClass();
+            } else {
+                next.getClass();
+                throw null;
+            }
+        }
+    }
+
+    public final void dispatchOnFragmentResumed(boolean z) {
+        Fragment fragment = this.mFragmentManager.mParent;
+        if (fragment != null) {
+            fragment.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentResumed(true);
+        }
+        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
+        while (it.hasNext()) {
+            FragmentLifecycleCallbacksHolder next = it.next();
+            if (z) {
+                next.getClass();
+            } else {
+                next.getClass();
+                throw null;
+            }
+        }
+    }
+
+    public final void dispatchOnFragmentSaveInstanceState(boolean z) {
+        Fragment fragment = this.mFragmentManager.mParent;
+        if (fragment != null) {
+            fragment.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentSaveInstanceState(true);
+        }
+        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
+        while (it.hasNext()) {
+            FragmentLifecycleCallbacksHolder next = it.next();
+            if (z) {
+                next.getClass();
+            } else {
+                next.getClass();
+                throw null;
+            }
+        }
+    }
+
+    public final void dispatchOnFragmentStarted(boolean z) {
+        Fragment fragment = this.mFragmentManager.mParent;
+        if (fragment != null) {
+            fragment.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentStarted(true);
+        }
+        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
+        while (it.hasNext()) {
+            FragmentLifecycleCallbacksHolder next = it.next();
+            if (z) {
+                next.getClass();
+            } else {
+                next.getClass();
+                throw null;
+            }
+        }
+    }
+
+    public final void dispatchOnFragmentStopped(boolean z) {
+        Fragment fragment = this.mFragmentManager.mParent;
+        if (fragment != null) {
+            fragment.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentStopped(true);
+        }
+        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
+        while (it.hasNext()) {
+            FragmentLifecycleCallbacksHolder next = it.next();
+            if (z) {
+                next.getClass();
+            } else {
+                next.getClass();
+                throw null;
+            }
+        }
+    }
+
+    public final void dispatchOnFragmentViewCreated(boolean z) {
+        Fragment fragment = this.mFragmentManager.mParent;
+        if (fragment != null) {
+            fragment.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentViewCreated(true);
+        }
+        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
+        while (it.hasNext()) {
+            FragmentLifecycleCallbacksHolder next = it.next();
+            if (z) {
+                next.getClass();
+            } else {
+                next.getClass();
+                throw null;
+            }
+        }
+    }
+
+    public final void dispatchOnFragmentViewDestroyed(boolean z) {
+        Fragment fragment = this.mFragmentManager.mParent;
+        if (fragment != null) {
+            fragment.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentViewDestroyed(true);
+        }
+        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
+        while (it.hasNext()) {
+            FragmentLifecycleCallbacksHolder next = it.next();
+            if (z) {
+                next.getClass();
+            } else {
+                next.getClass();
+                throw null;
+            }
+        }
+    }
+
     public FragmentLifecycleCallbacksDispatcher(FragmentManager fragmentManager) {
         this.mFragmentManager = fragmentManager;
-    }
-
-    public void dispatchOnFragmentActivityCreated(Fragment fragment, Bundle bundle, boolean z) {
-        Fragment fragment2 = this.mFragmentManager.mParent;
-        if (fragment2 != null) {
-            fragment2.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentActivityCreated(fragment, bundle, true);
-        }
-        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
-        while (it.hasNext()) {
-            FragmentLifecycleCallbacksHolder next = it.next();
-            if (z) {
-                Objects.requireNonNull(next);
-            } else {
-                Objects.requireNonNull(next);
-                throw null;
-            }
-        }
-    }
-
-    public void dispatchOnFragmentAttached(Fragment fragment, boolean z) {
-        FragmentManager fragmentManager = this.mFragmentManager;
-        Context context = fragmentManager.mHost.mContext;
-        Fragment fragment2 = fragmentManager.mParent;
-        if (fragment2 != null) {
-            fragment2.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentAttached(fragment, true);
-        }
-        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
-        while (it.hasNext()) {
-            FragmentLifecycleCallbacksHolder next = it.next();
-            if (z) {
-                Objects.requireNonNull(next);
-            } else {
-                Objects.requireNonNull(next);
-                throw null;
-            }
-        }
-    }
-
-    public void dispatchOnFragmentCreated(Fragment fragment, Bundle bundle, boolean z) {
-        Fragment fragment2 = this.mFragmentManager.mParent;
-        if (fragment2 != null) {
-            fragment2.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentCreated(fragment, bundle, true);
-        }
-        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
-        while (it.hasNext()) {
-            FragmentLifecycleCallbacksHolder next = it.next();
-            if (z) {
-                Objects.requireNonNull(next);
-            } else {
-                Objects.requireNonNull(next);
-                throw null;
-            }
-        }
-    }
-
-    public void dispatchOnFragmentDestroyed(Fragment fragment, boolean z) {
-        Fragment fragment2 = this.mFragmentManager.mParent;
-        if (fragment2 != null) {
-            fragment2.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentDestroyed(fragment, true);
-        }
-        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
-        while (it.hasNext()) {
-            FragmentLifecycleCallbacksHolder next = it.next();
-            if (z) {
-                Objects.requireNonNull(next);
-            } else {
-                Objects.requireNonNull(next);
-                throw null;
-            }
-        }
-    }
-
-    public void dispatchOnFragmentDetached(Fragment fragment, boolean z) {
-        Fragment fragment2 = this.mFragmentManager.mParent;
-        if (fragment2 != null) {
-            fragment2.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentDetached(fragment, true);
-        }
-        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
-        while (it.hasNext()) {
-            FragmentLifecycleCallbacksHolder next = it.next();
-            if (z) {
-                Objects.requireNonNull(next);
-            } else {
-                Objects.requireNonNull(next);
-                throw null;
-            }
-        }
-    }
-
-    public void dispatchOnFragmentPaused(Fragment fragment, boolean z) {
-        Fragment fragment2 = this.mFragmentManager.mParent;
-        if (fragment2 != null) {
-            fragment2.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentPaused(fragment, true);
-        }
-        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
-        while (it.hasNext()) {
-            FragmentLifecycleCallbacksHolder next = it.next();
-            if (z) {
-                Objects.requireNonNull(next);
-            } else {
-                Objects.requireNonNull(next);
-                throw null;
-            }
-        }
-    }
-
-    public void dispatchOnFragmentPreAttached(Fragment fragment, boolean z) {
-        FragmentManager fragmentManager = this.mFragmentManager;
-        Context context = fragmentManager.mHost.mContext;
-        Fragment fragment2 = fragmentManager.mParent;
-        if (fragment2 != null) {
-            fragment2.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentPreAttached(fragment, true);
-        }
-        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
-        while (it.hasNext()) {
-            FragmentLifecycleCallbacksHolder next = it.next();
-            if (z) {
-                Objects.requireNonNull(next);
-            } else {
-                Objects.requireNonNull(next);
-                throw null;
-            }
-        }
-    }
-
-    public void dispatchOnFragmentPreCreated(Fragment fragment, Bundle bundle, boolean z) {
-        Fragment fragment2 = this.mFragmentManager.mParent;
-        if (fragment2 != null) {
-            fragment2.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentPreCreated(fragment, bundle, true);
-        }
-        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
-        while (it.hasNext()) {
-            FragmentLifecycleCallbacksHolder next = it.next();
-            if (z) {
-                Objects.requireNonNull(next);
-            } else {
-                Objects.requireNonNull(next);
-                throw null;
-            }
-        }
-    }
-
-    public void dispatchOnFragmentResumed(Fragment fragment, boolean z) {
-        Fragment fragment2 = this.mFragmentManager.mParent;
-        if (fragment2 != null) {
-            fragment2.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentResumed(fragment, true);
-        }
-        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
-        while (it.hasNext()) {
-            FragmentLifecycleCallbacksHolder next = it.next();
-            if (z) {
-                Objects.requireNonNull(next);
-            } else {
-                Objects.requireNonNull(next);
-                throw null;
-            }
-        }
-    }
-
-    public void dispatchOnFragmentSaveInstanceState(Fragment fragment, Bundle bundle, boolean z) {
-        Fragment fragment2 = this.mFragmentManager.mParent;
-        if (fragment2 != null) {
-            fragment2.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentSaveInstanceState(fragment, bundle, true);
-        }
-        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
-        while (it.hasNext()) {
-            FragmentLifecycleCallbacksHolder next = it.next();
-            if (z) {
-                Objects.requireNonNull(next);
-            } else {
-                Objects.requireNonNull(next);
-                throw null;
-            }
-        }
-    }
-
-    public void dispatchOnFragmentStarted(Fragment fragment, boolean z) {
-        Fragment fragment2 = this.mFragmentManager.mParent;
-        if (fragment2 != null) {
-            fragment2.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentStarted(fragment, true);
-        }
-        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
-        while (it.hasNext()) {
-            FragmentLifecycleCallbacksHolder next = it.next();
-            if (z) {
-                Objects.requireNonNull(next);
-            } else {
-                Objects.requireNonNull(next);
-                throw null;
-            }
-        }
-    }
-
-    public void dispatchOnFragmentStopped(Fragment fragment, boolean z) {
-        Fragment fragment2 = this.mFragmentManager.mParent;
-        if (fragment2 != null) {
-            fragment2.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentStopped(fragment, true);
-        }
-        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
-        while (it.hasNext()) {
-            FragmentLifecycleCallbacksHolder next = it.next();
-            if (z) {
-                Objects.requireNonNull(next);
-            } else {
-                Objects.requireNonNull(next);
-                throw null;
-            }
-        }
-    }
-
-    public void dispatchOnFragmentViewCreated(Fragment fragment, View view, Bundle bundle, boolean z) {
-        Fragment fragment2 = this.mFragmentManager.mParent;
-        if (fragment2 != null) {
-            fragment2.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentViewCreated(fragment, view, bundle, true);
-        }
-        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
-        while (it.hasNext()) {
-            FragmentLifecycleCallbacksHolder next = it.next();
-            if (z) {
-                Objects.requireNonNull(next);
-            } else {
-                Objects.requireNonNull(next);
-                throw null;
-            }
-        }
-    }
-
-    public void dispatchOnFragmentViewDestroyed(Fragment fragment, boolean z) {
-        Fragment fragment2 = this.mFragmentManager.mParent;
-        if (fragment2 != null) {
-            fragment2.getParentFragmentManager().mLifecycleCallbacksDispatcher.dispatchOnFragmentViewDestroyed(fragment, true);
-        }
-        Iterator<FragmentLifecycleCallbacksHolder> it = this.mLifecycleCallbacks.iterator();
-        while (it.hasNext()) {
-            FragmentLifecycleCallbacksHolder next = it.next();
-            if (z) {
-                Objects.requireNonNull(next);
-            } else {
-                Objects.requireNonNull(next);
-                throw null;
-            }
-        }
     }
 }

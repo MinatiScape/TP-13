@@ -1,15 +1,15 @@
 package com.bumptech.glide.manager;
 /* loaded from: classes.dex */
-public class NullConnectivityMonitor implements ConnectivityMonitor {
+public final class NullConnectivityMonitor implements ConnectivityMonitor {
     @Override // com.bumptech.glide.manager.LifecycleListener
-    public void onDestroy() {
+    public final void onDestroy() {
     }
 
     @Override // com.bumptech.glide.manager.LifecycleListener
-    public void onStart() {
+    public final void onStart() {
     }
 
     @Override // com.bumptech.glide.manager.LifecycleListener
-    public void onStop() {
+    public final void onStop() {
     }
 }

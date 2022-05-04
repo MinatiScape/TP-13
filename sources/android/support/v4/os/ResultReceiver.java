@@ -12,13 +12,13 @@ import android.support.v4.os.IResultReceiver;
 public class ResultReceiver implements Parcelable {
     public static final Parcelable.Creator<ResultReceiver> CREATOR = new Parcelable.Creator<ResultReceiver>() { // from class: android.support.v4.os.ResultReceiver.1
         @Override // android.os.Parcelable.Creator
-        public ResultReceiver createFromParcel(Parcel in) {
-            return new ResultReceiver(in);
+        public final ResultReceiver createFromParcel(Parcel parcel) {
+            return new ResultReceiver(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public ResultReceiver[] newArray(int size) {
-            return new ResultReceiver[size];
+        public final ResultReceiver[] newArray(int i) {
+            return new ResultReceiver[i];
         }
     };
     public IResultReceiver mReceiver;
@@ -29,9 +29,27 @@ public class ResultReceiver implements Parcelable {
         }
     }
 
-    public ResultReceiver(Parcel in) {
+    @Override // android.os.Parcelable
+    public final int describeContents() {
+        return 0;
+    }
+
+    public void onReceiveResult(int i, Bundle bundle) {
+    }
+
+    @Override // android.os.Parcelable
+    public final void writeToParcel(Parcel parcel, int i) {
+        synchronized (this) {
+            if (this.mReceiver == null) {
+                this.mReceiver = new MyResultReceiver();
+            }
+            parcel.writeStrongBinder(this.mReceiver.asBinder());
+        }
+    }
+
+    public ResultReceiver(Parcel parcel) {
         IResultReceiver iResultReceiver;
-        IBinder readStrongBinder = in.readStrongBinder();
+        IBinder readStrongBinder = parcel.readStrongBinder();
         int i = IResultReceiver.Stub.$r8$clinit;
         if (readStrongBinder == null) {
             iResultReceiver = null;
@@ -44,23 +62,5 @@ public class ResultReceiver implements Parcelable {
             }
         }
         this.mReceiver = iResultReceiver;
-    }
-
-    @Override // android.os.Parcelable
-    public int describeContents() {
-        return 0;
-    }
-
-    public void onReceiveResult(int resultCode, Bundle resultData) {
-    }
-
-    @Override // android.os.Parcelable
-    public void writeToParcel(Parcel out, int flags) {
-        synchronized (this) {
-            if (this.mReceiver == null) {
-                this.mReceiver = new MyResultReceiver();
-            }
-            out.writeStrongBinder(this.mReceiver.asBinder());
-        }
     }
 }

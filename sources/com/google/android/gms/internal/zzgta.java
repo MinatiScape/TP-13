@@ -1,7 +1,9 @@
 package com.google.android.gms.internal;
 
+import androidx.core.math.MathUtils;
 import java.io.IOException;
 import java.util.Arrays;
+/* compiled from: CountersProto.java */
 /* loaded from: classes.dex */
 public final class zzgta extends zzgrt<zzgta> {
     public long zza = 0;
@@ -9,53 +11,6 @@ public final class zzgta extends zzgrt<zzgta> {
     public byte[] zzc;
     public String zze;
     public String zzf;
-
-    public zzgta() {
-        if (zzgsz.zzc == null) {
-            synchronized (zzgrx.zzb) {
-                if (zzgsz.zzc == null) {
-                    zzgsz.zzc = new zzgsz[0];
-                }
-            }
-        }
-        this.zzb = zzgsz.zzc;
-        this.zzc = zzgsc.zzh;
-        this.zze = "";
-        this.zzf = "";
-        this.zzay = null;
-        this.zzaz = -1;
-    }
-
-    @Override // com.google.android.gms.internal.zzgrt, com.google.android.gms.internal.zzgrz
-    public final int computeSerializedSize() {
-        super.computeSerializedSize();
-        long j = this.zza;
-        int i = 0;
-        int zzf = j != 0 ? zzgrr.zzf(1, j) + 0 : 0;
-        zzgsz[] zzgszVarArr = this.zzb;
-        if (zzgszVarArr != null && zzgszVarArr.length > 0) {
-            while (true) {
-                zzgsz[] zzgszVarArr2 = this.zzb;
-                if (i >= zzgszVarArr2.length) {
-                    break;
-                }
-                zzgsz zzgszVar = zzgszVarArr2[i];
-                if (zzgszVar != null) {
-                    zzf += zzgrr.zzb(2, zzgszVar);
-                }
-                i++;
-            }
-        }
-        if (!Arrays.equals(this.zzc, zzgsc.zzh)) {
-            zzf += zzgrr.zzb(3, this.zzc);
-        }
-        String str = this.zze;
-        if (str != null && !str.equals("")) {
-            zzf += zzgrr.zzb(5, this.zze);
-        }
-        String str2 = this.zzf;
-        return (str2 == null || str2.equals("")) ? zzf : zzf + zzgrr.zzb(6, this.zzf);
-    }
 
     public final boolean equals(Object obj) {
         if (obj == this) {
@@ -93,21 +48,33 @@ public final class zzgta extends zzgrt<zzgta> {
     }
 
     public final int hashCode() {
+        int i;
+        int i2;
         long j = this.zza;
         int hashCode = (Arrays.hashCode(this.zzc) + ((zzgrx.zza(this.zzb) + (((((-1208405882) + ((int) (j ^ (j >>> 32)))) * 31) + ((int) 0)) * 31)) * 31)) * 31;
         String str = this.zze;
-        int i = 0;
-        int hashCode2 = (hashCode + (str == null ? 0 : str.hashCode())) * 31;
+        int i3 = 0;
+        if (str == null) {
+            i = 0;
+        } else {
+            i = str.hashCode();
+        }
+        int i4 = (hashCode + i) * 31;
         String str2 = this.zzf;
-        int hashCode3 = (hashCode2 + (str2 == null ? 0 : str2.hashCode())) * 31;
+        if (str2 == null) {
+            i2 = 0;
+        } else {
+            i2 = str2.hashCode();
+        }
+        int i5 = (i4 + i2) * 31;
         zzgrv zzgrvVar = this.zzay;
         if (zzgrvVar != null && !zzgrvVar.zzb()) {
-            i = this.zzay.hashCode();
+            i3 = this.zzay.hashCode();
         }
-        return hashCode3 + i;
+        return i5 + i3;
     }
 
-    @Override // com.google.android.gms.internal.zzgrt, com.google.android.gms.internal.zzgrz
+    @Override // com.google.android.gms.internal.zzgrt
     public final void writeTo(zzgrr zzgrrVar) throws IOException {
         long j = this.zza;
         if (j != 0) {
@@ -128,7 +95,7 @@ public final class zzgta extends zzgrt<zzgta> {
                 i++;
             }
         }
-        if (!Arrays.equals(this.zzc, zzgsc.zzh)) {
+        if (!Arrays.equals(this.zzc, MathUtils.zzh)) {
             zzgrrVar.zza(3, this.zzc);
         }
         String str = this.zze;
@@ -140,5 +107,60 @@ public final class zzgta extends zzgrt<zzgta> {
             zzgrrVar.zza(6, this.zzf);
         }
         super.writeTo(zzgrrVar);
+    }
+
+    public zzgta() {
+        if (zzgsz.zzc == null) {
+            synchronized (zzgrx.zzb) {
+                if (zzgsz.zzc == null) {
+                    zzgsz.zzc = new zzgsz[0];
+                }
+            }
+        }
+        this.zzb = zzgsz.zzc;
+        this.zzc = MathUtils.zzh;
+        this.zze = "";
+        this.zzf = "";
+        this.zzay = null;
+        this.zzaz = -1;
+    }
+
+    @Override // com.google.android.gms.internal.zzgrt, com.google.android.gms.internal.zzgrz
+    public final int computeSerializedSize() {
+        int i;
+        super.computeSerializedSize();
+        long j = this.zza;
+        int i2 = 0;
+        if (j != 0) {
+            i = zzgrr.zzb(j) + zzgrr.zzb(1) + 0;
+        } else {
+            i = 0;
+        }
+        zzgsz[] zzgszVarArr = this.zzb;
+        if (zzgszVarArr != null && zzgszVarArr.length > 0) {
+            while (true) {
+                zzgsz[] zzgszVarArr2 = this.zzb;
+                if (i2 >= zzgszVarArr2.length) {
+                    break;
+                }
+                zzgsz zzgszVar = zzgszVarArr2[i2];
+                if (zzgszVar != null) {
+                    i += zzgrr.zzb(2, zzgszVar);
+                }
+                i2++;
+            }
+        }
+        if (!Arrays.equals(this.zzc, MathUtils.zzh)) {
+            i += zzgrr.zzb(3, this.zzc);
+        }
+        String str = this.zze;
+        if (str != null && !str.equals("")) {
+            i += zzgrr.zzb(5, this.zze);
+        }
+        String str2 = this.zzf;
+        if (str2 == null || str2.equals("")) {
+            return i;
+        }
+        return i + zzgrr.zzb(6, this.zzf);
     }
 }

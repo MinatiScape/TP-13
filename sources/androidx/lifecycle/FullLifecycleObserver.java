@@ -1,15 +1,15 @@
 package androidx.lifecycle;
 /* loaded from: classes.dex */
 public interface FullLifecycleObserver extends LifecycleObserver {
-    void onCreate(LifecycleOwner lifecycleOwner);
+    void onCreate();
 
-    void onDestroy(LifecycleOwner lifecycleOwner);
+    void onDestroy$1();
 
-    void onPause(LifecycleOwner lifecycleOwner);
+    void onPause$1();
 
-    void onResume(LifecycleOwner lifecycleOwner);
+    void onResume$1();
 
-    void onStart(LifecycleOwner lifecycleOwner);
+    void onStart$1();
 
-    void onStop(LifecycleOwner lifecycleOwner);
+    void onStop$1();
 }

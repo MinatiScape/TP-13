@@ -3,19 +3,25 @@ package com.bumptech.glide.gifdecoder;
 import android.util.Log;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
-import java.util.Objects;
 /* loaded from: classes.dex */
-public class GifHeaderParser {
+public final class GifHeaderParser {
     public final byte[] block = new byte[256];
     public int blockSize = 0;
     public GifHeader header;
     public ByteBuffer rawData;
 
     public final boolean err() {
-        return this.header.status != 0;
+        if (this.header.status != 0) {
+            return true;
+        }
+        return false;
     }
 
-    public GifHeader parseHeader() {
+    public final GifHeader parseHeader() {
+        boolean z;
+        boolean z2;
+        boolean z3;
+        boolean z4;
         if (this.rawData == null) {
             throw new IllegalStateException("You must call setData() before parseHeader()");
         } else if (err()) {
@@ -32,12 +38,17 @@ public class GifHeaderParser {
                 this.header.height = readShort();
                 int read = read();
                 GifHeader gifHeader = this.header;
-                gifHeader.gctFlag = (read & 128) != 0;
+                if ((read & 128) != 0) {
+                    z4 = true;
+                } else {
+                    z4 = false;
+                }
+                gifHeader.gctFlag = z4;
                 gifHeader.gctSize = (int) Math.pow(2.0d, (read & 7) + 1);
                 this.header.bgIndex = read();
                 GifHeader gifHeader2 = this.header;
                 read();
-                Objects.requireNonNull(gifHeader2);
+                gifHeader2.getClass();
                 if (this.header.gctFlag && !err()) {
                     GifHeader gifHeader3 = this.header;
                     gifHeader3.gct = readColorTable(gifHeader3.gctSize);
@@ -46,8 +57,8 @@ public class GifHeaderParser {
                 }
             }
             if (!err()) {
-                boolean z = false;
-                while (!z && !err() && this.header.frameCount <= Integer.MAX_VALUE) {
+                boolean z5 = false;
+                while (!z5 && !err() && this.header.frameCount <= Integer.MAX_VALUE) {
                     int read2 = read();
                     if (read2 == 33) {
                         int read3 = read();
@@ -63,7 +74,12 @@ public class GifHeaderParser {
                             if (i2 == 0) {
                                 gifFrame.dispose = 1;
                             }
-                            gifFrame.transparency = (read4 & 1) != 0;
+                            if ((read4 & 1) != 0) {
+                                z3 = true;
+                            } else {
+                                z3 = false;
+                            }
+                            gifFrame.transparency = z3;
                             int readShort = readShort();
                             if (readShort < 2) {
                                 readShort = 10;
@@ -89,7 +105,7 @@ public class GifHeaderParser {
                                     if (bArr[0] == 1) {
                                         byte b = bArr[1];
                                         byte b2 = bArr[2];
-                                        Objects.requireNonNull(this.header);
+                                        this.header.getClass();
                                     }
                                     if (this.blockSize > 0) {
                                     }
@@ -108,11 +124,20 @@ public class GifHeaderParser {
                         this.header.currentFrame.iw = readShort();
                         this.header.currentFrame.ih = readShort();
                         int read5 = read();
-                        boolean z2 = (read5 & 128) != 0;
+                        if ((read5 & 128) != 0) {
+                            z = true;
+                        } else {
+                            z = false;
+                        }
                         int pow = (int) Math.pow(2.0d, (read5 & 7) + 1);
                         GifFrame gifFrame3 = this.header.currentFrame;
-                        gifFrame3.interlace = (read5 & 64) != 0;
-                        if (z2) {
+                        if ((read5 & 64) != 0) {
+                            z2 = true;
+                        } else {
+                            z2 = false;
+                        }
+                        gifFrame3.interlace = z2;
+                        if (z) {
                             gifFrame3.lct = readColorTable(pow);
                         } else {
                             gifFrame3.lct = null;
@@ -128,7 +153,7 @@ public class GifHeaderParser {
                     } else if (read2 != 59) {
                         this.header.status = 1;
                     } else {
-                        z = true;
+                        z5 = true;
                     }
                 }
                 GifHeader gifHeader7 = this.header;
@@ -149,6 +174,36 @@ public class GifHeaderParser {
         }
     }
 
+    public final int[] readColorTable(int i) {
+        byte[] bArr = new byte[i * 3];
+        int[] iArr = null;
+        try {
+            this.rawData.get(bArr);
+            iArr = new int[256];
+            int i2 = 0;
+            int i3 = 0;
+            while (i2 < i) {
+                int i4 = i3 + 1;
+                int i5 = i4 + 1;
+                int i6 = i5 + 1;
+                int i7 = i2 + 1;
+                iArr[i2] = ((bArr[i3] & 255) << 16) | (-16777216) | ((bArr[i4] & 255) << 8) | (bArr[i5] & 255);
+                i3 = i6;
+                i2 = i7;
+            }
+        } catch (BufferUnderflowException e) {
+            if (Log.isLoggable("GifHeaderParser", 3)) {
+                Log.d("GifHeaderParser", "Format Error Reading Color Table", e);
+            }
+            this.header.status = 1;
+        }
+        return iArr;
+    }
+
+    public final int readShort() {
+        return this.rawData.getShort();
+    }
+
     public final void readBlock() {
         int read = read();
         this.blockSize = read;
@@ -167,46 +222,13 @@ public class GifHeaderParser {
                     }
                 } catch (Exception e) {
                     if (Log.isLoggable("GifHeaderParser", 3)) {
-                        int i3 = this.blockSize;
-                        StringBuilder m = GifHeaderParser$$ExternalSyntheticOutline0.m(76, "Error Reading Block n: ", i, " count: ", i2);
-                        m.append(" blockSize: ");
-                        m.append(i3);
-                        Log.d("GifHeaderParser", m.toString(), e);
+                        Log.d("GifHeaderParser", "Error Reading Block n: " + i + " count: " + i2 + " blockSize: " + this.blockSize, e);
                     }
                     this.header.status = 1;
                     return;
                 }
             }
         }
-    }
-
-    public final int[] readColorTable(int nColors) {
-        byte[] bArr = new byte[nColors * 3];
-        int[] iArr = null;
-        try {
-            this.rawData.get(bArr);
-            iArr = new int[256];
-            int i = 0;
-            int i2 = 0;
-            while (i < nColors) {
-                int i3 = i2 + 1;
-                int i4 = bArr[i2] & 255;
-                int i5 = i3 + 1;
-                i2 = i5 + 1;
-                i++;
-                iArr[i] = (i4 << 16) | (-16777216) | ((bArr[i3] & 255) << 8) | (bArr[i5] & 255);
-            }
-        } catch (BufferUnderflowException e) {
-            if (Log.isLoggable("GifHeaderParser", 3)) {
-                Log.d("GifHeaderParser", "Format Error Reading Color Table", e);
-            }
-            this.header.status = 1;
-        }
-        return iArr;
-    }
-
-    public final int readShort() {
-        return this.rawData.getShort();
     }
 
     public final void skip() {

@@ -11,6 +11,7 @@ import com.android.systemui.shared.R;
 import com.android.wallpaper.asset.Asset;
 import com.android.wallpaper.asset.ContentUriAsset;
 import com.android.wallpaper.asset.ExifInterfaceCompat;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,12 +21,12 @@ import java.util.List;
 public class ImageWallpaperInfo extends WallpaperInfo {
     public static final Parcelable.Creator<ImageWallpaperInfo> CREATOR = new Parcelable.Creator<ImageWallpaperInfo>() { // from class: com.android.wallpaper.model.ImageWallpaperInfo.1
         @Override // android.os.Parcelable.Creator
-        public ImageWallpaperInfo createFromParcel(Parcel parcel) {
+        public final ImageWallpaperInfo createFromParcel(Parcel parcel) {
             return new ImageWallpaperInfo(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public ImageWallpaperInfo[] newArray(int i) {
+        public final ImageWallpaperInfo[] newArray(int i) {
             return new ImageWallpaperInfo[i];
         }
     };
@@ -38,12 +39,13 @@ public class ImageWallpaperInfo extends WallpaperInfo {
         this.mUri = uri;
     }
 
-    public static List<String> getGenericAttributions(Context context) {
-        return Arrays.asList(context.getResources().getString(R.string.my_photos_generic_wallpaper_title));
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final String getTitle(Activity activity) {
+        return null;
     }
 
     @Override // com.android.wallpaper.model.WallpaperInfo
-    public Asset getAsset(Context context) {
+    public final Asset getAsset(Context context) {
         if (this.mIsAssetUncached) {
             this.mAsset = new ContentUriAsset(context, this.mUri, true);
         } else if (this.mAsset == null) {
@@ -52,84 +54,86 @@ public class ImageWallpaperInfo extends WallpaperInfo {
         return this.mAsset;
     }
 
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public List<String> getAttributions(Context context) {
-        String[] strArr;
-        String str;
-        ContentUriAsset contentUriAsset = (ContentUriAsset) getAsset(context);
-        if (!contentUriAsset.isJpeg()) {
-            return getGenericAttributions(context);
-        }
-        ArrayList arrayList = new ArrayList();
-        for (String str2 : EXIF_TAGS) {
-            contentUriAsset.ensureExifInterface();
-            ExifInterfaceCompat exifInterfaceCompat = contentUriAsset.mExifCompat;
-            String str3 = null;
-            if (exifInterfaceCompat == null) {
-                Log.w("ContentUriAsset", "Unable to read EXIF tags for content URI asset");
-            } else {
-                ExifInterface exifInterface = exifInterfaceCompat.mFrameworkExifInterface;
-                if (exifInterface != null) {
-                    str = exifInterface.getAttribute(str2);
-                } else {
-                    str = exifInterfaceCompat.mSupportExifInterface.getAttribute(str2);
-                }
-                if (str != null && !str.trim().isEmpty()) {
-                    str3 = str.trim();
-                }
-            }
-            if (str3 != null) {
-                if (str2 == "DateTimeOriginal") {
-                    try {
-                        str3 = SimpleDateFormat.getDateInstance().format(new SimpleDateFormat("yyyy:MM:dd HH:mm:ss").parse(str3));
-                    } catch (ParseException e) {
-                        Log.w("ImageWallpaperInfo", "Unable to parse image datetime", e);
-                    }
-                }
-                arrayList.add(str3);
-            }
-        }
-        return !arrayList.isEmpty() ? arrayList : getGenericAttributions(context);
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public String getCollectionId(Context context) {
-        return context.getString(R.string.image_wallpaper_collection_id);
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public Asset getThumbAsset(Context context) {
-        return getAsset(context);
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public String getTitle(Context context) {
-        return null;
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public Uri getUri() {
-        return this.mUri;
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public void showPreview(Activity activity, InlinePreviewIntentFactory inlinePreviewIntentFactory, int i) {
-        activity.startActivityForResult(inlinePreviewIntentFactory.newIntent(activity, this), i);
-    }
-
     @Override // com.android.wallpaper.model.WallpaperInfo, android.os.Parcelable
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeInt(this.mPlaceholderColor);
         parcel.writeString(this.mUri.toString());
     }
 
-    public ImageWallpaperInfo(Uri uri, boolean z) {
+    public ImageWallpaperInfo(Uri uri, int i) {
         this.mUri = uri;
-        this.mIsAssetUncached = z;
+        this.mIsAssetUncached = true;
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public List<String> getAttributions(Context context) {
+        boolean z;
+        ContentUriAsset contentUriAsset = (ContentUriAsset) getAsset(context);
+        String type = contentUriAsset.mContext.getContentResolver().getType(contentUriAsset.mUri);
+        if (type == null || !type.equals("image/jpeg")) {
+            z = false;
+        } else {
+            z = true;
+        }
+        if (!z) {
+            return Arrays.asList(context.getResources().getString(R.string.my_photos_generic_wallpaper_title));
+        }
+        ArrayList arrayList = new ArrayList();
+        String[] strArr = EXIF_TAGS;
+        for (int i = 0; i < 4; i++) {
+            String str = strArr[i];
+            contentUriAsset.ensureExifInterface();
+            ExifInterfaceCompat exifInterfaceCompat = contentUriAsset.mExifCompat;
+            String str2 = null;
+            if (exifInterfaceCompat == null) {
+                Log.w("ContentUriAsset", "Unable to read EXIF tags for content URI asset");
+            } else {
+                ExifInterface exifInterface = exifInterfaceCompat.mFrameworkExifInterface;
+                exifInterface.getClass();
+                String attribute = exifInterface.getAttribute(str);
+                if (attribute != null && !attribute.trim().isEmpty()) {
+                    str2 = attribute.trim();
+                }
+            }
+            if (str2 != null) {
+                if (str == "DateTimeOriginal") {
+                    try {
+                        str2 = DateFormat.getDateInstance().format(new SimpleDateFormat("yyyy:MM:dd HH:mm:ss").parse(str2));
+                    } catch (ParseException e) {
+                        Log.w("ImageWallpaperInfo", "Unable to parse image datetime", e);
+                    }
+                }
+                arrayList.add(str2);
+            }
+        }
+        if (!arrayList.isEmpty()) {
+            return arrayList;
+        }
+        return Arrays.asList(context.getResources().getString(R.string.my_photos_generic_wallpaper_title));
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final String getCollectionId(Context context) {
+        return context.getString(R.string.image_wallpaper_collection_id);
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final Asset getThumbAsset(Context context) {
+        return getAsset(context);
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final void showPreview(Activity activity, InlinePreviewIntentFactory inlinePreviewIntentFactory, int i) {
+        activity.startActivityForResult(inlinePreviewIntentFactory.newIntent(activity, this), i);
     }
 
     public ImageWallpaperInfo(Parcel parcel) {
         super(parcel);
         this.mUri = Uri.parse(parcel.readString());
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final Uri getUri() {
+        return this.mUri;
     }
 }

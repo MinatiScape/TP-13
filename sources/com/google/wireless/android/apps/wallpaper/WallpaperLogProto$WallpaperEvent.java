@@ -6,7 +6,6 @@ import com.google.protobuf.Internal;
 import com.google.protobuf.MessageLiteOrBuilder;
 import com.google.protobuf.Parser;
 import com.google.protobuf.RawMessageInfo;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public final class WallpaperLogProto$WallpaperEvent extends GeneratedMessageLite<WallpaperLogProto$WallpaperEvent, Builder> implements MessageLiteOrBuilder {
     public static final int ACCENT_COLOR_HASH_FIELD_NUMBER = 7;
@@ -38,23 +37,6 @@ public final class WallpaperLogProto$WallpaperEvent extends GeneratedMessageLite
     private String wallpaperId_ = "";
 
     /* loaded from: classes.dex */
-    public static final class Builder extends GeneratedMessageLite.Builder<WallpaperLogProto$WallpaperEvent, Builder> implements MessageLiteOrBuilder {
-        public Builder() {
-            super(WallpaperLogProto$WallpaperEvent.DEFAULT_INSTANCE);
-        }
-
-        public Builder setType(Type type) {
-            copyOnWrite();
-            WallpaperLogProto$WallpaperEvent.access$100((WallpaperLogProto$WallpaperEvent) this.instance, type);
-            return this;
-        }
-
-        public Builder(WallpaperLogProto$1 wallpaperLogProto$1) {
-            super(WallpaperLogProto$WallpaperEvent.DEFAULT_INSTANCE);
-        }
-    }
-
-    /* loaded from: classes.dex */
     public enum Type implements Internal.EnumLite {
         TYPE_UNSPECIFIED(0),
         APP_LAUNCHED(1),
@@ -84,11 +66,14 @@ public final class WallpaperLogProto$WallpaperEvent extends GeneratedMessageLite
 
         /* loaded from: classes.dex */
         public static final class TypeVerifier implements Internal.EnumVerifier {
-            public static final Internal.EnumVerifier INSTANCE = new TypeVerifier();
+            public static final TypeVerifier INSTANCE = new TypeVerifier();
 
             @Override // com.google.protobuf.Internal.EnumVerifier
-            public boolean isInRange(int i) {
-                return Type.forNumber(i) != null;
+            public final boolean isInRange(int i) {
+                if (Type.forNumber(i) != null) {
+                    return true;
+                }
+                return false;
             }
         }
 
@@ -156,6 +141,18 @@ public final class WallpaperLogProto$WallpaperEvent extends GeneratedMessageLite
     }
 
     /* loaded from: classes.dex */
+    public static final class Builder extends GeneratedMessageLite.Builder<WallpaperLogProto$WallpaperEvent, Builder> implements MessageLiteOrBuilder {
+        public Builder() {
+            super(WallpaperLogProto$WallpaperEvent.DEFAULT_INSTANCE);
+        }
+
+        public final void setType(Type type) {
+            copyOnWrite();
+            WallpaperLogProto$WallpaperEvent.m68$$Nest$msetType((WallpaperLogProto$WallpaperEvent) this.instance, type);
+        }
+    }
+
+    /* loaded from: classes.dex */
     public enum WallpaperSetSource implements Internal.EnumLite {
         WALLPAPER_SET_SOURCE_UNSPECIFIED(0),
         MY_PHOTOS(1),
@@ -166,32 +163,28 @@ public final class WallpaperLogProto$WallpaperEvent extends GeneratedMessageLite
 
         /* loaded from: classes.dex */
         public static final class WallpaperSetSourceVerifier implements Internal.EnumVerifier {
-            public static final Internal.EnumVerifier INSTANCE = new WallpaperSetSourceVerifier();
+            public static final WallpaperSetSourceVerifier INSTANCE = new WallpaperSetSourceVerifier();
 
             @Override // com.google.protobuf.Internal.EnumVerifier
-            public boolean isInRange(int i) {
-                return WallpaperSetSource.forNumber(i) != null;
+            public final boolean isInRange(int i) {
+                WallpaperSetSource wallpaperSetSource;
+                if (i == 0) {
+                    wallpaperSetSource = WallpaperSetSource.WALLPAPER_SET_SOURCE_UNSPECIFIED;
+                } else if (i == 1) {
+                    wallpaperSetSource = WallpaperSetSource.MY_PHOTOS;
+                } else if (i == 2) {
+                    wallpaperSetSource = WallpaperSetSource.ON_DEVICE;
+                } else if (i != 3) {
+                    wallpaperSetSource = null;
+                } else {
+                    wallpaperSetSource = WallpaperSetSource.REMOTE;
+                }
+                return wallpaperSetSource != null;
             }
         }
 
         WallpaperSetSource(int i) {
             this.value = i;
-        }
-
-        public static WallpaperSetSource forNumber(int i) {
-            if (i == 0) {
-                return WALLPAPER_SET_SOURCE_UNSPECIFIED;
-            }
-            if (i == 1) {
-                return MY_PHOTOS;
-            }
-            if (i == 2) {
-                return ON_DEVICE;
-            }
-            if (i != 3) {
-                return null;
-            }
-            return REMOTE;
         }
 
         @Override // com.google.protobuf.Internal.EnumLite
@@ -200,51 +193,61 @@ public final class WallpaperLogProto$WallpaperEvent extends GeneratedMessageLite
         }
     }
 
+    /* renamed from: -$$Nest$msetGridnameHash */
+    public static void m67$$Nest$msetGridnameHash(WallpaperLogProto$WallpaperEvent wallpaperLogProto$WallpaperEvent, int i) {
+        wallpaperLogProto$WallpaperEvent.bitField0_ |= QuickStepContract.SYSUI_STATE_SEARCH_DISABLED;
+        wallpaperLogProto$WallpaperEvent.gridnameHash_ = i;
+    }
+
     static {
         WallpaperLogProto$WallpaperEvent wallpaperLogProto$WallpaperEvent = new WallpaperLogProto$WallpaperEvent();
         DEFAULT_INSTANCE = wallpaperLogProto$WallpaperEvent;
         GeneratedMessageLite.registerDefaultInstance(WallpaperLogProto$WallpaperEvent.class, wallpaperLogProto$WallpaperEvent);
     }
 
-    public static void access$100(WallpaperLogProto$WallpaperEvent wallpaperLogProto$WallpaperEvent, Type type) {
-        Objects.requireNonNull(wallpaperLogProto$WallpaperEvent);
-        Objects.requireNonNull(type);
-        wallpaperLogProto$WallpaperEvent.bitField0_ |= 1;
-        wallpaperLogProto$WallpaperEvent.type_ = type.getNumber();
+    public static Builder newBuilder() {
+        return (Builder) ((GeneratedMessageLite.Builder) DEFAULT_INSTANCE.dynamicMethod(GeneratedMessageLite.MethodToInvoke.NEW_BUILDER));
     }
 
-    public static void access$1100(WallpaperLogProto$WallpaperEvent wallpaperLogProto$WallpaperEvent, String str) {
-        Objects.requireNonNull(wallpaperLogProto$WallpaperEvent);
-        Objects.requireNonNull(str);
-        wallpaperLogProto$WallpaperEvent.bitField0_ |= 16;
-        wallpaperLogProto$WallpaperEvent.wallpaperId_ = str;
+    public final Type getType() {
+        Type forNumber = Type.forNumber(this.type_);
+        if (forNumber == null) {
+            return Type.TYPE_UNSPECIFIED;
+        }
+        return forNumber;
     }
 
-    public static void access$2400(WallpaperLogProto$WallpaperEvent wallpaperLogProto$WallpaperEvent, int i) {
-        wallpaperLogProto$WallpaperEvent.bitField0_ |= QuickStepContract.SYSUI_STATE_SEARCH_DISABLED;
-        wallpaperLogProto$WallpaperEvent.gridnameHash_ = i;
-    }
-
-    public static void access$2600(WallpaperLogProto$WallpaperEvent wallpaperLogProto$WallpaperEvent, WallpaperPickerSnapshotProto$WallpaperPickerSnapshot wallpaperPickerSnapshotProto$WallpaperPickerSnapshot) {
-        Objects.requireNonNull(wallpaperLogProto$WallpaperEvent);
-        Objects.requireNonNull(wallpaperPickerSnapshotProto$WallpaperPickerSnapshot);
-        wallpaperLogProto$WallpaperEvent.wallpaperPickerSnapshot_ = wallpaperPickerSnapshotProto$WallpaperPickerSnapshot;
-        wallpaperLogProto$WallpaperEvent.bitField0_ |= QuickStepContract.SYSUI_STATE_QUICK_SETTINGS_EXPANDED;
-    }
-
-    public static void access$800(WallpaperLogProto$WallpaperEvent wallpaperLogProto$WallpaperEvent, String str) {
-        Objects.requireNonNull(wallpaperLogProto$WallpaperEvent);
-        Objects.requireNonNull(str);
+    /* renamed from: -$$Nest$msetCategoryCollectionId */
+    public static void m66$$Nest$msetCategoryCollectionId(WallpaperLogProto$WallpaperEvent wallpaperLogProto$WallpaperEvent, String str) {
+        wallpaperLogProto$WallpaperEvent.getClass();
         wallpaperLogProto$WallpaperEvent.bitField0_ |= 8;
         wallpaperLogProto$WallpaperEvent.categoryCollectionId_ = str;
     }
 
-    public static Builder newBuilder() {
-        return DEFAULT_INSTANCE.createBuilder();
+    /* renamed from: -$$Nest$msetType */
+    public static void m68$$Nest$msetType(WallpaperLogProto$WallpaperEvent wallpaperLogProto$WallpaperEvent, Type type) {
+        wallpaperLogProto$WallpaperEvent.getClass();
+        type.getClass();
+        wallpaperLogProto$WallpaperEvent.bitField0_ |= 1;
+        wallpaperLogProto$WallpaperEvent.type_ = type.getNumber();
+    }
+
+    /* renamed from: -$$Nest$msetWallpaperId */
+    public static void m69$$Nest$msetWallpaperId(WallpaperLogProto$WallpaperEvent wallpaperLogProto$WallpaperEvent, String str) {
+        wallpaperLogProto$WallpaperEvent.getClass();
+        wallpaperLogProto$WallpaperEvent.bitField0_ |= 16;
+        wallpaperLogProto$WallpaperEvent.wallpaperId_ = str;
+    }
+
+    /* renamed from: -$$Nest$msetWallpaperPickerSnapshot */
+    public static void m70$$Nest$msetWallpaperPickerSnapshot(WallpaperLogProto$WallpaperEvent wallpaperLogProto$WallpaperEvent, WallpaperPickerSnapshotProto$WallpaperPickerSnapshot wallpaperPickerSnapshotProto$WallpaperPickerSnapshot) {
+        wallpaperLogProto$WallpaperEvent.getClass();
+        wallpaperLogProto$WallpaperEvent.wallpaperPickerSnapshot_ = wallpaperPickerSnapshotProto$WallpaperPickerSnapshot;
+        wallpaperLogProto$WallpaperEvent.bitField0_ |= QuickStepContract.SYSUI_STATE_QUICK_SETTINGS_EXPANDED;
     }
 
     @Override // com.google.protobuf.GeneratedMessageLite
-    public final Object dynamicMethod(GeneratedMessageLite.MethodToInvoke methodToInvoke, Object obj, Object obj2) {
+    public final Object dynamicMethod(GeneratedMessageLite.MethodToInvoke methodToInvoke) {
         switch (methodToInvoke.ordinal()) {
             case 0:
                 return (byte) 1;
@@ -255,7 +258,7 @@ public final class WallpaperLogProto$WallpaperEvent extends GeneratedMessageLite
             case 3:
                 return new WallpaperLogProto$WallpaperEvent();
             case 4:
-                return new Builder(null);
+                return new Builder();
             case 5:
                 return DEFAULT_INSTANCE;
             case 6:
@@ -273,10 +276,5 @@ public final class WallpaperLogProto$WallpaperEvent extends GeneratedMessageLite
             default:
                 throw new UnsupportedOperationException();
         }
-    }
-
-    public Type getType() {
-        Type forNumber = Type.forNumber(this.type_);
-        return forNumber == null ? Type.TYPE_UNSPECIFIED : forNumber;
     }
 }

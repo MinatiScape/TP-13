@@ -7,34 +7,51 @@ import android.util.Log;
 import android.view.Display;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
+/* compiled from: DisplayUtils.kt */
 /* loaded from: classes.dex */
 public final class DisplayUtils {
     @NotNull
-    public final List<Display> internalDisplays;
+    public final ArrayList internalDisplays;
 
     public DisplayUtils(@NotNull Context context) {
+        boolean z;
+        boolean z2;
         Intrinsics.checkNotNullParameter(context, "context");
         Context applicationContext = context.getApplicationContext();
         Object systemService = applicationContext.getSystemService("display");
-        Objects.requireNonNull(systemService, "null cannot be cast to non-null type android.hardware.display.DisplayManager");
-        Display[] displays = ((DisplayManager) systemService).getDisplays();
-        Intrinsics.checkNotNullExpressionValue(displays, "dm.displays");
-        if (!(displays.length == 0)) {
-            ArrayList arrayList = new ArrayList();
-            for (Display display : displays) {
-                if (display.getType() == 1) {
-                    arrayList.add(display);
-                }
+        if (systemService != null) {
+            Display[] displays = ((DisplayManager) systemService).getDisplays();
+            Intrinsics.checkNotNullExpressionValue(displays, "dm.displays");
+            if (displays.length == 0) {
+                z = true;
+            } else {
+                z = false;
             }
-            this.internalDisplays = arrayList;
-            return;
+            if (!z) {
+                ArrayList arrayList = new ArrayList();
+                int length = displays.length;
+                int i = 0;
+                while (i < length) {
+                    Display display = displays[i];
+                    i++;
+                    if (display.getType() == 1) {
+                        z2 = true;
+                    } else {
+                        z2 = false;
+                    }
+                    if (z2) {
+                        arrayList.add(display);
+                    }
+                }
+                this.internalDisplays = arrayList;
+                return;
+            }
+            Log.e("DisplayUtils", Intrinsics.stringPlus("No displays found on context ", applicationContext));
+            throw new RuntimeException("No displays found!");
         }
-        Log.e("DisplayUtils", Intrinsics.stringPlus("No displays found on context ", applicationContext));
-        throw new RuntimeException("No displays found!");
+        throw new NullPointerException("null cannot be cast to non-null type android.hardware.display.DisplayManager");
     }
 
     /* JADX WARN: Multi-variable type inference failed */
@@ -43,9 +60,9 @@ public final class DisplayUtils {
     @NotNull
     public final Display getWallpaperDisplay() {
         Display display;
-        List<Display> maxWithOrNull = this.internalDisplays;
-        Intrinsics.checkNotNullParameter(maxWithOrNull, "$this$maxWithOrNull");
-        Iterator it = maxWithOrNull.iterator();
+        ArrayList arrayList = this.internalDisplays;
+        Intrinsics.checkNotNullParameter(arrayList, "<this>");
+        Iterator it = arrayList.iterator();
         if (!it.hasNext()) {
             display = null;
         } else {
@@ -55,21 +72,25 @@ public final class DisplayUtils {
                 Display a = next;
                 Display b = (Display) next2;
                 Intrinsics.checkNotNullExpressionValue(a, "a");
-                Objects.requireNonNull(this);
-                Point point = new Point();
-                a.getRealSize(point);
-                int i = point.x * point.y;
+                int access$getRealSize = access$getRealSize(this, a);
                 Intrinsics.checkNotNullExpressionValue(b, "b");
-                Objects.requireNonNull(this);
-                Point point2 = new Point();
-                b.getRealSize(point2);
-                if (i - (point2.x * point2.y) < 0) {
+                if (access$getRealSize - access$getRealSize(this, b) < 0) {
                     next = next2;
                 }
             }
             display = next;
         }
         Display display2 = display;
-        return display2 == null ? this.internalDisplays.get(0) : display2;
+        if (display2 == null) {
+            return (Display) this.internalDisplays.get(0);
+        }
+        return display2;
+    }
+
+    public static final int access$getRealSize(DisplayUtils displayUtils, Display display) {
+        displayUtils.getClass();
+        Point point = new Point();
+        display.getRealSize(point);
+        return point.x * point.y;
     }
 }

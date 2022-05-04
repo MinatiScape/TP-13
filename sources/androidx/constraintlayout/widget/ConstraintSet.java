@@ -12,12 +12,13 @@ import android.util.SparseIntArray;
 import android.util.Xml;
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.appcompat.R$id;
 import androidx.appcompat.view.SupportMenuInflater$$ExternalSyntheticOutline0;
-import androidx.constraintlayout.motion.utils.Easing;
-import androidx.constraintlayout.solver.SolverVariable$Type$r8$EnumUnboxingUtility;
 import androidx.constraintlayout.solver.widgets.Barrier;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.Constraints;
+import androidx.slice.SliceSpecs;
+import androidx.slice.compat.SliceProviderCompat$2;
 import com.android.systemui.flags.FlagManager;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 import java.io.IOException;
@@ -27,10 +28,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Objects;
 import org.xmlpull.v1.XmlPullParserException;
 /* loaded from: classes.dex */
-public class ConstraintSet {
+public final class ConstraintSet {
     public static final int[] VISIBILITY_FLAGS = {0, 4, 8};
     public static SparseIntArray mapToConstant;
     public HashMap<String, ConstraintAttribute> mSavedAttributes = new HashMap<>();
@@ -46,7 +46,7 @@ public class ConstraintSet {
         public final Transform transform = new Transform();
         public HashMap<String, ConstraintAttribute> mCustomConstraints = new HashMap<>();
 
-        public void applyTo(ConstraintLayout.LayoutParams layoutParams) {
+        public final void applyTo(ConstraintLayout.LayoutParams layoutParams) {
             Layout layout = this.layout;
             layoutParams.leftToLeft = layout.leftToLeft;
             layoutParams.leftToRight = layout.leftToRight;
@@ -106,14 +106,13 @@ public class ConstraintSet {
             layoutParams.validate();
         }
 
-        public Object clone() throws CloneNotSupportedException {
+        public final Object clone() throws CloneNotSupportedException {
             Constraint constraint = new Constraint();
             Layout layout = constraint.layout;
             Layout layout2 = this.layout;
-            Objects.requireNonNull(layout);
+            layout.getClass();
             layout.mIsGuideline = layout2.mIsGuideline;
             layout.mWidth = layout2.mWidth;
-            layout.mApply = layout2.mApply;
             layout.mHeight = layout2.mHeight;
             layout.guideBegin = layout2.guideBegin;
             layout.guideEnd = layout2.guideEnd;
@@ -180,26 +179,24 @@ public class ConstraintSet {
             layout.mBarrierAllowsGoneWidgets = layout2.mBarrierAllowsGoneWidgets;
             Motion motion = constraint.motion;
             Motion motion2 = this.motion;
-            Objects.requireNonNull(motion);
-            motion.mApply = motion2.mApply;
+            motion.getClass();
+            motion2.getClass();
             motion.mAnimateRelativeTo = motion2.mAnimateRelativeTo;
-            motion.mTransitionEasing = motion2.mTransitionEasing;
             motion.mPathMotionArc = motion2.mPathMotionArc;
-            motion.mDrawPath = motion2.mDrawPath;
             motion.mPathRotate = motion2.mPathRotate;
             motion.mMotionStagger = motion2.mMotionStagger;
             PropertySet propertySet = constraint.propertySet;
             PropertySet propertySet2 = this.propertySet;
-            Objects.requireNonNull(propertySet);
-            propertySet.mApply = propertySet2.mApply;
+            propertySet.getClass();
+            propertySet2.getClass();
             propertySet.visibility = propertySet2.visibility;
             propertySet.alpha = propertySet2.alpha;
             propertySet.mProgress = propertySet2.mProgress;
             propertySet.mVisibilityMode = propertySet2.mVisibilityMode;
             Transform transform = constraint.transform;
             Transform transform2 = this.transform;
-            Objects.requireNonNull(transform);
-            transform.mApply = transform2.mApply;
+            transform.getClass();
+            transform2.getClass();
             transform.rotation = transform2.rotation;
             transform.rotationX = transform2.rotationX;
             transform.rotationY = transform2.rotationY;
@@ -303,7 +300,6 @@ public class ConstraintSet {
         public int[] mReferenceIds;
         public int mWidth;
         public boolean mIsGuideline = false;
-        public boolean mApply = false;
         public int guideBegin = -1;
         public int guideEnd = -1;
         public float guidePercent = -1.0f;
@@ -420,9 +416,8 @@ public class ConstraintSet {
             mapToConstant.append(9, 75);
         }
 
-        public void fillFromAttributeList(Context context, AttributeSet attributeSet) {
-            TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, R$styleable.Layout);
-            this.mApply = true;
+        public final void fillFromAttributeList(Context context, AttributeSet attributeSet) {
+            TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, SliceProviderCompat$2.Layout);
             int indexCount = obtainStyledAttributes.getIndexCount();
             for (int i = 0; i < indexCount; i++) {
                 int index = obtainStyledAttributes.getIndex(i);
@@ -432,34 +427,16 @@ public class ConstraintSet {
                 } else if (i2 != 81) {
                     switch (i2) {
                         case 1:
-                            int i3 = this.baselineToBaseline;
-                            int[] iArr = ConstraintSet.VISIBILITY_FLAGS;
-                            int resourceId = obtainStyledAttributes.getResourceId(index, i3);
-                            if (resourceId == -1) {
-                                resourceId = obtainStyledAttributes.getInt(index, -1);
-                            }
-                            this.baselineToBaseline = resourceId;
+                            this.baselineToBaseline = ConstraintSet.lookupID(obtainStyledAttributes, index, this.baselineToBaseline);
                             continue;
                         case 2:
                             this.bottomMargin = obtainStyledAttributes.getDimensionPixelSize(index, this.bottomMargin);
                             continue;
                         case 3:
-                            int i4 = this.bottomToBottom;
-                            int[] iArr2 = ConstraintSet.VISIBILITY_FLAGS;
-                            int resourceId2 = obtainStyledAttributes.getResourceId(index, i4);
-                            if (resourceId2 == -1) {
-                                resourceId2 = obtainStyledAttributes.getInt(index, -1);
-                            }
-                            this.bottomToBottom = resourceId2;
+                            this.bottomToBottom = ConstraintSet.lookupID(obtainStyledAttributes, index, this.bottomToBottom);
                             continue;
                         case 4:
-                            int i5 = this.bottomToTop;
-                            int[] iArr3 = ConstraintSet.VISIBILITY_FLAGS;
-                            int resourceId3 = obtainStyledAttributes.getResourceId(index, i5);
-                            if (resourceId3 == -1) {
-                                resourceId3 = obtainStyledAttributes.getInt(index, -1);
-                            }
-                            this.bottomToTop = resourceId3;
+                            this.bottomToTop = ConstraintSet.lookupID(obtainStyledAttributes, index, this.bottomToTop);
                             continue;
                         case 5:
                             this.dimensionRatio = obtainStyledAttributes.getString(index);
@@ -474,22 +451,10 @@ public class ConstraintSet {
                             this.endMargin = obtainStyledAttributes.getDimensionPixelSize(index, this.endMargin);
                             continue;
                         case 9:
-                            int i6 = this.endToEnd;
-                            int[] iArr4 = ConstraintSet.VISIBILITY_FLAGS;
-                            int resourceId4 = obtainStyledAttributes.getResourceId(index, i6);
-                            if (resourceId4 == -1) {
-                                resourceId4 = obtainStyledAttributes.getInt(index, -1);
-                            }
-                            this.endToEnd = resourceId4;
+                            this.endToEnd = ConstraintSet.lookupID(obtainStyledAttributes, index, this.endToEnd);
                             continue;
                         case 10:
-                            int i7 = this.endToStart;
-                            int[] iArr5 = ConstraintSet.VISIBILITY_FLAGS;
-                            int resourceId5 = obtainStyledAttributes.getResourceId(index, i7);
-                            if (resourceId5 == -1) {
-                                resourceId5 = obtainStyledAttributes.getInt(index, -1);
-                            }
-                            this.endToStart = resourceId5;
+                            this.endToStart = ConstraintSet.lookupID(obtainStyledAttributes, index, this.endToStart);
                             continue;
                         case 11:
                             this.goneBottomMargin = obtainStyledAttributes.getDimensionPixelSize(index, this.goneBottomMargin);
@@ -531,22 +496,10 @@ public class ConstraintSet {
                             this.leftMargin = obtainStyledAttributes.getDimensionPixelSize(index, this.leftMargin);
                             continue;
                         case 24:
-                            int i8 = this.leftToLeft;
-                            int[] iArr6 = ConstraintSet.VISIBILITY_FLAGS;
-                            int resourceId6 = obtainStyledAttributes.getResourceId(index, i8);
-                            if (resourceId6 == -1) {
-                                resourceId6 = obtainStyledAttributes.getInt(index, -1);
-                            }
-                            this.leftToLeft = resourceId6;
+                            this.leftToLeft = ConstraintSet.lookupID(obtainStyledAttributes, index, this.leftToLeft);
                             continue;
                         case 25:
-                            int i9 = this.leftToRight;
-                            int[] iArr7 = ConstraintSet.VISIBILITY_FLAGS;
-                            int resourceId7 = obtainStyledAttributes.getResourceId(index, i9);
-                            if (resourceId7 == -1) {
-                                resourceId7 = obtainStyledAttributes.getInt(index, -1);
-                            }
-                            this.leftToRight = resourceId7;
+                            this.leftToRight = ConstraintSet.lookupID(obtainStyledAttributes, index, this.leftToRight);
                             continue;
                         case 26:
                             this.orientation = obtainStyledAttributes.getInt(index, this.orientation);
@@ -555,64 +508,28 @@ public class ConstraintSet {
                             this.rightMargin = obtainStyledAttributes.getDimensionPixelSize(index, this.rightMargin);
                             continue;
                         case 28:
-                            int i10 = this.rightToLeft;
-                            int[] iArr8 = ConstraintSet.VISIBILITY_FLAGS;
-                            int resourceId8 = obtainStyledAttributes.getResourceId(index, i10);
-                            if (resourceId8 == -1) {
-                                resourceId8 = obtainStyledAttributes.getInt(index, -1);
-                            }
-                            this.rightToLeft = resourceId8;
+                            this.rightToLeft = ConstraintSet.lookupID(obtainStyledAttributes, index, this.rightToLeft);
                             continue;
                         case 29:
-                            int i11 = this.rightToRight;
-                            int[] iArr9 = ConstraintSet.VISIBILITY_FLAGS;
-                            int resourceId9 = obtainStyledAttributes.getResourceId(index, i11);
-                            if (resourceId9 == -1) {
-                                resourceId9 = obtainStyledAttributes.getInt(index, -1);
-                            }
-                            this.rightToRight = resourceId9;
+                            this.rightToRight = ConstraintSet.lookupID(obtainStyledAttributes, index, this.rightToRight);
                             continue;
                         case 30:
                             this.startMargin = obtainStyledAttributes.getDimensionPixelSize(index, this.startMargin);
                             continue;
                         case 31:
-                            int i12 = this.startToEnd;
-                            int[] iArr10 = ConstraintSet.VISIBILITY_FLAGS;
-                            int resourceId10 = obtainStyledAttributes.getResourceId(index, i12);
-                            if (resourceId10 == -1) {
-                                resourceId10 = obtainStyledAttributes.getInt(index, -1);
-                            }
-                            this.startToEnd = resourceId10;
+                            this.startToEnd = ConstraintSet.lookupID(obtainStyledAttributes, index, this.startToEnd);
                             continue;
                         case 32:
-                            int i13 = this.startToStart;
-                            int[] iArr11 = ConstraintSet.VISIBILITY_FLAGS;
-                            int resourceId11 = obtainStyledAttributes.getResourceId(index, i13);
-                            if (resourceId11 == -1) {
-                                resourceId11 = obtainStyledAttributes.getInt(index, -1);
-                            }
-                            this.startToStart = resourceId11;
+                            this.startToStart = ConstraintSet.lookupID(obtainStyledAttributes, index, this.startToStart);
                             continue;
                         case 33:
                             this.topMargin = obtainStyledAttributes.getDimensionPixelSize(index, this.topMargin);
                             continue;
                         case 34:
-                            int i14 = this.topToBottom;
-                            int[] iArr12 = ConstraintSet.VISIBILITY_FLAGS;
-                            int resourceId12 = obtainStyledAttributes.getResourceId(index, i14);
-                            if (resourceId12 == -1) {
-                                resourceId12 = obtainStyledAttributes.getInt(index, -1);
-                            }
-                            this.topToBottom = resourceId12;
+                            this.topToBottom = ConstraintSet.lookupID(obtainStyledAttributes, index, this.topToBottom);
                             continue;
                         case 35:
-                            int i15 = this.topToTop;
-                            int[] iArr13 = ConstraintSet.VISIBILITY_FLAGS;
-                            int resourceId13 = obtainStyledAttributes.getResourceId(index, i15);
-                            if (resourceId13 == -1) {
-                                resourceId13 = obtainStyledAttributes.getInt(index, -1);
-                            }
-                            this.topToTop = resourceId13;
+                            this.topToTop = ConstraintSet.lookupID(obtainStyledAttributes, index, this.topToTop);
                             continue;
                         case 36:
                             this.verticalBias = obtainStyledAttributes.getFloat(index, this.verticalBias);
@@ -652,13 +569,7 @@ public class ConstraintSet {
                                 default:
                                     switch (i2) {
                                         case 61:
-                                            int i16 = this.circleConstraint;
-                                            int[] iArr14 = ConstraintSet.VISIBILITY_FLAGS;
-                                            int resourceId14 = obtainStyledAttributes.getResourceId(index, i16);
-                                            if (resourceId14 == -1) {
-                                                resourceId14 = obtainStyledAttributes.getInt(index, -1);
-                                            }
-                                            this.circleConstraint = resourceId14;
+                                            this.circleConstraint = ConstraintSet.lookupID(obtainStyledAttributes, index, this.circleConstraint);
                                             continue;
                                         case 62:
                                             this.circleRadius = obtainStyledAttributes.getDimensionPixelSize(index, this.circleRadius);
@@ -724,11 +635,8 @@ public class ConstraintSet {
     /* loaded from: classes.dex */
     public static class Motion {
         public static SparseIntArray mapToConstant;
-        public boolean mApply = false;
         public int mAnimateRelativeTo = -1;
-        public String mTransitionEasing = null;
         public int mPathMotionArc = -1;
-        public int mDrawPath = 0;
         public float mMotionStagger = Float.NaN;
         public float mPathRotate = Float.NaN;
 
@@ -743,9 +651,8 @@ public class ConstraintSet {
             mapToConstant.append(3, 6);
         }
 
-        public void fillFromAttributeList(Context context, AttributeSet attributeSet) {
-            TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, R$styleable.Motion);
-            this.mApply = true;
+        public final void fillFromAttributeList(Context context, AttributeSet attributeSet) {
+            TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, SliceProviderCompat$2.Motion);
             int indexCount = obtainStyledAttributes.getIndexCount();
             for (int i = 0; i < indexCount; i++) {
                 int index = obtainStyledAttributes.getIndex(i);
@@ -758,23 +665,17 @@ public class ConstraintSet {
                         break;
                     case 3:
                         if (obtainStyledAttributes.peekValue(index).type == 3) {
-                            this.mTransitionEasing = obtainStyledAttributes.getString(index);
+                            obtainStyledAttributes.getString(index);
                             break;
                         } else {
-                            this.mTransitionEasing = Easing.NAMED_EASING[obtainStyledAttributes.getInteger(index, 0)];
+                            String str = R$id.NAMED_EASING[obtainStyledAttributes.getInteger(index, 0)];
                             break;
                         }
                     case 4:
-                        this.mDrawPath = obtainStyledAttributes.getInt(index, 0);
+                        obtainStyledAttributes.getInt(index, 0);
                         break;
                     case 5:
-                        int i2 = this.mAnimateRelativeTo;
-                        int[] iArr = ConstraintSet.VISIBILITY_FLAGS;
-                        int resourceId = obtainStyledAttributes.getResourceId(index, i2);
-                        if (resourceId == -1) {
-                            resourceId = obtainStyledAttributes.getInt(index, -1);
-                        }
-                        this.mAnimateRelativeTo = resourceId;
+                        this.mAnimateRelativeTo = ConstraintSet.lookupID(obtainStyledAttributes, index, this.mAnimateRelativeTo);
                         break;
                     case 6:
                         this.mMotionStagger = obtainStyledAttributes.getFloat(index, this.mMotionStagger);
@@ -787,15 +688,13 @@ public class ConstraintSet {
 
     /* loaded from: classes.dex */
     public static class PropertySet {
-        public boolean mApply = false;
         public int visibility = 0;
         public int mVisibilityMode = 0;
         public float alpha = 1.0f;
         public float mProgress = Float.NaN;
 
-        public void fillFromAttributeList(Context context, AttributeSet attributeSet) {
-            TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, R$styleable.PropertySet);
-            this.mApply = true;
+        public final void fillFromAttributeList(Context context, AttributeSet attributeSet) {
+            TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, SliceProviderCompat$2.PropertySet);
             int indexCount = obtainStyledAttributes.getIndexCount();
             for (int i = 0; i < indexCount; i++) {
                 int index = obtainStyledAttributes.getIndex(i);
@@ -804,7 +703,6 @@ public class ConstraintSet {
                 } else if (index == 0) {
                     int i2 = obtainStyledAttributes.getInt(index, this.visibility);
                     this.visibility = i2;
-                    int[] iArr = ConstraintSet.VISIBILITY_FLAGS;
                     this.visibility = ConstraintSet.VISIBILITY_FLAGS[i2];
                 } else if (index == 4) {
                     this.mVisibilityMode = obtainStyledAttributes.getInt(index, this.mVisibilityMode);
@@ -819,7 +717,6 @@ public class ConstraintSet {
     /* loaded from: classes.dex */
     public static class Transform {
         public static SparseIntArray mapToConstant;
-        public boolean mApply = false;
         public float rotation = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
         public float rotationX = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
         public float rotationY = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
@@ -849,9 +746,8 @@ public class ConstraintSet {
             mapToConstant.append(10, 11);
         }
 
-        public void fillFromAttributeList(Context context, AttributeSet attributeSet) {
-            TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, R$styleable.Transform);
-            this.mApply = true;
+        public final void fillFromAttributeList(Context context, AttributeSet attributeSet) {
+            TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, SliceProviderCompat$2.Transform);
             int indexCount = obtainStyledAttributes.getIndexCount();
             for (int i = 0; i < indexCount; i++) {
                 int index = obtainStyledAttributes.getIndex(i);
@@ -987,354 +883,61 @@ public class ConstraintSet {
         mapToConstant.append(54, 81);
     }
 
-    public void applyTo(ConstraintLayout constraintLayout) {
-        applyToInternal(constraintLayout, true);
-        constraintLayout.mConstraintSet = null;
-        constraintLayout.requestLayout();
-    }
-
-    public void applyToInternal(ConstraintLayout constraintLayout, boolean z) {
+    public static int[] convertReferenceString(Barrier barrier, String str) {
         int i;
-        Iterator<String> it;
-        NoSuchMethodException e;
-        IllegalAccessException e2;
-        InvocationTargetException e3;
-        String str;
-        int childCount = constraintLayout.getChildCount();
-        HashSet hashSet = new HashSet(this.mConstraints.keySet());
-        int i2 = 0;
-        while (i2 < childCount) {
-            View childAt = constraintLayout.getChildAt(i2);
-            int id = childAt.getId();
-            if (!this.mConstraints.containsKey(Integer.valueOf(id))) {
-                StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("id unknown ");
-                try {
-                    str = childAt.getContext().getResources().getResourceEntryName(childAt.getId());
-                } catch (Exception unused) {
-                    str = "UNKNOWN";
-                }
-                m.append(str);
-                Log.w("ConstraintSet", m.toString());
-            } else if (this.mForceId && id == -1) {
-                throw new RuntimeException("All children of ConstraintLayout must have ids to use ConstraintSet");
-            } else if (id != -1) {
-                if (this.mConstraints.containsKey(Integer.valueOf(id))) {
-                    hashSet.remove(Integer.valueOf(id));
-                    Constraint constraint = this.mConstraints.get(Integer.valueOf(id));
-                    if (childAt instanceof Barrier) {
-                        constraint.layout.mHelperType = 1;
-                    }
-                    int i3 = constraint.layout.mHelperType;
-                    if (i3 != -1 && i3 == 1) {
-                        Barrier barrier = (Barrier) childAt;
-                        barrier.setId(id);
-                        Layout layout = constraint.layout;
-                        barrier.mIndicatedType = layout.mBarrierDirection;
-                        int i4 = layout.mBarrierMargin;
-                        Barrier barrier2 = barrier.mBarrier;
-                        barrier2.mMargin = i4;
-                        barrier2.mAllowsGoneWidget = layout.mBarrierAllowsGoneWidgets;
-                        int[] iArr = layout.mReferenceIds;
-                        if (iArr != null) {
-                            barrier.setReferencedIds(iArr);
-                        } else {
-                            String str2 = layout.mReferenceIdString;
-                            if (str2 != null) {
-                                layout.mReferenceIds = convertReferenceString(barrier, str2);
-                                barrier.setReferencedIds(constraint.layout.mReferenceIds);
-                            }
-                        }
-                    }
-                    ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) childAt.getLayoutParams();
-                    layoutParams.validate();
-                    constraint.applyTo(layoutParams);
-                    if (z) {
-                        HashMap<String, ConstraintAttribute> hashMap = constraint.mCustomConstraints;
-                        Class<?> cls = childAt.getClass();
-                        Iterator<String> it2 = hashMap.keySet().iterator();
-                        while (it2.hasNext()) {
-                            String next = it2.next();
-                            ConstraintAttribute constraintAttribute = hashMap.get(next);
-                            childCount = childCount;
-                            String m2 = SupportMenuInflater$$ExternalSyntheticOutline0.m("set", next);
-                            hashMap = hashMap;
-                            try {
-                                switch (SolverVariable$Type$r8$EnumUnboxingUtility.$enumboxing$ordinal(constraintAttribute.mType)) {
-                                    case 0:
-                                        it = it2;
-                                        cls.getMethod(m2, Integer.TYPE).invoke(childAt, Integer.valueOf(constraintAttribute.mIntegerValue));
-                                        break;
-                                    case 1:
-                                        it = it2;
-                                        cls.getMethod(m2, Float.TYPE).invoke(childAt, Float.valueOf(constraintAttribute.mFloatValue));
-                                        break;
-                                    case 2:
-                                        it = it2;
-                                        cls.getMethod(m2, Integer.TYPE).invoke(childAt, Integer.valueOf(constraintAttribute.mColorValue));
-                                        break;
-                                    case 3:
-                                        it = it2;
-                                        Method method = cls.getMethod(m2, Drawable.class);
-                                        ColorDrawable colorDrawable = new ColorDrawable();
-                                        colorDrawable.setColor(constraintAttribute.mColorValue);
-                                        method.invoke(childAt, colorDrawable);
-                                        break;
-                                    case 4:
-                                        it = it2;
-                                        cls.getMethod(m2, CharSequence.class).invoke(childAt, constraintAttribute.mStringValue);
-                                        break;
-                                    case 5:
-                                        it = it2;
-                                        cls.getMethod(m2, Boolean.TYPE).invoke(childAt, Boolean.valueOf(constraintAttribute.mBooleanValue));
-                                        break;
-                                    case 6:
-                                        it = it2;
-                                        try {
-                                            cls.getMethod(m2, Float.TYPE).invoke(childAt, Float.valueOf(constraintAttribute.mFloatValue));
-                                        } catch (IllegalAccessException e4) {
-                                            e2 = e4;
-                                            Log.e("TransitionLayout", " Custom Attribute \"" + next + "\" not found on " + cls.getName());
-                                            e2.printStackTrace();
-                                            it2 = it;
-                                        } catch (NoSuchMethodException e5) {
-                                            e = e5;
-                                            Log.e("TransitionLayout", e.getMessage());
-                                            Log.e("TransitionLayout", " Custom Attribute \"" + next + "\" not found on " + cls.getName());
-                                            StringBuilder sb = new StringBuilder();
-                                            sb.append(cls.getName());
-                                            sb.append(" must have a method ");
-                                            sb.append(m2);
-                                            Log.e("TransitionLayout", sb.toString());
-                                            it2 = it;
-                                        } catch (InvocationTargetException e6) {
-                                            e3 = e6;
-                                            Log.e("TransitionLayout", " Custom Attribute \"" + next + "\" not found on " + cls.getName());
-                                            e3.printStackTrace();
-                                            it2 = it;
-                                        }
-                                    default:
-                                        it = it2;
-                                        break;
-                                }
-                            } catch (IllegalAccessException e7) {
-                                e2 = e7;
-                                it = it2;
-                            } catch (NoSuchMethodException e8) {
-                                e = e8;
-                                it = it2;
-                            } catch (InvocationTargetException e9) {
-                                e3 = e9;
-                                it = it2;
-                            }
-                            it2 = it;
-                        }
-                    }
-                    i = childCount;
-                    childAt.setLayoutParams(layoutParams);
-                    PropertySet propertySet = constraint.propertySet;
-                    if (propertySet.mVisibilityMode == 0) {
-                        childAt.setVisibility(propertySet.visibility);
-                    }
-                    childAt.setAlpha(constraint.propertySet.alpha);
-                    childAt.setRotation(constraint.transform.rotation);
-                    childAt.setRotationX(constraint.transform.rotationX);
-                    childAt.setRotationY(constraint.transform.rotationY);
-                    childAt.setScaleX(constraint.transform.scaleX);
-                    childAt.setScaleY(constraint.transform.scaleY);
-                    if (!Float.isNaN(constraint.transform.transformPivotX)) {
-                        childAt.setPivotX(constraint.transform.transformPivotX);
-                    }
-                    if (!Float.isNaN(constraint.transform.transformPivotY)) {
-                        childAt.setPivotY(constraint.transform.transformPivotY);
-                    }
-                    childAt.setTranslationX(constraint.transform.translationX);
-                    childAt.setTranslationY(constraint.transform.translationY);
-                    childAt.setTranslationZ(constraint.transform.translationZ);
-                    Transform transform = constraint.transform;
-                    if (transform.applyElevation) {
-                        childAt.setElevation(transform.elevation);
-                    }
-                } else {
-                    i = childCount;
-                    Log.v("ConstraintSet", "WARNING NO CONSTRAINTS for view " + id);
-                }
-                i2++;
-                childCount = i;
-            }
-            i = childCount;
-            i2++;
-            childCount = i;
-        }
-        Iterator it3 = hashSet.iterator();
-        while (it3.hasNext()) {
-            Integer num = (Integer) it3.next();
-            Constraint constraint2 = this.mConstraints.get(num);
-            int i5 = constraint2.layout.mHelperType;
-            if (i5 != -1 && i5 == 1) {
-                Barrier barrier3 = new Barrier(constraintLayout.getContext());
-                barrier3.setId(num.intValue());
-                Layout layout2 = constraint2.layout;
-                int[] iArr2 = layout2.mReferenceIds;
-                if (iArr2 != null) {
-                    barrier3.setReferencedIds(iArr2);
-                } else {
-                    String str3 = layout2.mReferenceIdString;
-                    if (str3 != null) {
-                        layout2.mReferenceIds = convertReferenceString(barrier3, str3);
-                        barrier3.setReferencedIds(constraint2.layout.mReferenceIds);
-                    }
-                }
-                Layout layout3 = constraint2.layout;
-                barrier3.mIndicatedType = layout3.mBarrierDirection;
-                barrier3.mBarrier.mMargin = layout3.mBarrierMargin;
-                ConstraintLayout.LayoutParams generateDefaultLayoutParams = constraintLayout.generateDefaultLayoutParams();
-                barrier3.validateParams();
-                constraint2.applyTo(generateDefaultLayoutParams);
-                constraintLayout.addView(barrier3, generateDefaultLayoutParams);
-            }
-            if (constraint2.layout.mIsGuideline) {
-                View guideline = new Guideline(constraintLayout.getContext());
-                guideline.setId(num.intValue());
-                ConstraintLayout.LayoutParams generateDefaultLayoutParams2 = constraintLayout.generateDefaultLayoutParams();
-                constraint2.applyTo(generateDefaultLayoutParams2);
-                constraintLayout.addView(guideline, generateDefaultLayoutParams2);
-            }
-        }
-    }
-
-    public void clone(ConstraintLayout constraintLayout) {
-        NoSuchMethodException e;
-        IllegalAccessException e2;
-        InvocationTargetException e3;
-        ConstraintSet constraintSet = this;
-        int childCount = constraintLayout.getChildCount();
-        constraintSet.mConstraints.clear();
-        int i = 0;
-        while (i < childCount) {
-            View childAt = constraintLayout.getChildAt(i);
-            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) childAt.getLayoutParams();
-            int id = childAt.getId();
-            if (!constraintSet.mForceId || id != -1) {
-                if (!constraintSet.mConstraints.containsKey(Integer.valueOf(id))) {
-                    constraintSet.mConstraints.put(Integer.valueOf(id), new Constraint());
-                }
-                Constraint constraint = constraintSet.mConstraints.get(Integer.valueOf(id));
-                HashMap<String, ConstraintAttribute> hashMap = constraintSet.mSavedAttributes;
-                HashMap<String, ConstraintAttribute> hashMap2 = new HashMap<>();
-                Class<?> cls = childAt.getClass();
-                for (String str : hashMap.keySet()) {
-                    ConstraintAttribute constraintAttribute = hashMap.get(str);
-                    try {
-                    } catch (IllegalAccessException e4) {
-                        e2 = e4;
-                    } catch (NoSuchMethodException e5) {
-                        e = e5;
-                    } catch (InvocationTargetException e6) {
-                        e3 = e6;
-                    }
-                    if (str.equals("BackgroundColor")) {
-                        hashMap2.put(str, new ConstraintAttribute(constraintAttribute, Integer.valueOf(((ColorDrawable) childAt.getBackground()).getColor())));
-                    } else {
-                        try {
-                            hashMap2.put(str, new ConstraintAttribute(constraintAttribute, cls.getMethod("getMap" + str, new Class[0]).invoke(childAt, new Object[0])));
-                        } catch (IllegalAccessException e7) {
-                            e2 = e7;
-                            e2.printStackTrace();
-                        } catch (NoSuchMethodException e8) {
-                            e = e8;
-                            e.printStackTrace();
-                        } catch (InvocationTargetException e9) {
-                            e3 = e9;
-                            e3.printStackTrace();
-                        }
-                    }
-                }
-                constraint.mCustomConstraints = hashMap2;
-                constraint.fillFrom(id, layoutParams);
-                constraint.propertySet.visibility = childAt.getVisibility();
-                constraint.propertySet.alpha = childAt.getAlpha();
-                constraint.transform.rotation = childAt.getRotation();
-                constraint.transform.rotationX = childAt.getRotationX();
-                constraint.transform.rotationY = childAt.getRotationY();
-                constraint.transform.scaleX = childAt.getScaleX();
-                constraint.transform.scaleY = childAt.getScaleY();
-                float pivotX = childAt.getPivotX();
-                float pivotY = childAt.getPivotY();
-                if (!(pivotX == 0.0d && pivotY == 0.0d)) {
-                    Transform transform = constraint.transform;
-                    transform.transformPivotX = pivotX;
-                    transform.transformPivotY = pivotY;
-                }
-                constraint.transform.translationX = childAt.getTranslationX();
-                constraint.transform.translationY = childAt.getTranslationY();
-                constraint.transform.translationZ = childAt.getTranslationZ();
-                Transform transform2 = constraint.transform;
-                if (transform2.applyElevation) {
-                    transform2.elevation = childAt.getElevation();
-                }
-                if (childAt instanceof Barrier) {
-                    Barrier barrier = (Barrier) childAt;
-                    Layout layout = constraint.layout;
-                    layout.mBarrierAllowsGoneWidgets = barrier.mBarrier.mAllowsGoneWidget;
-                    layout.mReferenceIds = Arrays.copyOf(barrier.mIds, barrier.mCount);
-                    Layout layout2 = constraint.layout;
-                    layout2.mBarrierDirection = barrier.mIndicatedType;
-                    layout2.mBarrierMargin = barrier.mBarrier.mMargin;
-                }
-                i++;
-                constraintSet = this;
-            } else {
-                throw new RuntimeException("All children of ConstraintLayout must have ids to use ConstraintSet");
-            }
-        }
-    }
-
-    public final int[] convertReferenceString(View view, String str) {
-        int i;
-        Object designInformation;
+        HashMap<String, Integer> hashMap;
         String[] split = str.split(",");
-        Context context = view.getContext();
+        Context context = barrier.getContext();
         int[] iArr = new int[split.length];
         int i2 = 0;
-        for (String str2 : split) {
-            String trim = str2.trim();
+        int i3 = 0;
+        while (i2 < split.length) {
+            String trim = split[i2].trim();
+            Integer num = null;
             try {
-                i = R$id.class.getField(trim).getInt(null);
+                i = SliceSpecs.class.getField(trim).getInt(null);
             } catch (Exception unused) {
                 i = 0;
             }
             if (i == 0) {
-                i = context.getResources().getIdentifier(trim, FlagManager.FIELD_ID, context.getPackageName());
+                i = context.getResources().getIdentifier(trim, FlagManager.EXTRA_ID, context.getPackageName());
             }
-            if (i == 0 && view.isInEditMode() && (view.getParent() instanceof ConstraintLayout) && (designInformation = ((ConstraintLayout) view.getParent()).getDesignInformation(0, trim)) != null && (designInformation instanceof Integer)) {
-                i = ((Integer) designInformation).intValue();
+            if (i == 0 && barrier.isInEditMode() && (barrier.getParent() instanceof ConstraintLayout)) {
+                ConstraintLayout constraintLayout = (ConstraintLayout) barrier.getParent();
+                constraintLayout.getClass();
+                if ((trim instanceof String) && (hashMap = constraintLayout.mDesignIds) != null && hashMap.containsKey(trim)) {
+                    num = constraintLayout.mDesignIds.get(trim);
+                }
+                if (num != null && (num instanceof Integer)) {
+                    i = num.intValue();
+                }
             }
+            iArr[i3] = i;
             i2++;
-            iArr[i2] = i;
+            i3++;
         }
-        return i2 != split.length ? Arrays.copyOf(iArr, i2) : iArr;
+        if (i3 != split.length) {
+            return Arrays.copyOf(iArr, i3);
+        }
+        return iArr;
     }
 
-    public final Constraint fillFromAttributeList(Context context, AttributeSet attributeSet) {
+    public static Constraint fillFromAttributeList(Context context, AttributeSet attributeSet) {
         Constraint constraint = new Constraint();
-        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, R$styleable.Constraint);
+        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, SliceProviderCompat$2.Constraint);
         int indexCount = obtainStyledAttributes.getIndexCount();
         for (int i = 0; i < indexCount; i++) {
             int index = obtainStyledAttributes.getIndex(i);
             if (index != 1) {
-                constraint.motion.mApply = true;
-                constraint.layout.mApply = true;
-                constraint.propertySet.mApply = true;
-                constraint.transform.mApply = true;
+                constraint.motion.getClass();
+                constraint.layout.getClass();
+                constraint.propertySet.getClass();
+                constraint.transform.getClass();
             }
             switch (mapToConstant.get(index)) {
                 case 1:
                     Layout layout = constraint.layout;
-                    int resourceId = obtainStyledAttributes.getResourceId(index, layout.baselineToBaseline);
-                    if (resourceId == -1) {
-                        resourceId = obtainStyledAttributes.getInt(index, -1);
-                    }
-                    layout.baselineToBaseline = resourceId;
+                    layout.baselineToBaseline = lookupID(obtainStyledAttributes, index, layout.baselineToBaseline);
                     break;
                 case 2:
                     Layout layout2 = constraint.layout;
@@ -1342,19 +945,11 @@ public class ConstraintSet {
                     break;
                 case 3:
                     Layout layout3 = constraint.layout;
-                    int resourceId2 = obtainStyledAttributes.getResourceId(index, layout3.bottomToBottom);
-                    if (resourceId2 == -1) {
-                        resourceId2 = obtainStyledAttributes.getInt(index, -1);
-                    }
-                    layout3.bottomToBottom = resourceId2;
+                    layout3.bottomToBottom = lookupID(obtainStyledAttributes, index, layout3.bottomToBottom);
                     break;
                 case 4:
                     Layout layout4 = constraint.layout;
-                    int resourceId3 = obtainStyledAttributes.getResourceId(index, layout4.bottomToTop);
-                    if (resourceId3 == -1) {
-                        resourceId3 = obtainStyledAttributes.getInt(index, -1);
-                    }
-                    layout4.bottomToTop = resourceId3;
+                    layout4.bottomToTop = lookupID(obtainStyledAttributes, index, layout4.bottomToTop);
                     break;
                 case 5:
                     constraint.layout.dimensionRatio = obtainStyledAttributes.getString(index);
@@ -1373,19 +968,11 @@ public class ConstraintSet {
                     break;
                 case 9:
                     Layout layout8 = constraint.layout;
-                    int resourceId4 = obtainStyledAttributes.getResourceId(index, layout8.endToEnd);
-                    if (resourceId4 == -1) {
-                        resourceId4 = obtainStyledAttributes.getInt(index, -1);
-                    }
-                    layout8.endToEnd = resourceId4;
+                    layout8.endToEnd = lookupID(obtainStyledAttributes, index, layout8.endToEnd);
                     break;
                 case 10:
                     Layout layout9 = constraint.layout;
-                    int resourceId5 = obtainStyledAttributes.getResourceId(index, layout9.endToStart);
-                    if (resourceId5 == -1) {
-                        resourceId5 = obtainStyledAttributes.getInt(index, -1);
-                    }
-                    layout9.endToStart = resourceId5;
+                    layout9.endToStart = lookupID(obtainStyledAttributes, index, layout9.endToStart);
                     break;
                 case 11:
                     Layout layout10 = constraint.layout;
@@ -1447,19 +1034,11 @@ public class ConstraintSet {
                     break;
                 case 25:
                     Layout layout23 = constraint.layout;
-                    int resourceId6 = obtainStyledAttributes.getResourceId(index, layout23.leftToLeft);
-                    if (resourceId6 == -1) {
-                        resourceId6 = obtainStyledAttributes.getInt(index, -1);
-                    }
-                    layout23.leftToLeft = resourceId6;
+                    layout23.leftToLeft = lookupID(obtainStyledAttributes, index, layout23.leftToLeft);
                     break;
                 case 26:
                     Layout layout24 = constraint.layout;
-                    int resourceId7 = obtainStyledAttributes.getResourceId(index, layout24.leftToRight);
-                    if (resourceId7 == -1) {
-                        resourceId7 = obtainStyledAttributes.getInt(index, -1);
-                    }
-                    layout24.leftToRight = resourceId7;
+                    layout24.leftToRight = lookupID(obtainStyledAttributes, index, layout24.leftToRight);
                     break;
                 case 27:
                     Layout layout25 = constraint.layout;
@@ -1471,19 +1050,11 @@ public class ConstraintSet {
                     break;
                 case 29:
                     Layout layout27 = constraint.layout;
-                    int resourceId8 = obtainStyledAttributes.getResourceId(index, layout27.rightToLeft);
-                    if (resourceId8 == -1) {
-                        resourceId8 = obtainStyledAttributes.getInt(index, -1);
-                    }
-                    layout27.rightToLeft = resourceId8;
+                    layout27.rightToLeft = lookupID(obtainStyledAttributes, index, layout27.rightToLeft);
                     break;
                 case 30:
                     Layout layout28 = constraint.layout;
-                    int resourceId9 = obtainStyledAttributes.getResourceId(index, layout28.rightToRight);
-                    if (resourceId9 == -1) {
-                        resourceId9 = obtainStyledAttributes.getInt(index, -1);
-                    }
-                    layout28.rightToRight = resourceId9;
+                    layout28.rightToRight = lookupID(obtainStyledAttributes, index, layout28.rightToRight);
                     break;
                 case 31:
                     Layout layout29 = constraint.layout;
@@ -1491,19 +1062,11 @@ public class ConstraintSet {
                     break;
                 case 32:
                     Layout layout30 = constraint.layout;
-                    int resourceId10 = obtainStyledAttributes.getResourceId(index, layout30.startToEnd);
-                    if (resourceId10 == -1) {
-                        resourceId10 = obtainStyledAttributes.getInt(index, -1);
-                    }
-                    layout30.startToEnd = resourceId10;
+                    layout30.startToEnd = lookupID(obtainStyledAttributes, index, layout30.startToEnd);
                     break;
                 case 33:
                     Layout layout31 = constraint.layout;
-                    int resourceId11 = obtainStyledAttributes.getResourceId(index, layout31.startToStart);
-                    if (resourceId11 == -1) {
-                        resourceId11 = obtainStyledAttributes.getInt(index, -1);
-                    }
-                    layout31.startToStart = resourceId11;
+                    layout31.startToStart = lookupID(obtainStyledAttributes, index, layout31.startToStart);
                     break;
                 case 34:
                     Layout layout32 = constraint.layout;
@@ -1511,19 +1074,11 @@ public class ConstraintSet {
                     break;
                 case 35:
                     Layout layout33 = constraint.layout;
-                    int resourceId12 = obtainStyledAttributes.getResourceId(index, layout33.topToBottom);
-                    if (resourceId12 == -1) {
-                        resourceId12 = obtainStyledAttributes.getInt(index, -1);
-                    }
-                    layout33.topToBottom = resourceId12;
+                    layout33.topToBottom = lookupID(obtainStyledAttributes, index, layout33.topToBottom);
                     break;
                 case 36:
                     Layout layout34 = constraint.layout;
-                    int resourceId13 = obtainStyledAttributes.getResourceId(index, layout34.topToTop);
-                    if (resourceId13 == -1) {
-                        resourceId13 = obtainStyledAttributes.getInt(index, -1);
-                    }
-                    layout34.topToTop = resourceId13;
+                    layout34.topToTop = lookupID(obtainStyledAttributes, index, layout34.topToTop);
                     break;
                 case 37:
                     Layout layout35 = constraint.layout;
@@ -1623,11 +1178,7 @@ public class ConstraintSet {
                     break;
                 case 61:
                     Layout layout46 = constraint.layout;
-                    int resourceId14 = obtainStyledAttributes.getResourceId(index, layout46.circleConstraint);
-                    if (resourceId14 == -1) {
-                        resourceId14 = obtainStyledAttributes.getInt(index, -1);
-                    }
-                    layout46.circleConstraint = resourceId14;
+                    layout46.circleConstraint = lookupID(obtainStyledAttributes, index, layout46.circleConstraint);
                     break;
                 case 62:
                     Layout layout47 = constraint.layout;
@@ -1639,26 +1190,28 @@ public class ConstraintSet {
                     break;
                 case 64:
                     Motion motion = constraint.motion;
-                    int resourceId15 = obtainStyledAttributes.getResourceId(index, motion.mAnimateRelativeTo);
-                    if (resourceId15 == -1) {
-                        resourceId15 = obtainStyledAttributes.getInt(index, -1);
-                    }
-                    motion.mAnimateRelativeTo = resourceId15;
+                    motion.mAnimateRelativeTo = lookupID(obtainStyledAttributes, index, motion.mAnimateRelativeTo);
                     break;
                 case 65:
                     if (obtainStyledAttributes.peekValue(index).type == 3) {
-                        constraint.motion.mTransitionEasing = obtainStyledAttributes.getString(index);
+                        Motion motion2 = constraint.motion;
+                        obtainStyledAttributes.getString(index);
+                        motion2.getClass();
                         break;
                     } else {
-                        constraint.motion.mTransitionEasing = Easing.NAMED_EASING[obtainStyledAttributes.getInteger(index, 0)];
+                        Motion motion3 = constraint.motion;
+                        String str = R$id.NAMED_EASING[obtainStyledAttributes.getInteger(index, 0)];
+                        motion3.getClass();
                         break;
                     }
                 case 66:
-                    constraint.motion.mDrawPath = obtainStyledAttributes.getInt(index, 0);
+                    Motion motion4 = constraint.motion;
+                    obtainStyledAttributes.getInt(index, 0);
+                    motion4.getClass();
                     break;
                 case 67:
-                    Motion motion2 = constraint.motion;
-                    motion2.mPathRotate = obtainStyledAttributes.getFloat(index, motion2.mPathRotate);
+                    Motion motion5 = constraint.motion;
+                    motion5.mPathRotate = obtainStyledAttributes.getFloat(index, motion5.mPathRotate);
                     break;
                 case 68:
                     PropertySet propertySet4 = constraint.propertySet;
@@ -1689,8 +1242,8 @@ public class ConstraintSet {
                     layout51.mBarrierAllowsGoneWidgets = obtainStyledAttributes.getBoolean(index, layout51.mBarrierAllowsGoneWidgets);
                     break;
                 case 76:
-                    Motion motion3 = constraint.motion;
-                    motion3.mPathMotionArc = obtainStyledAttributes.getInt(index, motion3.mPathMotionArc);
+                    Motion motion6 = constraint.motion;
+                    motion6.mPathMotionArc = obtainStyledAttributes.getInt(index, motion6.mPathMotionArc);
                     break;
                 case 77:
                     constraint.layout.mConstraintTag = obtainStyledAttributes.getString(index);
@@ -1700,8 +1253,8 @@ public class ConstraintSet {
                     propertySet5.mVisibilityMode = obtainStyledAttributes.getInt(index, propertySet5.mVisibilityMode);
                     break;
                 case 79:
-                    Motion motion4 = constraint.motion;
-                    motion4.mMotionStagger = obtainStyledAttributes.getFloat(index, motion4.mMotionStagger);
+                    Motion motion7 = constraint.motion;
+                    motion7.mMotionStagger = obtainStyledAttributes.getFloat(index, motion7.mMotionStagger);
                     break;
                 case 80:
                     Layout layout52 = constraint.layout;
@@ -1731,6 +1284,310 @@ public class ConstraintSet {
         return constraint;
     }
 
+    public final void applyToInternal(ConstraintLayout constraintLayout) {
+        int i;
+        Iterator<String> it;
+        NoSuchMethodException e;
+        IllegalAccessException e2;
+        InvocationTargetException e3;
+        String str;
+        int childCount = constraintLayout.getChildCount();
+        HashSet hashSet = new HashSet(this.mConstraints.keySet());
+        int i2 = 0;
+        while (i2 < childCount) {
+            View childAt = constraintLayout.getChildAt(i2);
+            int id = childAt.getId();
+            if (!this.mConstraints.containsKey(Integer.valueOf(id))) {
+                StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("id unknown ");
+                try {
+                    str = childAt.getContext().getResources().getResourceEntryName(childAt.getId());
+                } catch (Exception unused) {
+                    str = "UNKNOWN";
+                }
+                m.append(str);
+                Log.w("ConstraintSet", m.toString());
+            } else if (this.mForceId && id == -1) {
+                throw new RuntimeException("All children of ConstraintLayout must have ids to use ConstraintSet");
+            } else if (id != -1) {
+                if (this.mConstraints.containsKey(Integer.valueOf(id))) {
+                    hashSet.remove(Integer.valueOf(id));
+                    Constraint constraint = this.mConstraints.get(Integer.valueOf(id));
+                    if (childAt instanceof Barrier) {
+                        constraint.layout.mHelperType = 1;
+                    }
+                    int i3 = constraint.layout.mHelperType;
+                    if (i3 != -1 && i3 == 1) {
+                        Barrier barrier = (Barrier) childAt;
+                        barrier.setId(id);
+                        Layout layout = constraint.layout;
+                        barrier.mIndicatedType = layout.mBarrierDirection;
+                        int i4 = layout.mBarrierMargin;
+                        Barrier barrier2 = barrier.mBarrier;
+                        barrier2.mMargin = i4;
+                        barrier2.mAllowsGoneWidget = layout.mBarrierAllowsGoneWidgets;
+                        int[] iArr = layout.mReferenceIds;
+                        if (iArr != null) {
+                            barrier.setReferencedIds(iArr);
+                        } else {
+                            String str2 = layout.mReferenceIdString;
+                            if (str2 != null) {
+                                layout.mReferenceIds = convertReferenceString(barrier, str2);
+                                barrier.setReferencedIds(constraint.layout.mReferenceIds);
+                            }
+                        }
+                    }
+                    ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) childAt.getLayoutParams();
+                    layoutParams.validate();
+                    constraint.applyTo(layoutParams);
+                    HashMap<String, ConstraintAttribute> hashMap = constraint.mCustomConstraints;
+                    Class<?> cls = childAt.getClass();
+                    Iterator<String> it2 = hashMap.keySet().iterator();
+                    while (it2.hasNext()) {
+                        String next = it2.next();
+                        ConstraintAttribute constraintAttribute = hashMap.get(next);
+                        int i5 = childCount;
+                        String m2 = SupportMenuInflater$$ExternalSyntheticOutline0.m("set", next);
+                        HashMap<String, ConstraintAttribute> hashMap2 = hashMap;
+                        try {
+                            switch (constraintAttribute.mType.ordinal()) {
+                                case 0:
+                                    it = it2;
+                                    cls.getMethod(m2, Integer.TYPE).invoke(childAt, Integer.valueOf(constraintAttribute.mIntegerValue));
+                                    break;
+                                case 1:
+                                    it = it2;
+                                    cls.getMethod(m2, Float.TYPE).invoke(childAt, Float.valueOf(constraintAttribute.mFloatValue));
+                                    break;
+                                case 2:
+                                    it = it2;
+                                    cls.getMethod(m2, Integer.TYPE).invoke(childAt, Integer.valueOf(constraintAttribute.mColorValue));
+                                    break;
+                                case 3:
+                                    it = it2;
+                                    Method method = cls.getMethod(m2, Drawable.class);
+                                    ColorDrawable colorDrawable = new ColorDrawable();
+                                    colorDrawable.setColor(constraintAttribute.mColorValue);
+                                    method.invoke(childAt, colorDrawable);
+                                    break;
+                                case 4:
+                                    it = it2;
+                                    cls.getMethod(m2, CharSequence.class).invoke(childAt, constraintAttribute.mStringValue);
+                                    break;
+                                case 5:
+                                    it = it2;
+                                    cls.getMethod(m2, Boolean.TYPE).invoke(childAt, Boolean.valueOf(constraintAttribute.mBooleanValue));
+                                    break;
+                                case 6:
+                                    it = it2;
+                                    try {
+                                        cls.getMethod(m2, Float.TYPE).invoke(childAt, Float.valueOf(constraintAttribute.mFloatValue));
+                                    } catch (IllegalAccessException e4) {
+                                        e2 = e4;
+                                        Log.e("TransitionLayout", " Custom Attribute \"" + next + "\" not found on " + cls.getName());
+                                        e2.printStackTrace();
+                                        childCount = i5;
+                                        hashMap = hashMap2;
+                                        it2 = it;
+                                    } catch (NoSuchMethodException e5) {
+                                        e = e5;
+                                        Log.e("TransitionLayout", e.getMessage());
+                                        Log.e("TransitionLayout", " Custom Attribute \"" + next + "\" not found on " + cls.getName());
+                                        StringBuilder sb = new StringBuilder();
+                                        sb.append(cls.getName());
+                                        sb.append(" must have a method ");
+                                        sb.append(m2);
+                                        Log.e("TransitionLayout", sb.toString());
+                                        childCount = i5;
+                                        hashMap = hashMap2;
+                                        it2 = it;
+                                    } catch (InvocationTargetException e6) {
+                                        e3 = e6;
+                                        Log.e("TransitionLayout", " Custom Attribute \"" + next + "\" not found on " + cls.getName());
+                                        e3.printStackTrace();
+                                        childCount = i5;
+                                        hashMap = hashMap2;
+                                        it2 = it;
+                                    }
+                                default:
+                                    it = it2;
+                                    break;
+                            }
+                        } catch (IllegalAccessException e7) {
+                            e2 = e7;
+                            it = it2;
+                        } catch (NoSuchMethodException e8) {
+                            e = e8;
+                            it = it2;
+                        } catch (InvocationTargetException e9) {
+                            e3 = e9;
+                            it = it2;
+                        }
+                        childCount = i5;
+                        hashMap = hashMap2;
+                        it2 = it;
+                    }
+                    i = childCount;
+                    childAt.setLayoutParams(layoutParams);
+                    PropertySet propertySet = constraint.propertySet;
+                    if (propertySet.mVisibilityMode == 0) {
+                        childAt.setVisibility(propertySet.visibility);
+                    }
+                    childAt.setAlpha(constraint.propertySet.alpha);
+                    childAt.setRotation(constraint.transform.rotation);
+                    childAt.setRotationX(constraint.transform.rotationX);
+                    childAt.setRotationY(constraint.transform.rotationY);
+                    childAt.setScaleX(constraint.transform.scaleX);
+                    childAt.setScaleY(constraint.transform.scaleY);
+                    if (!Float.isNaN(constraint.transform.transformPivotX)) {
+                        childAt.setPivotX(constraint.transform.transformPivotX);
+                    }
+                    if (!Float.isNaN(constraint.transform.transformPivotY)) {
+                        childAt.setPivotY(constraint.transform.transformPivotY);
+                    }
+                    childAt.setTranslationX(constraint.transform.translationX);
+                    childAt.setTranslationY(constraint.transform.translationY);
+                    childAt.setTranslationZ(constraint.transform.translationZ);
+                    Transform transform = constraint.transform;
+                    if (transform.applyElevation) {
+                        childAt.setElevation(transform.elevation);
+                    }
+                } else {
+                    i = childCount;
+                    Log.v("ConstraintSet", "WARNING NO CONSTRAINTS for view " + id);
+                }
+                i2++;
+                childCount = i;
+            }
+            i = childCount;
+            i2++;
+            childCount = i;
+        }
+        Iterator it3 = hashSet.iterator();
+        while (it3.hasNext()) {
+            Integer num = (Integer) it3.next();
+            Constraint constraint2 = this.mConstraints.get(num);
+            int i6 = constraint2.layout.mHelperType;
+            if (i6 != -1 && i6 == 1) {
+                Barrier barrier3 = new Barrier(constraintLayout.getContext());
+                barrier3.setId(num.intValue());
+                Layout layout2 = constraint2.layout;
+                int[] iArr2 = layout2.mReferenceIds;
+                if (iArr2 != null) {
+                    barrier3.setReferencedIds(iArr2);
+                } else {
+                    String str3 = layout2.mReferenceIdString;
+                    if (str3 != null) {
+                        layout2.mReferenceIds = convertReferenceString(barrier3, str3);
+                        barrier3.setReferencedIds(constraint2.layout.mReferenceIds);
+                    }
+                }
+                Layout layout3 = constraint2.layout;
+                barrier3.mIndicatedType = layout3.mBarrierDirection;
+                barrier3.mBarrier.mMargin = layout3.mBarrierMargin;
+                int i7 = ConstraintLayout.$r8$clinit;
+                ConstraintLayout.LayoutParams layoutParams2 = new ConstraintLayout.LayoutParams();
+                barrier3.validateParams();
+                constraint2.applyTo(layoutParams2);
+                constraintLayout.addView(barrier3, layoutParams2);
+            }
+            if (constraint2.layout.mIsGuideline) {
+                View guideline = new Guideline(constraintLayout.getContext());
+                guideline.setId(num.intValue());
+                int i8 = ConstraintLayout.$r8$clinit;
+                ConstraintLayout.LayoutParams layoutParams3 = new ConstraintLayout.LayoutParams();
+                constraint2.applyTo(layoutParams3);
+                constraintLayout.addView(guideline, layoutParams3);
+            }
+        }
+    }
+
+    public final void clone(ConstraintLayout constraintLayout) {
+        NoSuchMethodException e;
+        IllegalAccessException e2;
+        InvocationTargetException e3;
+        ConstraintSet constraintSet = this;
+        int childCount = constraintLayout.getChildCount();
+        constraintSet.mConstraints.clear();
+        int i = 0;
+        while (i < childCount) {
+            View childAt = constraintLayout.getChildAt(i);
+            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) childAt.getLayoutParams();
+            int id = childAt.getId();
+            if (!constraintSet.mForceId || id != -1) {
+                if (!constraintSet.mConstraints.containsKey(Integer.valueOf(id))) {
+                    constraintSet.mConstraints.put(Integer.valueOf(id), new Constraint());
+                }
+                Constraint constraint = constraintSet.mConstraints.get(Integer.valueOf(id));
+                HashMap<String, ConstraintAttribute> hashMap = constraintSet.mSavedAttributes;
+                HashMap<String, ConstraintAttribute> hashMap2 = new HashMap<>();
+                Class<?> cls = childAt.getClass();
+                for (String str : hashMap.keySet()) {
+                    ConstraintAttribute constraintAttribute = hashMap.get(str);
+                    try {
+                    } catch (IllegalAccessException e4) {
+                        e2 = e4;
+                    } catch (NoSuchMethodException e5) {
+                        e = e5;
+                    } catch (InvocationTargetException e6) {
+                        e3 = e6;
+                    }
+                    if (str.equals("BackgroundColor")) {
+                        hashMap2.put(str, new ConstraintAttribute(constraintAttribute, Integer.valueOf(((ColorDrawable) childAt.getBackground()).getColor())));
+                    } else {
+                        try {
+                            hashMap2.put(str, new ConstraintAttribute(constraintAttribute, cls.getMethod("getMap" + str, new Class[0]).invoke(childAt, new Object[0])));
+                        } catch (IllegalAccessException e7) {
+                            e2 = e7;
+                            e2.printStackTrace();
+                        } catch (NoSuchMethodException e8) {
+                            e = e8;
+                            e.printStackTrace();
+                        } catch (InvocationTargetException e9) {
+                            e3 = e9;
+                            e3.printStackTrace();
+                        }
+                    }
+                }
+                constraint.mCustomConstraints = hashMap2;
+                constraint.fillFrom(id, layoutParams);
+                constraint.propertySet.visibility = childAt.getVisibility();
+                constraint.propertySet.alpha = childAt.getAlpha();
+                constraint.transform.rotation = childAt.getRotation();
+                constraint.transform.rotationX = childAt.getRotationX();
+                constraint.transform.rotationY = childAt.getRotationY();
+                constraint.transform.scaleX = childAt.getScaleX();
+                constraint.transform.scaleY = childAt.getScaleY();
+                float pivotX = childAt.getPivotX();
+                float pivotY = childAt.getPivotY();
+                if (!(pivotX == 0.0d && pivotY == 0.0d)) {
+                    Transform transform = constraint.transform;
+                    transform.transformPivotX = pivotX;
+                    transform.transformPivotY = pivotY;
+                }
+                constraint.transform.translationX = childAt.getTranslationX();
+                constraint.transform.translationY = childAt.getTranslationY();
+                constraint.transform.translationZ = childAt.getTranslationZ();
+                Transform transform2 = constraint.transform;
+                if (transform2.applyElevation) {
+                    transform2.elevation = childAt.getElevation();
+                }
+                if (childAt instanceof Barrier) {
+                    Barrier barrier = (Barrier) childAt;
+                    Layout layout = constraint.layout;
+                    layout.mBarrierAllowsGoneWidgets = barrier.mBarrier.mAllowsGoneWidget;
+                    layout.mReferenceIds = Arrays.copyOf(barrier.mIds, barrier.mCount);
+                    Layout layout2 = constraint.layout;
+                    layout2.mBarrierDirection = barrier.mIndicatedType;
+                    layout2.mBarrierMargin = barrier.mBarrier.mMargin;
+                }
+                i++;
+                constraintSet = this;
+            } else {
+                throw new RuntimeException("All children of ConstraintLayout must have ids to use ConstraintSet");
+            }
+        }
+    }
+
     public final Constraint get(int i) {
         if (!this.mConstraints.containsKey(Integer.valueOf(i))) {
             this.mConstraints.put(Integer.valueOf(i), new Constraint());
@@ -1738,7 +1595,21 @@ public class ConstraintSet {
         return this.mConstraints.get(Integer.valueOf(i));
     }
 
-    public void load(Context context, int i) {
+    public static int lookupID(TypedArray typedArray, int i, int i2) {
+        int resourceId = typedArray.getResourceId(i, i2);
+        if (resourceId == -1) {
+            return typedArray.getInt(i, -1);
+        }
+        return resourceId;
+    }
+
+    public final void applyTo(ConstraintLayout constraintLayout) {
+        applyToInternal(constraintLayout);
+        constraintLayout.mConstraintSet = null;
+        constraintLayout.requestLayout();
+    }
+
+    public final void load(Context context, int i) {
         XmlResourceParser xml = context.getResources().getXml(i);
         try {
             for (int eventType = xml.getEventType(); eventType != 1; eventType = xml.next()) {

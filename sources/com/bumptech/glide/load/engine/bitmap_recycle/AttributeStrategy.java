@@ -1,56 +1,48 @@
 package com.bumptech.glide.load.engine.bitmap_recycle;
 
 import android.graphics.Bitmap;
-import android.support.v4.app.FragmentTabHost$SavedState$$ExternalSyntheticOutline0;
-import com.bumptech.glide.gifdecoder.GifHeaderParser$$ExternalSyntheticOutline0;
 /* loaded from: classes.dex */
-public class AttributeStrategy implements LruPoolStrategy {
+public final class AttributeStrategy implements LruPoolStrategy {
 
     /* loaded from: classes.dex */
     public static class Key implements Poolable {
-        public Bitmap.Config config;
-        public int height;
         public final KeyPool pool;
-        public int width;
 
-        public Key(KeyPool pool) {
-            this.pool = pool;
+        public final int hashCode() {
+            return 0;
         }
 
-        public boolean equals(Object o) {
-            if (!(o instanceof Key)) {
+        public final String toString() {
+            return AttributeStrategy.getBitmapString(0, 0, null);
+        }
+
+        public final boolean equals(Object obj) {
+            if (!(obj instanceof Key)) {
                 return false;
             }
-            Key key = (Key) o;
-            return this.width == key.width && this.height == key.height && this.config == key.config;
-        }
-
-        public int hashCode() {
-            int i = ((this.width * 31) + this.height) * 31;
-            Bitmap.Config config = this.config;
-            return i + (config != null ? config.hashCode() : 0);
+            ((Key) obj).getClass();
+            return true;
         }
 
         @Override // com.bumptech.glide.load.engine.bitmap_recycle.Poolable
-        public void offer() {
+        public final void offer() {
             this.pool.offer(this);
         }
 
-        public String toString() {
-            return AttributeStrategy.getBitmapString(this.width, this.height, this.config);
+        public Key(KeyPool keyPool) {
+            this.pool = keyPool;
         }
     }
 
     /* loaded from: classes.dex */
     public static class KeyPool extends BaseKeyPool<Key> {
         @Override // com.bumptech.glide.load.engine.bitmap_recycle.BaseKeyPool
-        public Key create() {
+        public final Key create() {
             return new Key(this);
         }
     }
 
-    public static String getBitmapString(int width, int height, Bitmap.Config config) {
-        String valueOf = String.valueOf(config);
-        return FragmentTabHost$SavedState$$ExternalSyntheticOutline0.m(GifHeaderParser$$ExternalSyntheticOutline0.m(valueOf.length() + 27, "[", width, "x", height), "], ", valueOf);
+    public static String getBitmapString(int i, int i2, Bitmap.Config config) {
+        return "[" + i + "x" + i2 + "], " + config;
     }
 }

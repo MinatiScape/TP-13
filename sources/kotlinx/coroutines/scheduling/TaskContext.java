@@ -1,10 +1,8 @@
 package kotlinx.coroutines.scheduling;
-
-import org.jetbrains.annotations.NotNull;
+/* compiled from: Tasks.kt */
 /* loaded from: classes.dex */
 public interface TaskContext {
     void afterTask();
 
-    @NotNull
-    TaskMode getTaskMode();
+    int getTaskMode();
 }

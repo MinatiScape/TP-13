@@ -33,6 +33,10 @@ public class MaterialTextView extends AppCompatTextView {
         return i;
     }
 
+    public MaterialTextView(Context context, AttributeSet attributeSet) {
+        this(context, attributeSet, 16842884);
+    }
+
     public final void applyLineHeightFromViewAppearance(Resources.Theme theme, int i) {
         TypedArray obtainStyledAttributes = theme.obtainStyledAttributes(i, R$styleable.MaterialTextAppearance);
         int readFirstAvailableDimension = readFirstAvailableDimension(getContext(), obtainStyledAttributes, 1, 2);
@@ -42,27 +46,29 @@ public class MaterialTextView extends AppCompatTextView {
         }
     }
 
-    @Override // androidx.appcompat.widget.AppCompatTextView, android.widget.TextView
-    public void setTextAppearance(Context context, int i) {
-        super.setTextAppearance(context, i);
-        if (MaterialAttributes.resolveBoolean(context, R.attr.textAppearanceLineHeightEnabled, true)) {
-            applyLineHeightFromViewAppearance(context.getTheme(), i);
-        }
-    }
-
-    public MaterialTextView(Context context, AttributeSet attributeSet) {
-        this(context, attributeSet, 16842884);
-    }
-
     public MaterialTextView(Context context, AttributeSet attributeSet, int i) {
         this(context, attributeSet, i, 0);
+    }
+
+    @Override // androidx.appcompat.widget.AppCompatTextView, android.widget.TextView
+    public final void setTextAppearance(Context context, int i) {
+        super.setTextAppearance(context, i);
+        TypedValue resolve = MaterialAttributes.resolve(context, R.attr.textAppearanceLineHeightEnabled);
+        boolean z = true;
+        if (resolve != null && resolve.type == 18 && resolve.data == 0) {
+            z = false;
+        }
+        if (z) {
+            applyLineHeightFromViewAppearance(context.getTheme(), i);
+        }
     }
 
     public MaterialTextView(Context context, AttributeSet attributeSet, int i, int i2) {
         super(MaterialThemeOverlay.wrap(context, attributeSet, i, i2), attributeSet, i);
         Context context2 = getContext();
+        TypedValue resolve = MaterialAttributes.resolve(context2, R.attr.textAppearanceLineHeightEnabled);
         boolean z = true;
-        if (MaterialAttributes.resolveBoolean(context2, R.attr.textAppearanceLineHeightEnabled, true)) {
+        if ((resolve != null && resolve.type == 18 && resolve.data == 0) ? false : true) {
             Resources.Theme theme = context2.getTheme();
             int[] iArr = R$styleable.MaterialTextView;
             TypedArray obtainStyledAttributes = theme.obtainStyledAttributes(attributeSet, iArr, i, i2);

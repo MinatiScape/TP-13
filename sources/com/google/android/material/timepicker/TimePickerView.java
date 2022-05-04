@@ -14,40 +14,36 @@ import androidx.core.view.ViewPropertyAnimatorCompat;
 import com.android.systemui.shared.R;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.chip.Chip;
-import java.util.Objects;
 import java.util.WeakHashMap;
 /* loaded from: classes.dex */
-public class TimePickerView extends ConstraintLayout {
+class TimePickerView extends ConstraintLayout {
     public static final /* synthetic */ int $r8$clinit = 0;
-    public final Chip hourView;
-    public final Chip minuteView;
-    public final View.OnClickListener selectionListener;
+    public final AnonymousClass1 selectionListener;
     public final MaterialButtonToggleGroup toggle;
 
     public TimePickerView(Context context) {
         this(context, null);
     }
 
-    @Override // android.view.ViewGroup, android.view.View
-    public void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        updateToggleConstraints();
-    }
-
-    @Override // android.view.View
-    public void onVisibilityChanged(View view, int i) {
-        super.onVisibilityChanged(view, i);
-        if (view == this && i == 0) {
-            updateToggleConstraints();
-        }
+    public TimePickerView(Context context, AttributeSet attributeSet) {
+        this(context, attributeSet, 0);
     }
 
     public final void updateToggleConstraints() {
+        boolean z;
         if (this.toggle.getVisibility() == 0) {
             ConstraintSet constraintSet = new ConstraintSet();
             constraintSet.clone(this);
             WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-            char c = getLayoutDirection() == 0 ? (char) 2 : (char) 1;
+            char c = 1;
+            if (ViewCompat.Api17Impl.getLayoutDirection(this) == 0) {
+                z = true;
+            } else {
+                z = false;
+            }
+            if (z) {
+                c = 2;
+            }
             if (constraintSet.mConstraints.containsKey(Integer.valueOf((int) R.id.material_clock_display))) {
                 ConstraintSet.Constraint constraint = constraintSet.mConstraints.get(Integer.valueOf((int) R.id.material_clock_display));
                 switch (c) {
@@ -100,57 +96,53 @@ public class TimePickerView extends ConstraintLayout {
                         throw new IllegalArgumentException("unknown constraint");
                 }
             }
-            constraintSet.applyToInternal(this, true);
-            this.mConstraintSet = null;
-            requestLayout();
+            constraintSet.applyTo(this);
         }
     }
 
-    public TimePickerView(Context context, AttributeSet attributeSet) {
-        this(context, attributeSet, 0);
-    }
-
+    /* JADX WARN: Multi-variable type inference failed */
+    /* JADX WARN: Type inference failed for: r5v1, types: [android.view.View$OnClickListener, com.google.android.material.timepicker.TimePickerView$1] */
     public TimePickerView(Context context, AttributeSet attributeSet, int i) {
         super(context, attributeSet, i);
-        View.OnClickListener onClickListener = new View.OnClickListener() { // from class: com.google.android.material.timepicker.TimePickerView.1
+        ?? r5 = new View.OnClickListener() { // from class: com.google.android.material.timepicker.TimePickerView.1
             @Override // android.view.View.OnClickListener
-            public void onClick(View view) {
+            public final void onClick(View view) {
                 TimePickerView timePickerView = TimePickerView.this;
                 int i2 = TimePickerView.$r8$clinit;
-                Objects.requireNonNull(timePickerView);
+                timePickerView.getClass();
             }
         };
-        this.selectionListener = onClickListener;
+        this.selectionListener = r5;
         LayoutInflater.from(context).inflate(R.layout.material_timepicker, this);
         ClockFaceView clockFaceView = (ClockFaceView) findViewById(R.id.material_clock_face);
         MaterialButtonToggleGroup materialButtonToggleGroup = (MaterialButtonToggleGroup) findViewById(R.id.material_clock_period_toggle);
         this.toggle = materialButtonToggleGroup;
         materialButtonToggleGroup.onButtonCheckedListeners.add(new MaterialButtonToggleGroup.OnButtonCheckedListener() { // from class: com.google.android.material.timepicker.TimePickerView.2
             @Override // com.google.android.material.button.MaterialButtonToggleGroup.OnButtonCheckedListener
-            public void onButtonChecked(MaterialButtonToggleGroup materialButtonToggleGroup2, int i2, boolean z) {
+            public final void onButtonChecked() {
                 TimePickerView timePickerView = TimePickerView.this;
-                int i3 = TimePickerView.$r8$clinit;
-                Objects.requireNonNull(timePickerView);
+                int i2 = TimePickerView.$r8$clinit;
+                timePickerView.getClass();
             }
         });
         Chip chip = (Chip) findViewById(R.id.material_minute_tv);
-        this.minuteView = chip;
         Chip chip2 = (Chip) findViewById(R.id.material_hour_tv);
-        this.hourView = chip2;
         ClockHandView clockHandView = (ClockHandView) findViewById(R.id.material_clock_hand);
+        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
+        ViewCompat.Api19Impl.setAccessibilityLiveRegion(chip, 2);
+        ViewCompat.Api19Impl.setAccessibilityLiveRegion(chip2, 2);
         final GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() { // from class: com.google.android.material.timepicker.TimePickerView.3
             @Override // android.view.GestureDetector.SimpleOnGestureListener, android.view.GestureDetector.OnDoubleTapListener
-            public boolean onDoubleTap(MotionEvent motionEvent) {
-                boolean onDoubleTap = super.onDoubleTap(motionEvent);
+            public final boolean onDoubleTap(MotionEvent motionEvent) {
                 TimePickerView timePickerView = TimePickerView.this;
                 int i2 = TimePickerView.$r8$clinit;
-                Objects.requireNonNull(timePickerView);
-                return onDoubleTap;
+                timePickerView.getClass();
+                return false;
             }
         });
-        View.OnTouchListener onTouchListener = new View.OnTouchListener(this) { // from class: com.google.android.material.timepicker.TimePickerView.4
+        View.OnTouchListener onTouchListener = new View.OnTouchListener() { // from class: com.google.android.material.timepicker.TimePickerView.4
             @Override // android.view.View.OnTouchListener
-            public boolean onTouch(View view, MotionEvent motionEvent) {
+            public final boolean onTouch(View view, MotionEvent motionEvent) {
                 if (((Checkable) view).isChecked()) {
                     return gestureDetector.onTouchEvent(motionEvent);
                 }
@@ -161,7 +153,21 @@ public class TimePickerView extends ConstraintLayout {
         chip2.setOnTouchListener(onTouchListener);
         chip.setTag(R.id.selection_type, 12);
         chip2.setTag(R.id.selection_type, 10);
-        chip.setOnClickListener(onClickListener);
-        chip2.setOnClickListener(onClickListener);
+        chip.setOnClickListener(r5);
+        chip2.setOnClickListener(r5);
+    }
+
+    @Override // android.view.ViewGroup, android.view.View
+    public final void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        updateToggleConstraints();
+    }
+
+    @Override // android.view.View
+    public final void onVisibilityChanged(View view, int i) {
+        super.onVisibilityChanged(view, i);
+        if (view == this && i == 0) {
+            updateToggleConstraints();
+        }
     }
 }

@@ -1,8 +1,6 @@
 package com.google.common.eventbus;
 
-import com.bumptech.glide.Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline0;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public class Subscriber {
     public final Object target;
@@ -10,7 +8,7 @@ public class Subscriber {
     /* loaded from: classes.dex */
     public static final class SynchronizedSubscriber extends Subscriber {
         @Override // com.google.common.eventbus.Subscriber
-        public void invokeSubscriberMethod(Object event) throws InvocationTargetException {
+        public final void invokeSubscriberMethod(Object event) throws InvocationTargetException {
             synchronized (this) {
                 Subscriber.super.invokeSubscriberMethod(event);
             }
@@ -24,25 +22,31 @@ public class Subscriber {
         throw null;
     }
 
-    public final int hashCode() {
-        throw null;
-    }
-
     public void invokeSubscriberMethod(Object event) throws InvocationTargetException {
         try {
-            Objects.requireNonNull(event);
+            event.getClass();
             throw null;
         } catch (IllegalAccessException e) {
             String valueOf = String.valueOf(event);
-            throw new Error(Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline0.m(valueOf.length() + 28, "Method became inaccessible: ", valueOf), e);
+            StringBuilder sb = new StringBuilder(valueOf.length() + 28);
+            sb.append("Method became inaccessible: ");
+            sb.append(valueOf);
+            throw new Error(sb.toString(), e);
         } catch (IllegalArgumentException e2) {
             String valueOf2 = String.valueOf(event);
-            throw new Error(Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline0.m(valueOf2.length() + 33, "Method rejected target/argument: ", valueOf2), e2);
+            StringBuilder sb2 = new StringBuilder(valueOf2.length() + 33);
+            sb2.append("Method rejected target/argument: ");
+            sb2.append(valueOf2);
+            throw new Error(sb2.toString(), e2);
         } catch (InvocationTargetException e3) {
             if (e3.getCause() instanceof Error) {
                 throw ((Error) e3.getCause());
             }
             throw e3;
         }
+    }
+
+    public final int hashCode() {
+        throw null;
     }
 }

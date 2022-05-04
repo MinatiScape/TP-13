@@ -1,39 +1,21 @@
 package kotlinx.coroutines;
 
 import java.util.concurrent.CancellationException;
-import kotlin.Unit;
 import kotlin.coroutines.CoroutineContext;
-import kotlin.jvm.functions.Function1;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: Job.kt */
 /* loaded from: classes.dex */
 public interface Job extends CoroutineContext.Element {
-    public static final Key Key = Key.$$INSTANCE;
 
-    /* loaded from: classes.dex */
-    public static final class DefaultImpls {
-        public static /* synthetic */ DisposableHandle invokeOnCompletion$default(Job job, boolean z, boolean z2, Function1 function1, int i, Object obj) {
-            if ((i & 1) != 0) {
-                z = false;
-            }
-            if ((i & 2) != 0) {
-                z2 = true;
-            }
-            return job.invokeOnCompletion(z, z2, function1);
-        }
-    }
-
+    /* compiled from: Job.kt */
     /* loaded from: classes.dex */
     public static final class Key implements CoroutineContext.Key<Job> {
         public static final /* synthetic */ Key $$INSTANCE = new Key();
-
-        static {
-            int i = CoroutineExceptionHandler.$r8$clinit;
-        }
     }
 
     @NotNull
-    ChildHandle attachChild(@NotNull ChildJob childJob);
+    ChildHandle attachChild(@NotNull JobSupport jobSupport);
 
     void cancel(@Nullable CancellationException cancellationException);
 
@@ -41,7 +23,7 @@ public interface Job extends CoroutineContext.Element {
     CancellationException getCancellationException();
 
     @NotNull
-    DisposableHandle invokeOnCompletion(boolean z, boolean z2, @NotNull Function1<? super Throwable, Unit> function1);
+    DisposableHandle invokeOnCompletion(boolean z, boolean z2, @NotNull JobNode jobNode);
 
     boolean isActive();
 

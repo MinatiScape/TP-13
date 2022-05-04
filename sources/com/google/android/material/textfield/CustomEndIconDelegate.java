@@ -1,19 +1,25 @@
 package com.google.android.material.textfield;
 
+import android.view.View;
 import com.google.android.material.internal.CheckableImageButton;
 /* loaded from: classes.dex */
-public class CustomEndIconDelegate extends EndIconDelegate {
-    public CustomEndIconDelegate(TextInputLayout textInputLayout) {
-        super(textInputLayout);
+public final class CustomEndIconDelegate extends EndIconDelegate {
+    @Override // com.google.android.material.textfield.EndIconDelegate
+    public final void initialize() {
+        this.textInputLayout.setEndIconDrawable(this.customEndIcon);
+        TextInputLayout textInputLayout = this.textInputLayout;
+        CheckableImageButton checkableImageButton = textInputLayout.endIconView;
+        View.OnLongClickListener onLongClickListener = textInputLayout.endIconOnLongClickListener;
+        checkableImageButton.setOnClickListener(null);
+        TextInputLayout.setIconClickable(checkableImageButton, onLongClickListener);
+        TextInputLayout textInputLayout2 = this.textInputLayout;
+        textInputLayout2.endIconOnLongClickListener = null;
+        CheckableImageButton checkableImageButton2 = textInputLayout2.endIconView;
+        checkableImageButton2.setOnLongClickListener(null);
+        TextInputLayout.setIconClickable(checkableImageButton2, null);
     }
 
-    @Override // com.google.android.material.textfield.EndIconDelegate
-    public void initialize() {
-        this.textInputLayout.setEndIconOnClickListener(null);
-        TextInputLayout textInputLayout = this.textInputLayout;
-        textInputLayout.endIconOnLongClickListener = null;
-        CheckableImageButton checkableImageButton = textInputLayout.endIconView;
-        checkableImageButton.setOnLongClickListener(null);
-        TextInputLayout.setIconClickable(checkableImageButton, null);
+    public CustomEndIconDelegate(TextInputLayout textInputLayout, int i) {
+        super(textInputLayout, i);
     }
 }

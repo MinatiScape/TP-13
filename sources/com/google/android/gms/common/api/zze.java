@@ -3,6 +3,7 @@ package com.google.android.gms.common.api;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.android.gms.internal.zzbkw;
+/* compiled from: ScopeCreator.java */
 /* loaded from: classes.dex */
 public final class zze implements Parcelable.Creator<Scope> {
     @Override // android.os.Parcelable.Creator

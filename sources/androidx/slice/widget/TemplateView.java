@@ -7,15 +7,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.slice.SliceItem;
 import androidx.slice.core.SliceAction;
-import androidx.slice.widget.SliceView;
 import androidx.slice.widget.SliceViewPolicy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 /* loaded from: classes.dex */
-public class TemplateView extends SliceChildView implements SliceViewPolicy.PolicyChangeListener {
+public final class TemplateView extends SliceChildView implements SliceViewPolicy.PolicyChangeListener {
     public SliceAdapter mAdapter;
     public final View mForeground;
     public ListContent mListContent;
@@ -25,11 +23,160 @@ public class TemplateView extends SliceChildView implements SliceViewPolicy.Poli
     public int mDisplayedItemsHeight = 0;
     public int[] mLoc = new int[2];
 
+    @Override // androidx.slice.widget.SliceChildView
+    public final void resetView() {
+        this.mDisplayedItemsHeight = 0;
+        this.mDisplayedItems.clear();
+        this.mAdapter.setSliceItems(null, getMode());
+        this.mListContent = null;
+    }
+
+    @Override // androidx.slice.widget.SliceChildView
+    public final void setSliceActionListener() {
+        this.mObserver = null;
+        SliceAdapter sliceAdapter = this.mAdapter;
+        if (sliceAdapter != null) {
+            sliceAdapter.mSliceObserver = null;
+        }
+    }
+
+    @Override // androidx.slice.widget.SliceChildView
+    public final Set<SliceItem> getLoadingActions() {
+        return this.mAdapter.mLoadingActions;
+    }
+
+    @Override // androidx.slice.widget.SliceChildView
+    public final void setActionLoading(SliceItem sliceItem) {
+        this.mAdapter.onSliceActionLoading(sliceItem, 0);
+    }
+
+    @Override // androidx.slice.widget.SliceChildView
+    public final void setAllowTwoLines(boolean z) {
+        SliceAdapter sliceAdapter = this.mAdapter;
+        sliceAdapter.mAllowTwoLines = z;
+        sliceAdapter.notifyHeaderChanged();
+    }
+
+    @Override // androidx.slice.widget.SliceChildView
+    public final void setLastUpdated(long j) {
+        this.mLastUpdated = j;
+        SliceAdapter sliceAdapter = this.mAdapter;
+        if (sliceAdapter.mLastUpdated != j) {
+            sliceAdapter.mLastUpdated = j;
+            sliceAdapter.notifyHeaderChanged();
+        }
+    }
+
+    @Override // androidx.slice.widget.SliceChildView
+    public final void setLoadingActions(Set<SliceItem> set) {
+        SliceAdapter sliceAdapter = this.mAdapter;
+        if (set == null) {
+            sliceAdapter.mLoadingActions.clear();
+        } else {
+            sliceAdapter.mLoadingActions = set;
+        }
+        sliceAdapter.notifyDataSetChanged();
+    }
+
+    @Override // androidx.slice.widget.SliceChildView
+    public final void setPolicy(SliceViewPolicy sliceViewPolicy) {
+        this.mViewPolicy = sliceViewPolicy;
+        this.mAdapter.mPolicy = sliceViewPolicy;
+        sliceViewPolicy.mListener = this;
+    }
+
+    @Override // androidx.slice.widget.SliceChildView
+    public final void setShowLastUpdated(boolean z) {
+        this.mShowLastUpdated = z;
+        SliceAdapter sliceAdapter = this.mAdapter;
+        if (sliceAdapter.mShowLastUpdated != z) {
+            sliceAdapter.mShowLastUpdated = z;
+            sliceAdapter.notifyHeaderChanged();
+        }
+    }
+
+    @Override // androidx.slice.widget.SliceChildView
+    public final void setSliceActions(List<SliceAction> list) {
+        SliceAdapter sliceAdapter = this.mAdapter;
+        sliceAdapter.mSliceActions = list;
+        sliceAdapter.notifyHeaderChanged();
+    }
+
+    @Override // androidx.slice.widget.SliceChildView
+    public final void setSliceContent(ListContent listContent) {
+        this.mListContent = listContent;
+        updateDisplayedItems(listContent.getHeight(this.mSliceStyle, this.mViewPolicy));
+    }
+
+    @Override // androidx.slice.widget.SliceChildView
+    public final void setStyle(SliceStyle sliceStyle, RowStyle rowStyle) {
+        this.mSliceStyle = sliceStyle;
+        this.mRowStyle = rowStyle;
+        SliceAdapter sliceAdapter = this.mAdapter;
+        sliceAdapter.mSliceStyle = sliceStyle;
+        sliceAdapter.notifyDataSetChanged();
+        if (rowStyle.mDisableRecyclerViewItemAnimator) {
+            this.mRecyclerView.setItemAnimator(null);
+        }
+    }
+
+    @Override // androidx.slice.widget.SliceChildView
+    public final void setTint(int i) {
+        this.mTintColor = i;
+        updateDisplayedItems(getMeasuredHeight());
+    }
+
+    public final void updateDisplayedItems(int i) {
+        DisplayedListItems displayedListItems;
+        ListContent listContent = this.mListContent;
+        if (listContent == null || !listContent.isValid()) {
+            resetView();
+            return;
+        }
+        ListContent listContent2 = this.mListContent;
+        SliceStyle sliceStyle = this.mSliceStyle;
+        SliceViewPolicy sliceViewPolicy = this.mViewPolicy;
+        listContent2.getClass();
+        int i2 = 1;
+        boolean z = false;
+        if (sliceViewPolicy.mMode == 1) {
+            displayedListItems = new DisplayedListItems(new ArrayList(Arrays.asList(listContent2.mHeaderContent)), listContent2.mRowItems.size() - 1);
+        } else if (sliceViewPolicy.mScrollable || i <= 0) {
+            sliceStyle.getClass();
+            ArrayList<SliceContent> arrayList = listContent2.mRowItems;
+            int size = arrayList.size();
+            List<SliceContent> list = arrayList;
+            if (size > 0) {
+                boolean shouldSkipFirstListItem = sliceStyle.shouldSkipFirstListItem(arrayList);
+                list = arrayList;
+                if (shouldSkipFirstListItem) {
+                    list = arrayList.subList(1, arrayList.size());
+                }
+            }
+            displayedListItems = new DisplayedListItems(list, 0);
+        } else {
+            displayedListItems = sliceStyle.getListItemsForNonScrollingList(listContent2, i, sliceViewPolicy);
+        }
+        List<SliceContent> list2 = displayedListItems.mDisplayedItems;
+        this.mDisplayedItems = list2;
+        this.mDisplayedItemsHeight = this.mSliceStyle.getListItemsHeight(list2, this.mViewPolicy);
+        this.mAdapter.setSliceItems(this.mDisplayedItems, this.mViewPolicy.mMode);
+        if (this.mDisplayedItemsHeight > getMeasuredHeight()) {
+            z = true;
+        }
+        RecyclerView recyclerView = this.mRecyclerView;
+        if (!this.mViewPolicy.mScrollable || !z) {
+            i2 = 2;
+        }
+        recyclerView.setOverScrollMode(i2);
+    }
+
     public TemplateView(Context context) {
         super(context);
         RecyclerView recyclerView = new RecyclerView(getContext());
         this.mRecyclerView = recyclerView;
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        getContext();
+        recyclerView.setLayoutManager(new LinearLayoutManager(1));
         SliceAdapter sliceAdapter = new SliceAdapter(context);
         this.mAdapter = sliceAdapter;
         recyclerView.setAdapter(sliceAdapter);
@@ -47,13 +194,8 @@ public class TemplateView extends SliceChildView implements SliceViewPolicy.Poli
         view.setLayoutParams(layoutParams);
     }
 
-    @Override // androidx.slice.widget.SliceChildView
-    public Set<SliceItem> getLoadingActions() {
-        return this.mAdapter.mLoadingActions;
-    }
-
     @Override // android.view.ViewGroup, android.view.View
-    public void onAttachedToWindow() {
+    public final void onAttachedToWindow() {
         super.onAttachedToWindow();
         SliceView sliceView = (SliceView) getParent();
         this.mParent = sliceView;
@@ -63,161 +205,21 @@ public class TemplateView extends SliceChildView implements SliceViewPolicy.Poli
     }
 
     @Override // android.widget.FrameLayout, android.view.View
-    public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int size = View.MeasureSpec.getSize(heightMeasureSpec);
+    public final void onMeasure(int i, int i2) {
+        int size = View.MeasureSpec.getSize(i2);
         if (!this.mViewPolicy.mScrollable && this.mDisplayedItems.size() > 0 && this.mDisplayedItemsHeight != size) {
             updateDisplayedItems(size);
         }
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        super.onMeasure(i, i2);
     }
 
     @Override // androidx.slice.widget.SliceChildView
-    public void resetView() {
-        this.mDisplayedItemsHeight = 0;
-        this.mDisplayedItems.clear();
-        this.mAdapter.setSliceItems(null, -1, getMode());
-        this.mListContent = null;
-    }
-
-    @Override // androidx.slice.widget.SliceChildView
-    public void setActionLoading(SliceItem item) {
-        this.mAdapter.onSliceActionLoading(item, 0);
-    }
-
-    @Override // androidx.slice.widget.SliceChildView
-    public void setAllowTwoLines(boolean allowTwoLines) {
+    public final void setInsets(int i, int i2, int i3, int i4) {
+        super.setInsets(i, i2, i3, i4);
         SliceAdapter sliceAdapter = this.mAdapter;
-        sliceAdapter.mAllowTwoLines = allowTwoLines;
-        sliceAdapter.notifyHeaderChanged();
-    }
-
-    @Override // androidx.slice.widget.SliceChildView
-    public void setInsets(int l, int t, int r, int b) {
-        this.mInsetStart = l;
-        this.mInsetTop = t;
-        this.mInsetEnd = r;
-        this.mInsetBottom = b;
-        SliceAdapter sliceAdapter = this.mAdapter;
-        sliceAdapter.mInsetStart = l;
-        sliceAdapter.mInsetTop = t;
-        sliceAdapter.mInsetEnd = r;
-        sliceAdapter.mInsetBottom = b;
-    }
-
-    @Override // androidx.slice.widget.SliceChildView
-    public void setLastUpdated(long lastUpdated) {
-        this.mLastUpdated = lastUpdated;
-        SliceAdapter sliceAdapter = this.mAdapter;
-        if (sliceAdapter.mLastUpdated != lastUpdated) {
-            sliceAdapter.mLastUpdated = lastUpdated;
-            sliceAdapter.notifyHeaderChanged();
-        }
-    }
-
-    @Override // androidx.slice.widget.SliceChildView
-    public void setLoadingActions(Set<SliceItem> loadingActions) {
-        SliceAdapter sliceAdapter = this.mAdapter;
-        if (loadingActions == null) {
-            sliceAdapter.mLoadingActions.clear();
-        } else {
-            sliceAdapter.mLoadingActions = loadingActions;
-        }
-        sliceAdapter.mObservable.notifyChanged();
-    }
-
-    @Override // androidx.slice.widget.SliceChildView
-    public void setPolicy(SliceViewPolicy policy) {
-        this.mViewPolicy = policy;
-        this.mAdapter.mPolicy = policy;
-        policy.mListener = this;
-    }
-
-    @Override // androidx.slice.widget.SliceChildView
-    public void setShowLastUpdated(boolean showLastUpdated) {
-        this.mShowLastUpdated = showLastUpdated;
-        SliceAdapter sliceAdapter = this.mAdapter;
-        if (sliceAdapter.mShowLastUpdated != showLastUpdated) {
-            sliceAdapter.mShowLastUpdated = showLastUpdated;
-            sliceAdapter.notifyHeaderChanged();
-        }
-    }
-
-    @Override // androidx.slice.widget.SliceChildView
-    public void setSliceActionListener(SliceView.OnSliceActionListener observer) {
-        this.mObserver = null;
-        SliceAdapter sliceAdapter = this.mAdapter;
-        if (sliceAdapter != null) {
-            sliceAdapter.mSliceObserver = null;
-        }
-    }
-
-    @Override // androidx.slice.widget.SliceChildView
-    public void setSliceActions(List<SliceAction> actions) {
-        SliceAdapter sliceAdapter = this.mAdapter;
-        sliceAdapter.mSliceActions = actions;
-        sliceAdapter.notifyHeaderChanged();
-    }
-
-    @Override // androidx.slice.widget.SliceChildView
-    public void setSliceContent(ListContent sliceContent) {
-        this.mListContent = sliceContent;
-        updateDisplayedItems(sliceContent.getHeight(this.mSliceStyle, this.mViewPolicy));
-    }
-
-    @Override // androidx.slice.widget.SliceChildView
-    public void setStyle(SliceStyle style, RowStyle rowStyle) {
-        this.mSliceStyle = style;
-        this.mRowStyle = rowStyle;
-        SliceAdapter sliceAdapter = this.mAdapter;
-        sliceAdapter.mSliceStyle = style;
-        sliceAdapter.mObservable.notifyChanged();
-        if (rowStyle.mDisableRecyclerViewItemAnimator) {
-            this.mRecyclerView.setItemAnimator(null);
-        }
-    }
-
-    @Override // androidx.slice.widget.SliceChildView
-    public void setTint(int tint) {
-        this.mTintColor = tint;
-        updateDisplayedItems(getMeasuredHeight());
-    }
-
-    public final void updateDisplayedItems(int height) {
-        DisplayedListItems displayedListItems;
-        ListContent listContent = this.mListContent;
-        if (listContent == null || !listContent.isValid()) {
-            resetView();
-            return;
-        }
-        ListContent listContent2 = this.mListContent;
-        SliceStyle sliceStyle = this.mSliceStyle;
-        SliceViewPolicy sliceViewPolicy = this.mViewPolicy;
-        Objects.requireNonNull(listContent2);
-        int i = 1;
-        boolean z = false;
-        if (sliceViewPolicy.mMode == 1) {
-            displayedListItems = new DisplayedListItems(new ArrayList(Arrays.asList(listContent2.mHeaderContent)), listContent2.mRowItems.size() - 1);
-        } else if (sliceViewPolicy.mScrollable || height <= 0) {
-            Objects.requireNonNull(sliceStyle);
-            List<SliceContent> list = listContent2.mRowItems;
-            if (list.size() > 0 && sliceStyle.shouldSkipFirstListItem(list)) {
-                list = list.subList(1, list.size());
-            }
-            displayedListItems = new DisplayedListItems(list, 0);
-        } else {
-            displayedListItems = sliceStyle.getListItemsForNonScrollingList(listContent2, height, sliceViewPolicy);
-        }
-        List<SliceContent> list2 = displayedListItems.mDisplayedItems;
-        this.mDisplayedItems = list2;
-        this.mDisplayedItemsHeight = this.mSliceStyle.getListItemsHeight(list2, this.mViewPolicy);
-        this.mAdapter.setSliceItems(this.mDisplayedItems, this.mTintColor, this.mViewPolicy.mMode);
-        if (this.mDisplayedItemsHeight > getMeasuredHeight()) {
-            z = true;
-        }
-        RecyclerView recyclerView = this.mRecyclerView;
-        if (!this.mViewPolicy.mScrollable || !z) {
-            i = 2;
-        }
-        recyclerView.setOverScrollMode(i);
+        sliceAdapter.mInsetStart = i;
+        sliceAdapter.mInsetTop = i2;
+        sliceAdapter.mInsetEnd = i3;
+        sliceAdapter.mInsetBottom = i4;
     }
 }

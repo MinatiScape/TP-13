@@ -1,12 +1,9 @@
 package androidx.fragment.app;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
-import android.support.v4.app.FragmentTabHost$SavedState$$ExternalSyntheticOutline0;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -14,24 +11,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.ViewPropertyAnimatorCompat;
+import androidx.exifinterface.media.ExifInterface$$ExternalSyntheticOutline0;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.SpecialEffectsController;
+import androidx.fragment.app.strictmode.FragmentStrictMode;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LifecycleRegistry;
-import androidx.lifecycle.ViewModelStore;
-import androidx.lifecycle.ViewModelStoreOwner;
-import androidx.savedstate.SavedStateRegistryController;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.loader.app.LoaderManagerImpl$LoaderInfo;
+import androidx.loader.app.LoaderManagerImpl$LoaderViewModel;
 import com.android.systemui.shared.R;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Objects;
-import java.util.UUID;
 import java.util.WeakHashMap;
 /* loaded from: classes.dex */
-public class FragmentStateManager {
+public final class FragmentStateManager {
     public final FragmentLifecycleCallbacksDispatcher mDispatcher;
     public final Fragment mFragment;
     public final FragmentStore mFragmentStore;
@@ -44,7 +40,7 @@ public class FragmentStateManager {
         this.mFragment = fragment;
     }
 
-    public void activityCreated() {
+    public final void activityCreated() {
         if (FragmentManager.isLoggingEnabled(3)) {
             StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("moveto ACTIVITY_CREATED: ");
             m.append(this.mFragment);
@@ -54,7 +50,6 @@ public class FragmentStateManager {
         Bundle bundle = fragment.mSavedFragmentState;
         fragment.mChildFragmentManager.noteStateNotSaved();
         fragment.mState = 3;
-        fragment.mCalled = false;
         fragment.mCalled = true;
         if (FragmentManager.isLoggingEnabled(3)) {
             Log.d("FragmentManager", "moveto RESTORE_VIEW_STATE: " + fragment);
@@ -75,20 +70,303 @@ public class FragmentStateManager {
             fragment.mCalled = false;
             fragment.onViewStateRestored(bundle2);
             if (!fragment.mCalled) {
-                throw new SuperNotCalledException(Fragment$$ExternalSyntheticOutline0.m("Fragment ", fragment, " did not call through to super.onViewStateRestored()"));
+                throw new SuperNotCalledException("Fragment " + fragment + " did not call through to super.onViewStateRestored()");
             } else if (fragment.mView != null) {
                 fragment.mViewLifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_CREATE);
             }
         }
         fragment.mSavedFragmentState = null;
-        FragmentManager fragmentManager = fragment.mChildFragmentManager;
-        fragmentManager.mStateSaved = false;
-        fragmentManager.mStopped = false;
-        fragmentManager.mNonConfig.mIsStateSaved = false;
-        fragmentManager.dispatchStateChange(4);
+        FragmentManagerImpl fragmentManagerImpl = fragment.mChildFragmentManager;
+        fragmentManagerImpl.mStateSaved = false;
+        fragmentManagerImpl.mStopped = false;
+        fragmentManagerImpl.mNonConfig.mIsStateSaved = false;
+        fragmentManagerImpl.dispatchStateChange(4);
         FragmentLifecycleCallbacksDispatcher fragmentLifecycleCallbacksDispatcher = this.mDispatcher;
+        Bundle bundle3 = this.mFragment.mSavedFragmentState;
+        fragmentLifecycleCallbacksDispatcher.dispatchOnFragmentActivityCreated(false);
+    }
+
+    public final void attach() {
+        if (FragmentManager.isLoggingEnabled(3)) {
+            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("moveto ATTACHED: ");
+            m.append(this.mFragment);
+            Log.d("FragmentManager", m.toString());
+        }
+        Fragment fragment = this.mFragment;
+        Fragment fragment2 = fragment.mTarget;
+        FragmentStateManager fragmentStateManager = null;
+        if (fragment2 != null) {
+            FragmentStateManager fragmentStateManager2 = this.mFragmentStore.mActive.get(fragment2.mWho);
+            if (fragmentStateManager2 != null) {
+                Fragment fragment3 = this.mFragment;
+                fragment3.mTargetWho = fragment3.mTarget.mWho;
+                fragment3.mTarget = null;
+                fragmentStateManager = fragmentStateManager2;
+            } else {
+                StringBuilder m2 = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Fragment ");
+                m2.append(this.mFragment);
+                m2.append(" declared target fragment ");
+                m2.append(this.mFragment.mTarget);
+                m2.append(" that does not belong to this FragmentManager!");
+                throw new IllegalStateException(m2.toString());
+            }
+        } else {
+            String str = fragment.mTargetWho;
+            if (str != null && (fragmentStateManager = this.mFragmentStore.mActive.get(str)) == null) {
+                StringBuilder m3 = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Fragment ");
+                m3.append(this.mFragment);
+                m3.append(" declared target fragment ");
+                m3.append(this.mFragment.mTargetWho);
+                m3.append(" that does not belong to this FragmentManager!");
+                throw new IllegalStateException(m3.toString());
+            }
+        }
+        if (fragmentStateManager != null) {
+            fragmentStateManager.moveToExpectedState();
+        }
+        Fragment fragment4 = this.mFragment;
+        FragmentManager fragmentManager = fragment4.mFragmentManager;
+        fragment4.mHost = fragmentManager.mHost;
+        fragment4.mParentFragment = fragmentManager.mParent;
+        this.mDispatcher.dispatchOnFragmentPreAttached(false);
+        Fragment fragment5 = this.mFragment;
+        Iterator<Fragment.OnPreAttachedListener> it = fragment5.mOnPreAttachedListeners.iterator();
+        while (it.hasNext()) {
+            it.next().onPreAttached();
+        }
+        fragment5.mOnPreAttachedListeners.clear();
+        fragment5.mChildFragmentManager.attachController(fragment5.mHost, fragment5.createFragmentContainer(), fragment5);
+        fragment5.mState = 0;
+        fragment5.mCalled = false;
+        fragment5.onAttach(fragment5.mHost.mContext);
+        if (fragment5.mCalled) {
+            Iterator<FragmentOnAttachListener> it2 = fragment5.mFragmentManager.mOnAttachListeners.iterator();
+            while (it2.hasNext()) {
+                it2.next().onAttachFragment$1();
+            }
+            FragmentManagerImpl fragmentManagerImpl = fragment5.mChildFragmentManager;
+            fragmentManagerImpl.mStateSaved = false;
+            fragmentManagerImpl.mStopped = false;
+            fragmentManagerImpl.mNonConfig.mIsStateSaved = false;
+            fragmentManagerImpl.dispatchStateChange(0);
+            this.mDispatcher.dispatchOnFragmentAttached(false);
+            return;
+        }
+        throw new SuperNotCalledException("Fragment " + fragment5 + " did not call through to super.onAttach()");
+    }
+
+    public final void create() {
+        Parcelable parcelable;
+        if (FragmentManager.isLoggingEnabled(3)) {
+            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("moveto CREATED: ");
+            m.append(this.mFragment);
+            Log.d("FragmentManager", m.toString());
+        }
+        Fragment fragment = this.mFragment;
+        if (!fragment.mIsCreated) {
+            this.mDispatcher.dispatchOnFragmentPreCreated(false);
+            final Fragment fragment2 = this.mFragment;
+            Bundle bundle = fragment2.mSavedFragmentState;
+            fragment2.mChildFragmentManager.noteStateNotSaved();
+            fragment2.mState = 1;
+            fragment2.mCalled = false;
+            fragment2.mLifecycleRegistry.addObserver(new LifecycleEventObserver() { // from class: androidx.fragment.app.Fragment.5
+                @Override // androidx.lifecycle.LifecycleEventObserver
+                public final void onStateChanged(LifecycleOwner lifecycleOwner, Lifecycle.Event event) {
+                    View view;
+                    if (event == Lifecycle.Event.ON_STOP && (view = fragment2.mView) != null) {
+                        view.cancelPendingInputEvents();
+                    }
+                }
+            });
+            fragment2.mSavedStateRegistryController.performRestore(bundle);
+            fragment2.onCreate(bundle);
+            fragment2.mIsCreated = true;
+            if (fragment2.mCalled) {
+                fragment2.mLifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE);
+                FragmentLifecycleCallbacksDispatcher fragmentLifecycleCallbacksDispatcher = this.mDispatcher;
+                Bundle bundle2 = this.mFragment.mSavedFragmentState;
+                fragmentLifecycleCallbacksDispatcher.dispatchOnFragmentCreated(false);
+                return;
+            }
+            throw new SuperNotCalledException("Fragment " + fragment2 + " did not call through to super.onCreate()");
+        }
+        Bundle bundle3 = fragment.mSavedFragmentState;
+        if (!(bundle3 == null || (parcelable = bundle3.getParcelable("android:support:fragments")) == null)) {
+            fragment.mChildFragmentManager.restoreSaveStateInternal(parcelable);
+            FragmentManagerImpl fragmentManagerImpl = fragment.mChildFragmentManager;
+            fragmentManagerImpl.mStateSaved = false;
+            fragmentManagerImpl.mStopped = false;
+            fragmentManagerImpl.mNonConfig.mIsStateSaved = false;
+            fragmentManagerImpl.dispatchStateChange(1);
+        }
+        this.mFragment.mState = 1;
+    }
+
+    /* JADX WARN: Code restructure failed: missing block: B:36:0x0085, code lost:
+        if (r5 != false) goto L37;
+     */
+    /* JADX WARN: Removed duplicated region for block: B:16:0x0032  */
+    /* JADX WARN: Removed duplicated region for block: B:18:0x0040  */
+    /* JADX WARN: Removed duplicated region for block: B:28:0x0061  */
+    /* JADX WARN: Removed duplicated region for block: B:57:0x012c  */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+        To view partially-correct add '--show-bad-code' argument
+    */
+    public final void destroy() {
+        /*
+            Method dump skipped, instructions count: 327
+            To view this dump add '--comments-level debug' option
+        */
+        throw new UnsupportedOperationException("Method not decompiled: androidx.fragment.app.FragmentStateManager.destroy():void");
+    }
+
+    public final void destroyFragmentView() {
+        View view;
+        if (FragmentManager.isLoggingEnabled(3)) {
+            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("movefrom CREATE_VIEW: ");
+            m.append(this.mFragment);
+            Log.d("FragmentManager", m.toString());
+        }
+        Fragment fragment = this.mFragment;
+        ViewGroup viewGroup = fragment.mContainer;
+        if (!(viewGroup == null || (view = fragment.mView) == null)) {
+            viewGroup.removeView(view);
+        }
         Fragment fragment2 = this.mFragment;
-        fragmentLifecycleCallbacksDispatcher.dispatchOnFragmentActivityCreated(fragment2, fragment2.mSavedFragmentState, false);
+        fragment2.mChildFragmentManager.dispatchStateChange(1);
+        if (fragment2.mView != null) {
+            FragmentViewLifecycleOwner fragmentViewLifecycleOwner = fragment2.mViewLifecycleOwner;
+            fragmentViewLifecycleOwner.initialize();
+            if (fragmentViewLifecycleOwner.mLifecycleRegistry.mState.isAtLeast(Lifecycle.State.CREATED)) {
+                fragment2.mViewLifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY);
+            }
+        }
+        fragment2.mState = 1;
+        fragment2.mCalled = false;
+        fragment2.onDestroyView();
+        if (fragment2.mCalled) {
+            LoaderManagerImpl$LoaderViewModel loaderManagerImpl$LoaderViewModel = (LoaderManagerImpl$LoaderViewModel) new ViewModelProvider(fragment2.getViewModelStore(), LoaderManagerImpl$LoaderViewModel.FACTORY).get(LoaderManagerImpl$LoaderViewModel.class);
+            int i = loaderManagerImpl$LoaderViewModel.mLoaders.mSize;
+            for (int i2 = 0; i2 < i; i2++) {
+                ((LoaderManagerImpl$LoaderInfo) loaderManagerImpl$LoaderViewModel.mLoaders.mValues[i2]).getClass();
+            }
+            fragment2.mPerformedCreateView = false;
+            this.mDispatcher.dispatchOnFragmentViewDestroyed(false);
+            Fragment fragment3 = this.mFragment;
+            fragment3.mContainer = null;
+            fragment3.mView = null;
+            fragment3.mViewLifecycleOwner = null;
+            fragment3.mViewLifecycleOwnerLiveData.setValue(null);
+            this.mFragment.mInLayout = false;
+            return;
+        }
+        throw new SuperNotCalledException("Fragment " + fragment2 + " did not call through to super.onDestroyView()");
+    }
+
+    /* JADX WARN: Removed duplicated region for block: B:20:0x005d  */
+    /* JADX WARN: Removed duplicated region for block: B:29:0x007c  */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+        To view partially-correct add '--show-bad-code' argument
+    */
+    public final void detach() {
+        /*
+            Method dump skipped, instructions count: 239
+            To view this dump add '--comments-level debug' option
+        */
+        throw new UnsupportedOperationException("Method not decompiled: androidx.fragment.app.FragmentStateManager.detach():void");
+    }
+
+    public final void pause() {
+        if (FragmentManager.isLoggingEnabled(3)) {
+            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("movefrom RESUMED: ");
+            m.append(this.mFragment);
+            Log.d("FragmentManager", m.toString());
+        }
+        Fragment fragment = this.mFragment;
+        fragment.mChildFragmentManager.dispatchStateChange(5);
+        if (fragment.mView != null) {
+            fragment.mViewLifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE);
+        }
+        fragment.mLifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE);
+        fragment.mState = 6;
+        fragment.mCalled = false;
+        fragment.onPause();
+        if (fragment.mCalled) {
+            this.mDispatcher.dispatchOnFragmentPaused(false);
+            return;
+        }
+        throw new SuperNotCalledException("Fragment " + fragment + " did not call through to super.onPause()");
+    }
+
+    /* JADX WARN: Removed duplicated region for block: B:21:0x0045  */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+        To view partially-correct add '--show-bad-code' argument
+    */
+    public final void resume() {
+        /*
+            Method dump skipped, instructions count: 244
+            To view this dump add '--comments-level debug' option
+        */
+        throw new UnsupportedOperationException("Method not decompiled: androidx.fragment.app.FragmentStateManager.resume():void");
+    }
+
+    public final void start() {
+        if (FragmentManager.isLoggingEnabled(3)) {
+            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("moveto STARTED: ");
+            m.append(this.mFragment);
+            Log.d("FragmentManager", m.toString());
+        }
+        Fragment fragment = this.mFragment;
+        fragment.mChildFragmentManager.noteStateNotSaved();
+        fragment.mChildFragmentManager.execPendingActions(true);
+        fragment.mState = 5;
+        fragment.mCalled = false;
+        fragment.onStart();
+        if (fragment.mCalled) {
+            LifecycleRegistry lifecycleRegistry = fragment.mLifecycleRegistry;
+            Lifecycle.Event event = Lifecycle.Event.ON_START;
+            lifecycleRegistry.handleLifecycleEvent(event);
+            if (fragment.mView != null) {
+                fragment.mViewLifecycleOwner.handleLifecycleEvent(event);
+            }
+            FragmentManagerImpl fragmentManagerImpl = fragment.mChildFragmentManager;
+            fragmentManagerImpl.mStateSaved = false;
+            fragmentManagerImpl.mStopped = false;
+            fragmentManagerImpl.mNonConfig.mIsStateSaved = false;
+            fragmentManagerImpl.dispatchStateChange(5);
+            this.mDispatcher.dispatchOnFragmentStarted(false);
+            return;
+        }
+        throw new SuperNotCalledException("Fragment " + fragment + " did not call through to super.onStart()");
+    }
+
+    public final void stop() {
+        if (FragmentManager.isLoggingEnabled(3)) {
+            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("movefrom STARTED: ");
+            m.append(this.mFragment);
+            Log.d("FragmentManager", m.toString());
+        }
+        Fragment fragment = this.mFragment;
+        FragmentManagerImpl fragmentManagerImpl = fragment.mChildFragmentManager;
+        fragmentManagerImpl.mStopped = true;
+        fragmentManagerImpl.mNonConfig.mIsStateSaved = true;
+        fragmentManagerImpl.dispatchStateChange(4);
+        if (fragment.mView != null) {
+            fragment.mViewLifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_STOP);
+        }
+        fragment.mLifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP);
+        fragment.mState = 4;
+        fragment.mCalled = false;
+        fragment.onStop();
+        if (fragment.mCalled) {
+            this.mDispatcher.dispatchOnFragmentStopped(false);
+            return;
+        }
+        throw new SuperNotCalledException("Fragment " + fragment + " did not call through to super.onStop()");
     }
 
     /* JADX WARN: Code restructure failed: missing block: B:12:0x0031, code lost:
@@ -116,12 +394,12 @@ public class FragmentStateManager {
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public void addViewToContainer() {
+    public final void addViewToContainer() {
         /*
             r7 = this;
             androidx.fragment.app.FragmentStore r0 = r7.mFragmentStore
             androidx.fragment.app.Fragment r1 = r7.mFragment
-            java.util.Objects.requireNonNull(r0)
+            r0.getClass()
             android.view.ViewGroup r2 = r1.mContainer
             r3 = -1
             if (r2 != 0) goto Ld
@@ -168,76 +446,7 @@ public class FragmentStateManager {
         throw new UnsupportedOperationException("Method not decompiled: androidx.fragment.app.FragmentStateManager.addViewToContainer():void");
     }
 
-    public void attach() {
-        if (FragmentManager.isLoggingEnabled(3)) {
-            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("moveto ATTACHED: ");
-            m.append(this.mFragment);
-            Log.d("FragmentManager", m.toString());
-        }
-        Fragment fragment = this.mFragment;
-        Fragment fragment2 = fragment.mTarget;
-        FragmentStateManager fragmentStateManager = null;
-        if (fragment2 != null) {
-            FragmentStateManager fragmentStateManager2 = this.mFragmentStore.getFragmentStateManager(fragment2.mWho);
-            if (fragmentStateManager2 != null) {
-                Fragment fragment3 = this.mFragment;
-                fragment3.mTargetWho = fragment3.mTarget.mWho;
-                fragment3.mTarget = null;
-                fragmentStateManager = fragmentStateManager2;
-            } else {
-                StringBuilder m2 = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Fragment ");
-                m2.append(this.mFragment);
-                m2.append(" declared target fragment ");
-                m2.append(this.mFragment.mTarget);
-                m2.append(" that does not belong to this FragmentManager!");
-                throw new IllegalStateException(m2.toString());
-            }
-        } else {
-            String str = fragment.mTargetWho;
-            if (str != null && (fragmentStateManager = this.mFragmentStore.getFragmentStateManager(str)) == null) {
-                StringBuilder m3 = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Fragment ");
-                m3.append(this.mFragment);
-                m3.append(" declared target fragment ");
-                throw new IllegalStateException(FragmentTabHost$SavedState$$ExternalSyntheticOutline0.m(m3, this.mFragment.mTargetWho, " that does not belong to this FragmentManager!"));
-            }
-        }
-        if (fragmentStateManager != null) {
-            fragmentStateManager.moveToExpectedState();
-        }
-        Fragment fragment4 = this.mFragment;
-        FragmentManager fragmentManager = fragment4.mFragmentManager;
-        fragment4.mHost = fragmentManager.mHost;
-        fragment4.mParentFragment = fragmentManager.mParent;
-        this.mDispatcher.dispatchOnFragmentPreAttached(fragment4, false);
-        Fragment fragment5 = this.mFragment;
-        Iterator<Fragment.OnPreAttachedListener> it = fragment5.mOnPreAttachedListeners.iterator();
-        while (it.hasNext()) {
-            it.next().onPreAttached();
-        }
-        fragment5.mOnPreAttachedListeners.clear();
-        fragment5.mChildFragmentManager.attachController(fragment5.mHost, fragment5.createFragmentContainer(), fragment5);
-        fragment5.mState = 0;
-        fragment5.mCalled = false;
-        fragment5.onAttach(fragment5.mHost.mContext);
-        if (fragment5.mCalled) {
-            FragmentManager fragmentManager2 = fragment5.mFragmentManager;
-            Iterator<FragmentOnAttachListener> it2 = fragmentManager2.mOnAttachListeners.iterator();
-            while (it2.hasNext()) {
-                it2.next().onAttachFragment(fragmentManager2, fragment5);
-            }
-            FragmentManager fragmentManager3 = fragment5.mChildFragmentManager;
-            fragmentManager3.mStateSaved = false;
-            fragmentManager3.mStopped = false;
-            fragmentManager3.mNonConfig.mIsStateSaved = false;
-            fragmentManager3.dispatchStateChange(0);
-            this.mDispatcher.dispatchOnFragmentAttached(this.mFragment, false);
-            return;
-        }
-        throw new SuperNotCalledException(Fragment$$ExternalSyntheticOutline0.m("Fragment ", fragment5, " did not call through to super.onAttach()"));
-    }
-
-    public int computeExpectedState() {
-        SpecialEffectsController.Operation operation;
+    public final int computeExpectedState() {
         SpecialEffectsController.Operation.LifecycleImpact lifecycleImpact;
         Fragment fragment = this.mFragment;
         if (fragment.mFragmentManager == null) {
@@ -245,6 +454,7 @@ public class FragmentStateManager {
         }
         int i = this.mFragmentManagerState;
         int ordinal = fragment.mMaxState.ordinal();
+        boolean z = false;
         if (ordinal == 1) {
             i = Math.min(i, 0);
         } else if (ordinal == 2) {
@@ -272,30 +482,33 @@ public class FragmentStateManager {
         Fragment fragment3 = this.mFragment;
         ViewGroup viewGroup = fragment3.mContainer;
         SpecialEffectsController.Operation.LifecycleImpact lifecycleImpact2 = null;
+        SpecialEffectsController.Operation operation = null;
         if (viewGroup != null) {
             SpecialEffectsController orCreateController = SpecialEffectsController.getOrCreateController(viewGroup, fragment3.getParentFragmentManager().getSpecialEffectsControllerFactory());
-            Objects.requireNonNull(orCreateController);
+            orCreateController.getClass();
             SpecialEffectsController.Operation findPendingOperation = orCreateController.findPendingOperation(this.mFragment);
             if (findPendingOperation != null) {
                 lifecycleImpact = findPendingOperation.mLifecycleImpact;
             } else {
-                Fragment fragment4 = this.mFragment;
-                Iterator<SpecialEffectsController.Operation> it = orCreateController.mRunningOperations.iterator();
-                while (true) {
-                    if (!it.hasNext()) {
-                        operation = null;
-                        break;
-                    }
-                    operation = it.next();
-                    if (operation.mFragment.equals(fragment4) && !operation.mIsCanceled) {
-                        break;
-                    }
+                lifecycleImpact = null;
+            }
+            Fragment fragment4 = this.mFragment;
+            Iterator<SpecialEffectsController.Operation> it = orCreateController.mRunningOperations.iterator();
+            while (true) {
+                if (!it.hasNext()) {
+                    break;
                 }
-                if (operation != null) {
-                    lifecycleImpact = operation.mLifecycleImpact;
+                SpecialEffectsController.Operation next = it.next();
+                if (next.mFragment.equals(fragment4) && !next.mIsCanceled) {
+                    operation = next;
+                    break;
                 }
             }
-            lifecycleImpact2 = lifecycleImpact;
+            if (operation == null || !(lifecycleImpact == null || lifecycleImpact == SpecialEffectsController.Operation.LifecycleImpact.NONE)) {
+                lifecycleImpact2 = lifecycleImpact;
+            } else {
+                lifecycleImpact2 = operation.mLifecycleImpact;
+            }
         }
         if (lifecycleImpact2 == SpecialEffectsController.Operation.LifecycleImpact.ADDING) {
             i = Math.min(i, 6);
@@ -304,7 +517,10 @@ public class FragmentStateManager {
         } else {
             Fragment fragment5 = this.mFragment;
             if (fragment5.mRemoving) {
-                if (fragment5.isInBackStack()) {
+                if (fragment5.mBackStackNesting > 0) {
+                    z = true;
+                }
+                if (z) {
                     i = Math.min(i, 1);
                 } else {
                     i = Math.min(i, -1);
@@ -316,51 +532,14 @@ public class FragmentStateManager {
             i = Math.min(i, 4);
         }
         if (FragmentManager.isLoggingEnabled(2)) {
-            Log.v("FragmentManager", "computeExpectedState() of " + i + " for " + this.mFragment);
+            StringBuilder m = ExifInterface$$ExternalSyntheticOutline0.m("computeExpectedState() of ", i, " for ");
+            m.append(this.mFragment);
+            Log.v("FragmentManager", m.toString());
         }
         return i;
     }
 
-    public void create() {
-        if (FragmentManager.isLoggingEnabled(3)) {
-            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("moveto CREATED: ");
-            m.append(this.mFragment);
-            Log.d("FragmentManager", m.toString());
-        }
-        Fragment fragment = this.mFragment;
-        if (!fragment.mIsCreated) {
-            this.mDispatcher.dispatchOnFragmentPreCreated(fragment, fragment.mSavedFragmentState, false);
-            final Fragment fragment2 = this.mFragment;
-            Bundle bundle = fragment2.mSavedFragmentState;
-            fragment2.mChildFragmentManager.noteStateNotSaved();
-            fragment2.mState = 1;
-            fragment2.mCalled = false;
-            fragment2.mLifecycleRegistry.addObserver(new LifecycleEventObserver() { // from class: androidx.fragment.app.Fragment.5
-                @Override // androidx.lifecycle.LifecycleEventObserver
-                public void onStateChanged(LifecycleOwner lifecycleOwner, Lifecycle.Event event) {
-                    View view;
-                    if (event == Lifecycle.Event.ON_STOP && (view = fragment2.mView) != null) {
-                        view.cancelPendingInputEvents();
-                    }
-                }
-            });
-            fragment2.mSavedStateRegistryController.performRestore(bundle);
-            fragment2.onCreate(bundle);
-            fragment2.mIsCreated = true;
-            if (fragment2.mCalled) {
-                fragment2.mLifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE);
-                FragmentLifecycleCallbacksDispatcher fragmentLifecycleCallbacksDispatcher = this.mDispatcher;
-                Fragment fragment3 = this.mFragment;
-                fragmentLifecycleCallbacksDispatcher.dispatchOnFragmentCreated(fragment3, fragment3.mSavedFragmentState, false);
-                return;
-            }
-            throw new SuperNotCalledException(Fragment$$ExternalSyntheticOutline0.m("Fragment ", fragment2, " did not call through to super.onCreate()"));
-        }
-        fragment.restoreChildFragmentState(fragment.mSavedFragmentState);
-        this.mFragment.mState = 1;
-    }
-
-    public void createView() {
+    public final void createView() {
         String str;
         if (!this.mFragment.mFromLayout) {
             if (FragmentManager.isLoggingEnabled(3)) {
@@ -396,6 +575,8 @@ public class FragmentStateManager {
                                 m2.append(this.mFragment);
                                 throw new IllegalArgumentException(m2.toString());
                             }
+                        } else if (!(viewGroup instanceof FragmentContainerView)) {
+                            FragmentStrictMode.onWrongFragmentContainer(this.mFragment, viewGroup);
                         }
                     } else {
                         StringBuilder m3 = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Cannot create fragment ");
@@ -422,21 +603,21 @@ public class FragmentStateManager {
                 }
                 View view2 = this.mFragment.mView;
                 WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-                if (view2.isAttachedToWindow()) {
-                    this.mFragment.mView.requestApplyInsets();
+                if (ViewCompat.Api19Impl.isAttachedToWindow(view2)) {
+                    ViewCompat.Api20Impl.requestApplyInsets(this.mFragment.mView);
                 } else {
                     final View view3 = this.mFragment.mView;
-                    view3.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener(this) { // from class: androidx.fragment.app.FragmentStateManager.1
+                    view3.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() { // from class: androidx.fragment.app.FragmentStateManager.1
                         @Override // android.view.View.OnAttachStateChangeListener
-                        public void onViewAttachedToWindow(View view4) {
-                            view3.removeOnAttachStateChangeListener(this);
-                            View view5 = view3;
-                            WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap2 = ViewCompat.sViewPropertyAnimatorMap;
-                            view5.requestApplyInsets();
+                        public final void onViewDetachedFromWindow(View view4) {
                         }
 
                         @Override // android.view.View.OnAttachStateChangeListener
-                        public void onViewDetachedFromWindow(View view4) {
+                        public final void onViewAttachedToWindow(View view4) {
+                            view3.removeOnAttachStateChangeListener(this);
+                            View view5 = view3;
+                            WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap2 = ViewCompat.sViewPropertyAnimatorMap;
+                            ViewCompat.Api20Impl.requestApplyInsets(view5);
                         }
                     });
                 }
@@ -444,13 +625,13 @@ public class FragmentStateManager {
                 fragment7.onViewCreated(fragment7.mView, fragment7.mSavedFragmentState);
                 fragment7.mChildFragmentManager.dispatchStateChange(2);
                 FragmentLifecycleCallbacksDispatcher fragmentLifecycleCallbacksDispatcher = this.mDispatcher;
-                Fragment fragment8 = this.mFragment;
-                fragmentLifecycleCallbacksDispatcher.dispatchOnFragmentViewCreated(fragment8, fragment8.mView, fragment8.mSavedFragmentState, false);
+                View view4 = this.mFragment.mView;
+                fragmentLifecycleCallbacksDispatcher.dispatchOnFragmentViewCreated(false);
                 int visibility = this.mFragment.mView.getVisibility();
                 this.mFragment.ensureAnimationInfo().mPostOnViewCreatedAlpha = this.mFragment.mView.getAlpha();
-                Fragment fragment9 = this.mFragment;
-                if (fragment9.mContainer != null && visibility == 0) {
-                    View findFocus = fragment9.mView.findFocus();
+                Fragment fragment8 = this.mFragment;
+                if (fragment8.mContainer != null && visibility == 0) {
+                    View findFocus = fragment8.mView.findFocus();
                     if (findFocus != null) {
                         this.mFragment.ensureAnimationInfo().mFocusedView = findFocus;
                         if (FragmentManager.isLoggingEnabled(2)) {
@@ -464,159 +645,7 @@ public class FragmentStateManager {
         }
     }
 
-    public void destroy() {
-        Fragment findActiveFragment;
-        if (FragmentManager.isLoggingEnabled(3)) {
-            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("movefrom CREATED: ");
-            m.append(this.mFragment);
-            Log.d("FragmentManager", m.toString());
-        }
-        Fragment fragment = this.mFragment;
-        boolean z = true;
-        boolean z2 = fragment.mRemoving && !fragment.isInBackStack();
-        if (z2 || this.mFragmentStore.mNonConfig.shouldDestroy(this.mFragment)) {
-            FragmentHostCallback<?> fragmentHostCallback = this.mFragment.mHost;
-            if (fragmentHostCallback instanceof ViewModelStoreOwner) {
-                z = this.mFragmentStore.mNonConfig.mHasBeenCleared;
-            } else {
-                Context context = fragmentHostCallback.mContext;
-                if (context instanceof Activity) {
-                    z = true ^ ((Activity) context).isChangingConfigurations();
-                }
-            }
-            if (z2 || z) {
-                FragmentManagerViewModel fragmentManagerViewModel = this.mFragmentStore.mNonConfig;
-                Fragment fragment2 = this.mFragment;
-                Objects.requireNonNull(fragmentManagerViewModel);
-                if (FragmentManager.isLoggingEnabled(3)) {
-                    Log.d("FragmentManager", "Clearing non-config state for " + fragment2);
-                }
-                FragmentManagerViewModel fragmentManagerViewModel2 = fragmentManagerViewModel.mChildNonConfigs.get(fragment2.mWho);
-                if (fragmentManagerViewModel2 != null) {
-                    fragmentManagerViewModel2.onCleared();
-                    fragmentManagerViewModel.mChildNonConfigs.remove(fragment2.mWho);
-                }
-                ViewModelStore viewModelStore = fragmentManagerViewModel.mViewModelStores.get(fragment2.mWho);
-                if (viewModelStore != null) {
-                    viewModelStore.clear();
-                    fragmentManagerViewModel.mViewModelStores.remove(fragment2.mWho);
-                }
-            }
-            Fragment fragment3 = this.mFragment;
-            fragment3.mChildFragmentManager.dispatchDestroy();
-            fragment3.mLifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY);
-            fragment3.mState = 0;
-            fragment3.mCalled = false;
-            fragment3.mIsCreated = false;
-            fragment3.onDestroy();
-            if (fragment3.mCalled) {
-                this.mDispatcher.dispatchOnFragmentDestroyed(this.mFragment, false);
-                Iterator it = ((ArrayList) this.mFragmentStore.getActiveFragmentStateManagers()).iterator();
-                while (it.hasNext()) {
-                    FragmentStateManager fragmentStateManager = (FragmentStateManager) it.next();
-                    if (fragmentStateManager != null) {
-                        Fragment fragment4 = fragmentStateManager.mFragment;
-                        if (this.mFragment.mWho.equals(fragment4.mTargetWho)) {
-                            fragment4.mTarget = this.mFragment;
-                            fragment4.mTargetWho = null;
-                        }
-                    }
-                }
-                Fragment fragment5 = this.mFragment;
-                String str = fragment5.mTargetWho;
-                if (str != null) {
-                    fragment5.mTarget = this.mFragmentStore.findActiveFragment(str);
-                }
-                this.mFragmentStore.makeInactive(this);
-                return;
-            }
-            throw new SuperNotCalledException(Fragment$$ExternalSyntheticOutline0.m("Fragment ", fragment3, " did not call through to super.onDestroy()"));
-        }
-        String str2 = this.mFragment.mTargetWho;
-        if (!(str2 == null || (findActiveFragment = this.mFragmentStore.findActiveFragment(str2)) == null || !findActiveFragment.mRetainInstance)) {
-            this.mFragment.mTarget = findActiveFragment;
-        }
-        this.mFragment.mState = 0;
-    }
-
-    public void destroyFragmentView() {
-        View view;
-        if (FragmentManager.isLoggingEnabled(3)) {
-            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("movefrom CREATE_VIEW: ");
-            m.append(this.mFragment);
-            Log.d("FragmentManager", m.toString());
-        }
-        Fragment fragment = this.mFragment;
-        ViewGroup viewGroup = fragment.mContainer;
-        if (!(viewGroup == null || (view = fragment.mView) == null)) {
-            viewGroup.removeView(view);
-        }
-        this.mFragment.performDestroyView();
-        this.mDispatcher.dispatchOnFragmentViewDestroyed(this.mFragment, false);
-        Fragment fragment2 = this.mFragment;
-        fragment2.mContainer = null;
-        fragment2.mView = null;
-        fragment2.mViewLifecycleOwner = null;
-        fragment2.mViewLifecycleOwnerLiveData.setValue(null);
-        this.mFragment.mInLayout = false;
-    }
-
-    public void detach() {
-        if (FragmentManager.isLoggingEnabled(3)) {
-            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("movefrom ATTACHED: ");
-            m.append(this.mFragment);
-            Log.d("FragmentManager", m.toString());
-        }
-        Fragment fragment = this.mFragment;
-        fragment.mState = -1;
-        fragment.mCalled = false;
-        fragment.onDetach();
-        if (fragment.mCalled) {
-            FragmentManager fragmentManager = fragment.mChildFragmentManager;
-            if (!fragmentManager.mDestroyed) {
-                fragmentManager.dispatchDestroy();
-                fragment.mChildFragmentManager = new FragmentManagerImpl();
-            }
-            this.mDispatcher.dispatchOnFragmentDetached(this.mFragment, false);
-            Fragment fragment2 = this.mFragment;
-            fragment2.mState = -1;
-            fragment2.mHost = null;
-            fragment2.mParentFragment = null;
-            fragment2.mFragmentManager = null;
-            if ((fragment2.mRemoving && !fragment2.isInBackStack()) || this.mFragmentStore.mNonConfig.shouldDestroy(this.mFragment)) {
-                if (FragmentManager.isLoggingEnabled(3)) {
-                    StringBuilder m2 = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("initState called for fragment: ");
-                    m2.append(this.mFragment);
-                    Log.d("FragmentManager", m2.toString());
-                }
-                Fragment fragment3 = this.mFragment;
-                Objects.requireNonNull(fragment3);
-                fragment3.mLifecycleRegistry = new LifecycleRegistry(fragment3, true);
-                fragment3.mSavedStateRegistryController = new SavedStateRegistryController(fragment3);
-                fragment3.mDefaultFactory = null;
-                fragment3.mWho = UUID.randomUUID().toString();
-                fragment3.mAdded = false;
-                fragment3.mRemoving = false;
-                fragment3.mFromLayout = false;
-                fragment3.mInLayout = false;
-                fragment3.mRestored = false;
-                fragment3.mBackStackNesting = 0;
-                fragment3.mFragmentManager = null;
-                fragment3.mChildFragmentManager = new FragmentManagerImpl();
-                fragment3.mHost = null;
-                fragment3.mFragmentId = 0;
-                fragment3.mContainerId = 0;
-                fragment3.mTag = null;
-                fragment3.mHidden = false;
-                fragment3.mDetached = false;
-                return;
-            }
-            return;
-        }
-        throw new SuperNotCalledException(Fragment$$ExternalSyntheticOutline0.m("Fragment ", fragment, " did not call through to super.onDetach()"));
-    }
-
-    public void ensureInflatedView() {
+    public final void ensureInflatedView() {
         Fragment fragment = this.mFragment;
         if (fragment.mFromLayout && fragment.mInLayout && !fragment.mPerformedCreateView) {
             if (FragmentManager.isLoggingEnabled(3)) {
@@ -639,14 +668,14 @@ public class FragmentStateManager {
                 fragment5.onViewCreated(fragment5.mView, fragment5.mSavedFragmentState);
                 fragment5.mChildFragmentManager.dispatchStateChange(2);
                 FragmentLifecycleCallbacksDispatcher fragmentLifecycleCallbacksDispatcher = this.mDispatcher;
-                Fragment fragment6 = this.mFragment;
-                fragmentLifecycleCallbacksDispatcher.dispatchOnFragmentViewCreated(fragment6, fragment6.mView, fragment6.mSavedFragmentState, false);
+                View view2 = this.mFragment.mView;
+                fragmentLifecycleCallbacksDispatcher.dispatchOnFragmentViewCreated(false);
                 this.mFragment.mState = 2;
             }
         }
     }
 
-    public void moveToExpectedState() {
+    public final void moveToExpectedState() {
         ViewGroup viewGroup;
         ViewGroup viewGroup2;
         ViewGroup viewGroup3;
@@ -663,13 +692,13 @@ public class FragmentStateManager {
                             if (!(fragment.mView == null || (viewGroup = fragment.mContainer) == null)) {
                                 SpecialEffectsController orCreateController = SpecialEffectsController.getOrCreateController(viewGroup, fragment.getParentFragmentManager().getSpecialEffectsControllerFactory());
                                 if (this.mFragment.mHidden) {
-                                    Objects.requireNonNull(orCreateController);
+                                    orCreateController.getClass();
                                     if (FragmentManager.isLoggingEnabled(2)) {
                                         Log.v("FragmentManager", "SpecialEffectsController: Enqueuing hide operation for fragment " + this.mFragment);
                                     }
                                     orCreateController.enqueue(SpecialEffectsController.Operation.State.GONE, lifecycleImpact, this);
                                 } else {
-                                    Objects.requireNonNull(orCreateController);
+                                    orCreateController.getClass();
                                     if (FragmentManager.isLoggingEnabled(2)) {
                                         Log.v("FragmentManager", "SpecialEffectsController: Enqueuing show operation for fragment " + this.mFragment);
                                     }
@@ -678,7 +707,7 @@ public class FragmentStateManager {
                             }
                             Fragment fragment2 = this.mFragment;
                             FragmentManager fragmentManager = fragment2.mFragmentManager;
-                            if (fragmentManager != null && fragment2.mAdded && fragmentManager.isMenuAvailable(fragment2)) {
+                            if (fragmentManager != null && fragment2.mAdded && FragmentManager.isMenuAvailable(fragment2)) {
                                 fragmentManager.mNeedMenuInvalidate = true;
                             }
                             this.mFragment.mHiddenChanged = false;
@@ -703,7 +732,7 @@ public class FragmentStateManager {
                                 if (!(fragment.mView == null || (viewGroup2 = fragment.mContainer) == null)) {
                                     SpecialEffectsController orCreateController2 = SpecialEffectsController.getOrCreateController(viewGroup2, fragment.getParentFragmentManager().getSpecialEffectsControllerFactory());
                                     SpecialEffectsController.Operation.State from = SpecialEffectsController.Operation.State.from(this.mFragment.mView.getVisibility());
-                                    Objects.requireNonNull(orCreateController2);
+                                    orCreateController2.getClass();
                                     if (FragmentManager.isLoggingEnabled(2)) {
                                         Log.v("FragmentManager", "SpecialEffectsController: Enqueuing add operation for fragment " + this.mFragment);
                                     }
@@ -743,6 +772,7 @@ public class FragmentStateManager {
                                 if (FragmentManager.isLoggingEnabled(3)) {
                                     Log.d("FragmentManager", "movefrom ACTIVITY_CREATED: " + this.mFragment);
                                 }
+                                this.mFragment.getClass();
                                 Fragment fragment3 = this.mFragment;
                                 if (fragment3.mView != null && fragment3.mSavedViewState == null) {
                                     saveViewState();
@@ -750,7 +780,7 @@ public class FragmentStateManager {
                                 Fragment fragment4 = this.mFragment;
                                 if (!(fragment4.mView == null || (viewGroup3 = fragment4.mContainer) == null)) {
                                     SpecialEffectsController orCreateController3 = SpecialEffectsController.getOrCreateController(viewGroup3, fragment4.getParentFragmentManager().getSpecialEffectsControllerFactory());
-                                    Objects.requireNonNull(orCreateController3);
+                                    orCreateController3.getClass();
                                     if (FragmentManager.isLoggingEnabled(2)) {
                                         Log.v("FragmentManager", "SpecialEffectsController: Enqueuing remove operation for fragment " + this.mFragment);
                                     }
@@ -782,29 +812,7 @@ public class FragmentStateManager {
         }
     }
 
-    public void pause() {
-        if (FragmentManager.isLoggingEnabled(3)) {
-            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("movefrom RESUMED: ");
-            m.append(this.mFragment);
-            Log.d("FragmentManager", m.toString());
-        }
-        Fragment fragment = this.mFragment;
-        fragment.mChildFragmentManager.dispatchStateChange(5);
-        if (fragment.mView != null) {
-            fragment.mViewLifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE);
-        }
-        fragment.mLifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE);
-        fragment.mState = 6;
-        fragment.mCalled = false;
-        fragment.onPause();
-        if (fragment.mCalled) {
-            this.mDispatcher.dispatchOnFragmentPaused(this.mFragment, false);
-            return;
-        }
-        throw new SuperNotCalledException(Fragment$$ExternalSyntheticOutline0.m("Fragment ", fragment, " did not call through to super.onPause()"));
-    }
-
-    public void restoreState(ClassLoader classLoader) {
+    public final void restoreState(ClassLoader classLoader) {
         Bundle bundle = this.mFragment.mSavedFragmentState;
         if (bundle != null) {
             bundle.setClassLoader(classLoader);
@@ -819,7 +827,7 @@ public class FragmentStateManager {
                 fragment4.mTargetRequestCode = fragment4.mSavedFragmentState.getInt("android:target_req_state", 0);
             }
             Fragment fragment5 = this.mFragment;
-            Objects.requireNonNull(fragment5);
+            fragment5.getClass();
             fragment5.mUserVisibleHint = fragment5.mSavedFragmentState.getBoolean("android:user_visible_hint", true);
             Fragment fragment6 = this.mFragment;
             if (!fragment6.mUserVisibleHint) {
@@ -828,20 +836,61 @@ public class FragmentStateManager {
         }
     }
 
-    /* JADX WARN: Removed duplicated region for block: B:21:0x0045  */
-    /*
-        Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
-    */
-    public void resume() {
-        /*
-            Method dump skipped, instructions count: 229
-            To view this dump add '--comments-level debug' option
-        */
-        throw new UnsupportedOperationException("Method not decompiled: androidx.fragment.app.FragmentStateManager.resume():void");
+    public final void saveState() {
+        FragmentState fragmentState = new FragmentState(this.mFragment);
+        Fragment fragment = this.mFragment;
+        if (fragment.mState <= -1 || fragmentState.mSavedFragmentState != null) {
+            fragmentState.mSavedFragmentState = fragment.mSavedFragmentState;
+        } else {
+            Bundle bundle = new Bundle();
+            Fragment fragment2 = this.mFragment;
+            fragment2.onSaveInstanceState(bundle);
+            fragment2.mSavedStateRegistryController.performSave(bundle);
+            Parcelable saveAllStateInternal = fragment2.mChildFragmentManager.saveAllStateInternal();
+            if (saveAllStateInternal != null) {
+                bundle.putParcelable("android:support:fragments", saveAllStateInternal);
+            }
+            this.mDispatcher.dispatchOnFragmentSaveInstanceState(false);
+            if (bundle.isEmpty()) {
+                bundle = null;
+            }
+            if (this.mFragment.mView != null) {
+                saveViewState();
+            }
+            if (this.mFragment.mSavedViewState != null) {
+                if (bundle == null) {
+                    bundle = new Bundle();
+                }
+                bundle.putSparseParcelableArray("android:view_state", this.mFragment.mSavedViewState);
+            }
+            if (this.mFragment.mSavedViewRegistryState != null) {
+                if (bundle == null) {
+                    bundle = new Bundle();
+                }
+                bundle.putBundle("android:view_registry_state", this.mFragment.mSavedViewRegistryState);
+            }
+            if (!this.mFragment.mUserVisibleHint) {
+                if (bundle == null) {
+                    bundle = new Bundle();
+                }
+                bundle.putBoolean("android:user_visible_hint", this.mFragment.mUserVisibleHint);
+            }
+            fragmentState.mSavedFragmentState = bundle;
+            if (this.mFragment.mTargetWho != null) {
+                if (bundle == null) {
+                    fragmentState.mSavedFragmentState = new Bundle();
+                }
+                fragmentState.mSavedFragmentState.putString("android:target_state", this.mFragment.mTargetWho);
+                int i = this.mFragment.mTargetRequestCode;
+                if (i != 0) {
+                    fragmentState.mSavedFragmentState.putInt("android:target_req_state", i);
+                }
+            }
+        }
+        this.mFragmentStore.setSavedState(this.mFragment.mWho, fragmentState);
     }
 
-    public void saveViewState() {
+    public final void saveViewState() {
         if (this.mFragment.mView != null) {
             SparseArray<Parcelable> sparseArray = new SparseArray<>();
             this.mFragment.mView.saveHierarchyState(sparseArray);
@@ -856,65 +905,10 @@ public class FragmentStateManager {
         }
     }
 
-    public void start() {
-        if (FragmentManager.isLoggingEnabled(3)) {
-            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("moveto STARTED: ");
-            m.append(this.mFragment);
-            Log.d("FragmentManager", m.toString());
-        }
-        Fragment fragment = this.mFragment;
-        fragment.mChildFragmentManager.noteStateNotSaved();
-        fragment.mChildFragmentManager.execPendingActions(true);
-        fragment.mState = 5;
-        fragment.mCalled = false;
-        fragment.onStart();
-        if (fragment.mCalled) {
-            LifecycleRegistry lifecycleRegistry = fragment.mLifecycleRegistry;
-            Lifecycle.Event event = Lifecycle.Event.ON_START;
-            lifecycleRegistry.handleLifecycleEvent(event);
-            if (fragment.mView != null) {
-                fragment.mViewLifecycleOwner.handleLifecycleEvent(event);
-            }
-            FragmentManager fragmentManager = fragment.mChildFragmentManager;
-            fragmentManager.mStateSaved = false;
-            fragmentManager.mStopped = false;
-            fragmentManager.mNonConfig.mIsStateSaved = false;
-            fragmentManager.dispatchStateChange(5);
-            this.mDispatcher.dispatchOnFragmentStarted(this.mFragment, false);
-            return;
-        }
-        throw new SuperNotCalledException(Fragment$$ExternalSyntheticOutline0.m("Fragment ", fragment, " did not call through to super.onStart()"));
-    }
-
-    public void stop() {
-        if (FragmentManager.isLoggingEnabled(3)) {
-            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("movefrom STARTED: ");
-            m.append(this.mFragment);
-            Log.d("FragmentManager", m.toString());
-        }
-        Fragment fragment = this.mFragment;
-        FragmentManager fragmentManager = fragment.mChildFragmentManager;
-        fragmentManager.mStopped = true;
-        fragmentManager.mNonConfig.mIsStateSaved = true;
-        fragmentManager.dispatchStateChange(4);
-        if (fragment.mView != null) {
-            fragment.mViewLifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_STOP);
-        }
-        fragment.mLifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP);
-        fragment.mState = 4;
-        fragment.mCalled = false;
-        fragment.onStop();
-        if (fragment.mCalled) {
-            this.mDispatcher.dispatchOnFragmentStopped(this.mFragment, false);
-            return;
-        }
-        throw new SuperNotCalledException(Fragment$$ExternalSyntheticOutline0.m("Fragment ", fragment, " did not call through to super.onStop()"));
-    }
-
     public FragmentStateManager(FragmentLifecycleCallbacksDispatcher fragmentLifecycleCallbacksDispatcher, FragmentStore fragmentStore, ClassLoader classLoader, FragmentFactory fragmentFactory, FragmentState fragmentState) {
         this.mDispatcher = fragmentLifecycleCallbacksDispatcher;
         this.mFragmentStore = fragmentStore;
-        Fragment instantiate = fragmentFactory.instantiate(classLoader, fragmentState.mClassName);
+        Fragment instantiate = fragmentFactory.instantiate(fragmentState.mClassName);
         Bundle bundle = fragmentState.mArguments;
         if (bundle != null) {
             bundle.setClassLoader(classLoader);

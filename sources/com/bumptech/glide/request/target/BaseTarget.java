@@ -7,25 +7,16 @@ import com.bumptech.glide.request.Request;
 public abstract class BaseTarget<Z> implements Target<Z> {
     public Request request;
 
-    @Override // com.bumptech.glide.request.target.Target
-    public Request getRequest() {
-        return this.request;
-    }
-
     @Override // com.bumptech.glide.manager.LifecycleListener
-    public void onDestroy() {
+    public final void onDestroy() {
     }
 
     @Override // com.bumptech.glide.request.target.Target
-    public void onLoadCleared(Drawable placeholder) {
+    public void onLoadCleared(Drawable drawable) {
     }
 
     @Override // com.bumptech.glide.request.target.Target
-    public void onLoadFailed(Drawable errorDrawable) {
-    }
-
-    @Override // com.bumptech.glide.request.target.Target
-    public void onLoadStarted(Drawable placeholder) {
+    public void onLoadStarted(Drawable drawable) {
     }
 
     @Override // com.bumptech.glide.manager.LifecycleListener
@@ -39,5 +30,10 @@ public abstract class BaseTarget<Z> implements Target<Z> {
     @Override // com.bumptech.glide.request.target.Target
     public void setRequest(Request request) {
         this.request = request;
+    }
+
+    @Override // com.bumptech.glide.request.target.Target
+    public Request getRequest() {
+        return this.request;
     }
 }

@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 /* loaded from: classes.dex */
-public class NetworkResponse {
+public final class NetworkResponse {
     public final List<Header> allHeaders;
     public final byte[] data;
     public final Map<String, String> headers;

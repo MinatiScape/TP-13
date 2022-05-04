@@ -1,6 +1,6 @@
 package com.bumptech.glide.load.engine;
 
-import androidx.recyclerview.R$attr$$ExternalSyntheticOutline0;
+import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.Transformation;
@@ -21,28 +21,20 @@ public final class ResourceCacheKey implements Key {
     public final Transformation<?> transformation;
     public final int width;
 
-    public ResourceCacheKey(ArrayPool arrayPool, Key sourceKey, Key signature, int width, int height, Transformation<?> appliedTransformation, Class<?> decodedResourceClass, Options options) {
-        this.arrayPool = arrayPool;
-        this.sourceKey = sourceKey;
-        this.signature = signature;
-        this.width = width;
-        this.height = height;
-        this.transformation = appliedTransformation;
-        this.decodedResourceClass = decodedResourceClass;
-        this.options = options;
-    }
-
     @Override // com.bumptech.glide.load.Key
-    public boolean equals(Object o) {
-        if (!(o instanceof ResourceCacheKey)) {
+    public final boolean equals(Object obj) {
+        if (!(obj instanceof ResourceCacheKey)) {
             return false;
         }
-        ResourceCacheKey resourceCacheKey = (ResourceCacheKey) o;
-        return this.height == resourceCacheKey.height && this.width == resourceCacheKey.width && Util.bothNullOrEqual(this.transformation, resourceCacheKey.transformation) && this.decodedResourceClass.equals(resourceCacheKey.decodedResourceClass) && this.sourceKey.equals(resourceCacheKey.sourceKey) && this.signature.equals(resourceCacheKey.signature) && this.options.equals(resourceCacheKey.options);
+        ResourceCacheKey resourceCacheKey = (ResourceCacheKey) obj;
+        if (this.height != resourceCacheKey.height || this.width != resourceCacheKey.width || !Util.bothNullOrEqual(this.transformation, resourceCacheKey.transformation) || !this.decodedResourceClass.equals(resourceCacheKey.decodedResourceClass) || !this.sourceKey.equals(resourceCacheKey.sourceKey) || !this.signature.equals(resourceCacheKey.signature) || !this.options.equals(resourceCacheKey.options)) {
+            return false;
+        }
+        return true;
     }
 
     @Override // com.bumptech.glide.load.Key
-    public int hashCode() {
+    public final int hashCode() {
         int hashCode = ((((this.signature.hashCode() + (this.sourceKey.hashCode() * 31)) * 31) + this.width) * 31) + this.height;
         Transformation<?> transformation = this.transformation;
         if (transformation != null) {
@@ -52,33 +44,29 @@ public final class ResourceCacheKey implements Key {
         return this.options.hashCode() + ((hashCode2 + (hashCode * 31)) * 31);
     }
 
-    public String toString() {
-        String valueOf = String.valueOf(this.sourceKey);
-        String valueOf2 = String.valueOf(this.signature);
-        int i = this.width;
-        int i2 = this.height;
-        String valueOf3 = String.valueOf(this.decodedResourceClass);
-        String valueOf4 = String.valueOf(this.transformation);
-        String valueOf5 = String.valueOf(this.options);
-        StringBuilder m = R$attr$$ExternalSyntheticOutline0.m(valueOf5.length() + valueOf4.length() + valueOf3.length() + valueOf2.length() + valueOf.length() + 131, "ResourceCacheKey{sourceKey=", valueOf, ", signature=", valueOf2);
+    public final String toString() {
+        StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("ResourceCacheKey{sourceKey=");
+        m.append(this.sourceKey);
+        m.append(", signature=");
+        m.append(this.signature);
         m.append(", width=");
-        m.append(i);
+        m.append(this.width);
         m.append(", height=");
-        m.append(i2);
+        m.append(this.height);
         m.append(", decodedResourceClass=");
-        m.append(valueOf3);
+        m.append(this.decodedResourceClass);
         m.append(", transformation='");
-        m.append(valueOf4);
+        m.append(this.transformation);
         m.append('\'');
         m.append(", options=");
-        m.append(valueOf5);
+        m.append(this.options);
         m.append('}');
         return m.toString();
     }
 
     @Override // com.bumptech.glide.load.Key
-    public void updateDiskCacheKey(MessageDigest messageDigest) {
-        byte[] bArr = (byte[]) this.arrayPool.getExact(8, byte[].class);
+    public final void updateDiskCacheKey(MessageDigest messageDigest) {
+        byte[] bArr = (byte[]) this.arrayPool.getExact();
         ByteBuffer.wrap(bArr).putInt(this.width).putInt(this.height).array();
         this.signature.updateDiskCacheKey(messageDigest);
         this.sourceKey.updateDiskCacheKey(messageDigest);
@@ -96,5 +84,16 @@ public final class ResourceCacheKey implements Key {
         }
         messageDigest.update(bArr2);
         this.arrayPool.put(bArr);
+    }
+
+    public ResourceCacheKey(ArrayPool arrayPool, Key key, Key key2, int i, int i2, Transformation<?> transformation, Class<?> cls, Options options) {
+        this.arrayPool = arrayPool;
+        this.sourceKey = key;
+        this.signature = key2;
+        this.width = i;
+        this.height = i2;
+        this.transformation = transformation;
+        this.decodedResourceClass = cls;
+        this.options = options;
     }
 }

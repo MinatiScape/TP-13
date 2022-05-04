@@ -5,6 +5,7 @@ import kotlin.coroutines.CoroutineContext;
 import kotlin.jvm.functions.Function2;
 import kotlin.jvm.internal.Intrinsics;
 import kotlin.jvm.internal.Lambda;
+/* compiled from: CoroutineContext.kt */
 /* loaded from: classes.dex */
 public final class CoroutineContext$plus$1 extends Lambda implements Function2<CoroutineContext, CoroutineContext.Element, CoroutineContext> {
     public static final CoroutineContext$plus$1 INSTANCE = new CoroutineContext$plus$1();
@@ -14,7 +15,7 @@ public final class CoroutineContext$plus$1 extends Lambda implements Function2<C
     }
 
     @Override // kotlin.jvm.functions.Function2
-    public CoroutineContext invoke(CoroutineContext coroutineContext, CoroutineContext.Element element) {
+    public final CoroutineContext invoke(CoroutineContext coroutineContext, CoroutineContext.Element element) {
         CombinedContext combinedContext;
         CoroutineContext acc = coroutineContext;
         CoroutineContext.Element element2 = element;

@@ -12,8 +12,13 @@ public class WallpaperThumbnailView extends ImageView {
         setScaleType(ImageView.ScaleType.MATRIX);
     }
 
+    public WallpaperThumbnailView(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet);
+        setScaleType(ImageView.ScaleType.MATRIX);
+    }
+
     @Override // android.view.View
-    public void onLayout(boolean z, int i, int i2, int i3, int i4) {
+    public final void onLayout(boolean z, int i, int i2, int i3, int i4) {
         float f;
         float f2;
         super.onLayout(z, i, i2, i3, i4);
@@ -43,10 +48,5 @@ public class WallpaperThumbnailView extends ImageView {
             setImageMatrix(imageMatrix);
             invalidate();
         }
-    }
-
-    public WallpaperThumbnailView(Context context, AttributeSet attributeSet) {
-        super(context, attributeSet);
-        setScaleType(ImageView.ScaleType.MATRIX);
     }
 }

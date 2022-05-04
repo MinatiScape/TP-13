@@ -1,12 +1,13 @@
 package com.google.common.collect;
 
+import androidx.cardview.R$style$$ExternalSyntheticOutline0;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableList;
 import com.google.common.math.IntMath;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.Set;
 /* loaded from: classes.dex */
 public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements Set<E> {
@@ -18,13 +19,42 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
         public int hashCode;
         public Object[] hashTable;
 
-        public Builder() {
-            super(4);
+        public ImmutableSet<E> build() {
+            ImmutableSet<E> immutableSet;
+            Object[] objArr;
+            int i = this.size;
+            if (i != 0) {
+                boolean z = false;
+                if (i != 1) {
+                    if (this.hashTable == null || ImmutableSet.chooseTableSize(i) != this.hashTable.length) {
+                        immutableSet = ImmutableSet.construct(this.size, this.contents);
+                        this.size = immutableSet.size();
+                    } else {
+                        int i2 = this.size;
+                        Object[] objArr2 = this.contents;
+                        int length = objArr2.length;
+                        if (i2 < (length >> 1) + (length >> 2)) {
+                            z = true;
+                        }
+                        if (z) {
+                            objArr2 = Arrays.copyOf(objArr2, i2);
+                        }
+                        immutableSet = new RegularImmutableSet<>(objArr2, this.hashCode, this.hashTable, objArr.length - 1, this.size);
+                    }
+                    this.forceCopy = true;
+                    this.hashTable = null;
+                    return immutableSet;
+                }
+                Object obj = this.contents[0];
+                int i3 = ImmutableSet.$r8$clinit;
+                return new SingletonImmutableSet(obj);
+            }
+            int i4 = ImmutableSet.$r8$clinit;
+            return RegularImmutableSet.EMPTY;
         }
 
-        @Override // com.google.common.collect.ImmutableCollection.ArrayBasedBuilder
-        public Builder<E> add(E element) {
-            Objects.requireNonNull(element);
+        public void add$1(Object element) {
+            element.getClass();
             if (this.hashTable != null) {
                 int chooseTableSize = ImmutableSet.chooseTableSize(this.size);
                 Object[] objArr = this.hashTable;
@@ -39,20 +69,18 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
                         if (obj == null) {
                             objArr2[i] = element;
                             this.hashCode += hashCode;
-                            add((Builder<E>) element);
-                            break;
-                        } else if (obj.equals(element)) {
-                            break;
-                        } else {
+                            add(element);
+                            return;
+                        } else if (!obj.equals(element)) {
                             smear = i + 1;
+                        } else {
+                            return;
                         }
                     }
-                    return this;
                 }
             }
             this.hashTable = null;
-            add((Builder<E>) element);
-            return this;
+            add(element);
         }
     }
 
@@ -60,10 +88,6 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
     public static class SerializedForm implements Serializable {
         private static final long serialVersionUID = 0;
         public final Object[] elements;
-
-        public SerializedForm(Object[] elements) {
-            this.elements = elements;
-        }
 
         public Object readResolve() {
             Object[] objArr = this.elements;
@@ -76,6 +100,10 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
                 return ImmutableSet.construct(objArr.length, (Object[]) objArr.clone());
             }
             return new SingletonImmutableSet(objArr[0]);
+        }
+
+        public SerializedForm(Object[] elements) {
+            this.elements = elements;
         }
     }
 
@@ -96,6 +124,10 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
         return IntMath.MAX_SIGNED_POWER_OF_TWO;
     }
 
+    public boolean isHashCodeFast() {
+        return this instanceof RegularImmutableSet;
+    }
+
     public static <E> ImmutableSet<E> construct(int n, Object... elements) {
         if (n == 0) {
             return RegularImmutableSet.EMPTY;
@@ -111,23 +143,26 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
         int i3 = 0;
         for (int i4 = 0; i4 < n; i4++) {
             Object obj = elements[i4];
-            ObjectArrays.checkElementNotNull(obj, i4);
-            int hashCode = obj.hashCode();
-            int smear = Hashing.smear(hashCode);
-            while (true) {
-                int i5 = smear & i;
-                Object obj2 = objArr[i5];
-                if (obj2 == null) {
-                    i3++;
-                    elements[i3] = obj;
-                    objArr[i5] = obj;
-                    i2 += hashCode;
-                    break;
-                } else if (obj2.equals(obj)) {
-                    break;
-                } else {
-                    smear++;
+            if (obj != null) {
+                int hashCode = obj.hashCode();
+                int smear = Hashing.smear(hashCode);
+                while (true) {
+                    int i5 = smear & i;
+                    Object obj2 = objArr[i5];
+                    if (obj2 == null) {
+                        elements[i3] = obj;
+                        objArr[i5] = obj;
+                        i2 += hashCode;
+                        i3++;
+                        break;
+                    } else if (obj2.equals(obj)) {
+                        break;
+                    } else {
+                        smear++;
+                    }
                 }
+            } else {
+                throw new NullPointerException(R$style$$ExternalSyntheticOutline0.m(20, "at index ", i4));
             }
         }
         Arrays.fill(elements, i3, n, (Object) null);
@@ -157,10 +192,6 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
         return createAsList;
     }
 
-    public ImmutableList<E> createAsList() {
-        return ImmutableList.asImmutableList(toArray());
-    }
-
     @Override // java.util.Collection, java.util.Set
     public boolean equals(Object object) {
         if (object == this) {
@@ -172,22 +203,29 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
         return false;
     }
 
+    @Override // com.google.common.collect.ImmutableCollection
+    Object writeReplace() {
+        return new SerializedForm(toArray());
+    }
+
+    public ImmutableList<E> createAsList() {
+        Object[] array = toArray();
+        ImmutableList.Itr itr = ImmutableList.EMPTY_ITR;
+        return ImmutableList.asImmutableList(array, array.length);
+    }
+
     @Override // java.util.Collection, java.util.Set
     public int hashCode() {
         return Sets.hashCodeImpl(this);
     }
 
-    public boolean isHashCodeFast() {
-        return this instanceof RegularImmutableSet;
-    }
-
     @Override // com.google.common.collect.ImmutableCollection, java.util.AbstractCollection, java.util.Collection, java.lang.Iterable
-    public /* bridge */ /* synthetic */ Iterator iterator() {
+    /* renamed from: iterator */
+    public /* bridge */ /* synthetic */ Iterator mo59iterator() {
         return iterator();
     }
 
-    @Override // com.google.common.collect.ImmutableCollection
-    Object writeReplace() {
-        return new SerializedForm(toArray());
+    public static <E> ImmutableSet<E> of() {
+        return RegularImmutableSet.EMPTY;
     }
 }

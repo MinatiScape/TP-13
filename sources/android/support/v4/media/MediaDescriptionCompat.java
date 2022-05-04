@@ -10,12 +10,12 @@ import android.os.Parcelable;
 public final class MediaDescriptionCompat implements Parcelable {
     public static final Parcelable.Creator<MediaDescriptionCompat> CREATOR = new Parcelable.Creator<MediaDescriptionCompat>() { // from class: android.support.v4.media.MediaDescriptionCompat.1
         @Override // android.os.Parcelable.Creator
-        public MediaDescriptionCompat createFromParcel(Parcel parcel) {
+        public final MediaDescriptionCompat createFromParcel(Parcel parcel) {
             return MediaDescriptionCompat.fromMediaDescription(MediaDescription.CREATOR.createFromParcel(parcel));
         }
 
         @Override // android.os.Parcelable.Creator
-        public MediaDescriptionCompat[] newArray(int i) {
+        public final MediaDescriptionCompat[] newArray(int i) {
             return new MediaDescriptionCompat[i];
         }
     };
@@ -28,6 +28,10 @@ public final class MediaDescriptionCompat implements Parcelable {
     public final Uri mMediaUri;
     public final CharSequence mSubtitle;
     public final CharSequence mTitle;
+
+    public MediaDescriptionCompat() {
+        throw null;
+    }
 
     public MediaDescriptionCompat(String str, CharSequence charSequence, CharSequence charSequence2, CharSequence charSequence3, Bitmap bitmap, Uri uri, Bundle bundle, Uri uri2) {
         this.mMediaId = str;
@@ -98,16 +102,16 @@ public final class MediaDescriptionCompat implements Parcelable {
     }
 
     @Override // android.os.Parcelable
-    public int describeContents() {
+    public final int describeContents() {
         return 0;
     }
 
-    public String toString() {
+    public final String toString() {
         return ((Object) this.mTitle) + ", " + ((Object) this.mSubtitle) + ", " + ((Object) this.mDescription);
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
+    public final void writeToParcel(Parcel parcel, int i) {
         Object obj = this.mDescriptionObj;
         if (obj == null) {
             MediaDescription.Builder builder = new MediaDescription.Builder();

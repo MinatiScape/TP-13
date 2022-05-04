@@ -6,11 +6,11 @@ import java.security.MessageDigest;
 public final class EmptySignature implements Key {
     public static final EmptySignature EMPTY_KEY = new EmptySignature();
 
-    public String toString() {
+    public final String toString() {
         return "EmptySignature";
     }
 
     @Override // com.bumptech.glide.load.Key
-    public void updateDiskCacheKey(MessageDigest messageDigest) {
+    public final void updateDiskCacheKey(MessageDigest messageDigest) {
     }
 }

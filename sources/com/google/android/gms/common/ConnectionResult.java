@@ -4,7 +4,6 @@ import android.app.PendingIntent;
 import android.os.Parcel;
 import android.os.Parcelable;
 import androidx.core.R$id;
-import androidx.slice.view.R$layout;
 import com.google.android.gms.common.internal.zzam;
 import com.google.android.gms.internal.zzbkv;
 import java.util.Arrays;
@@ -17,11 +16,30 @@ public final class ConnectionResult extends zzbkv {
     public static final ConnectionResult zza = new ConnectionResult(0);
     public static final Parcelable.Creator<ConnectionResult> CREATOR = new zzb();
 
-    public ConnectionResult(int i) {
-        this.zzb = 1;
-        this.zzc = i;
-        this.zzd = null;
-        this.zze = null;
+    public ConnectionResult() {
+        throw null;
+    }
+
+    public ConnectionResult(int i, int i2, PendingIntent pendingIntent, String str) {
+        this.zzb = i;
+        this.zzc = i2;
+        this.zzd = pendingIntent;
+        this.zze = str;
+    }
+
+    public final boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof ConnectionResult)) {
+            return false;
+        }
+        ConnectionResult connectionResult = (ConnectionResult) obj;
+        return this.zzc == connectionResult.zzc && R$id.zza(this.zzd, connectionResult.zzd) && R$id.zza(this.zze, connectionResult.zze);
+    }
+
+    public final int hashCode() {
+        return Arrays.hashCode(new Object[]{Integer.valueOf(this.zzc), this.zzd, this.zze});
     }
 
     public static String zza(int i) {
@@ -88,62 +106,33 @@ public final class ConnectionResult extends zzbkv {
         }
     }
 
-    public final boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (!(obj instanceof ConnectionResult)) {
-            return false;
-        }
-        ConnectionResult connectionResult = (ConnectionResult) obj;
-        return this.zzc == connectionResult.zzc && R$id.zza(this.zzd, connectionResult.zzd) && R$id.zza(this.zze, connectionResult.zze);
-    }
-
-    public final boolean hasResolution() {
-        return (this.zzc == 0 || this.zzd == null) ? false : true;
-    }
-
-    public final int hashCode() {
-        return Arrays.hashCode(new Object[]{Integer.valueOf(this.zzc), this.zzd, this.zze});
-    }
-
-    public final boolean isSuccess() {
-        return this.zzc == 0;
-    }
-
     public final String toString() {
-        zzam zza2 = R$id.zza(this);
-        zza2.zza("statusCode", zza(this.zzc));
-        zza2.zza("resolution", this.zzd);
-        zza2.zza("message", this.zze);
-        return zza2.toString();
+        zzam zzamVar = new zzam(this, 0);
+        zzamVar.zza("statusCode", zza(this.zzc));
+        zzamVar.zza("resolution", this.zzd);
+        zzamVar.zza("message", this.zze);
+        return zzamVar.toString();
     }
 
     @Override // android.os.Parcelable
     public final void writeToParcel(Parcel parcel, int i) {
-        int zzb = R$layout.zzb(parcel, 20293);
+        int zzb = R$id.zzb(parcel, 20293);
         int i2 = this.zzb;
-        R$layout.zzb(parcel, 1, 4);
+        R$id.zzb(parcel, 1, 4);
         parcel.writeInt(i2);
         int i3 = this.zzc;
-        R$layout.zzb(parcel, 2, 4);
+        R$id.zzb(parcel, 2, 4);
         parcel.writeInt(i3);
-        R$layout.zza(parcel, 3, this.zzd, i, false);
-        R$layout.zza(parcel, 4, this.zze, false);
-        R$layout.zzc(parcel, zzb);
+        R$id.zza(parcel, 3, this.zzd, i);
+        R$id.zza(parcel, 4, this.zze);
+        R$id.zzc(parcel, zzb);
     }
 
-    public ConnectionResult(int i, int i2, PendingIntent pendingIntent, String str) {
-        this.zzb = i;
-        this.zzc = i2;
-        this.zzd = pendingIntent;
-        this.zze = str;
+    public ConnectionResult(int i) {
+        this(1, i, null, null);
     }
 
     public ConnectionResult(int i, PendingIntent pendingIntent) {
-        this.zzb = 1;
-        this.zzc = i;
-        this.zzd = pendingIntent;
-        this.zze = null;
+        this(1, i, pendingIntent, null);
     }
 }

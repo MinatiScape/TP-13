@@ -8,10 +8,6 @@ public class VolleyError extends Exception {
         this.networkResponse = null;
     }
 
-    public void setNetworkTimeMs(long j) {
-        this.networkTimeMs = j;
-    }
-
     public VolleyError(NetworkResponse networkResponse) {
         this.networkResponse = networkResponse;
     }
@@ -21,8 +17,12 @@ public class VolleyError extends Exception {
         this.networkResponse = null;
     }
 
-    public VolleyError(Throwable th) {
-        super(th);
+    public VolleyError(Exception exc) {
+        super(exc);
         this.networkResponse = null;
+    }
+
+    public final void setNetworkTimeMs(long j) {
+        this.networkTimeMs = j;
     }
 }

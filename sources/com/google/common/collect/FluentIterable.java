@@ -1,16 +1,16 @@
 package com.google.common.collect;
 
-import com.google.common.base.Absent;
 import com.google.common.base.Optional;
 /* loaded from: classes.dex */
 public abstract class FluentIterable<E> implements Iterable<E> {
-    public final Optional<Iterable<E>> iterableDelegate = Absent.INSTANCE;
+    public final Optional<Iterable<E>> iterableDelegate = Optional.absent();
 
-    public String toString() {
+    public final String toString() {
+        this.iterableDelegate.or(this);
         StringBuilder sb = new StringBuilder();
         sb.append('[');
         boolean z = true;
-        for (E e : this.iterableDelegate.or(this)) {
+        for (E e : this) {
             if (!z) {
                 sb.append(", ");
             }

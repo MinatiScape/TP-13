@@ -1,6 +1,7 @@
 package androidx.lifecycle;
 
 import android.annotation.SuppressLint;
+import android.os.Looper;
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 import androidx.arch.core.executor.ArchTaskExecutor;
 import androidx.arch.core.internal.FastSafeIterableMap;
@@ -12,9 +13,8 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 /* loaded from: classes.dex */
-public class LifecycleRegistry extends Lifecycle {
+public final class LifecycleRegistry extends Lifecycle {
     public final boolean mEnforceMainThread;
     public final WeakReference<LifecycleOwner> mLifecycleOwner;
     public FastSafeIterableMap<LifecycleObserver, ObserverWithState> mObserverMap = new FastSafeIterableMap<>();
@@ -31,7 +31,7 @@ public class LifecycleRegistry extends Lifecycle {
 
         public ObserverWithState(LifecycleObserver lifecycleObserver, Lifecycle.State state) {
             LifecycleEventObserver lifecycleEventObserver;
-            Map<Class<?>, Integer> map = Lifecycling.sCallbackCache;
+            HashMap hashMap = Lifecycling.sCallbackCache;
             boolean z = lifecycleObserver instanceof LifecycleEventObserver;
             boolean z2 = lifecycleObserver instanceof FullLifecycleObserver;
             if (z && z2) {
@@ -43,7 +43,7 @@ public class LifecycleRegistry extends Lifecycle {
             } else {
                 Class<?> cls = lifecycleObserver.getClass();
                 if (Lifecycling.getObserverConstructorType(cls) == 2) {
-                    List list = (List) ((HashMap) Lifecycling.sClassToAdapters).get(cls);
+                    List list = (List) Lifecycling.sClassToAdapters.get(cls);
                     if (list.size() == 1) {
                         lifecycleEventObserver = new SingleGeneratedAdapterObserver(Lifecycling.createGeneratedAdapter((Constructor) list.get(0), lifecycleObserver));
                     } else {
@@ -61,30 +61,28 @@ public class LifecycleRegistry extends Lifecycle {
             this.mState = state;
         }
 
-        public void dispatchEvent(LifecycleOwner lifecycleOwner, Lifecycle.Event event) {
+        public final void dispatchEvent(LifecycleOwner lifecycleOwner, Lifecycle.Event event) {
             Lifecycle.State targetState = event.getTargetState();
-            this.mState = LifecycleRegistry.min(this.mState, targetState);
+            Lifecycle.State state = this.mState;
+            if (targetState.compareTo(state) < 0) {
+                state = targetState;
+            }
+            this.mState = state;
             this.mLifecycleObserver.onStateChanged(lifecycleOwner, event);
             this.mState = targetState;
         }
-    }
-
-    public LifecycleRegistry(LifecycleOwner lifecycleOwner, boolean z) {
-        this.mLifecycleOwner = new WeakReference<>(lifecycleOwner);
-        this.mEnforceMainThread = z;
     }
 
     public static LifecycleRegistry createUnsafe(LifecycleOwner lifecycleOwner) {
         return new LifecycleRegistry(lifecycleOwner, false);
     }
 
-    public static Lifecycle.State min(Lifecycle.State state, Lifecycle.State state2) {
-        return (state2 == null || state2.compareTo(state) >= 0) ? state : state2;
-    }
-
     @Override // androidx.lifecycle.Lifecycle
-    public void addObserver(LifecycleObserver lifecycleObserver) {
+    public final void addObserver(LifecycleObserver lifecycleObserver) {
         LifecycleOwner lifecycleOwner;
+        boolean z;
+        Lifecycle.Event event;
+        ArrayList<Lifecycle.State> arrayList;
         enforceMainThreadIfNeeded("addObserver");
         Lifecycle.State state = this.mState;
         Lifecycle.State state2 = Lifecycle.State.DESTROYED;
@@ -93,15 +91,28 @@ public class LifecycleRegistry extends Lifecycle {
         }
         ObserverWithState observerWithState = new ObserverWithState(lifecycleObserver, state2);
         if (this.mObserverMap.putIfAbsent(lifecycleObserver, observerWithState) == null && (lifecycleOwner = this.mLifecycleOwner.get()) != null) {
-            boolean z = this.mAddingObserverCounter != 0 || this.mHandlingEvent;
+            if (this.mAddingObserverCounter != 0 || this.mHandlingEvent) {
+                z = true;
+            } else {
+                z = false;
+            }
             Lifecycle.State calculateTargetState = calculateTargetState(lifecycleObserver);
             this.mAddingObserverCounter++;
             while (observerWithState.mState.compareTo(calculateTargetState) < 0 && this.mObserverMap.mHashMap.containsKey(lifecycleObserver)) {
                 this.mParentStates.add(observerWithState.mState);
-                Lifecycle.Event upFrom = Lifecycle.Event.upFrom(observerWithState.mState);
-                if (upFrom != null) {
-                    observerWithState.dispatchEvent(lifecycleOwner, upFrom);
-                    popParentState();
+                int ordinal = observerWithState.mState.ordinal();
+                if (ordinal == 1) {
+                    event = Lifecycle.Event.ON_CREATE;
+                } else if (ordinal == 2) {
+                    event = Lifecycle.Event.ON_START;
+                } else if (ordinal != 3) {
+                    event = null;
+                } else {
+                    event = Lifecycle.Event.ON_RESUME;
+                }
+                if (event != null) {
+                    observerWithState.dispatchEvent(lifecycleOwner, event);
+                    this.mParentStates.remove(arrayList.size() - 1);
                     calculateTargetState = calculateTargetState(lifecycleObserver);
                 } else {
                     StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("no event up from ");
@@ -117,25 +128,51 @@ public class LifecycleRegistry extends Lifecycle {
     }
 
     public final Lifecycle.State calculateTargetState(LifecycleObserver lifecycleObserver) {
+        SafeIterableMap.Entry<LifecycleObserver, ObserverWithState> entry;
+        Lifecycle.State state;
+        ArrayList<Lifecycle.State> arrayList;
         FastSafeIterableMap<LifecycleObserver, ObserverWithState> fastSafeIterableMap = this.mObserverMap;
-        Lifecycle.State state = null;
-        SafeIterableMap.Entry<LifecycleObserver, ObserverWithState> entry = fastSafeIterableMap.mHashMap.containsKey(lifecycleObserver) ? fastSafeIterableMap.mHashMap.get(lifecycleObserver).mPrevious : null;
-        Lifecycle.State state2 = entry != null ? entry.mValue.mState : null;
-        if (!this.mParentStates.isEmpty()) {
-            ArrayList<Lifecycle.State> arrayList = this.mParentStates;
-            state = arrayList.get(arrayList.size() - 1);
+        Lifecycle.State state2 = null;
+        if (fastSafeIterableMap.mHashMap.containsKey(lifecycleObserver)) {
+            entry = fastSafeIterableMap.mHashMap.get(lifecycleObserver).mPrevious;
+        } else {
+            entry = null;
         }
-        return min(min(this.mState, state2), state);
+        if (entry != null) {
+            state = entry.mValue.mState;
+        } else {
+            state = null;
+        }
+        if (!this.mParentStates.isEmpty()) {
+            state2 = this.mParentStates.get(arrayList.size() - 1);
+        }
+        Lifecycle.State state3 = this.mState;
+        if (state == null || state.compareTo(state3) >= 0) {
+            state = state3;
+        }
+        if (state2 == null || state2.compareTo(state) >= 0) {
+            return state;
+        }
+        return state2;
     }
 
     @SuppressLint({"RestrictedApi"})
     public final void enforceMainThreadIfNeeded(String str) {
-        if (this.mEnforceMainThread && !ArchTaskExecutor.getInstance().isMainThread()) {
-            throw new IllegalStateException(AbstractResolvableFuture$$ExternalSyntheticOutline0.m("Method ", str, " must be called on the main thread"));
+        boolean z;
+        if (this.mEnforceMainThread) {
+            ArchTaskExecutor.getInstance().mDelegate.getClass();
+            if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
+                z = true;
+            } else {
+                z = false;
+            }
+            if (!z) {
+                throw new IllegalStateException(AbstractResolvableFuture$$ExternalSyntheticOutline0.m("Method ", str, " must be called on the main thread"));
+            }
         }
     }
 
-    public void handleLifecycleEvent(Lifecycle.Event event) {
+    public final void handleLifecycleEvent(Lifecycle.Event event) {
         enforceMainThreadIfNeeded("handleLifecycleEvent");
         moveToState(event.getTargetState());
     }
@@ -153,89 +190,34 @@ public class LifecycleRegistry extends Lifecycle {
         }
     }
 
-    public final void popParentState() {
-        ArrayList<Lifecycle.State> arrayList = this.mParentStates;
-        arrayList.remove(arrayList.size() - 1);
-    }
-
     @Override // androidx.lifecycle.Lifecycle
-    public void removeObserver(LifecycleObserver lifecycleObserver) {
+    public final void removeObserver(LifecycleObserver lifecycleObserver) {
         enforceMainThreadIfNeeded("removeObserver");
         this.mObserverMap.remove(lifecycleObserver);
     }
 
-    /* JADX WARN: Multi-variable type inference failed */
+    /* JADX WARN: Code restructure failed: missing block: B:90:0x0055, code lost:
+        continue;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:94:0x00f8, code lost:
+        continue;
+     */
+    /* JADX WARN: Removed duplicated region for block: B:13:0x002e  */
+    /* JADX WARN: Removed duplicated region for block: B:75:0x016f A[SYNTHETIC] */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+        To view partially-correct add '--show-bad-code' argument
+    */
     public final void sync() {
-        Lifecycle.Event event;
-        LifecycleOwner lifecycleOwner = this.mLifecycleOwner.get();
-        if (lifecycleOwner != null) {
-            while (true) {
-                FastSafeIterableMap<LifecycleObserver, ObserverWithState> fastSafeIterableMap = this.mObserverMap;
-                boolean z = true;
-                if (fastSafeIterableMap.mSize != 0) {
-                    Lifecycle.State state = fastSafeIterableMap.mStart.mValue.mState;
-                    Lifecycle.State state2 = fastSafeIterableMap.mEnd.mValue.mState;
-                    if (!(state == state2 && this.mState == state2)) {
-                        z = false;
-                    }
-                }
-                if (!z) {
-                    this.mNewEventOccurred = false;
-                    if (this.mState.compareTo(fastSafeIterableMap.mStart.mValue.mState) < 0) {
-                        FastSafeIterableMap<LifecycleObserver, ObserverWithState> fastSafeIterableMap2 = this.mObserverMap;
-                        SafeIterableMap.DescendingIterator descendingIterator = new SafeIterableMap.DescendingIterator(fastSafeIterableMap2.mEnd, fastSafeIterableMap2.mStart);
-                        fastSafeIterableMap2.mIterators.put(descendingIterator, Boolean.FALSE);
-                        while (descendingIterator.hasNext() && !this.mNewEventOccurred) {
-                            Map.Entry entry = (Map.Entry) descendingIterator.next();
-                            ObserverWithState observerWithState = (ObserverWithState) entry.getValue();
-                            while (observerWithState.mState.compareTo(this.mState) > 0 && !this.mNewEventOccurred && this.mObserverMap.contains(entry.getKey())) {
-                                int ordinal = observerWithState.mState.ordinal();
-                                if (ordinal == 2) {
-                                    event = Lifecycle.Event.ON_DESTROY;
-                                } else if (ordinal != 3) {
-                                    event = ordinal != 4 ? null : Lifecycle.Event.ON_PAUSE;
-                                } else {
-                                    event = Lifecycle.Event.ON_STOP;
-                                }
-                                if (event != null) {
-                                    this.mParentStates.add(event.getTargetState());
-                                    observerWithState.dispatchEvent(lifecycleOwner, event);
-                                    popParentState();
-                                } else {
-                                    StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("no event down from ");
-                                    m.append(observerWithState.mState);
-                                    throw new IllegalStateException(m.toString());
-                                }
-                            }
-                        }
-                    }
-                    SafeIterableMap.Entry<LifecycleObserver, ObserverWithState> entry2 = this.mObserverMap.mEnd;
-                    if (!this.mNewEventOccurred && entry2 != null && this.mState.compareTo(entry2.mValue.mState) > 0) {
-                        SafeIterableMap<LifecycleObserver, ObserverWithState>.IteratorWithAdditions iteratorWithAdditions = this.mObserverMap.iteratorWithAdditions();
-                        while (iteratorWithAdditions.hasNext() && !this.mNewEventOccurred) {
-                            Map.Entry entry3 = (Map.Entry) iteratorWithAdditions.next();
-                            ObserverWithState observerWithState2 = (ObserverWithState) entry3.getValue();
-                            while (observerWithState2.mState.compareTo(this.mState) < 0 && !this.mNewEventOccurred && this.mObserverMap.contains(entry3.getKey())) {
-                                this.mParentStates.add(observerWithState2.mState);
-                                Lifecycle.Event upFrom = Lifecycle.Event.upFrom(observerWithState2.mState);
-                                if (upFrom != null) {
-                                    observerWithState2.dispatchEvent(lifecycleOwner, upFrom);
-                                    popParentState();
-                                } else {
-                                    StringBuilder m2 = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("no event up from ");
-                                    m2.append(observerWithState2.mState);
-                                    throw new IllegalStateException(m2.toString());
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    this.mNewEventOccurred = false;
-                    return;
-                }
-            }
-        } else {
-            throw new IllegalStateException("LifecycleOwner of this LifecycleRegistry is alreadygarbage collected. It is too late to change lifecycle state.");
-        }
+        /*
+            Method dump skipped, instructions count: 378
+            To view this dump add '--comments-level debug' option
+        */
+        throw new UnsupportedOperationException("Method not decompiled: androidx.lifecycle.LifecycleRegistry.sync():void");
+    }
+
+    public LifecycleRegistry(LifecycleOwner lifecycleOwner, boolean z) {
+        this.mLifecycleOwner = new WeakReference<>(lifecycleOwner);
+        this.mEnforceMainThread = z;
     }
 }

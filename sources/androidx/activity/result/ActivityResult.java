@@ -10,12 +10,12 @@ import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalS
 public final class ActivityResult implements Parcelable {
     public static final Parcelable.Creator<ActivityResult> CREATOR = new Parcelable.Creator<ActivityResult>() { // from class: androidx.activity.result.ActivityResult.1
         @Override // android.os.Parcelable.Creator
-        public ActivityResult createFromParcel(Parcel parcel) {
+        public final ActivityResult createFromParcel(Parcel parcel) {
             return new ActivityResult(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public ActivityResult[] newArray(int i) {
+        public final ActivityResult[] newArray(int i) {
             return new ActivityResult[i];
         }
     };
@@ -28,18 +28,20 @@ public final class ActivityResult implements Parcelable {
     }
 
     @Override // android.os.Parcelable
-    public int describeContents() {
+    public final int describeContents() {
         return 0;
     }
 
-    public String toString() {
+    public final String toString() {
         String str;
         StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("ActivityResult{resultCode=");
         int i = this.mResultCode;
-        if (i != -1) {
-            str = i != 0 ? String.valueOf(i) : "RESULT_CANCELED";
-        } else {
+        if (i == -1) {
             str = "RESULT_OK";
+        } else if (i != 0) {
+            str = String.valueOf(i);
+        } else {
+            str = "RESULT_CANCELED";
         }
         m.append(str);
         m.append(", data=");
@@ -49,9 +51,15 @@ public final class ActivityResult implements Parcelable {
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
+    public final void writeToParcel(Parcel parcel, int i) {
+        int i2;
         parcel.writeInt(this.mResultCode);
-        parcel.writeInt(this.mData == null ? 0 : 1);
+        if (this.mData == null) {
+            i2 = 0;
+        } else {
+            i2 = 1;
+        }
+        parcel.writeInt(i2);
         Intent intent = this.mData;
         if (intent != null) {
             intent.writeToParcel(parcel, i);

@@ -11,9 +11,9 @@ public interface MenuPresenter {
         boolean onOpenSubMenu(MenuBuilder menuBuilder);
     }
 
-    boolean collapseItemActionView(MenuBuilder menuBuilder, MenuItemImpl menuItemImpl);
+    boolean collapseItemActionView(MenuItemImpl menuItemImpl);
 
-    boolean expandItemActionView(MenuBuilder menuBuilder, MenuItemImpl menuItemImpl);
+    boolean expandItemActionView(MenuItemImpl menuItemImpl);
 
     boolean flagActionItems();
 
@@ -25,5 +25,5 @@ public interface MenuPresenter {
 
     void setCallback(Callback callback);
 
-    void updateMenuView(boolean z);
+    void updateMenuView();
 }

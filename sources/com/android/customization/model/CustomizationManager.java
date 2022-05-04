@@ -8,19 +8,19 @@ public interface CustomizationManager<T extends CustomizationOption> {
 
     /* loaded from: classes.dex */
     public interface Callback {
-        void onError(Throwable th);
+        void onError();
 
         void onSuccess();
     }
 
     /* loaded from: classes.dex */
     public interface OptionsFetchedListener<T extends CustomizationOption> {
+        void onOptionsLoaded(List<T> list);
+
         default void onError(Throwable th) {
             if (th != null) {
                 Log.e("OptionsFecthedListener", "Error loading options", th);
             }
         }
-
-        void onOptionsLoaded(List<T> list);
     }
 }

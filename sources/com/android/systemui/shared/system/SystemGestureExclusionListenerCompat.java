@@ -21,15 +21,7 @@ public abstract class SystemGestureExclusionListenerCompat {
     };
     private boolean mRegistered;
 
-    public SystemGestureExclusionListenerCompat(int i) {
-        this.mDisplayId = i;
-    }
-
     public abstract void onExclusionChanged(Region region);
-
-    public void onExclusionChanged(Region region, Region region2) {
-        onExclusionChanged(region);
-    }
 
     public void register() {
         if (!this.mRegistered) {
@@ -51,5 +43,13 @@ public abstract class SystemGestureExclusionListenerCompat {
                 Log.e(TAG, "Failed to unregister window manager callbacks", e);
             }
         }
+    }
+
+    public SystemGestureExclusionListenerCompat(int i) {
+        this.mDisplayId = i;
+    }
+
+    public void onExclusionChanged(Region region, Region region2) {
+        onExclusionChanged(region);
     }
 }

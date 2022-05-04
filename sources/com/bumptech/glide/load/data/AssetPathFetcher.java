@@ -12,17 +12,16 @@ public abstract class AssetPathFetcher<T> implements DataFetcher<T> {
     public final String assetPath;
     public T data;
 
-    public AssetPathFetcher(AssetManager assetManager, String assetPath) {
-        this.assetManager = assetManager;
-        this.assetPath = assetPath;
+    @Override // com.bumptech.glide.load.data.DataFetcher
+    public final void cancel() {
     }
 
-    @Override // com.bumptech.glide.load.data.DataFetcher
-    public void cancel() {
-    }
+    public abstract void close(T t) throws IOException;
+
+    public abstract T loadResource(AssetManager assetManager, String str) throws IOException;
 
     @Override // com.bumptech.glide.load.data.DataFetcher
-    public void cleanup() {
+    public final void cleanup() {
         T t = this.data;
         if (t != null) {
             try {
@@ -32,26 +31,27 @@ public abstract class AssetPathFetcher<T> implements DataFetcher<T> {
         }
     }
 
-    public abstract void close(T data) throws IOException;
-
     @Override // com.bumptech.glide.load.data.DataFetcher
-    public DataSource getDataSource() {
-        return DataSource.LOCAL;
-    }
-
-    @Override // com.bumptech.glide.load.data.DataFetcher
-    public void loadData(Priority priority, DataFetcher.DataCallback<? super T> callback) {
+    public final void loadData(Priority priority, DataFetcher.DataCallback<? super T> dataCallback) {
         try {
             T loadResource = loadResource(this.assetManager, this.assetPath);
             this.data = loadResource;
-            callback.onDataReady(loadResource);
+            dataCallback.onDataReady(loadResource);
         } catch (IOException e) {
             if (Log.isLoggable("AssetPathFetcher", 3)) {
                 Log.d("AssetPathFetcher", "Failed to load data from asset manager", e);
             }
-            callback.onLoadFailed(e);
+            dataCallback.onLoadFailed(e);
         }
     }
 
-    public abstract T loadResource(AssetManager assetManager, String path) throws IOException;
+    public AssetPathFetcher(AssetManager assetManager, String str) {
+        this.assetManager = assetManager;
+        this.assetPath = str;
+    }
+
+    @Override // com.bumptech.glide.load.data.DataFetcher
+    public final DataSource getDataSource() {
+        return DataSource.LOCAL;
+    }
 }

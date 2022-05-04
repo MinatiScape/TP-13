@@ -8,7 +8,7 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
-import androidx.transition.R$id;
+import androidx.appcompat.R$bool;
 import com.android.customization.model.CustomizationManager;
 import com.android.customization.model.CustomizationOption;
 import com.android.customization.widget.GridTileDrawable;
@@ -17,12 +17,12 @@ import com.android.systemui.shared.R;
 public class GridOption implements CustomizationOption<GridOption>, Parcelable {
     public static final Parcelable.Creator<GridOption> CREATOR = new Parcelable.Creator<GridOption>() { // from class: com.android.customization.model.grid.GridOption.1
         @Override // android.os.Parcelable.Creator
-        public GridOption createFromParcel(Parcel parcel) {
+        public final GridOption createFromParcel(Parcel parcel) {
             return new GridOption(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public GridOption[] newArray(int i) {
+        public final GridOption[] newArray(int i) {
             return new GridOption[i];
         }
     };
@@ -48,26 +48,12 @@ public class GridOption implements CustomizationOption<GridOption>, Parcelable {
         this.previewPagesCount = i3;
     }
 
-    @Override // com.android.customization.model.CustomizationOption
-    public void bindThumbnailTile(View view) {
-        int i;
-        Context context = view.getContext();
-        if (view.isActivated()) {
-            i = this.mIsCurrent ? 16842806 : 16842809;
-        } else {
-            i = 16843282;
-        }
-        this.mTileDrawable.setColorFilter(R$id.getColorAttr(context, i), PorterDuff.Mode.SRC_ATOP);
-        ((ImageView) view.findViewById(R.id.grid_option_thumbnail)).setImageDrawable(this.mTileDrawable);
-        view.findViewById(R.id.option_tile).setBackgroundResource((!view.isActivated() || this.mIsCurrent) ? R.drawable.option_border : R.drawable.option_border_new_selection);
-    }
-
     @Override // android.os.Parcelable
-    public int describeContents() {
+    public final int describeContents() {
         return 0;
     }
 
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
@@ -79,26 +65,16 @@ public class GridOption implements CustomizationOption<GridOption>, Parcelable {
     }
 
     @Override // com.android.customization.model.CustomizationOption
-    public int getLayoutResId() {
+    public final int getLayoutResId() {
         return R.layout.grid_option;
     }
 
-    @Override // com.android.customization.model.CustomizationOption
-    public String getTitle() {
-        return this.mTitle;
-    }
-
-    @Override // com.android.customization.model.CustomizationOption
-    public boolean isActive(CustomizationManager<GridOption> customizationManager) {
-        return this.mIsCurrent;
-    }
-
-    public String toString() {
+    public final String toString() {
         return String.format("GridOption{mTitle='%s', mIsCurrent=%s, mTileDrawable=%s, name='%s', rows=%d, cols=%d, previewImageUri=%s, previewPagesCount=%d}\n", this.mTitle, Boolean.valueOf(this.mIsCurrent), this.mTileDrawable, this.name, Integer.valueOf(this.rows), Integer.valueOf(this.cols), this.previewImageUri, Integer.valueOf(this.previewPagesCount));
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
+    public final void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(this.mTitle);
         parcel.writeByte(this.mIsCurrent ? (byte) 1 : (byte) 0);
         parcel.writeString(this.mIconShapePath);
@@ -107,6 +83,28 @@ public class GridOption implements CustomizationOption<GridOption>, Parcelable {
         parcel.writeInt(this.cols);
         parcel.writeParcelable(this.previewImageUri, i);
         parcel.writeInt(this.previewPagesCount);
+    }
+
+    @Override // com.android.customization.model.CustomizationOption
+    public final void bindThumbnailTile(View view) {
+        int i;
+        int i2;
+        Context context = view.getContext();
+        if (!view.isActivated()) {
+            i = 16843282;
+        } else if (this.mIsCurrent) {
+            i = 16842806;
+        } else {
+            i = 16842809;
+        }
+        this.mTileDrawable.setColorFilter(R$bool.getColorAttr(context, i), PorterDuff.Mode.SRC_ATOP);
+        ((ImageView) view.findViewById(R.id.grid_option_thumbnail)).setImageDrawable(this.mTileDrawable);
+        if (!view.isActivated() || this.mIsCurrent) {
+            i2 = R.drawable.option_border;
+        } else {
+            i2 = R.drawable.option_border_new_selection;
+        }
+        view.findViewById(R.id.option_tile).setBackgroundResource(i2);
     }
 
     public GridOption(Parcel parcel) {
@@ -122,5 +120,15 @@ public class GridOption implements CustomizationOption<GridOption>, Parcelable {
         this.previewImageUri = (Uri) parcel.readParcelable(Uri.class.getClassLoader());
         this.previewPagesCount = parcel.readInt();
         this.mTileDrawable = new GridTileDrawable(readInt, readInt2, readString);
+    }
+
+    @Override // com.android.customization.model.CustomizationOption
+    public final boolean isActive(CustomizationManager<GridOption> customizationManager) {
+        return this.mIsCurrent;
+    }
+
+    @Override // com.android.customization.model.CustomizationOption
+    public final String getTitle() {
+        return this.mTitle;
     }
 }

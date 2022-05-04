@@ -2,10 +2,9 @@ package com.android.customization.model.theme;
 
 import com.android.customization.model.CustomizationManager;
 import java.util.HashSet;
-import java.util.Set;
 /* loaded from: classes.dex */
-public class ThemeManager implements CustomizationManager<?> {
-    public static final Set<String> THEME_CATEGORIES;
+public final class ThemeManager implements CustomizationManager<Object> {
+    public static final HashSet THEME_CATEGORIES;
 
     static {
         HashSet hashSet = new HashSet();

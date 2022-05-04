@@ -3,11 +3,11 @@ package com.bumptech.glide.load.engine.bitmap_recycle;
 public interface ArrayPool {
     void clearMemory();
 
-    <T> T get(int size, Class<T> arrayClass);
+    <T> T get(int i, Class<T> cls);
 
-    <T> T getExact(int size, Class<T> arrayClass);
+    Object getExact();
 
-    <T> void put(T array);
+    <T> void put(T t);
 
-    void trimMemory(int level);
+    void trimMemory(int i);
 }

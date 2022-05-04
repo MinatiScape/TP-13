@@ -4,52 +4,55 @@ import androidx.constraintlayout.solver.ArrayRow;
 import androidx.constraintlayout.solver.LinearSystem;
 import androidx.constraintlayout.solver.SolverVariable;
 import androidx.constraintlayout.solver.widgets.ConstraintAnchor;
+import androidx.constraintlayout.solver.widgets.ConstraintWidget;
 /* loaded from: classes.dex */
-public class Guideline extends ConstraintWidget {
+public final class Guideline extends ConstraintWidget {
     public float mRelativePercent = -1.0f;
     public int mRelativeBegin = -1;
     public int mRelativeEnd = -1;
     public ConstraintAnchor mAnchor = this.mTop;
     public int mOrientation = 0;
 
-    public Guideline() {
-        this.mAnchors.clear();
-        this.mAnchors.add(this.mAnchor);
-        int length = this.mListAnchors.length;
-        for (int i = 0; i < length; i++) {
-            this.mListAnchors[i] = this.mAnchor;
-        }
+    @Override // androidx.constraintlayout.solver.widgets.ConstraintWidget
+    public final boolean allowedInBarrier() {
+        return true;
     }
 
     @Override // androidx.constraintlayout.solver.widgets.ConstraintWidget
-    public void addToSolver(LinearSystem linearSystem) {
+    public final void addToSolver(LinearSystem linearSystem) {
+        boolean z;
+        ConstraintWidget.DimensionBehaviour dimensionBehaviour = ConstraintWidget.DimensionBehaviour.WRAP_CONTENT;
         ConstraintWidgetContainer constraintWidgetContainer = (ConstraintWidgetContainer) this.mParent;
         if (constraintWidgetContainer != null) {
             ConstraintAnchor anchor = constraintWidgetContainer.getAnchor(ConstraintAnchor.Type.LEFT);
             ConstraintAnchor anchor2 = constraintWidgetContainer.getAnchor(ConstraintAnchor.Type.RIGHT);
             ConstraintWidget constraintWidget = this.mParent;
-            boolean z = true;
-            boolean z2 = constraintWidget != null && constraintWidget.mListDimensionBehaviors[0] == 2;
+            boolean z2 = true;
+            if (constraintWidget == null || constraintWidget.mListDimensionBehaviors[0] != dimensionBehaviour) {
+                z = false;
+            } else {
+                z = true;
+            }
             if (this.mOrientation == 0) {
                 anchor = constraintWidgetContainer.getAnchor(ConstraintAnchor.Type.TOP);
                 anchor2 = constraintWidgetContainer.getAnchor(ConstraintAnchor.Type.BOTTOM);
                 ConstraintWidget constraintWidget2 = this.mParent;
-                if (constraintWidget2 == null || constraintWidget2.mListDimensionBehaviors[1] != 2) {
-                    z = false;
+                if (constraintWidget2 == null || constraintWidget2.mListDimensionBehaviors[1] != dimensionBehaviour) {
+                    z2 = false;
                 }
-                z2 = z;
+                z = z2;
             }
             if (this.mRelativeBegin != -1) {
                 SolverVariable createObjectVariable = linearSystem.createObjectVariable(this.mAnchor);
                 linearSystem.addEquality(createObjectVariable, linearSystem.createObjectVariable(anchor), this.mRelativeBegin, 7);
-                if (z2) {
+                if (z) {
                     linearSystem.addGreaterThan(linearSystem.createObjectVariable(anchor2), createObjectVariable, 0, 5);
                 }
             } else if (this.mRelativeEnd != -1) {
                 SolverVariable createObjectVariable2 = linearSystem.createObjectVariable(this.mAnchor);
                 SolverVariable createObjectVariable3 = linearSystem.createObjectVariable(anchor2);
                 linearSystem.addEquality(createObjectVariable2, createObjectVariable3, -this.mRelativeEnd, 7);
-                if (z2) {
+                if (z) {
                     linearSystem.addGreaterThan(createObjectVariable2, linearSystem.createObjectVariable(anchor), 0, 5);
                     linearSystem.addGreaterThan(createObjectVariable3, createObjectVariable2, 0, 5);
                 }
@@ -65,13 +68,54 @@ public class Guideline extends ConstraintWidget {
         }
     }
 
-    @Override // androidx.constraintlayout.solver.widgets.ConstraintWidget
-    public boolean allowedInBarrier() {
-        return true;
+    public final void setOrientation(int i) {
+        if (this.mOrientation != i) {
+            this.mOrientation = i;
+            this.mAnchors.clear();
+            if (this.mOrientation == 1) {
+                this.mAnchor = this.mLeft;
+            } else {
+                this.mAnchor = this.mTop;
+            }
+            this.mAnchors.add(this.mAnchor);
+            int length = this.mListAnchors.length;
+            for (int i2 = 0; i2 < length; i2++) {
+                this.mListAnchors[i2] = this.mAnchor;
+            }
+        }
     }
 
     @Override // androidx.constraintlayout.solver.widgets.ConstraintWidget
-    public ConstraintAnchor getAnchor(ConstraintAnchor.Type type) {
+    public final void updateFromSolver(LinearSystem linearSystem) {
+        if (this.mParent != null) {
+            ConstraintAnchor constraintAnchor = this.mAnchor;
+            linearSystem.getClass();
+            int objectVariableValue = LinearSystem.getObjectVariableValue(constraintAnchor);
+            if (this.mOrientation == 1) {
+                this.mX = objectVariableValue;
+                this.mY = 0;
+                setHeight(this.mParent.getHeight());
+                setWidth(0);
+                return;
+            }
+            this.mX = 0;
+            this.mY = objectVariableValue;
+            setWidth(this.mParent.getWidth());
+            setHeight(0);
+        }
+    }
+
+    public Guideline() {
+        this.mAnchors.clear();
+        this.mAnchors.add(this.mAnchor);
+        int length = this.mListAnchors.length;
+        for (int i = 0; i < length; i++) {
+            this.mListAnchors[i] = this.mAnchor;
+        }
+    }
+
+    @Override // androidx.constraintlayout.solver.widgets.ConstraintWidget
+    public final ConstraintAnchor getAnchor(ConstraintAnchor.Type type) {
         switch (type.ordinal()) {
             case 0:
             case 5:
@@ -93,40 +137,5 @@ public class Guideline extends ConstraintWidget {
                 break;
         }
         throw new AssertionError(type.name());
-    }
-
-    public void setOrientation(int i) {
-        if (this.mOrientation != i) {
-            this.mOrientation = i;
-            this.mAnchors.clear();
-            if (this.mOrientation == 1) {
-                this.mAnchor = this.mLeft;
-            } else {
-                this.mAnchor = this.mTop;
-            }
-            this.mAnchors.add(this.mAnchor);
-            int length = this.mListAnchors.length;
-            for (int i2 = 0; i2 < length; i2++) {
-                this.mListAnchors[i2] = this.mAnchor;
-            }
-        }
-    }
-
-    @Override // androidx.constraintlayout.solver.widgets.ConstraintWidget
-    public void updateFromSolver(LinearSystem linearSystem) {
-        if (this.mParent != null) {
-            int objectVariableValue = linearSystem.getObjectVariableValue(this.mAnchor);
-            if (this.mOrientation == 1) {
-                this.mX = objectVariableValue;
-                this.mY = 0;
-                setHeight(this.mParent.getHeight());
-                setWidth(0);
-                return;
-            }
-            this.mX = 0;
-            this.mY = objectVariableValue;
-            setWidth(this.mParent.getWidth());
-            setHeight(0);
-        }
     }
 }

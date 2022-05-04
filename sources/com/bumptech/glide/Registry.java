@@ -1,8 +1,6 @@
 package com.bumptech.glide;
 
-import androidx.core.util.Pools$Pool;
 import androidx.core.util.Pools$SynchronizedPool;
-import com.bumptech.glide.load.Encoder;
 import com.bumptech.glide.load.ImageHeaderParser;
 import com.bumptech.glide.load.ResourceDecoder;
 import com.bumptech.glide.load.ResourceEncoder;
@@ -12,10 +10,10 @@ import com.bumptech.glide.load.model.ModelLoader;
 import com.bumptech.glide.load.model.ModelLoaderFactory;
 import com.bumptech.glide.load.model.ModelLoaderRegistry;
 import com.bumptech.glide.load.model.MultiModelLoaderFactory;
+import com.bumptech.glide.load.model.StreamEncoder;
 import com.bumptech.glide.load.resource.transcode.ResourceTranscoder;
 import com.bumptech.glide.load.resource.transcode.TranscoderRegistry;
 import com.bumptech.glide.provider.EncoderRegistry;
-import com.bumptech.glide.provider.ImageHeaderParserRegistry;
 import com.bumptech.glide.provider.LoadPathCache;
 import com.bumptech.glide.provider.ModelToResourceClassCache;
 import com.bumptech.glide.provider.ResourceDecoderRegistry;
@@ -26,31 +24,141 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 /* loaded from: classes.dex */
-public class Registry {
-    public final ResourceDecoderRegistry decoderRegistry;
+public final class Registry {
     public final ModelLoaderRegistry modelLoaderRegistry;
-    public final Pools$Pool<List<Throwable>> throwableListPool;
+    public final FactoryPools.FactoryPool throwableListPool;
     public final ModelToResourceClassCache modelToResourceClassCache = new ModelToResourceClassCache();
     public final LoadPathCache loadPathCache = new LoadPathCache();
     public final EncoderRegistry encoderRegistry = new EncoderRegistry();
+    public final ResourceDecoderRegistry decoderRegistry = new ResourceDecoderRegistry();
     public final ResourceEncoderRegistry resourceEncoderRegistry = new ResourceEncoderRegistry();
     public final DataRewinderRegistry dataRewinderRegistry = new DataRewinderRegistry();
     public final TranscoderRegistry transcoderRegistry = new TranscoderRegistry();
-    public final ImageHeaderParserRegistry imageHeaderParserRegistry = new ImageHeaderParserRegistry();
-
-    /* loaded from: classes.dex */
-    public static class MissingComponentException extends RuntimeException {
-        public MissingComponentException(String message) {
-            super(message);
-        }
-    }
+    public final StreamEncoder imageHeaderParserRegistry = new StreamEncoder();
 
     /* loaded from: classes.dex */
     public static final class NoImageHeaderParserException extends MissingComponentException {
         public NoImageHeaderParserException() {
             super("Failed to find image header parser.");
+        }
+    }
+
+    /* loaded from: classes.dex */
+    public static class NoResultEncoderAvailableException extends MissingComponentException {
+        public NoResultEncoderAvailableException(Class<?> cls) {
+            super("Failed to find result encoder for resource class: " + cls + ", you may need to consider registering a new Encoder for the requested type or DiskCacheStrategy.DATA/DiskCacheStrategy.NONE if caching your transformed resource is unnecessary.");
+        }
+    }
+
+    /* loaded from: classes.dex */
+    public static class NoSourceEncoderAvailableException extends MissingComponentException {
+        public NoSourceEncoderAvailableException(Class<?> cls) {
+            super("Failed to find source encoder for data class: " + cls);
+        }
+    }
+
+    public final void append(String str, Class cls, Class cls2, ResourceDecoder resourceDecoder) {
+        ResourceDecoderRegistry resourceDecoderRegistry = this.decoderRegistry;
+        synchronized (resourceDecoderRegistry) {
+            resourceDecoderRegistry.getOrAddEntryList(str).add(new ResourceDecoderRegistry.Entry<>(cls, cls2, resourceDecoder));
+        }
+    }
+
+    public final void register(DataRewinder.Factory factory) {
+        DataRewinderRegistry dataRewinderRegistry = this.dataRewinderRegistry;
+        synchronized (dataRewinderRegistry) {
+            dataRewinderRegistry.rewinders.put(factory.getDataClass(), factory);
+        }
+    }
+
+    public final List<ImageHeaderParser> getImageHeaderParsers() {
+        List<ImageHeaderParser> list;
+        StreamEncoder streamEncoder = this.imageHeaderParserRegistry;
+        synchronized (streamEncoder) {
+            list = (List) streamEncoder.byteArrayPool;
+        }
+        if (!list.isEmpty()) {
+            return list;
+        }
+        throw new NoImageHeaderParserException();
+    }
+
+    public final <Model> List<ModelLoader<Model, ?>> getModelLoaders(Model model) {
+        List<ModelLoader<Model, ?>> list;
+        ModelLoaderRegistry modelLoaderRegistry = this.modelLoaderRegistry;
+        modelLoaderRegistry.getClass();
+        Class<?> cls = model.getClass();
+        synchronized (modelLoaderRegistry) {
+            ModelLoaderRegistry.ModelLoaderCache.Entry entry = (ModelLoaderRegistry.ModelLoaderCache.Entry) modelLoaderRegistry.cache.cachedModelLoaders.get(cls);
+            if (entry == null) {
+                list = null;
+            } else {
+                list = entry.loaders;
+            }
+            if (list == null) {
+                list = Collections.unmodifiableList(modelLoaderRegistry.multiModelLoaderFactory.build(cls));
+                modelLoaderRegistry.cache.put(cls, list);
+            }
+        }
+        if (!list.isEmpty()) {
+            int size = list.size();
+            List<ModelLoader<Model, ?>> emptyList = Collections.emptyList();
+            boolean z = true;
+            for (int i = 0; i < size; i++) {
+                ModelLoader<Model, ?> modelLoader = list.get(i);
+                if (modelLoader.handles(model)) {
+                    if (z) {
+                        emptyList = new ArrayList<>(size - i);
+                        z = false;
+                    }
+                    emptyList.add(modelLoader);
+                }
+            }
+            if (!emptyList.isEmpty()) {
+                return emptyList;
+            }
+            throw new NoModelLoaderAvailableException(model, list);
+        }
+        throw new NoModelLoaderAvailableException(model);
+    }
+
+    public Registry() {
+        FactoryPools.FactoryPool factoryPool = new FactoryPools.FactoryPool(new Pools$SynchronizedPool(20), new FactoryPools.Factory<List<Object>>() { // from class: com.bumptech.glide.util.pool.FactoryPools.2
+            @Override // com.bumptech.glide.util.pool.FactoryPools.Factory
+            public final List<Object> create() {
+                return new ArrayList();
+            }
+        }, new FactoryPools.Resetter<List<Object>>() { // from class: com.bumptech.glide.util.pool.FactoryPools.3
+            @Override // com.bumptech.glide.util.pool.FactoryPools.Resetter
+            public final void reset(List<Object> list) {
+                list.clear();
+            }
+        });
+        this.throwableListPool = factoryPool;
+        this.modelLoaderRegistry = new ModelLoaderRegistry(factoryPool);
+        List<String> asList = Arrays.asList("Gif", "Bitmap", "BitmapDrawable");
+        ArrayList arrayList = new ArrayList(asList.size());
+        arrayList.add("legacy_prepend_all");
+        for (String str : asList) {
+            arrayList.add(str);
+        }
+        arrayList.add("legacy_append");
+        ResourceDecoderRegistry resourceDecoderRegistry = this.decoderRegistry;
+        synchronized (resourceDecoderRegistry) {
+            ArrayList arrayList2 = new ArrayList(resourceDecoderRegistry.bucketPriorityList);
+            resourceDecoderRegistry.bucketPriorityList.clear();
+            Iterator it = arrayList.iterator();
+            while (it.hasNext()) {
+                resourceDecoderRegistry.bucketPriorityList.add((String) it.next());
+            }
+            Iterator it2 = arrayList2.iterator();
+            while (it2.hasNext()) {
+                String str2 = (String) it2.next();
+                if (!arrayList.contains(str2)) {
+                    resourceDecoderRegistry.bucketPriorityList.add(str2);
+                }
+            }
         }
     }
 
@@ -61,219 +169,60 @@ public class Registry {
             Code decompiled incorrectly, please refer to instructions dump.
             To view partially-correct add '--show-bad-code' argument
         */
-        public NoModelLoaderAvailableException(java.lang.Object r3) {
+        public NoModelLoaderAvailableException(java.lang.Object r2) {
             /*
-                r2 = this;
-                java.lang.String r3 = java.lang.String.valueOf(r3)
-                int r0 = r3.length()
-                int r0 = r0 + 43
-                java.lang.String r1 = "Failed to find any ModelLoaders for model: "
-                java.lang.String r3 = com.bumptech.glide.Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline0.m(r0, r1, r3)
-                r2.<init>(r3)
+                r1 = this;
+                java.lang.String r0 = "Failed to find any ModelLoaders registered for model class: "
+                java.lang.StringBuilder r0 = android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m(r0)
+                java.lang.Class r2 = r2.getClass()
+                r0.append(r2)
+                java.lang.String r2 = r0.toString()
+                r1.<init>(r2)
                 return
             */
             throw new UnsupportedOperationException("Method not decompiled: com.bumptech.glide.Registry.NoModelLoaderAvailableException.<init>(java.lang.Object):void");
         }
 
-        /* JADX WARN: Illegal instructions before constructor call */
-        /*
-            Code decompiled incorrectly, please refer to instructions dump.
-            To view partially-correct add '--show-bad-code' argument
-        */
-        public NoModelLoaderAvailableException(java.lang.Class<?> r4, java.lang.Class<?> r5) {
-            /*
-                r3 = this;
-                java.lang.String r4 = java.lang.String.valueOf(r4)
-                java.lang.String r5 = java.lang.String.valueOf(r5)
-                int r0 = r4.length()
-                int r0 = r0 + 54
-                int r1 = r5.length()
-                int r1 = r1 + r0
-                java.lang.String r0 = "Failed to find any ModelLoaders for model: "
-                java.lang.String r2 = " and data: "
-                java.lang.String r4 = com.bumptech.glide.Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline1.m(r1, r0, r4, r2, r5)
-                r3.<init>(r4)
-                return
-            */
-            throw new UnsupportedOperationException("Method not decompiled: com.bumptech.glide.Registry.NoModelLoaderAvailableException.<init>(java.lang.Class, java.lang.Class):void");
+        public <M> NoModelLoaderAvailableException(M m, List<ModelLoader<M, ?>> list) {
+            super("Found ModelLoaders for model class: " + list + ", but none that handle this specific model instance: " + m);
+        }
+
+        public NoModelLoaderAvailableException(Class<?> cls, Class<?> cls2) {
+            super("Failed to find any ModelLoaders for model: " + cls + " and data: " + cls2);
         }
     }
 
-    /* loaded from: classes.dex */
-    public static class NoResultEncoderAvailableException extends MissingComponentException {
-        /* JADX WARN: Illegal instructions before constructor call */
-        /*
-            Code decompiled incorrectly, please refer to instructions dump.
-            To view partially-correct add '--show-bad-code' argument
-        */
-        public NoResultEncoderAvailableException(java.lang.Class<?> r4) {
-            /*
-                r3 = this;
-                java.lang.String r4 = java.lang.String.valueOf(r4)
-                int r0 = r4.length()
-                int r0 = r0 + 227
-                java.lang.String r1 = "Failed to find result encoder for resource class: "
-                java.lang.String r2 = ", you may need to consider registering a new Encoder for the requested type or DiskCacheStrategy.DATA/DiskCacheStrategy.NONE if caching your transformed resource is unnecessary."
-                java.lang.String r4 = androidx.viewpager2.widget.FakeDrag$$ExternalSyntheticOutline0.m(r0, r1, r4, r2)
-                r3.<init>(r4)
-                return
-            */
-            throw new UnsupportedOperationException("Method not decompiled: com.bumptech.glide.Registry.NoResultEncoderAvailableException.<init>(java.lang.Class):void");
-        }
-    }
-
-    /* loaded from: classes.dex */
-    public static class NoSourceEncoderAvailableException extends MissingComponentException {
-        /* JADX WARN: Illegal instructions before constructor call */
-        /*
-            Code decompiled incorrectly, please refer to instructions dump.
-            To view partially-correct add '--show-bad-code' argument
-        */
-        public NoSourceEncoderAvailableException(java.lang.Class<?> r3) {
-            /*
-                r2 = this;
-                java.lang.String r3 = java.lang.String.valueOf(r3)
-                int r0 = r3.length()
-                int r0 = r0 + 46
-                java.lang.String r1 = "Failed to find source encoder for data class: "
-                java.lang.String r3 = com.bumptech.glide.Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline0.m(r0, r1, r3)
-                r2.<init>(r3)
-                return
-            */
-            throw new UnsupportedOperationException("Method not decompiled: com.bumptech.glide.Registry.NoSourceEncoderAvailableException.<init>(java.lang.Class):void");
-        }
-    }
-
-    public Registry() {
-        FactoryPools.FactoryPool factoryPool = new FactoryPools.FactoryPool(new Pools$SynchronizedPool(20), new FactoryPools.Factory<List<?>>() { // from class: com.bumptech.glide.util.pool.FactoryPools.2
-            @Override // com.bumptech.glide.util.pool.FactoryPools.Factory
-            public List<?> create() {
-                return new ArrayList();
-            }
-        }, new FactoryPools.Resetter<List<?>>() { // from class: com.bumptech.glide.util.pool.FactoryPools.3
-            @Override // com.bumptech.glide.util.pool.FactoryPools.Resetter
-            public void reset(List<?> object) {
-                object.clear();
-            }
-        });
-        this.throwableListPool = factoryPool;
-        this.modelLoaderRegistry = new ModelLoaderRegistry(factoryPool);
-        ResourceDecoderRegistry resourceDecoderRegistry = new ResourceDecoderRegistry();
-        this.decoderRegistry = resourceDecoderRegistry;
-        List asList = Arrays.asList("Gif", "Bitmap", "BitmapDrawable");
-        ArrayList arrayList = new ArrayList(asList.size());
-        arrayList.addAll(asList);
-        arrayList.add(0, "legacy_prepend_all");
-        arrayList.add("legacy_append");
-        synchronized (resourceDecoderRegistry) {
-            ArrayList arrayList2 = new ArrayList(resourceDecoderRegistry.bucketPriorityList);
-            resourceDecoderRegistry.bucketPriorityList.clear();
-            resourceDecoderRegistry.bucketPriorityList.addAll(arrayList);
-            Iterator it = arrayList2.iterator();
-            while (it.hasNext()) {
-                String str = (String) it.next();
-                if (!arrayList.contains(str)) {
-                    resourceDecoderRegistry.bucketPriorityList.add(str);
-                }
-            }
-        }
-    }
-
-    public <Data> Registry append(Class<Data> dataClass, Encoder<Data> encoder) {
-        EncoderRegistry encoderRegistry = this.encoderRegistry;
-        synchronized (encoderRegistry) {
-            encoderRegistry.encoders.add(new EncoderRegistry.Entry<>(dataClass, encoder));
-        }
-        return this;
-    }
-
-    public List<ImageHeaderParser> getImageHeaderParsers() {
-        List<ImageHeaderParser> list;
-        ImageHeaderParserRegistry imageHeaderParserRegistry = this.imageHeaderParserRegistry;
-        synchronized (imageHeaderParserRegistry) {
-            list = imageHeaderParserRegistry.parsers;
-        }
-        if (!list.isEmpty()) {
-            return list;
-        }
-        throw new NoImageHeaderParserException();
-    }
-
-    public <Model> List<ModelLoader<Model, ?>> getModelLoaders(Model model) {
-        List<ModelLoader<?, ?>> list;
-        ModelLoaderRegistry modelLoaderRegistry = this.modelLoaderRegistry;
-        Objects.requireNonNull(modelLoaderRegistry);
-        Class<?> cls = model.getClass();
-        synchronized (modelLoaderRegistry) {
-            ModelLoaderRegistry.ModelLoaderCache.Entry<?> entry = modelLoaderRegistry.cache.cachedModelLoaders.get(cls);
-            list = entry == null ? null : entry.loaders;
-            if (list == null) {
-                list = Collections.unmodifiableList(modelLoaderRegistry.multiModelLoaderFactory.build(cls));
-                modelLoaderRegistry.cache.put(cls, list);
-            }
-        }
-        int size = list.size();
-        List<ModelLoader<Model, ?>> emptyList = Collections.emptyList();
-        boolean z = true;
-        for (int i = 0; i < size; i++) {
-            ModelLoader<?, ?> modelLoader = list.get(i);
-            if (modelLoader.handles(model)) {
-                if (z) {
-                    emptyList = new ArrayList<>(size - i);
-                    z = false;
-                }
-                emptyList.add(modelLoader);
-            }
-        }
-        if (!emptyList.isEmpty()) {
-            return emptyList;
-        }
-        throw new NoModelLoaderAvailableException(model);
-    }
-
-    public Registry register(DataRewinder.Factory<?> factory) {
-        DataRewinderRegistry dataRewinderRegistry = this.dataRewinderRegistry;
-        synchronized (dataRewinderRegistry) {
-            dataRewinderRegistry.rewinders.put(factory.getDataClass(), factory);
-        }
-        return this;
-    }
-
-    public <Data, TResource> Registry append(String bucket, Class<Data> dataClass, Class<TResource> resourceClass, ResourceDecoder<Data, TResource> decoder) {
-        ResourceDecoderRegistry resourceDecoderRegistry = this.decoderRegistry;
-        synchronized (resourceDecoderRegistry) {
-            resourceDecoderRegistry.getOrAddEntryList(bucket).add(new ResourceDecoderRegistry.Entry<>(dataClass, resourceClass, decoder));
-        }
-        return this;
-    }
-
-    public <TResource, Transcode> Registry register(Class<TResource> resourceClass, Class<Transcode> transcodeClass, ResourceTranscoder<TResource, Transcode> transcoder) {
-        TranscoderRegistry transcoderRegistry = this.transcoderRegistry;
-        synchronized (transcoderRegistry) {
-            transcoderRegistry.transcoders.add(new TranscoderRegistry.Entry<>(resourceClass, transcodeClass, transcoder));
-        }
-        return this;
-    }
-
-    public <TResource> Registry append(Class<TResource> resourceClass, ResourceEncoder<TResource> encoder) {
+    public final void append(Class cls, ResourceEncoder resourceEncoder) {
         ResourceEncoderRegistry resourceEncoderRegistry = this.resourceEncoderRegistry;
         synchronized (resourceEncoderRegistry) {
-            resourceEncoderRegistry.encoders.add(new ResourceEncoderRegistry.Entry<>(resourceClass, encoder));
+            resourceEncoderRegistry.encoders.add(new ResourceEncoderRegistry.Entry(cls, resourceEncoder));
         }
-        return this;
     }
 
-    public <Model, Data> Registry append(Class<Model> modelClass, Class<Data> dataClass, ModelLoaderFactory<Model, Data> factory) {
+    public final void register(Class cls, Class cls2, ResourceTranscoder resourceTranscoder) {
+        TranscoderRegistry transcoderRegistry = this.transcoderRegistry;
+        synchronized (transcoderRegistry) {
+            transcoderRegistry.transcoders.add(new TranscoderRegistry.Entry(cls, cls2, resourceTranscoder));
+        }
+    }
+
+    public final void append(Class cls, Class cls2, ModelLoaderFactory modelLoaderFactory) {
         ModelLoaderRegistry modelLoaderRegistry = this.modelLoaderRegistry;
         synchronized (modelLoaderRegistry) {
             MultiModelLoaderFactory multiModelLoaderFactory = modelLoaderRegistry.multiModelLoaderFactory;
             synchronized (multiModelLoaderFactory) {
-                MultiModelLoaderFactory.Entry<?, ?> entry = new MultiModelLoaderFactory.Entry<>(modelClass, dataClass, factory);
-                List<MultiModelLoaderFactory.Entry<?, ?>> list = multiModelLoaderFactory.entries;
-                list.add(list.size(), entry);
+                MultiModelLoaderFactory.Entry entry = new MultiModelLoaderFactory.Entry(cls, cls2, modelLoaderFactory);
+                ArrayList arrayList = multiModelLoaderFactory.entries;
+                arrayList.add(arrayList.size(), entry);
             }
             modelLoaderRegistry.cache.cachedModelLoaders.clear();
         }
-        return this;
+    }
+
+    /* loaded from: classes.dex */
+    public static class MissingComponentException extends RuntimeException {
+        public MissingComponentException(String str) {
+            super(str);
+        }
     }
 }

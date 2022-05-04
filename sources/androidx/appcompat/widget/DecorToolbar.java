@@ -1,11 +1,9 @@
 package androidx.appcompat.widget;
 
 import android.content.Context;
-import android.view.Menu;
-import android.view.ViewGroup;
 import android.view.Window;
+import androidx.appcompat.app.AppCompatDelegateImpl;
 import androidx.appcompat.view.menu.MenuBuilder;
-import androidx.appcompat.view.menu.MenuPresenter;
 import androidx.core.view.ViewPropertyAnimatorCompat;
 /* loaded from: classes.dex */
 public interface DecorToolbar {
@@ -19,11 +17,7 @@ public interface DecorToolbar {
 
     int getDisplayOptions();
 
-    Menu getMenu();
-
-    int getNavigationMode();
-
-    ViewGroup getViewGroup();
+    void getNavigationMode();
 
     boolean hasExpandedActionView();
 
@@ -41,17 +35,13 @@ public interface DecorToolbar {
 
     void setDisplayOptions(int i);
 
-    void setEmbeddedTabView(ScrollingTabContainerView scrollingTabContainerView);
+    void setEmbeddedTabView();
 
-    void setHomeButtonEnabled(boolean z);
+    void setHomeButtonEnabled();
 
-    void setMenu(Menu menu, MenuPresenter.Callback callback);
-
-    void setMenuCallbacks(MenuPresenter.Callback callback, MenuBuilder.Callback callback2);
+    void setMenu(MenuBuilder menuBuilder, AppCompatDelegateImpl.ActionMenuPresenterCallback actionMenuPresenterCallback);
 
     void setMenuPrepared();
-
-    void setTitle(CharSequence charSequence);
 
     void setVisibility(int i);
 

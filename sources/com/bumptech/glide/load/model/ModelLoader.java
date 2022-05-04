@@ -1,11 +1,11 @@
 package com.bumptech.glide.load.model;
 
+import androidx.collection.ContainerHelpers;
 import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.data.DataFetcher;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public interface ModelLoader<Model, Data> {
 
@@ -15,18 +15,22 @@ public interface ModelLoader<Model, Data> {
         public final DataFetcher<Data> fetcher;
         public final Key sourceKey;
 
-        public LoadData(Key sourceKey, DataFetcher<Data> fetcher) {
+        public LoadData() {
+            throw null;
+        }
+
+        public LoadData(Key key, DataFetcher<Data> dataFetcher) {
             List<Key> emptyList = Collections.emptyList();
-            Objects.requireNonNull(sourceKey, "Argument must not be null");
-            this.sourceKey = sourceKey;
-            Objects.requireNonNull(emptyList, "Argument must not be null");
+            ContainerHelpers.checkNotNull(key);
+            this.sourceKey = key;
+            ContainerHelpers.checkNotNull(emptyList);
             this.alternateKeys = emptyList;
-            Objects.requireNonNull(fetcher, "Argument must not be null");
-            this.fetcher = fetcher;
+            ContainerHelpers.checkNotNull(dataFetcher);
+            this.fetcher = dataFetcher;
         }
     }
 
-    LoadData<Data> buildLoadData(Model model, int width, int height, Options options);
+    LoadData<Data> buildLoadData(Model model, int i, int i2, Options options);
 
     boolean handles(Model model);
 }

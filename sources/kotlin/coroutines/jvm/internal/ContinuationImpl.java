@@ -6,9 +6,12 @@ import kotlin.coroutines.CoroutineContext;
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: ContinuationImpl.kt */
 /* loaded from: classes.dex */
 public abstract class ContinuationImpl extends BaseContinuationImpl {
+    @Nullable
     private final CoroutineContext _context;
+    @Nullable
     public transient Continuation<Object> intercepted;
 
     public ContinuationImpl(@Nullable Continuation<Object> continuation, @Nullable CoroutineContext coroutineContext) {
@@ -18,7 +21,7 @@ public abstract class ContinuationImpl extends BaseContinuationImpl {
 
     @Override // kotlin.coroutines.Continuation
     @NotNull
-    public CoroutineContext getContext() {
+    public final CoroutineContext getContext() {
         CoroutineContext coroutineContext = this._context;
         Intrinsics.checkNotNull(coroutineContext);
         return coroutineContext;
@@ -30,10 +33,11 @@ public abstract class ContinuationImpl extends BaseContinuationImpl {
         if (continuation == null) {
             CoroutineContext coroutineContext = this._context;
             Intrinsics.checkNotNull(coroutineContext);
-            int i = ContinuationInterceptor.$r8$clinit;
             ContinuationInterceptor continuationInterceptor = (ContinuationInterceptor) coroutineContext.get(ContinuationInterceptor.Key.$$INSTANCE);
-            if (continuationInterceptor == null || (continuation = continuationInterceptor.interceptContinuation(this)) == null) {
+            if (continuationInterceptor == null) {
                 continuation = this;
+            } else {
+                continuation = continuationInterceptor.interceptContinuation(this);
             }
             this.intercepted = continuation;
         }
@@ -41,7 +45,7 @@ public abstract class ContinuationImpl extends BaseContinuationImpl {
     }
 
     @Override // kotlin.coroutines.jvm.internal.BaseContinuationImpl
-    public void releaseIntercepted() {
+    public final void releaseIntercepted() {
         Continuation<?> continuation = this.intercepted;
         if (!(continuation == null || continuation == this)) {
             CoroutineContext coroutineContext = this._context;
@@ -54,10 +58,7 @@ public abstract class ContinuationImpl extends BaseContinuationImpl {
         this.intercepted = CompletedContinuation.INSTANCE;
     }
 
-    /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
     public ContinuationImpl(@Nullable Continuation<Object> continuation) {
-        super(continuation);
-        CoroutineContext context = continuation != null ? continuation.getContext() : null;
-        this._context = context;
+        this(continuation, continuation == null ? null : continuation.getContext());
     }
 }

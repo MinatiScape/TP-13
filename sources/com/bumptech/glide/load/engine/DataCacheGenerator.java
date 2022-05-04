@@ -4,11 +4,12 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.data.DataFetcher;
 import com.bumptech.glide.load.engine.DataFetcherGenerator;
+import com.bumptech.glide.load.engine.Engine;
 import com.bumptech.glide.load.model.ModelLoader;
 import java.io.File;
 import java.util.List;
 /* loaded from: classes.dex */
-public class DataCacheGenerator implements DataFetcherGenerator, DataFetcher.DataCallback<Object> {
+public final class DataCacheGenerator implements DataFetcherGenerator, DataFetcher.DataCallback<Object> {
     public File cacheFile;
     public final List<Key> cacheKeys;
     public final DataFetcherGenerator.FetcherReadyCallback cb;
@@ -19,15 +20,8 @@ public class DataCacheGenerator implements DataFetcherGenerator, DataFetcher.Dat
     public int sourceIdIndex = -1;
     public Key sourceKey;
 
-    public DataCacheGenerator(DecodeHelper<?> helper, DataFetcherGenerator.FetcherReadyCallback cb) {
-        List<Key> cacheKeys = helper.getCacheKeys();
-        this.cacheKeys = cacheKeys;
-        this.helper = helper;
-        this.cb = cb;
-    }
-
     @Override // com.bumptech.glide.load.engine.DataFetcherGenerator
-    public void cancel() {
+    public final void cancel() {
         ModelLoader.LoadData<?> loadData = this.loadData;
         if (loadData != null) {
             loadData.fetcher.cancel();
@@ -35,25 +29,38 @@ public class DataCacheGenerator implements DataFetcherGenerator, DataFetcher.Dat
     }
 
     @Override // com.bumptech.glide.load.data.DataFetcher.DataCallback
-    public void onDataReady(Object data) {
-        this.cb.onDataFetcherReady(this.sourceKey, data, this.loadData.fetcher, DataSource.DATA_DISK_CACHE, this.sourceKey);
+    public final void onDataReady(Object obj) {
+        this.cb.onDataFetcherReady(this.sourceKey, obj, this.loadData.fetcher, DataSource.DATA_DISK_CACHE, this.sourceKey);
     }
 
     @Override // com.bumptech.glide.load.data.DataFetcher.DataCallback
-    public void onLoadFailed(Exception e) {
-        this.cb.onDataFetcherFailed(this.sourceKey, e, this.loadData.fetcher, DataSource.DATA_DISK_CACHE);
+    public final void onLoadFailed(Exception exc) {
+        this.cb.onDataFetcherFailed(this.sourceKey, exc, this.loadData.fetcher, DataSource.DATA_DISK_CACHE);
     }
 
     @Override // com.bumptech.glide.load.engine.DataFetcherGenerator
-    public boolean startNext() {
+    public final boolean startNext() {
+        boolean z;
+        boolean z2;
+        boolean z3;
         while (true) {
             List<ModelLoader<File, ?>> list = this.modelLoaders;
             if (list != null) {
                 if (this.modelLoaderIndex < list.size()) {
+                    z = true;
+                } else {
+                    z = false;
+                }
+                if (z) {
                     this.loadData = null;
-                    boolean z = false;
-                    while (!z) {
-                        if (!(this.modelLoaderIndex < this.modelLoaders.size())) {
+                    boolean z4 = false;
+                    while (!z4) {
+                        if (this.modelLoaderIndex < this.modelLoaders.size()) {
+                            z2 = true;
+                        } else {
+                            z2 = false;
+                        }
+                        if (!z2) {
                             break;
                         }
                         List<ModelLoader<File, ?>> list2 = this.modelLoaders;
@@ -62,12 +69,19 @@ public class DataCacheGenerator implements DataFetcherGenerator, DataFetcher.Dat
                         File file = this.cacheFile;
                         DecodeHelper<?> decodeHelper = this.helper;
                         this.loadData = list2.get(i).buildLoadData(file, decodeHelper.width, decodeHelper.height, decodeHelper.options);
-                        if (this.loadData != null && this.helper.hasLoadPath(this.loadData.fetcher.getDataClass())) {
-                            this.loadData.fetcher.loadData(this.helper.priority, this);
-                            z = true;
+                        if (this.loadData != null) {
+                            if (this.helper.getLoadPath(this.loadData.fetcher.getDataClass()) != null) {
+                                z3 = true;
+                            } else {
+                                z3 = false;
+                            }
+                            if (z3) {
+                                this.loadData.fetcher.loadData(this.helper.priority, this);
+                                z4 = true;
+                            }
                         }
                     }
-                    return z;
+                    return z4;
                 }
             }
             int i2 = this.sourceIdIndex + 1;
@@ -77,7 +91,7 @@ public class DataCacheGenerator implements DataFetcherGenerator, DataFetcher.Dat
             }
             Key key = this.cacheKeys.get(this.sourceIdIndex);
             DecodeHelper<?> decodeHelper2 = this.helper;
-            File file2 = decodeHelper2.getDiskCache().get(new DataCacheKey(key, decodeHelper2.signature));
+            File file2 = ((Engine.LazyDiskCacheProvider) decodeHelper2.diskCacheProvider).getDiskCache().get(new DataCacheKey(key, decodeHelper2.signature));
             this.cacheFile = file2;
             if (file2 != null) {
                 this.sourceKey = key;
@@ -87,9 +101,9 @@ public class DataCacheGenerator implements DataFetcherGenerator, DataFetcher.Dat
         }
     }
 
-    public DataCacheGenerator(List<Key> cacheKeys, DecodeHelper<?> helper, DataFetcherGenerator.FetcherReadyCallback cb) {
-        this.cacheKeys = cacheKeys;
-        this.helper = helper;
-        this.cb = cb;
+    public DataCacheGenerator(List<Key> list, DecodeHelper<?> decodeHelper, DataFetcherGenerator.FetcherReadyCallback fetcherReadyCallback) {
+        this.cacheKeys = list;
+        this.helper = decodeHelper;
+        this.cb = fetcherReadyCallback;
     }
 }

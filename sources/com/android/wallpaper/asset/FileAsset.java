@@ -9,17 +9,17 @@ import java.io.InputStream;
 public final class FileAsset extends StreamableAsset {
     public final File mFile;
 
-    public FileAsset(File file) {
-        this.mFile = file;
-    }
-
     @Override // com.android.wallpaper.asset.StreamableAsset
-    public InputStream openInputStream() {
+    public final InputStream openInputStream() {
         try {
             return new FileInputStream(this.mFile.getAbsolutePath());
         } catch (FileNotFoundException e) {
             Log.w("FileAsset", "Image file not found", e);
             return null;
         }
+    }
+
+    public FileAsset(File file) {
+        this.mFile = file;
     }
 }

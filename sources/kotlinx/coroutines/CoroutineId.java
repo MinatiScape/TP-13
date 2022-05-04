@@ -3,21 +3,31 @@ package kotlinx.coroutines;
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 import kotlin.coroutines.AbstractCoroutineContextElement;
 import kotlin.coroutines.CoroutineContext;
-import kotlin.jvm.functions.Function2;
-import kotlin.jvm.internal.DefaultConstructorMarker;
 import kotlin.jvm.internal.Intrinsics;
 import kotlin.text.StringsKt__StringsKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: CoroutineContext.kt */
 /* loaded from: classes.dex */
 public final class CoroutineId extends AbstractCoroutineContextElement implements ThreadContextElement<String> {
-    public static final Key Key = new Key(null);
+    @NotNull
+    public static final Key Key = new Key();
     public final long id;
 
+    /* compiled from: CoroutineContext.kt */
     /* loaded from: classes.dex */
     public static final class Key implements CoroutineContext.Key<CoroutineId> {
-        public Key(DefaultConstructorMarker defaultConstructorMarker) {
+    }
+
+    public final boolean equals(@Nullable Object obj) {
+        if (this == obj) {
+            return true;
         }
+        return (obj instanceof CoroutineId) && this.id == ((CoroutineId) obj).id;
+    }
+
+    public final int hashCode() {
+        return Long.hashCode(this.id);
     }
 
     public CoroutineId(long j) {
@@ -25,65 +35,15 @@ public final class CoroutineId extends AbstractCoroutineContextElement implement
         this.id = j;
     }
 
-    public boolean equals(@Nullable Object obj) {
-        if (this != obj) {
-            if (obj instanceof CoroutineId) {
-                if (this.id == ((CoroutineId) obj).id) {
-                }
-            }
-            return false;
-        }
-        return true;
-    }
-
-    @Override // kotlin.coroutines.AbstractCoroutineContextElement, kotlin.coroutines.CoroutineContext
-    public <R> R fold(R r, @NotNull Function2<? super R, ? super CoroutineContext.Element, ? extends R> operation) {
-        Intrinsics.checkParameterIsNotNull(operation, "operation");
-        Intrinsics.checkParameterIsNotNull(operation, "operation");
-        return (R) CoroutineContext.Element.DefaultImpls.fold(this, r, operation);
-    }
-
-    @Override // kotlin.coroutines.AbstractCoroutineContextElement, kotlin.coroutines.CoroutineContext.Element, kotlin.coroutines.CoroutineContext
-    @Nullable
-    public <E extends CoroutineContext.Element> E get(@NotNull CoroutineContext.Key<E> key) {
-        Intrinsics.checkParameterIsNotNull(key, "key");
-        Intrinsics.checkParameterIsNotNull(key, "key");
-        return (E) CoroutineContext.Element.DefaultImpls.get(this, key);
-    }
-
-    public int hashCode() {
-        long j = this.id;
-        return (int) (j ^ (j >>> 32));
-    }
-
-    @Override // kotlin.coroutines.AbstractCoroutineContextElement, kotlin.coroutines.CoroutineContext
-    @NotNull
-    public CoroutineContext minusKey(@NotNull CoroutineContext.Key<?> key) {
-        Intrinsics.checkParameterIsNotNull(key, "key");
-        Intrinsics.checkParameterIsNotNull(key, "key");
-        return CoroutineContext.Element.DefaultImpls.minusKey(this, key);
-    }
-
-    @Override // kotlin.coroutines.AbstractCoroutineContextElement, kotlin.coroutines.CoroutineContext
-    @NotNull
-    public CoroutineContext plus(@NotNull CoroutineContext context) {
-        Intrinsics.checkParameterIsNotNull(context, "context");
-        Intrinsics.checkParameterIsNotNull(context, "context");
-        return CoroutineContext.Element.DefaultImpls.plus(this, context);
-    }
-
     @Override // kotlinx.coroutines.ThreadContextElement
-    public void restoreThreadContext(CoroutineContext context, String str) {
+    public final void restoreThreadContext(CoroutineContext coroutineContext, String str) {
         String oldState = str;
-        Intrinsics.checkParameterIsNotNull(context, "context");
-        Intrinsics.checkParameterIsNotNull(oldState, "oldState");
-        Thread currentThread = Thread.currentThread();
-        Intrinsics.checkExpressionValueIsNotNull(currentThread, "Thread.currentThread()");
-        currentThread.setName(oldState);
+        Intrinsics.checkNotNullParameter(oldState, "oldState");
+        Thread.currentThread().setName(oldState);
     }
 
     @NotNull
-    public String toString() {
+    public final String toString() {
         StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("CoroutineId(");
         m.append(this.id);
         m.append(')');
@@ -91,27 +51,26 @@ public final class CoroutineId extends AbstractCoroutineContextElement implement
     }
 
     @Override // kotlinx.coroutines.ThreadContextElement
-    public String updateThreadContext(CoroutineContext context) {
-        Intrinsics.checkParameterIsNotNull(context, "context");
+    public final String updateThreadContext(CoroutineContext context) {
+        Intrinsics.checkNotNullParameter(context, "context");
         CoroutineName coroutineName = (CoroutineName) context.get(CoroutineName.Key);
         Thread currentThread = Thread.currentThread();
-        Intrinsics.checkExpressionValueIsNotNull(currentThread, "currentThread");
         String oldName = currentThread.getName();
-        Intrinsics.checkExpressionValueIsNotNull(oldName, "oldName");
-        int lastIndexOf$default = StringsKt__StringsKt.lastIndexOf$default(oldName, " @", 0, false, 6);
-        if (lastIndexOf$default < 0) {
-            lastIndexOf$default = oldName.length();
+        Intrinsics.checkNotNullExpressionValue(oldName, "oldName");
+        int lastIndexOf = oldName.lastIndexOf(" @", StringsKt__StringsKt.getLastIndex(oldName));
+        if (lastIndexOf < 0) {
+            lastIndexOf = oldName.length();
         }
-        StringBuilder sb = new StringBuilder(9 + lastIndexOf$default + 10);
-        String substring = oldName.substring(0, lastIndexOf$default);
-        Intrinsics.checkExpressionValueIsNotNull(substring, "(this as java.lang.Strin…ing(startIndex, endIndex)");
+        StringBuilder sb = new StringBuilder(lastIndexOf + 9 + 10);
+        String substring = oldName.substring(0, lastIndexOf);
+        Intrinsics.checkNotNullExpressionValue(substring, "this as java.lang.String…ing(startIndex, endIndex)");
         sb.append(substring);
         sb.append(" @");
         sb.append("coroutine");
         sb.append('#');
         sb.append(this.id);
         String sb2 = sb.toString();
-        Intrinsics.checkExpressionValueIsNotNull(sb2, "StringBuilder(capacity).…builderAction).toString()");
+        Intrinsics.checkNotNullExpressionValue(sb2, "StringBuilder(capacity).…builderAction).toString()");
         currentThread.setName(sb2);
         return oldName;
     }

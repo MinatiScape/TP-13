@@ -7,50 +7,34 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 import android.util.Log;
+import androidx.collection.ContainerHelpers;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.manager.ConnectivityMonitor;
-import com.bumptech.glide.request.Request;
-import com.bumptech.glide.util.Util;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public final class DefaultConnectivityMonitor implements ConnectivityMonitor {
-    public final BroadcastReceiver connectivityReceiver = new BroadcastReceiver() { // from class: com.bumptech.glide.manager.DefaultConnectivityMonitor.1
+    public final AnonymousClass1 connectivityReceiver = new BroadcastReceiver() { // from class: com.bumptech.glide.manager.DefaultConnectivityMonitor.1
         @Override // android.content.BroadcastReceiver
-        public void onReceive(Context context, Intent intent) {
+        public final void onReceive(Context context, Intent intent) {
             DefaultConnectivityMonitor defaultConnectivityMonitor = DefaultConnectivityMonitor.this;
             boolean z = defaultConnectivityMonitor.isConnected;
-            defaultConnectivityMonitor.isConnected = defaultConnectivityMonitor.isConnected(context);
+            defaultConnectivityMonitor.isConnected = DefaultConnectivityMonitor.isConnected(context);
             if (z != DefaultConnectivityMonitor.this.isConnected) {
                 if (Log.isLoggable("ConnectivityMonitor", 3)) {
-                    boolean z2 = DefaultConnectivityMonitor.this.isConnected;
-                    StringBuilder sb = new StringBuilder(40);
-                    sb.append("connectivity changed, isConnected: ");
-                    sb.append(z2);
-                    Log.d("ConnectivityMonitor", sb.toString());
+                    StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("connectivity changed, isConnected: ");
+                    m.append(DefaultConnectivityMonitor.this.isConnected);
+                    Log.d("ConnectivityMonitor", m.toString());
                 }
                 DefaultConnectivityMonitor defaultConnectivityMonitor2 = DefaultConnectivityMonitor.this;
-                ConnectivityMonitor.ConnectivityListener connectivityListener = defaultConnectivityMonitor2.listener;
-                boolean z3 = defaultConnectivityMonitor2.isConnected;
-                RequestManager.RequestManagerConnectivityListener requestManagerConnectivityListener = (RequestManager.RequestManagerConnectivityListener) connectivityListener;
-                Objects.requireNonNull(requestManagerConnectivityListener);
-                if (z3) {
-                    RequestTracker requestTracker = requestManagerConnectivityListener.requestTracker;
-                    Iterator it = ((ArrayList) Util.getSnapshot(requestTracker.requests)).iterator();
-                    while (it.hasNext()) {
-                        Request request = (Request) it.next();
-                        if (!request.isComplete() && !request.isCleared()) {
-                            request.clear();
-                            if (!requestTracker.isPaused) {
-                                request.begin();
-                            } else {
-                                requestTracker.pendingRequests.add(request);
-                            }
-                        }
+                RequestManager.RequestManagerConnectivityListener requestManagerConnectivityListener = (RequestManager.RequestManagerConnectivityListener) defaultConnectivityMonitor2.listener;
+                if (defaultConnectivityMonitor2.isConnected) {
+                    synchronized (RequestManager.this) {
+                        requestManagerConnectivityListener.requestTracker.restartRequests();
                     }
+                    return;
                 }
+                requestManagerConnectivityListener.getClass();
             }
         }
     };
@@ -59,18 +43,20 @@ public final class DefaultConnectivityMonitor implements ConnectivityMonitor {
     public boolean isRegistered;
     public final ConnectivityMonitor.ConnectivityListener listener;
 
-    public DefaultConnectivityMonitor(Context context, ConnectivityMonitor.ConnectivityListener listener) {
-        this.context = context.getApplicationContext();
-        this.listener = listener;
+    @Override // com.bumptech.glide.manager.LifecycleListener
+    public final void onDestroy() {
     }
 
     @SuppressLint({"MissingPermission"})
-    public boolean isConnected(Context context) {
+    public static boolean isConnected(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService("connectivity");
-        Objects.requireNonNull(connectivityManager, "Argument must not be null");
+        ContainerHelpers.checkNotNull(connectivityManager);
         try {
             NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-            return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+            if (activeNetworkInfo == null || !activeNetworkInfo.isConnected()) {
+                return false;
+            }
+            return true;
         } catch (RuntimeException e) {
             if (Log.isLoggable("ConnectivityMonitor", 5)) {
                 Log.w("ConnectivityMonitor", "Failed to determine connectivity status when connectivity changed", e);
@@ -80,11 +66,7 @@ public final class DefaultConnectivityMonitor implements ConnectivityMonitor {
     }
 
     @Override // com.bumptech.glide.manager.LifecycleListener
-    public void onDestroy() {
-    }
-
-    @Override // com.bumptech.glide.manager.LifecycleListener
-    public void onStart() {
+    public final void onStart() {
         if (!this.isRegistered) {
             this.isConnected = isConnected(this.context);
             try {
@@ -99,10 +81,16 @@ public final class DefaultConnectivityMonitor implements ConnectivityMonitor {
     }
 
     @Override // com.bumptech.glide.manager.LifecycleListener
-    public void onStop() {
+    public final void onStop() {
         if (this.isRegistered) {
             this.context.unregisterReceiver(this.connectivityReceiver);
             this.isRegistered = false;
         }
+    }
+
+    /* JADX WARN: Type inference failed for: r0v0, types: [com.bumptech.glide.manager.DefaultConnectivityMonitor$1] */
+    public DefaultConnectivityMonitor(Context context, RequestManager.RequestManagerConnectivityListener requestManagerConnectivityListener) {
+        this.context = context.getApplicationContext();
+        this.listener = requestManagerConnectivityListener;
     }
 }

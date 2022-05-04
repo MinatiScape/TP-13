@@ -28,10 +28,10 @@ public abstract class FragmentTransaction {
         public int mEnterAnim;
         public int mExitAnim;
         public Fragment mFragment;
+        public boolean mFromExpandedOp;
         public Lifecycle.State mOldMaxState;
         public int mPopEnterAnim;
         public int mPopExitAnim;
-        public boolean mTopmostFragment;
 
         public Op() {
         }
@@ -39,31 +39,25 @@ public abstract class FragmentTransaction {
         public Op(int i, Fragment fragment) {
             this.mCmd = i;
             this.mFragment = fragment;
-            this.mTopmostFragment = false;
+            this.mFromExpandedOp = false;
             Lifecycle.State state = Lifecycle.State.RESUMED;
             this.mOldMaxState = state;
             this.mCurrentMaxState = state;
         }
 
-        public Op(int i, Fragment fragment, boolean z) {
+        public Op(int i, Fragment fragment, int i2) {
             this.mCmd = i;
             this.mFragment = fragment;
-            this.mTopmostFragment = z;
+            this.mFromExpandedOp = true;
             Lifecycle.State state = Lifecycle.State.RESUMED;
             this.mOldMaxState = state;
             this.mCurrentMaxState = state;
         }
     }
 
-    public FragmentTransaction(FragmentFactory fragmentFactory, ClassLoader classLoader) {
-    }
+    public abstract void doAddOp(int i, Fragment fragment, String str, int i2);
 
-    public FragmentTransaction add(int i, Fragment fragment) {
-        doAddOp(i, fragment, null, 1);
-        return this;
-    }
-
-    public void addOp(Op op) {
+    public final void addOp(Op op) {
         this.mOps.add(op);
         op.mEnterAnim = this.mEnterAnim;
         op.mExitAnim = this.mExitAnim;
@@ -71,25 +65,10 @@ public abstract class FragmentTransaction {
         op.mPopExitAnim = this.mPopExitAnim;
     }
 
-    public FragmentTransaction addToBackStack(String str) {
-        if (this.mAllowAddToBackStack) {
-            this.mAddToBackStack = true;
-            this.mName = null;
-            return this;
-        }
-        throw new IllegalStateException("This FragmentTransaction is not allowed to be added to the back stack.");
-    }
-
-    public abstract int commit();
-
-    public abstract void commitNow();
-
-    public abstract void doAddOp(int i, Fragment fragment, String str, int i2);
-
-    public FragmentTransaction replace(int i, Fragment fragment) {
+    public final void replace(int i, Fragment fragment) {
         if (i != 0) {
             doAddOp(i, fragment, null, 2);
-            return this;
+            return;
         }
         throw new IllegalArgumentException("Must use non-zero containerViewId");
     }

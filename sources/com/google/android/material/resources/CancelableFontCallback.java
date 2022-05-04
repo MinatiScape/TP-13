@@ -1,9 +1,9 @@
 package com.google.android.material.resources;
 
 import android.graphics.Typeface;
-import com.google.android.gms.internal.zzgms;
+import androidx.transition.PathMotion;
 /* loaded from: classes.dex */
-public final class CancelableFontCallback extends zzgms {
+public final class CancelableFontCallback extends PathMotion {
     public final ApplyFont applyFont;
     public boolean cancelled;
     public final Typeface fallbackFont;
@@ -13,24 +13,23 @@ public final class CancelableFontCallback extends zzgms {
         void apply(Typeface typeface);
     }
 
-    public CancelableFontCallback(ApplyFont applyFont, Typeface typeface) {
-        super(1);
-        this.fallbackFont = typeface;
-        this.applyFont = applyFont;
-    }
-
-    @Override // com.google.android.gms.internal.zzgms
-    public void onFontRetrievalFailed(int i) {
+    @Override // androidx.transition.PathMotion
+    public final void onFontRetrievalFailed(int i) {
         Typeface typeface = this.fallbackFont;
         if (!this.cancelled) {
             this.applyFont.apply(typeface);
         }
     }
 
-    @Override // com.google.android.gms.internal.zzgms
-    public void onFontRetrieved(Typeface typeface, boolean z) {
+    @Override // androidx.transition.PathMotion
+    public final void onFontRetrieved(Typeface typeface, boolean z) {
         if (!this.cancelled) {
             this.applyFont.apply(typeface);
         }
+    }
+
+    public CancelableFontCallback(ApplyFont applyFont, Typeface typeface) {
+        this.fallbackFont = typeface;
+        this.applyFont = applyFont;
     }
 }

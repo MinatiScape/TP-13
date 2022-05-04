@@ -1,4 +1,5 @@
 package com.google.android.gms.internal;
+/* compiled from: SafeParcelReader.java */
 /* loaded from: classes.dex */
 public final class zzbkx extends RuntimeException {
     /* JADX WARN: Illegal instructions before constructor call */
@@ -12,7 +13,7 @@ public final class zzbkx extends RuntimeException {
             int r0 = r5.dataPosition()
             int r5 = r5.dataSize()
             r1 = 41
-            int r1 = com.adobe.xmp.XMPPathFactory$$ExternalSyntheticOutline0.m(r4, r1)
+            int r1 = com.adobe.xmp.impl.ParseRDF$$ExternalSyntheticOutline0.m(r4, r1)
             java.lang.StringBuilder r2 = new java.lang.StringBuilder
             r2.<init>(r1)
             r2.append(r4)

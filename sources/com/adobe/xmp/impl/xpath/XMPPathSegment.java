@@ -1,17 +1,12 @@
 package com.adobe.xmp.impl.xpath;
 /* loaded from: classes.dex */
-public class XMPPathSegment {
+public final class XMPPathSegment {
     public boolean alias;
     public int aliasForm;
     public int kind;
     public String name;
 
-    public XMPPathSegment(String name, int kind) {
-        this.name = name;
-        this.kind = kind;
-    }
-
-    public String toString() {
+    public final String toString() {
         switch (this.kind) {
             case 1:
             case 2:
@@ -24,5 +19,10 @@ public class XMPPathSegment {
             default:
                 return this.name;
         }
+    }
+
+    public XMPPathSegment(String name, int kind) {
+        this.name = name;
+        this.kind = kind;
     }
 }

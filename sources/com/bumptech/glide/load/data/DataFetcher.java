@@ -7,9 +7,9 @@ public interface DataFetcher<T> {
 
     /* loaded from: classes.dex */
     public interface DataCallback<T> {
-        void onDataReady(T data);
+        void onDataReady(T t);
 
-        void onLoadFailed(Exception e);
+        void onLoadFailed(Exception exc);
     }
 
     void cancel();
@@ -20,5 +20,5 @@ public interface DataFetcher<T> {
 
     DataSource getDataSource();
 
-    void loadData(Priority priority, DataCallback<? super T> callback);
+    void loadData(Priority priority, DataCallback<? super T> dataCallback);
 }

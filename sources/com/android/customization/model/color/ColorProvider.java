@@ -3,38 +3,32 @@ package com.android.customization.model.color;
 import android.app.WallpaperColors;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import androidx.cardview.R$style;
 import androidx.core.graphics.ColorUtils;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleCoroutineScopeImpl;
-import androidx.lifecycle.LifecycleCoroutineScopeImpl$register$1;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LifecycleOwnerKt;
 import com.android.customization.model.ResourcesApkProvider;
 import com.android.customization.model.color.ColorSeedOption;
 import com.android.systemui.monet.ColorScheme;
-import com.android.wallpaper.compat.WallpaperManagerCompatV16;
-import com.android.wallpaper.module.InjectorProvider;
+import com.android.systemui.monet.Style;
+import com.android.wallpaper.compat.WallpaperManagerCompat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
-import kotlin.collections.CollectionsKt__CollectionsKt;
+import kotlin.collections.ArraysUtilJVM;
 import kotlin.collections.CollectionsKt___CollectionsKt;
 import kotlin.collections.EmptyList;
 import kotlin.jvm.internal.Intrinsics;
-import kotlinx.coroutines.BuildersKt;
-import kotlinx.coroutines.CompletableJob;
-import kotlinx.coroutines.CoroutineDispatcher;
 import kotlinx.coroutines.CoroutineScope;
 import kotlinx.coroutines.CoroutineScopeKt;
 import kotlinx.coroutines.Dispatchers;
-import kotlinx.coroutines.JobSupport;
-import kotlinx.coroutines.MainCoroutineDispatcher;
 import kotlinx.coroutines.SupervisorKt;
-import kotlinx.coroutines.internal.MainDispatcherLoader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: ColorProvider.kt */
 /* loaded from: classes.dex */
 public final class ColorProvider extends ResourcesApkProvider implements ColorOptionsProvider {
+    public static final int styleSize = Style.values().length;
     @Nullable
     public List<? extends ColorOption> colorBundles;
     public boolean colorsAvailable;
@@ -45,63 +39,161 @@ public final class ColorProvider extends ResourcesApkProvider implements ColorOp
     public final boolean monetEnabled;
     @NotNull
     public final CoroutineScope scope;
+    @NotNull
+    public Style[] styleList = {Style.TONAL_SPOT, Style.SPRITZ, Style.VIBRANT, Style.EXPRESSIVE};
+
+    /* compiled from: ColorProvider.kt */
+    /* loaded from: classes.dex */
+    public /* synthetic */ class WhenMappings {
+        public static final /* synthetic */ int[] $EnumSwitchMapping$0;
+
+        static {
+            int[] iArr = new int[Style.values().length];
+            iArr[Style.FRUIT_SALAD.ordinal()] = 1;
+            iArr[Style.TONAL_SPOT.ordinal()] = 2;
+            $EnumSwitchMapping$0 = iArr;
+        }
+    }
 
     /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
-    /* JADX WARN: Multi-variable type inference failed */
-    /* JADX WARN: Type inference failed for: r10v10, types: [java.lang.Object, androidx.lifecycle.LifecycleCoroutineScopeImpl, kotlinx.coroutines.CoroutineScope] */
-    /* JADX WARN: Type inference failed for: r10v3, types: [kotlinx.coroutines.CoroutineScope] */
-    /* JADX WARN: Type inference failed for: r10v5, types: [kotlinx.coroutines.CoroutineScope] */
-    /* JADX WARN: Type inference failed for: r10v9, types: [androidx.lifecycle.LifecycleCoroutineScopeImpl] */
     public ColorProvider(@NotNull Context context, @NotNull String stubPackageName) {
         super(context, stubPackageName);
-        ?? r10;
+        CoroutineScope coroutineScope;
         Intrinsics.checkNotNullParameter(stubPackageName, "stubPackageName");
         this.monetEnabled = ColorUtils.isMonetEnabled(context);
         if (context instanceof LifecycleOwner) {
-            Lifecycle lifecycle = ((LifecycleOwner) context).getLifecycle();
-            Intrinsics.checkNotNullExpressionValue(lifecycle, "lifecycle");
-            while (true) {
-                r10 = (LifecycleCoroutineScopeImpl) lifecycle.mInternalScopeRef.get();
-                if (r10 == 0) {
-                    CompletableJob SupervisorJob$default = SupervisorKt.SupervisorJob$default(null, 1);
-                    CoroutineDispatcher coroutineDispatcher = Dispatchers.Default;
-                    MainCoroutineDispatcher mainCoroutineDispatcher = MainDispatcherLoader.dispatcher;
-                    r10 = new LifecycleCoroutineScopeImpl(lifecycle, ((JobSupport) SupervisorJob$default).plus(mainCoroutineDispatcher.getImmediate()));
-                    if (lifecycle.mInternalScopeRef.compareAndSet(null, r10)) {
-                        BuildersKt.launch$default(r10, mainCoroutineDispatcher.getImmediate(), null, new LifecycleCoroutineScopeImpl$register$1(r10, null), 2, null);
+            coroutineScope = LifecycleOwnerKt.getLifecycleScope((LifecycleOwner) context);
+        } else {
+            coroutineScope = CoroutineScopeKt.CoroutineScope(Dispatchers.Default.plus(SupervisorKt.SupervisorJob$default()));
+        }
+        this.scope = coroutineScope;
+        this.colorsAvailable = true;
+    }
+
+    public final void buildBundle(int i, int i2, boolean z, String str, ArrayList arrayList) {
+        String str2;
+        Style[] styleArr = this.styleList;
+        int length = styleArr.length;
+        int i3 = 0;
+        while (i3 < length) {
+            Style style = styleArr[i3];
+            int i4 = i3 + 1;
+            Style style2 = Style.SPRITZ;
+            HashMap hashMap = new HashMap();
+            ColorScheme colorScheme = new ColorScheme(i, false, style);
+            ColorScheme colorScheme2 = new ColorScheme(i, true, style);
+            int[] iArr = {ColorUtils.setAlphaComponent(colorScheme.getAccent1().get(2).intValue(), 255), ColorUtils.setAlphaComponent(colorScheme.getAccent1().get(2).intValue(), 255), ColorStateList.valueOf(colorScheme.getAccent3().get(6).intValue()).withLStar(85.0f).getColors()[0], ColorUtils.setAlphaComponent(colorScheme.getAccent1().get(6).intValue(), 255)};
+            int[] iArr2 = {ColorUtils.setAlphaComponent(colorScheme2.getAccent1().get(2).intValue(), 255), ColorUtils.setAlphaComponent(colorScheme2.getAccent1().get(2).intValue(), 255), ColorStateList.valueOf(colorScheme2.getAccent3().get(6).intValue()).withLStar(85.0f).getColors()[0], ColorUtils.setAlphaComponent(colorScheme2.getAccent1().get(6).intValue(), 255)};
+            String str3 = "";
+            if (z) {
+                str2 = str3;
+            } else {
+                str2 = ColorUtils.toColorString(i);
+            }
+            hashMap.put("android.theme.customization.system_palette", str2);
+            if (!z) {
+                str3 = ColorUtils.toColorString(i);
+            }
+            hashMap.put("android.theme.customization.accent_color", str3);
+            arrayList.add(new ColorSeedOption(null, hashMap, z, str, style, i2 + 1, new ColorSeedOption.PreviewInfo(iArr, iArr2)));
+            i3 = i4;
+        }
+    }
+
+    public final void buildColorSeeds(WallpaperColors wallpaperColors, int i, String str, boolean z, ArrayList arrayList) {
+        boolean z2;
+        List<Number> list;
+        List<Integer> seedColors = ColorScheme.Companion.getSeedColors(wallpaperColors);
+        buildBundle(((Number) CollectionsKt___CollectionsKt.first(seedColors)).intValue(), 0, z, str, arrayList);
+        List<Object> drop = CollectionsKt___CollectionsKt.drop(seedColors, 1);
+        int i2 = i - 1;
+        Intrinsics.checkNotNullParameter(drop, "<this>");
+        int i3 = 0;
+        if (i2 >= 0) {
+            z2 = true;
+        } else {
+            z2 = false;
+        }
+        if (z2) {
+            if (i2 == 0) {
+                list = EmptyList.INSTANCE;
+            } else if (i2 >= drop.size()) {
+                list = CollectionsKt___CollectionsKt.toList(drop);
+            } else if (i2 == 1) {
+                list = ArraysUtilJVM.listOf(CollectionsKt___CollectionsKt.first(drop));
+            } else {
+                ArrayList arrayList2 = new ArrayList(i2);
+                int i4 = 0;
+                for (Object obj : drop) {
+                    arrayList2.add(obj);
+                    i4++;
+                    if (i4 == i2) {
                         break;
                     }
-                } else {
-                    break;
                 }
+                list = ArraysUtilJVM.optimizeReadOnlyList(arrayList2);
             }
-        } else {
-            Dispatchers dispatchers = Dispatchers.INSTANCE;
-            r10 = CoroutineScopeKt.CoroutineScope(Dispatchers.Default.plus(SupervisorKt.SupervisorJob$default(null, 1)));
+            for (Number number : list) {
+                i3++;
+                buildBundle(number.intValue(), i3, false, str, arrayList);
+            }
+            return;
         }
-        this.scope = r10;
-        this.colorsAvailable = true;
+        throw new IllegalArgumentException(("Requested element count " + i2 + " is less than zero.").toString());
+    }
+
+    public static final int[] access$getPresetColorPreview(ColorProvider colorProvider, ColorScheme colorScheme, int i) {
+        colorProvider.getClass();
+        int i2 = WhenMappings.$EnumSwitchMapping$0[colorScheme.getStyle().ordinal()];
+        return i2 != 1 ? i2 != 2 ? new int[]{colorScheme.getAccent1().get(2).intValue(), colorScheme.getAccent1().get(2).intValue()} : new int[]{colorScheme.getAccentColor(), colorScheme.getAccentColor()} : new int[]{i, colorScheme.getAccent1().get(2).intValue()};
     }
 
     /* JADX WARN: Multi-variable type inference failed */
     public static final void access$loadSeedColors(ColorProvider colorProvider, WallpaperColors wallpaperColors, WallpaperColors wallpaperColors2) {
+        int i;
         EmptyList emptyList;
-        Objects.requireNonNull(colorProvider);
+        WallpaperColors wallpaperColors3;
+        String str;
+        WallpaperColors wallpaperColors4;
+        String str2;
+        colorProvider.getClass();
         if (wallpaperColors != null) {
             ArrayList arrayList = new ArrayList();
-            int i = 4;
-            if (wallpaperColors2 != null) {
+            if (wallpaperColors2 == null) {
+                i = 4;
+            } else {
                 i = 2;
             }
             if (wallpaperColors2 != null) {
-                WallpaperManagerCompatV16 wallpaperManagerCompat = InjectorProvider.getInjector().getWallpaperManagerCompat(colorProvider.mContext);
+                WallpaperManagerCompat wallpaperManagerCompat = R$style.getInjector().getWallpaperManagerCompat(colorProvider.mContext);
                 boolean z = true;
                 if (wallpaperManagerCompat.getWallpaperId(2) <= wallpaperManagerCompat.getWallpaperId(1)) {
                     z = false;
                 }
                 boolean z2 = z;
-                colorProvider.buildColorSeeds(z2 ? wallpaperColors2 : wallpaperColors, i, z2 ? "lock_wallpaper" : "home_wallpaper", true, arrayList);
-                colorProvider.buildColorSeeds(z2 ? wallpaperColors : wallpaperColors2, 4 - arrayList.size(), z2 ? "home_wallpaper" : "lock_wallpaper", false, arrayList);
+                if (z2) {
+                    wallpaperColors3 = wallpaperColors2;
+                } else {
+                    wallpaperColors3 = wallpaperColors;
+                }
+                if (z2) {
+                    str = "lock_wallpaper";
+                } else {
+                    str = "home_wallpaper";
+                }
+                colorProvider.buildColorSeeds(wallpaperColors3, i, str, true, arrayList);
+                if (z2) {
+                    wallpaperColors4 = wallpaperColors;
+                } else {
+                    wallpaperColors4 = wallpaperColors2;
+                }
+                int size = 4 - (arrayList.size() / styleSize);
+                if (z2) {
+                    str2 = "home_wallpaper";
+                } else {
+                    str2 = "lock_wallpaper";
+                }
+                colorProvider.buildColorSeeds(wallpaperColors4, size, str2, false, arrayList);
             } else {
                 colorProvider.buildColorSeeds(wallpaperColors, i, "home_wallpaper", true, arrayList);
             }
@@ -123,56 +215,5 @@ public final class ColorProvider extends ResourcesApkProvider implements ColorOp
             arrayList.addAll(emptyList);
             colorProvider.colorBundles = arrayList;
         }
-    }
-
-    public final void buildBundle(int i, int i2, boolean z, String str, List<ColorOption> list) {
-        HashMap hashMap = new HashMap();
-        ColorScheme colorScheme = new ColorScheme(i, false);
-        ColorScheme colorScheme2 = new ColorScheme(i, true);
-        int[] iArr = {ColorUtils.setAlphaComponent(colorScheme.getAccent1().get(2).intValue(), 255), ColorUtils.setAlphaComponent(colorScheme.getAccent1().get(2).intValue(), 255), ColorStateList.valueOf(colorScheme.getAccent3().get(6).intValue()).withLStar(85.0f).getColors()[0], ColorUtils.setAlphaComponent(colorScheme.getAccent1().get(6).intValue(), 255)};
-        int[] iArr2 = {ColorUtils.setAlphaComponent(colorScheme2.getAccent1().get(2).intValue(), 255), ColorUtils.setAlphaComponent(colorScheme2.getAccent1().get(2).intValue(), 255), ColorStateList.valueOf(colorScheme2.getAccent3().get(6).intValue()).withLStar(85.0f).getColors()[0], ColorUtils.setAlphaComponent(colorScheme2.getAccent1().get(6).intValue(), 255)};
-        String str2 = "";
-        hashMap.put("android.theme.customization.system_palette", z ? str2 : ColorUtils.toColorString(i));
-        if (!z) {
-            str2 = ColorUtils.toColorString(i);
-        }
-        hashMap.put("android.theme.customization.accent_color", str2);
-        list.add(new ColorSeedOption(null, hashMap, z, str, 1 + i2, new ColorSeedOption.PreviewInfo(iArr, iArr2, null)));
-    }
-
-    public final void buildColorSeeds(WallpaperColors wallpaperColors, int i, String str, boolean z, List<ColorOption> list) {
-        List<Number> list2;
-        List<Integer> seedColors = ColorScheme.Companion.getSeedColors(wallpaperColors);
-        buildBundle(((Number) CollectionsKt___CollectionsKt.first(seedColors)).intValue(), 0, z, str, list);
-        List<Object> take = CollectionsKt___CollectionsKt.drop(seedColors, 1);
-        int i2 = i - 1;
-        Intrinsics.checkNotNullParameter(take, "$this$take");
-        int i3 = 0;
-        if (i2 >= 0) {
-            if (i2 == 0) {
-                list2 = EmptyList.INSTANCE;
-            } else if (i2 >= take.size()) {
-                list2 = CollectionsKt___CollectionsKt.toList(take);
-            } else if (i2 == 1) {
-                list2 = CollectionsKt__CollectionsKt.listOf(CollectionsKt___CollectionsKt.first(take));
-            } else {
-                ArrayList arrayList = new ArrayList(i2);
-                int i4 = 0;
-                for (Object obj : take) {
-                    arrayList.add(obj);
-                    i4++;
-                    if (i4 == i2) {
-                        break;
-                    }
-                }
-                list2 = CollectionsKt__CollectionsKt.optimizeReadOnlyList(arrayList);
-            }
-            for (Number number : list2) {
-                i3++;
-                buildBundle(number.intValue(), i3, false, str, list);
-            }
-            return;
-        }
-        throw new IllegalArgumentException(("Requested element count " + i2 + " is less than zero.").toString());
     }
 }

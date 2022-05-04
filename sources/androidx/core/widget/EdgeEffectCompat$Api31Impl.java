@@ -5,10 +5,10 @@ import android.util.AttributeSet;
 import android.widget.EdgeEffect;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 /* loaded from: classes.dex */
-public class EdgeEffectCompat$Api31Impl {
-    public static EdgeEffect create(Context context, AttributeSet attrs) {
+public final class EdgeEffectCompat$Api31Impl {
+    public static EdgeEffect create(Context context, AttributeSet attributeSet) {
         try {
-            return new EdgeEffect(context, attrs);
+            return new EdgeEffect(context, attributeSet);
         } catch (Throwable unused) {
             return new EdgeEffect(context);
         }
@@ -22,11 +22,11 @@ public class EdgeEffectCompat$Api31Impl {
         }
     }
 
-    public static float onPullDistance(EdgeEffect edgeEffect, float deltaDistance, float displacement) {
+    public static float onPullDistance(EdgeEffect edgeEffect, float f, float f2) {
         try {
-            return edgeEffect.onPullDistance(deltaDistance, displacement);
+            return edgeEffect.onPullDistance(f, f2);
         } catch (Throwable unused) {
-            edgeEffect.onPull(deltaDistance, displacement);
+            edgeEffect.onPull(f, f2);
             return HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
         }
     }

@@ -1,36 +1,18 @@
 package androidx.dynamicanimation.animation;
 
 import android.util.AndroidRuntimeException;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public final class SpringAnimation extends DynamicAnimation<SpringAnimation> {
     public SpringForce mSpring = null;
     public float mPendingPosition = Float.MAX_VALUE;
 
-    public <K> SpringAnimation(K object, FloatPropertyCompat<K> property) {
-        super(object, property);
-    }
-
-    public void animateToFinalPosition(float finalPosition) {
-        if (this.mRunning) {
-            this.mPendingPosition = finalPosition;
-            return;
-        }
-        if (this.mSpring == null) {
-            this.mSpring = new SpringForce(finalPosition);
-        }
-        this.mSpring.mFinalPosition = finalPosition;
-        start();
-    }
-
-    public void start() {
+    public final void start() {
         SpringForce springForce = this.mSpring;
         if (springForce != null) {
             double d = (float) springForce.mFinalPosition;
             if (d > this.mMaxValue) {
                 throw new UnsupportedOperationException("Final position of the spring cannot be greater than the max value.");
             } else if (d >= this.mMinValue) {
-                Objects.requireNonNull(springForce);
                 double abs = Math.abs(this.mMinVisibleChange * 0.75f);
                 springForce.mValueThreshold = abs;
                 springForce.mVelocityThreshold = abs * 62.5d;
@@ -64,5 +46,9 @@ public final class SpringAnimation extends DynamicAnimation<SpringAnimation> {
         } else {
             throw new UnsupportedOperationException("Incomplete SpringAnimation: Either final position or a spring force needs to be set.");
         }
+    }
+
+    public <K> SpringAnimation(K k, FloatPropertyCompat<K> floatPropertyCompat) {
+        super(k, floatPropertyCompat);
     }
 }

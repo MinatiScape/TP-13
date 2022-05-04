@@ -5,59 +5,33 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.util.Log;
 import android.view.WindowManager;
+import androidx.cardview.R$style;
 import com.android.wallpaper.util.DiskBasedLogger;
 import com.android.wallpaper.util.ScreenSizeCalculator;
-import com.android.wallpaper.util.SizeCalculator;
 import com.android.wallpaper.util.WallpaperCropUtils;
 import com.google.android.libraries.imageurl.FifeImageUrlUtil;
-import com.google.photos.base.ImageUrlOptionsEnum;
-import com.google.photos.base.ParsedImageUrlOptions$Builder;
 /* loaded from: classes.dex */
-public class FifeImageUrlFactory {
+public final class FifeImageUrlFactory {
     public static FifeImageUrlFactory sInstance;
     public FifeImageUrlUtil mFifeImageUrlUtil = new FifeImageUrlUtil();
 
-    public static FifeImageUrlFactory getInstance() {
-        if (sInstance == null) {
-            sInstance = new FifeImageUrlFactory();
-        }
-        return sInstance;
-    }
-
-    public final int calculateAndAddSize(Context context, FifeImageUrlUtil.Options options) {
+    public static int calculateAndAddSize(Context context, FifeImageUrlUtil.Options options) {
         Point screenSize = ScreenSizeCalculator.getInstance().getScreenSize(((WindowManager) context.getSystemService("window")).getDefaultDisplay());
         int max = (int) (Math.max(screenSize.x, screenSize.y) * 1.5d);
-        options.setSize(max, false);
-        ParsedImageUrlOptions$Builder parsedImageUrlOptions$Builder = options.options;
-        ImageUrlOptionsEnum imageUrlOptionsEnum = ImageUrlOptionsEnum.QUALITY_LEVEL;
-        parsedImageUrlOptions$Builder.setOptionWithReadableError(imageUrlOptionsEnum, 90, "QualityLevel");
-        options.options.setIsSigned(imageUrlOptionsEnum, false);
+        options.setSize(max);
+        options.setQualityLevel();
         return max;
     }
 
-    public Uri createDesktopUri(Context context, String str) {
+    public static Uri createDesktopUri(Context context, String str) {
         Point screenSize = ScreenSizeCalculator.getInstance().getScreenSize(((WindowManager) context.getSystemService("window")).getDefaultDisplay());
         Uri parse = Uri.parse(str);
         FifeImageUrlUtil fifeImageUrlUtil = new FifeImageUrlUtil();
-        if (fifeImageUrlUtil.isFifeHostedUri(parse)) {
+        if (FifeImageUrlUtil.isFifeHostedUri(parse)) {
             FifeImageUrlUtil.Options options = new FifeImageUrlUtil.Options();
-            int i = screenSize.x;
-            ParsedImageUrlOptions$Builder parsedImageUrlOptions$Builder = options.options;
-            Integer valueOf = Integer.valueOf(i);
-            ImageUrlOptionsEnum imageUrlOptionsEnum = ImageUrlOptionsEnum.WIDTH;
-            parsedImageUrlOptions$Builder.setOptionWithReadableError(imageUrlOptionsEnum, valueOf, "Width");
-            options.options.setIsSigned(imageUrlOptionsEnum, false);
-            int i2 = screenSize.y;
-            ParsedImageUrlOptions$Builder parsedImageUrlOptions$Builder2 = options.options;
-            Integer valueOf2 = Integer.valueOf(i2);
-            ImageUrlOptionsEnum imageUrlOptionsEnum2 = ImageUrlOptionsEnum.HEIGHT;
-            parsedImageUrlOptions$Builder2.setOptionWithReadableError(imageUrlOptionsEnum2, valueOf2, "Height");
-            options.options.setIsSigned(imageUrlOptionsEnum2, false);
-            ParsedImageUrlOptions$Builder parsedImageUrlOptions$Builder3 = options.options;
-            Boolean bool = Boolean.TRUE;
-            ImageUrlOptionsEnum imageUrlOptionsEnum3 = ImageUrlOptionsEnum.CENTER_CROP;
-            parsedImageUrlOptions$Builder3.setOptionWithReadableError(imageUrlOptionsEnum3, bool, "CenterCrop");
-            options.options.setIsSigned(imageUrlOptionsEnum3, false);
+            options.setWidth(screenSize.x);
+            options.setHeight(screenSize.y);
+            options.setCenterCrop();
             try {
                 return fifeImageUrlUtil.mergeOptions(options, parse);
             } catch (FifeImageUrlUtil.InvalidUrlException unused) {
@@ -67,25 +41,11 @@ public class FifeImageUrlFactory {
         return parse;
     }
 
-    public Uri createFullSizedUri(Context context, String str) {
-        Uri parse = Uri.parse(str);
-        if (this.mFifeImageUrlUtil.isFifeHostedUri(parse)) {
-            FifeImageUrlUtil.Options options = new FifeImageUrlUtil.Options();
-            int calculateAndAddSize = calculateAndAddSize(context, options);
-            try {
-                return this.mFifeImageUrlUtil.mergeOptions(options, parse);
-            } catch (FifeImageUrlUtil.InvalidUrlException unused) {
-                DiskBasedLogger.e("FifeImageUrlFactory", "Unable to merge FIFE URL options for size " + calculateAndAddSize + " on URL " + str, context);
-            }
-        }
-        return Uri.parse(str);
-    }
-
-    public Uri createRotatingWallpaperUri(Context context, String str) {
+    public static Uri createRotatingWallpaperUri(Context context, String str) {
         Point defaultCropSurfaceSize = WallpaperCropUtils.getDefaultCropSurfaceSize(context.getResources(), ((WindowManager) context.getSystemService("window")).getDefaultDisplay());
         Uri parse = Uri.parse(str);
         FifeImageUrlUtil fifeImageUrlUtil = new FifeImageUrlUtil();
-        if (fifeImageUrlUtil.isFifeHostedUri(parse)) {
+        if (FifeImageUrlUtil.isFifeHostedUri(parse)) {
             FifeImageUrlUtil.Options options = new FifeImageUrlUtil.Options();
             calculateAndAddSize(context, options);
             try {
@@ -97,17 +57,30 @@ public class FifeImageUrlFactory {
         return parse;
     }
 
-    public Uri createThumbUri(Context context, String str) {
+    public final Uri createFullSizedUri(Context context, String str) {
         Uri parse = Uri.parse(str);
-        if (this.mFifeImageUrlUtil.isFifeHostedUri(parse)) {
+        this.mFifeImageUrlUtil.getClass();
+        if (FifeImageUrlUtil.isFifeHostedUri(parse)) {
             FifeImageUrlUtil.Options options = new FifeImageUrlUtil.Options();
-            Point suggestedThumbnailSize = SizeCalculator.getSuggestedThumbnailSize(context);
+            int calculateAndAddSize = calculateAndAddSize(context, options);
+            try {
+                return this.mFifeImageUrlUtil.mergeOptions(options, parse);
+            } catch (FifeImageUrlUtil.InvalidUrlException unused) {
+                DiskBasedLogger.e("FifeImageUrlFactory", "Unable to merge FIFE URL options for size " + calculateAndAddSize + " on URL " + str, context);
+            }
+        }
+        return Uri.parse(str);
+    }
+
+    public final Uri createThumbUri(Context context, String str) {
+        Uri parse = Uri.parse(str);
+        this.mFifeImageUrlUtil.getClass();
+        if (FifeImageUrlUtil.isFifeHostedUri(parse)) {
+            FifeImageUrlUtil.Options options = new FifeImageUrlUtil.Options();
+            Point suggestedThumbnailSize = R$style.getSuggestedThumbnailSize(context);
             int max = Math.max(suggestedThumbnailSize.x, suggestedThumbnailSize.y);
-            options.setSize(max, false);
-            ParsedImageUrlOptions$Builder parsedImageUrlOptions$Builder = options.options;
-            ImageUrlOptionsEnum imageUrlOptionsEnum = ImageUrlOptionsEnum.QUALITY_BUCKET;
-            parsedImageUrlOptions$Builder.setOptionWithReadableError(imageUrlOptionsEnum, 1, "QualityBucket");
-            options.options.setIsSigned(imageUrlOptionsEnum, false);
+            options.setSize(max);
+            options.setQualityBucket();
             try {
                 return this.mFifeImageUrlUtil.mergeOptions(options, parse);
             } catch (FifeImageUrlUtil.InvalidUrlException unused) {
@@ -117,15 +90,13 @@ public class FifeImageUrlFactory {
         return Uri.parse(str);
     }
 
-    public Uri createTinyUri(String str) {
+    public final Uri createTinyUri(String str) {
         Uri parse = Uri.parse(str);
-        if (this.mFifeImageUrlUtil.isFifeHostedUri(parse)) {
+        this.mFifeImageUrlUtil.getClass();
+        if (FifeImageUrlUtil.isFifeHostedUri(parse)) {
             FifeImageUrlUtil.Options options = new FifeImageUrlUtil.Options();
-            options.setSize(50, false);
-            ParsedImageUrlOptions$Builder parsedImageUrlOptions$Builder = options.options;
-            ImageUrlOptionsEnum imageUrlOptionsEnum = ImageUrlOptionsEnum.QUALITY_BUCKET;
-            parsedImageUrlOptions$Builder.setOptionWithReadableError(imageUrlOptionsEnum, 1, "QualityBucket");
-            options.options.setIsSigned(imageUrlOptionsEnum, false);
+            options.setSize(50);
+            options.setQualityBucket();
             try {
                 return this.mFifeImageUrlUtil.mergeOptions(options, parse);
             } catch (FifeImageUrlUtil.InvalidUrlException unused) {

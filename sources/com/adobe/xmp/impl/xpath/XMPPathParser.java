@@ -10,10 +10,13 @@ import com.android.systemui.shared.system.QuickStepContract;
 /* loaded from: classes.dex */
 public final class XMPPathParser {
     public static XMPPath expandXPath(String schemaNS, String path) throws XMPException {
+        XMPAliasInfo xMPAliasInfo;
         int i;
         XMPPathSegment xMPPathSegment;
         boolean z;
         char c;
+        String str;
+        String str2;
         int i2;
         XMPPathSegment xMPPathSegment2;
         XMPPath xMPPath = new XMPPath();
@@ -23,26 +26,29 @@ public final class XMPPathParser {
         }
         if (i3 != 0) {
             String verifyXPathRoot = verifyXPathRoot(schemaNS, path.substring(0, i3));
-            XMPAliasInfo findAlias = ((XMPSchemaRegistryImpl) XMPMetaFactory.schema).findAlias(verifyXPathRoot);
-            if (findAlias == null) {
-                xMPPath.segments.add(new XMPPathSegment(schemaNS, RecyclerView.UNDEFINED_DURATION));
-                xMPPath.segments.add(new XMPPathSegment(verifyXPathRoot, 1));
+            XMPSchemaRegistryImpl xMPSchemaRegistryImpl = XMPMetaFactory.schema;
+            synchronized (xMPSchemaRegistryImpl) {
+                xMPAliasInfo = (XMPAliasInfo) xMPSchemaRegistryImpl.aliasMap.get(verifyXPathRoot);
+            }
+            if (xMPAliasInfo == null) {
+                xMPPath.add(new XMPPathSegment(schemaNS, RecyclerView.UNDEFINED_DURATION));
+                xMPPath.add(new XMPPathSegment(verifyXPathRoot, 1));
             } else {
-                xMPPath.segments.add(new XMPPathSegment(findAlias.getNamespace(), RecyclerView.UNDEFINED_DURATION));
-                XMPPathSegment xMPPathSegment3 = new XMPPathSegment(verifyXPathRoot(findAlias.getNamespace(), findAlias.getPropName()), 1);
+                xMPPath.add(new XMPPathSegment(xMPAliasInfo.getNamespace(), RecyclerView.UNDEFINED_DURATION));
+                XMPPathSegment xMPPathSegment3 = new XMPPathSegment(verifyXPathRoot(xMPAliasInfo.getNamespace(), xMPAliasInfo.getPropName()), 1);
                 xMPPathSegment3.alias = true;
-                xMPPathSegment3.aliasForm = findAlias.getAliasForm().options;
-                xMPPath.segments.add(xMPPathSegment3);
-                if (findAlias.getAliasForm().getOption(QuickStepContract.SYSUI_STATE_TRACING_ENABLED)) {
+                xMPPathSegment3.aliasForm = xMPAliasInfo.getAliasForm().options;
+                xMPPath.add(xMPPathSegment3);
+                if (xMPAliasInfo.getAliasForm().getOption(QuickStepContract.SYSUI_STATE_TRACING_ENABLED)) {
                     XMPPathSegment xMPPathSegment4 = new XMPPathSegment("[?xml:lang='x-default']", 5);
                     xMPPathSegment4.alias = true;
-                    xMPPathSegment4.aliasForm = findAlias.getAliasForm().options;
-                    xMPPath.segments.add(xMPPathSegment4);
-                } else if (findAlias.getAliasForm().getOption(QuickStepContract.SYSUI_STATE_STATUS_BAR_KEYGUARD_SHOWING_OCCLUDED)) {
+                    xMPPathSegment4.aliasForm = xMPAliasInfo.getAliasForm().options;
+                    xMPPath.add(xMPPathSegment4);
+                } else if (xMPAliasInfo.getAliasForm().getOption(QuickStepContract.SYSUI_STATE_STATUS_BAR_KEYGUARD_SHOWING_OCCLUDED)) {
                     XMPPathSegment xMPPathSegment5 = new XMPPathSegment("[1]", 3);
                     xMPPathSegment5.alias = true;
-                    xMPPathSegment5.aliasForm = findAlias.getAliasForm().options;
-                    xMPPath.segments.add(xMPPathSegment5);
+                    xMPPathSegment5.aliasForm = xMPAliasInfo.getAliasForm().options;
+                    xMPPath.add(xMPPathSegment5);
                 }
             }
             int i4 = 0;
@@ -88,15 +94,16 @@ public final class XMPPathParser {
                                         i8++;
                                     }
                                     if (i8 < path.length()) {
-                                        i2 = i8 + 1;
                                         xMPPathSegment = new XMPPathSegment(null, 6);
-                                        i4 = i6;
+                                        int i10 = i6;
+                                        i2 = i8 + 1;
+                                        i4 = i10;
                                         if (i2 < path.length() || path.charAt(i2) != ']') {
                                             throw new XMPException("Missing ']' for array index", 102);
                                         }
-                                        int i10 = i2 + 1;
-                                        xMPPathSegment.name = path.substring(i3, i10);
-                                        i3 = i10;
+                                        int i11 = i2 + 1;
+                                        xMPPathSegment.name = path.substring(i3, i11);
+                                        i3 = i11;
                                     } else {
                                         throw new XMPException("No terminating quote for array selector", 102);
                                     }
@@ -115,20 +122,25 @@ public final class XMPPathParser {
                             }
                             xMPPathSegment2 = new XMPPathSegment(null, 3);
                         }
-                        i = i5;
+                        int i12 = i5;
                         xMPPathSegment = xMPPathSegment2;
                         i2 = i;
+                        i = i12;
                         if (i2 < path.length()) {
                         }
                         throw new XMPException("Missing ']' for array index", 102);
                     }
-                    int i11 = xMPPathSegment.kind;
-                    if (i11 == 1) {
+                    int i13 = xMPPathSegment.kind;
+                    if (i13 == 1) {
                         if (xMPPathSegment.name.charAt(0) == '@') {
                             String valueOf = String.valueOf(xMPPathSegment.name.substring(1));
-                            String concat = valueOf.length() != 0 ? "?".concat(valueOf) : new String("?");
-                            xMPPathSegment.name = concat;
-                            if (!"?xml:lang".equals(concat)) {
+                            if (valueOf.length() != 0) {
+                                str2 = "?".concat(valueOf);
+                            } else {
+                                str2 = new String("?");
+                            }
+                            xMPPathSegment.name = str2;
+                            if (!"?xml:lang".equals(str2)) {
                                 throw new XMPException("Only xml:lang allowed with '@'", 102);
                             }
                         }
@@ -140,12 +152,16 @@ public final class XMPPathParser {
                         z = false;
                     } else {
                         z = false;
-                        if (i11 == 6) {
+                        if (i13 == 6) {
                             if (xMPPathSegment.name.charAt(1) == '@') {
                                 String valueOf2 = String.valueOf(xMPPathSegment.name.substring(2));
-                                String concat2 = valueOf2.length() != 0 ? "[?".concat(valueOf2) : new String("[?");
-                                xMPPathSegment.name = concat2;
-                                if (!concat2.startsWith("[?xml:lang=")) {
+                                if (valueOf2.length() != 0) {
+                                    str = "[?".concat(valueOf2);
+                                } else {
+                                    str = new String("[?");
+                                }
+                                xMPPathSegment.name = str;
+                                if (!str.startsWith("[?xml:lang=")) {
                                     throw new XMPException("Only xml:lang allowed with '@'", 102);
                                 }
                             }
@@ -154,13 +170,13 @@ public final class XMPPathParser {
                                 c = 5;
                                 xMPPathSegment.kind = 5;
                                 verifyQualName(path.substring(i, i4));
-                                xMPPath.segments.add(xMPPathSegment);
+                                xMPPath.add(xMPPathSegment);
                                 i5 = i;
                             }
                         }
                     }
                     c = 5;
-                    xMPPath.segments.add(xMPPathSegment);
+                    xMPPath.add(xMPPathSegment);
                     i5 = i;
                 } else {
                     throw new XMPException("Missing '[' after '*'", 102);
@@ -177,7 +193,7 @@ public final class XMPPathParser {
         if (indexOf > 0) {
             String substring = qualName.substring(0, indexOf);
             if (Utils.isXMLNameNS(substring)) {
-                XMPSchemaRegistryImpl xMPSchemaRegistryImpl = (XMPSchemaRegistryImpl) XMPMetaFactory.schema;
+                XMPSchemaRegistryImpl xMPSchemaRegistryImpl = XMPMetaFactory.schema;
                 synchronized (xMPSchemaRegistryImpl) {
                     if (!substring.endsWith(":")) {
                         substring = substring.concat(":");
@@ -194,7 +210,7 @@ public final class XMPPathParser {
     }
 
     /* JADX WARN: Code restructure failed: missing block: B:10:0x001c, code lost:
-        if ((r0 > 255 || com.adobe.xmp.impl.Utils.xmlNameStartChars[r0]) == false) goto L23;
+        if (r0 == false) goto L23;
      */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
@@ -267,17 +283,20 @@ public final class XMPPathParser {
         } else if (rootProp.indexOf(47) >= 0 || rootProp.indexOf(91) >= 0) {
             throw new XMPException("Top level name must be simple", 102);
         } else {
-            String namespacePrefix = ((XMPSchemaRegistryImpl) XMPMetaFactory.schema).getNamespacePrefix(schemaNS);
+            String namespacePrefix = XMPMetaFactory.schema.getNamespacePrefix(schemaNS);
             if (namespacePrefix != null) {
                 int indexOf = rootProp.indexOf(58);
                 if (indexOf < 0) {
                     verifySimpleXMLName(rootProp);
-                    return rootProp.length() != 0 ? namespacePrefix.concat(rootProp) : new String(namespacePrefix);
+                    if (rootProp.length() != 0) {
+                        return namespacePrefix.concat(rootProp);
+                    }
+                    return new String(namespacePrefix);
                 }
                 verifySimpleXMLName(rootProp.substring(0, indexOf));
                 verifySimpleXMLName(rootProp.substring(indexOf));
                 String substring = rootProp.substring(0, indexOf + 1);
-                String namespacePrefix2 = ((XMPSchemaRegistryImpl) XMPMetaFactory.schema).getNamespacePrefix(schemaNS);
+                String namespacePrefix2 = XMPMetaFactory.schema.getNamespacePrefix(schemaNS);
                 if (namespacePrefix2 == null) {
                     throw new XMPException("Unknown schema namespace prefix", 101);
                 } else if (substring.equals(namespacePrefix2)) {

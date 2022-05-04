@@ -15,6 +15,10 @@ public class RecentsAnimationControllerCompat {
     public RecentsAnimationControllerCompat() {
     }
 
+    public RecentsAnimationControllerCompat(IRecentsAnimationController iRecentsAnimationController) {
+        this.mAnimationController = iRecentsAnimationController;
+    }
+
     public void animateNavigationBarToApp(long j) {
         try {
             this.mAnimationController.animateNavigationBarToApp(j);
@@ -114,9 +118,5 @@ public class RecentsAnimationControllerCompat {
         } catch (RemoteException e) {
             Log.e(TAG, "Failed to set overview reached state", e);
         }
-    }
-
-    public RecentsAnimationControllerCompat(IRecentsAnimationController iRecentsAnimationController) {
-        this.mAnimationController = iRecentsAnimationController;
     }
 }

@@ -1,19 +1,16 @@
 package com.google.common.util.concurrent;
 
+import androidx.fragment.app.FragmentContainer;
+import com.adobe.xmp.impl.XMPNode$$ExternalSyntheticOutline0;
 import com.android.systemui.flags.FlagManager;
-import com.bumptech.glide.Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline0;
-import com.bumptech.glide.Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline1;
 import com.google.common.base.Throwables;
-import com.google.common.util.concurrent.internal.InternalFutureFailureAccess;
 import java.lang.reflect.Field;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.util.Objects;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -23,7 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import sun.misc.Unsafe;
 /* loaded from: classes.dex */
-public abstract class AbstractFuture<V> extends InternalFutureFailureAccess implements ListenableFuture<V> {
+public abstract class AbstractFuture<V> extends FragmentContainer implements ListenableFuture<V> {
     public static final AtomicHelper ATOMIC_HELPER;
     public static final Object NULL;
     public volatile Listener listeners;
@@ -34,10 +31,7 @@ public abstract class AbstractFuture<V> extends InternalFutureFailureAccess impl
 
     /* loaded from: classes.dex */
     public static abstract class AtomicHelper {
-        public AtomicHelper(AnonymousClass1 r1) {
-        }
-
-        public abstract boolean casListeners(AbstractFuture<?> future, Listener expect, Listener update);
+        public abstract boolean casListeners(AbstractFuture abstractFuture, Listener listener);
 
         public abstract boolean casValue(AbstractFuture<?> future, Object expect, Object update);
 
@@ -53,7 +47,6 @@ public abstract class AbstractFuture<V> extends InternalFutureFailureAccess impl
         public static final Cancellation CAUSELESS_CANCELLED;
         public static final Cancellation CAUSELESS_INTERRUPTED;
         public final Throwable cause;
-        public final boolean wasInterrupted;
 
         static {
             if (AbstractFuture.GENERATE_CANCELLATION_CAUSES) {
@@ -66,7 +59,6 @@ public abstract class AbstractFuture<V> extends InternalFutureFailureAccess impl
         }
 
         public Cancellation(boolean wasInterrupted, Throwable cause) {
-            this.wasInterrupted = wasInterrupted;
             this.cause = cause;
         }
     }
@@ -78,27 +70,24 @@ public abstract class AbstractFuture<V> extends InternalFutureFailureAccess impl
         static {
             new Failure(new Throwable("Failure occurred while trying to finish a future.") { // from class: com.google.common.util.concurrent.AbstractFuture.Failure.1
                 @Override // java.lang.Throwable
-                public synchronized Throwable fillInStackTrace() {
+                public final synchronized Throwable fillInStackTrace() {
                     return this;
                 }
             });
         }
 
         public Failure(Throwable exception) {
-            Objects.requireNonNull(exception);
+            exception.getClass();
             this.exception = exception;
         }
     }
 
     /* loaded from: classes.dex */
     public static final class Listener {
-        public static final Listener TOMBSTONE = new Listener(null, null);
+        public static final Listener TOMBSTONE = new Listener();
         public Listener next;
         public final Runnable task = null;
         public final Executor executor = null;
-
-        public Listener(Runnable task, Executor executor) {
-        }
     }
 
     /* loaded from: classes.dex */
@@ -109,68 +98,44 @@ public abstract class AbstractFuture<V> extends InternalFutureFailureAccess impl
         public final AtomicReferenceFieldUpdater<Waiter, Thread> waiterThreadUpdater;
         public final AtomicReferenceFieldUpdater<AbstractFuture, Waiter> waitersUpdater;
 
+        @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
+        public final boolean casListeners(AbstractFuture abstractFuture, Listener listener) {
+            return this.listenersUpdater.compareAndSet(abstractFuture, listener, Listener.TOMBSTONE);
+        }
+
+        @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
+        public final boolean casValue(AbstractFuture<?> future, Object expect, Object update) {
+            return this.valueUpdater.compareAndSet(future, expect, update);
+        }
+
+        @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
+        public final boolean casWaiters(AbstractFuture<?> future, Waiter expect, Waiter update) {
+            return this.waitersUpdater.compareAndSet(future, expect, update);
+        }
+
+        @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
+        public final void putNext(Waiter waiter, Waiter newValue) {
+            this.waiterNextUpdater.lazySet(waiter, newValue);
+        }
+
+        @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
+        public final void putThread(Waiter waiter, Thread newValue) {
+            this.waiterThreadUpdater.lazySet(waiter, newValue);
+        }
+
         public SafeAtomicHelper(AtomicReferenceFieldUpdater<Waiter, Thread> waiterThreadUpdater, AtomicReferenceFieldUpdater<Waiter, Waiter> waiterNextUpdater, AtomicReferenceFieldUpdater<AbstractFuture, Waiter> waitersUpdater, AtomicReferenceFieldUpdater<AbstractFuture, Listener> listenersUpdater, AtomicReferenceFieldUpdater<AbstractFuture, Object> valueUpdater) {
-            super(null);
             this.waiterThreadUpdater = waiterThreadUpdater;
             this.waiterNextUpdater = waiterNextUpdater;
             this.waitersUpdater = waitersUpdater;
             this.listenersUpdater = listenersUpdater;
             this.valueUpdater = valueUpdater;
         }
-
-        @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
-        public boolean casListeners(AbstractFuture<?> future, Listener expect, Listener update) {
-            return this.listenersUpdater.compareAndSet(future, expect, update);
-        }
-
-        @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
-        public boolean casValue(AbstractFuture<?> future, Object expect, Object update) {
-            return this.valueUpdater.compareAndSet(future, expect, update);
-        }
-
-        @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
-        public boolean casWaiters(AbstractFuture<?> future, Waiter expect, Waiter update) {
-            return this.waitersUpdater.compareAndSet(future, expect, update);
-        }
-
-        @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
-        public void putNext(Waiter waiter, Waiter newValue) {
-            this.waiterNextUpdater.lazySet(waiter, newValue);
-        }
-
-        @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
-        public void putThread(Waiter waiter, Thread newValue) {
-            this.waiterThreadUpdater.lazySet(waiter, newValue);
-        }
-    }
-
-    /* loaded from: classes.dex */
-    public static final class SetFuture<V> implements Runnable {
-        @Override // java.lang.Runnable
-        public void run() {
-            throw null;
-        }
     }
 
     /* loaded from: classes.dex */
     public static final class SynchronizedHelper extends AtomicHelper {
-        public SynchronizedHelper(AnonymousClass1 r1) {
-            super(null);
-        }
-
         @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
-        public boolean casListeners(AbstractFuture<?> future, Listener expect, Listener update) {
-            synchronized (future) {
-                if (future.listeners != expect) {
-                    return false;
-                }
-                future.listeners = update;
-                return true;
-            }
-        }
-
-        @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
-        public boolean casValue(AbstractFuture<?> future, Object expect, Object update) {
+        public final boolean casValue(AbstractFuture<?> future, Object expect, Object update) {
             synchronized (future) {
                 if (future.value != expect) {
                     return false;
@@ -181,7 +146,7 @@ public abstract class AbstractFuture<V> extends InternalFutureFailureAccess impl
         }
 
         @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
-        public boolean casWaiters(AbstractFuture<?> future, Waiter expect, Waiter update) {
+        public final boolean casWaiters(AbstractFuture<?> future, Waiter expect, Waiter update) {
             synchronized (future) {
                 if (future.waiters != expect) {
                     return false;
@@ -192,12 +157,24 @@ public abstract class AbstractFuture<V> extends InternalFutureFailureAccess impl
         }
 
         @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
-        public void putNext(Waiter waiter, Waiter newValue) {
+        public final boolean casListeners(AbstractFuture abstractFuture, Listener listener) {
+            Listener listener2 = Listener.TOMBSTONE;
+            synchronized (abstractFuture) {
+                if (abstractFuture.listeners != listener) {
+                    return false;
+                }
+                abstractFuture.listeners = listener2;
+                return true;
+            }
+        }
+
+        @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
+        public final void putNext(Waiter waiter, Waiter newValue) {
             waiter.next = newValue;
         }
 
         @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
-        public void putThread(Waiter waiter, Thread newValue) {
+        public final void putThread(Waiter waiter, Thread newValue) {
             waiter.thread = newValue;
         }
     }
@@ -205,13 +182,13 @@ public abstract class AbstractFuture<V> extends InternalFutureFailureAccess impl
     /* loaded from: classes.dex */
     public static abstract class TrustedFuture<V> extends AbstractFuture<V> {
         @Override // com.google.common.util.concurrent.AbstractFuture, java.util.concurrent.Future
-        public final boolean cancel(boolean mayInterruptIfRunning) {
-            return AbstractFuture.super.cancel(mayInterruptIfRunning);
+        public final V get() throws InterruptedException, ExecutionException {
+            return (V) AbstractFuture.super.get();
         }
 
         @Override // com.google.common.util.concurrent.AbstractFuture, java.util.concurrent.Future
-        public final V get() throws InterruptedException, ExecutionException {
-            return (V) AbstractFuture.super.get();
+        public final V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+            return (V) AbstractFuture.super.get(timeout, unit);
         }
 
         @Override // com.google.common.util.concurrent.AbstractFuture, java.util.concurrent.Future
@@ -220,13 +197,13 @@ public abstract class AbstractFuture<V> extends InternalFutureFailureAccess impl
         }
 
         @Override // com.google.common.util.concurrent.AbstractFuture, java.util.concurrent.Future
-        public final boolean isDone() {
-            return AbstractFuture.super.isDone();
+        public final boolean cancel(boolean mayInterruptIfRunning) {
+            return AbstractFuture.super.cancel(mayInterruptIfRunning);
         }
 
         @Override // com.google.common.util.concurrent.AbstractFuture, java.util.concurrent.Future
-        public final V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-            return (V) AbstractFuture.super.get(timeout, unit);
+        public final boolean isDone() {
+            return AbstractFuture.super.isDone();
         }
     }
 
@@ -250,7 +227,7 @@ public abstract class AbstractFuture<V> extends InternalFutureFailureAccess impl
             } catch (SecurityException unused) {
                 unsafe = (Unsafe) AccessController.doPrivileged(new PrivilegedExceptionAction<Unsafe>() { // from class: com.google.common.util.concurrent.AbstractFuture.UnsafeAtomicHelper.1
                     @Override // java.security.PrivilegedExceptionAction
-                    public Unsafe run() throws Exception {
+                    public final Unsafe run() throws Exception {
                         Field[] declaredFields;
                         for (Field field : Unsafe.class.getDeclaredFields()) {
                             field.setAccessible(true);
@@ -266,7 +243,7 @@ public abstract class AbstractFuture<V> extends InternalFutureFailureAccess impl
             try {
                 WAITERS_OFFSET = unsafe.objectFieldOffset(AbstractFuture.class.getDeclaredField("waiters"));
                 LISTENERS_OFFSET = unsafe.objectFieldOffset(AbstractFuture.class.getDeclaredField("listeners"));
-                VALUE_OFFSET = unsafe.objectFieldOffset(AbstractFuture.class.getDeclaredField(FlagManager.FIELD_VALUE));
+                VALUE_OFFSET = unsafe.objectFieldOffset(AbstractFuture.class.getDeclaredField(FlagManager.EXTRA_VALUE));
                 WAITER_THREAD_OFFSET = unsafe.objectFieldOffset(Waiter.class.getDeclaredField("thread"));
                 WAITER_NEXT_OFFSET = unsafe.objectFieldOffset(Waiter.class.getDeclaredField("next"));
                 UNSAFE = unsafe;
@@ -282,208 +259,44 @@ public abstract class AbstractFuture<V> extends InternalFutureFailureAccess impl
             }
         }
 
-        public UnsafeAtomicHelper(AnonymousClass1 r1) {
-            super(null);
+        @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
+        public final boolean casListeners(AbstractFuture abstractFuture, Listener listener) {
+            return UNSAFE.compareAndSwapObject(abstractFuture, LISTENERS_OFFSET, listener, Listener.TOMBSTONE);
         }
 
         @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
-        public boolean casListeners(AbstractFuture<?> future, Listener expect, Listener update) {
-            return UNSAFE.compareAndSwapObject(future, LISTENERS_OFFSET, expect, update);
-        }
-
-        @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
-        public boolean casValue(AbstractFuture<?> future, Object expect, Object update) {
+        public final boolean casValue(AbstractFuture<?> future, Object expect, Object update) {
             return UNSAFE.compareAndSwapObject(future, VALUE_OFFSET, expect, update);
         }
 
         @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
-        public boolean casWaiters(AbstractFuture<?> future, Waiter expect, Waiter update) {
+        public final boolean casWaiters(AbstractFuture<?> future, Waiter expect, Waiter update) {
             return UNSAFE.compareAndSwapObject(future, WAITERS_OFFSET, expect, update);
         }
 
         @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
-        public void putNext(Waiter waiter, Waiter newValue) {
+        public final void putNext(Waiter waiter, Waiter newValue) {
             UNSAFE.putObject(waiter, WAITER_NEXT_OFFSET, newValue);
         }
 
         @Override // com.google.common.util.concurrent.AbstractFuture.AtomicHelper
-        public void putThread(Waiter waiter, Thread newValue) {
+        public final void putThread(Waiter waiter, Thread newValue) {
             UNSAFE.putObject(waiter, WAITER_THREAD_OFFSET, newValue);
         }
     }
 
     /* loaded from: classes.dex */
     public static final class Waiter {
-        public static final Waiter TOMBSTONE = new Waiter(false);
+        public static final Waiter TOMBSTONE = new Waiter(0);
         public volatile Waiter next;
         public volatile Thread thread;
 
-        public Waiter(boolean unused) {
+        public Waiter(int unused) {
         }
 
         public Waiter() {
             AbstractFuture.ATOMIC_HELPER.putThread(this, Thread.currentThread());
         }
-    }
-
-    static {
-        Throwable th;
-        Throwable th2;
-        AtomicHelper atomicHelper;
-        try {
-            atomicHelper = new UnsafeAtomicHelper(null);
-            th2 = null;
-            th = null;
-        } catch (Throwable th3) {
-            try {
-                th2 = th3;
-                atomicHelper = new SafeAtomicHelper(AtomicReferenceFieldUpdater.newUpdater(Waiter.class, Thread.class, "thread"), AtomicReferenceFieldUpdater.newUpdater(Waiter.class, Waiter.class, "next"), AtomicReferenceFieldUpdater.newUpdater(AbstractFuture.class, Waiter.class, "waiters"), AtomicReferenceFieldUpdater.newUpdater(AbstractFuture.class, Listener.class, "listeners"), AtomicReferenceFieldUpdater.newUpdater(AbstractFuture.class, Object.class, FlagManager.FIELD_VALUE));
-                th = null;
-            } catch (Throwable th4) {
-                th = th4;
-                th2 = th3;
-                atomicHelper = new SynchronizedHelper(null);
-            }
-        }
-        ATOMIC_HELPER = atomicHelper;
-        if (th != null) {
-            Logger logger = log;
-            Level level = Level.SEVERE;
-            logger.logp(level, "com.google.common.util.concurrent.AbstractFuture", "<clinit>", "UnsafeAtomicHelper is broken!", th2);
-            logger.logp(level, "com.google.common.util.concurrent.AbstractFuture", "<clinit>", "SafeAtomicHelper is broken!", th);
-        }
-        NULL = new Object();
-    }
-
-    private void addDoneString(StringBuilder builder) {
-        try {
-            Object uninterruptibly = getUninterruptibly(this);
-            builder.append("SUCCESS, result=[");
-            builder.append(uninterruptibly == this ? "this future" : String.valueOf(uninterruptibly));
-            builder.append("]");
-        } catch (CancellationException unused) {
-            builder.append("CANCELLED");
-        } catch (RuntimeException e) {
-            builder.append("UNKNOWN, cause=[");
-            builder.append(e.getClass());
-            builder.append(" thrown from get()]");
-        } catch (ExecutionException e2) {
-            builder.append("FAILURE, cause=[");
-            builder.append(e2.getCause());
-            builder.append("]");
-        }
-    }
-
-    public static void complete(AbstractFuture<?> future) {
-        Waiter waiter;
-        Listener listener;
-        do {
-            waiter = future.waiters;
-        } while (!ATOMIC_HELPER.casWaiters(future, waiter, Waiter.TOMBSTONE));
-        while (waiter != null) {
-            Thread thread = waiter.thread;
-            if (thread != null) {
-                waiter.thread = null;
-                LockSupport.unpark(thread);
-            }
-            waiter = waiter.next;
-        }
-        do {
-            listener = future.listeners;
-        } while (!ATOMIC_HELPER.casListeners(future, listener, Listener.TOMBSTONE));
-        Listener listener2 = null;
-        while (listener != null) {
-            Listener listener3 = listener.next;
-            listener.next = listener2;
-            listener2 = listener;
-            listener = listener3;
-        }
-        while (listener2 != null) {
-            Listener listener4 = listener2.next;
-            Runnable runnable = listener2.task;
-            if (!(runnable instanceof SetFuture)) {
-                Executor executor = listener2.executor;
-                try {
-                    executor.execute(runnable);
-                } catch (RuntimeException e) {
-                    Logger logger = log;
-                    Level level = Level.SEVERE;
-                    String valueOf = String.valueOf(runnable);
-                    String valueOf2 = String.valueOf(executor);
-                    logger.logp(level, "com.google.common.util.concurrent.AbstractFuture", "executeListener", Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline1.m(valueOf2.length() + valueOf.length() + 57, "RuntimeException while executing runnable ", valueOf, " with executor ", valueOf2), (Throwable) e);
-                }
-                listener2 = listener4;
-            } else {
-                Objects.requireNonNull((SetFuture) runnable);
-                throw null;
-            }
-        }
-    }
-
-    /* JADX WARN: Multi-variable type inference failed */
-    private V getDoneValue(Object obj) throws ExecutionException {
-        if (obj instanceof Cancellation) {
-            Throwable th = ((Cancellation) obj).cause;
-            CancellationException cancellationException = new CancellationException("Task was cancelled.");
-            cancellationException.initCause(th);
-            throw cancellationException;
-        } else if (obj instanceof Failure) {
-            throw new ExecutionException(((Failure) obj).exception);
-        } else if (obj == NULL) {
-            return null;
-        } else {
-            return obj;
-        }
-    }
-
-    public static <V> V getUninterruptibly(Future<V> future) throws ExecutionException {
-        V v;
-        boolean z = false;
-        while (true) {
-            try {
-                v = future.get();
-                break;
-            } catch (InterruptedException unused) {
-                z = true;
-            } catch (Throwable th) {
-                if (z) {
-                    Thread.currentThread().interrupt();
-                }
-                throw th;
-            }
-        }
-        if (z) {
-            Thread.currentThread().interrupt();
-        }
-        return v;
-    }
-
-    @Override // java.util.concurrent.Future
-    public boolean cancel(boolean mayInterruptIfRunning) {
-        Cancellation cancellation;
-        Object obj = this.value;
-        if (!(obj == null) && !(obj instanceof SetFuture)) {
-            return false;
-        }
-        if (GENERATE_CANCELLATION_CAUSES) {
-            cancellation = new Cancellation(mayInterruptIfRunning, new CancellationException("Future.cancel() was called."));
-        } else if (mayInterruptIfRunning) {
-            cancellation = Cancellation.CAUSELESS_INTERRUPTED;
-        } else {
-            cancellation = Cancellation.CAUSELESS_CANCELLED;
-        }
-        while (!ATOMIC_HELPER.casValue(this, obj, cancellation)) {
-            obj = this.value;
-            if (!(obj instanceof SetFuture)) {
-                return false;
-            }
-        }
-        complete(this);
-        if (!(obj instanceof SetFuture)) {
-            return true;
-        }
-        Objects.requireNonNull((SetFuture) obj);
-        throw null;
     }
 
     /* JADX WARN: Code restructure failed: missing block: B:23:0x004c, code lost:
@@ -508,7 +321,7 @@ public abstract class AbstractFuture<V> extends InternalFutureFailureAccess impl
         if ((r5 & (!(r4 instanceof com.google.common.util.concurrent.AbstractFuture.SetFuture))) == false) goto L33;
      */
     /* JADX WARN: Code restructure failed: missing block: B:32:0x0066, code lost:
-        return getDoneValue(r4);
+        return (V) getDoneValue(r4);
      */
     /* JADX WARN: Code restructure failed: missing block: B:33:0x0067, code lost:
         r4 = r10 - java.lang.System.nanoTime();
@@ -538,34 +351,6 @@ public abstract class AbstractFuture<V> extends InternalFutureFailureAccess impl
         throw new UnsupportedOperationException("Method not decompiled: com.google.common.util.concurrent.AbstractFuture.get(long, java.util.concurrent.TimeUnit):java.lang.Object");
     }
 
-    @Override // java.util.concurrent.Future
-    public boolean isCancelled() {
-        return this.value instanceof Cancellation;
-    }
-
-    @Override // java.util.concurrent.Future
-    public boolean isDone() {
-        Object obj = this.value;
-        return (!(obj instanceof SetFuture)) & (obj != null);
-    }
-
-    public String pendingToString() {
-        Object obj = this.value;
-        if (obj instanceof SetFuture) {
-            Objects.requireNonNull((SetFuture) obj);
-            return "setFuture=[null]";
-        } else if (!(this instanceof ScheduledFuture)) {
-            return null;
-        } else {
-            long delay = ((ScheduledFuture) this).getDelay(TimeUnit.MILLISECONDS);
-            StringBuilder sb = new StringBuilder(41);
-            sb.append("remaining delay=[");
-            sb.append(delay);
-            sb.append(" ms]");
-            return sb.toString();
-        }
-    }
-
     public final void removeWaiter(Waiter node) {
         node.thread = null;
         while (true) {
@@ -592,7 +377,215 @@ public abstract class AbstractFuture<V> extends InternalFutureFailureAccess impl
         }
     }
 
-    public String toString() {
+    static {
+        Throwable th;
+        Throwable th2;
+        AtomicHelper atomicHelper;
+        try {
+            atomicHelper = new UnsafeAtomicHelper();
+            th2 = null;
+            th = null;
+        } catch (Throwable th3) {
+            try {
+                th = null;
+                th2 = th3;
+                atomicHelper = new SafeAtomicHelper(AtomicReferenceFieldUpdater.newUpdater(Waiter.class, Thread.class, "thread"), AtomicReferenceFieldUpdater.newUpdater(Waiter.class, Waiter.class, "next"), AtomicReferenceFieldUpdater.newUpdater(AbstractFuture.class, Waiter.class, "waiters"), AtomicReferenceFieldUpdater.newUpdater(AbstractFuture.class, Listener.class, "listeners"), AtomicReferenceFieldUpdater.newUpdater(AbstractFuture.class, Object.class, FlagManager.EXTRA_VALUE));
+            } catch (Throwable th4) {
+                th = th4;
+                th2 = th3;
+                atomicHelper = new SynchronizedHelper();
+            }
+        }
+        ATOMIC_HELPER = atomicHelper;
+        if (th != null) {
+            Logger logger = log;
+            Level level = Level.SEVERE;
+            logger.logp(level, "com.google.common.util.concurrent.AbstractFuture", "<clinit>", "UnsafeAtomicHelper is broken!", th2);
+            logger.logp(level, "com.google.common.util.concurrent.AbstractFuture", "<clinit>", "SafeAtomicHelper is broken!", th);
+        }
+        NULL = new Object();
+    }
+
+    private void addDoneString(StringBuilder builder) {
+        V v;
+        String str;
+        boolean z = false;
+        while (true) {
+            try {
+                try {
+                    v = get();
+                    break;
+                } catch (InterruptedException unused) {
+                    z = true;
+                } catch (Throwable th) {
+                    if (z) {
+                        Thread.currentThread().interrupt();
+                    }
+                    throw th;
+                }
+            } catch (CancellationException unused2) {
+                builder.append("CANCELLED");
+                return;
+            } catch (RuntimeException e) {
+                builder.append("UNKNOWN, cause=[");
+                builder.append(e.getClass());
+                builder.append(" thrown from get()]");
+                return;
+            } catch (ExecutionException e2) {
+                builder.append("FAILURE, cause=[");
+                builder.append(e2.getCause());
+                builder.append("]");
+                return;
+            }
+        }
+        if (z) {
+            Thread.currentThread().interrupt();
+        }
+        builder.append("SUCCESS, result=[");
+        if (v == this) {
+            str = "this future";
+        } else {
+            str = String.valueOf(v);
+        }
+        builder.append(str);
+        builder.append("]");
+    }
+
+    public static void complete(AbstractFuture<?> future) {
+        Waiter waiter;
+        Listener listener;
+        do {
+            waiter = future.waiters;
+        } while (!ATOMIC_HELPER.casWaiters(future, waiter, Waiter.TOMBSTONE));
+        while (waiter != null) {
+            Thread thread = waiter.thread;
+            if (thread != null) {
+                waiter.thread = null;
+                LockSupport.unpark(thread);
+            }
+            waiter = waiter.next;
+        }
+        do {
+            listener = future.listeners;
+        } while (!ATOMIC_HELPER.casListeners(future, listener));
+        Listener listener2 = null;
+        while (listener != null) {
+            Listener listener3 = listener.next;
+            listener.next = listener2;
+            listener2 = listener;
+            listener = listener3;
+        }
+        while (listener2 != null) {
+            Listener listener4 = listener2.next;
+            Runnable runnable = listener2.task;
+            if (!(runnable instanceof SetFuture)) {
+                Executor executor = listener2.executor;
+                try {
+                    executor.execute(runnable);
+                } catch (RuntimeException e) {
+                    Logger logger = log;
+                    Level level = Level.SEVERE;
+                    String valueOf = String.valueOf(runnable);
+                    String valueOf2 = String.valueOf(executor);
+                    StringBuilder sb = new StringBuilder(valueOf2.length() + valueOf.length() + 57);
+                    sb.append("RuntimeException while executing runnable ");
+                    sb.append(valueOf);
+                    sb.append(" with executor ");
+                    sb.append(valueOf2);
+                    logger.logp(level, "com.google.common.util.concurrent.AbstractFuture", "executeListener", sb.toString(), (Throwable) e);
+                }
+                listener2 = listener4;
+            } else {
+                ((SetFuture) runnable).getClass();
+                throw null;
+            }
+        }
+    }
+
+    private static Object getDoneValue(Object obj) throws ExecutionException {
+        if (obj instanceof Cancellation) {
+            Throwable th = ((Cancellation) obj).cause;
+            CancellationException cancellationException = new CancellationException("Task was cancelled.");
+            cancellationException.initCause(th);
+            throw cancellationException;
+        } else if (obj instanceof Failure) {
+            throw new ExecutionException(((Failure) obj).exception);
+        } else if (obj == NULL) {
+            return null;
+        } else {
+            return obj;
+        }
+    }
+
+    @Override // java.util.concurrent.Future
+    public boolean cancel(boolean mayInterruptIfRunning) {
+        boolean z;
+        Cancellation cancellation;
+        Object obj = this.value;
+        if (obj == null) {
+            z = true;
+        } else {
+            z = false;
+        }
+        if (!z && !(obj instanceof SetFuture)) {
+            return false;
+        }
+        if (GENERATE_CANCELLATION_CAUSES) {
+            cancellation = new Cancellation(mayInterruptIfRunning, new CancellationException("Future.cancel() was called."));
+        } else if (mayInterruptIfRunning) {
+            cancellation = Cancellation.CAUSELESS_INTERRUPTED;
+        } else {
+            cancellation = Cancellation.CAUSELESS_CANCELLED;
+        }
+        while (!ATOMIC_HELPER.casValue(this, obj, cancellation)) {
+            obj = this.value;
+            if (!(obj instanceof SetFuture)) {
+                return false;
+            }
+        }
+        complete(this);
+        if (!(obj instanceof SetFuture)) {
+            return true;
+        }
+        ((SetFuture) obj).getClass();
+        throw null;
+    }
+
+    @Override // java.util.concurrent.Future
+    public boolean isCancelled() {
+        return this.value instanceof Cancellation;
+    }
+
+    @Override // java.util.concurrent.Future
+    public boolean isDone() {
+        Object obj;
+        boolean z;
+        if (this.value != null) {
+            z = true;
+        } else {
+            z = false;
+        }
+        return (!(obj instanceof SetFuture)) & z;
+    }
+
+    public final String pendingToString() {
+        Object obj = this.value;
+        if (obj instanceof SetFuture) {
+            ((SetFuture) obj).getClass();
+            return XMPNode$$ExternalSyntheticOutline0.m("null".length() + 12, "setFuture=[", "null", "]");
+        } else if (!(this instanceof ScheduledFuture)) {
+            return null;
+        } else {
+            long delay = ((ScheduledFuture) this).getDelay(TimeUnit.MILLISECONDS);
+            StringBuilder sb = new StringBuilder(41);
+            sb.append("remaining delay=[");
+            sb.append(delay);
+            sb.append(" ms]");
+            return sb.toString();
+        }
+    }
+
+    public final String toString() {
         String str;
         StringBuilder sb = new StringBuilder();
         sb.append(super.toString());
@@ -606,7 +599,10 @@ public abstract class AbstractFuture<V> extends InternalFutureFailureAccess impl
                 str = pendingToString();
             } catch (RuntimeException e) {
                 String valueOf = String.valueOf(e.getClass());
-                str = Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline0.m(valueOf.length() + 38, "Exception thrown from implementation: ", valueOf);
+                StringBuilder sb2 = new StringBuilder(valueOf.length() + 38);
+                sb2.append("Exception thrown from implementation: ");
+                sb2.append(valueOf);
+                str = sb2.toString();
             }
             if (str != null && !str.isEmpty()) {
                 sb.append("PENDING, info=[");
@@ -644,7 +640,7 @@ public abstract class AbstractFuture<V> extends InternalFutureFailureAccess impl
         if ((r4 & (!(r0 instanceof com.google.common.util.concurrent.AbstractFuture.SetFuture))) == false) goto L17;
      */
     /* JADX WARN: Code restructure failed: missing block: B:26:0x004a, code lost:
-        return getDoneValue(r0);
+        return (V) getDoneValue(r0);
      */
     /* JADX WARN: Code restructure failed: missing block: B:27:0x004b, code lost:
         removeWaiter(r3);
@@ -675,7 +671,7 @@ public abstract class AbstractFuture<V> extends InternalFutureFailureAccess impl
             r4 = r4 ^ r2
             r3 = r3 & r4
             if (r3 == 0) goto L1a
-            java.lang.Object r6 = r6.getDoneValue(r0)
+            java.lang.Object r6 = getDoneValue(r0)
             return r6
         L1a:
             com.google.common.util.concurrent.AbstractFuture$Waiter r0 = r6.waiters
@@ -703,7 +699,7 @@ public abstract class AbstractFuture<V> extends InternalFutureFailureAccess impl
             r5 = r5 ^ r2
             r4 = r4 & r5
             if (r4 == 0) goto L30
-            java.lang.Object r6 = r6.getDoneValue(r0)
+            java.lang.Object r6 = getDoneValue(r0)
             return r6
         L4b:
             r6.removeWaiter(r3)
@@ -715,8 +711,8 @@ public abstract class AbstractFuture<V> extends InternalFutureFailureAccess impl
             com.google.common.util.concurrent.AbstractFuture$Waiter r4 = com.google.common.util.concurrent.AbstractFuture.Waiter.TOMBSTONE
             if (r0 != r4) goto L25
         L5a:
-            java.lang.Object r0 = r6.value
-            java.lang.Object r6 = r6.getDoneValue(r0)
+            java.lang.Object r6 = r6.value
+            java.lang.Object r6 = getDoneValue(r6)
             return r6
         L61:
             java.lang.InterruptedException r6 = new java.lang.InterruptedException
@@ -724,5 +720,13 @@ public abstract class AbstractFuture<V> extends InternalFutureFailureAccess impl
             throw r6
         */
         throw new UnsupportedOperationException("Method not decompiled: com.google.common.util.concurrent.AbstractFuture.get():java.lang.Object");
+    }
+
+    /* loaded from: classes.dex */
+    public static final class SetFuture<V> implements Runnable {
+        @Override // java.lang.Runnable
+        public final void run() {
+            throw null;
+        }
     }
 }

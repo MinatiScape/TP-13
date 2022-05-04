@@ -1,49 +1,33 @@
 package com.bumptech.glide.load.engine;
 
+import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
+import androidx.collection.ContainerHelpers;
 import androidx.core.util.Pools$Pool;
-import androidx.recyclerview.R$attr$$ExternalSyntheticOutline0;
-import com.adobe.xmp.XMPPathFactory$$ExternalSyntheticOutline0;
 import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.data.DataRewinder;
-import com.bumptech.glide.load.engine.DecodePath;
+import com.bumptech.glide.load.engine.DecodeJob;
+import com.bumptech.glide.util.pool.FactoryPools;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 /* loaded from: classes.dex */
-public class LoadPath<Data, ResourceType, Transcode> {
+public final class LoadPath<Data, ResourceType, Transcode> {
     public final List<? extends DecodePath<Data, ResourceType, Transcode>> decodePaths;
     public final String failureMessage;
     public final Pools$Pool<List<Throwable>> listPool;
 
-    public LoadPath(Class<Data> dataClass, Class<ResourceType> resourceClass, Class<Transcode> transcodeClass, List<DecodePath<Data, ResourceType, Transcode>> decodePaths, Pools$Pool<List<Throwable>> listPool) {
-        this.listPool = listPool;
-        if (!decodePaths.isEmpty()) {
-            this.decodePaths = decodePaths;
-            String simpleName = dataClass.getSimpleName();
-            String simpleName2 = resourceClass.getSimpleName();
-            String simpleName3 = transcodeClass.getSimpleName();
-            StringBuilder m = R$attr$$ExternalSyntheticOutline0.m(simpleName3.length() + simpleName2.length() + simpleName.length() + 21, "Failed LoadPath{", simpleName, "->", simpleName2);
-            m.append("->");
-            m.append(simpleName3);
-            m.append("}");
-            this.failureMessage = m.toString();
-            return;
-        }
-        throw new IllegalArgumentException("Must not be empty.");
-    }
-
-    public Resource<Transcode> load(DataRewinder<Data> rewinder, Options options, int width, int height, DecodePath.DecodeCallback<ResourceType> decodeCallback) throws GlideException {
+    public final Resource load(DataRewinder dataRewinder, Options options, int i, int i2, DecodeJob.DecodeCallback decodeCallback) throws GlideException {
         List<Throwable> acquire = this.listPool.acquire();
-        Objects.requireNonNull(acquire, "Argument must not be null");
+        ContainerHelpers.checkNotNull(acquire);
+        List<Throwable> list = acquire;
         try {
             int size = this.decodePaths.size();
-            Resource<Transcode> resource = null;
-            for (int i = 0; i < size; i++) {
+            Resource resource = null;
+            for (int i3 = 0; i3 < size; i3++) {
                 try {
-                    resource = this.decodePaths.get(i).decode(rewinder, width, height, options, decodeCallback);
+                    resource = this.decodePaths.get(i3).decode(dataRewinder, i, i2, options, decodeCallback);
                 } catch (GlideException e) {
-                    acquire.add(e);
+                    list.add(e);
                 }
                 if (resource != null) {
                     break;
@@ -52,18 +36,33 @@ public class LoadPath<Data, ResourceType, Transcode> {
             if (resource != null) {
                 return resource;
             }
-            throw new GlideException(this.failureMessage, new ArrayList(acquire));
+            throw new GlideException(this.failureMessage, new ArrayList(list));
         } finally {
-            this.listPool.release(acquire);
+            this.listPool.release(list);
         }
     }
 
-    public String toString() {
-        String arrays = Arrays.toString(this.decodePaths.toArray());
-        StringBuilder sb = new StringBuilder(XMPPathFactory$$ExternalSyntheticOutline0.m(arrays, 22));
-        sb.append("LoadPath{decodePaths=");
-        sb.append(arrays);
-        sb.append('}');
-        return sb.toString();
+    public final String toString() {
+        StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("LoadPath{decodePaths=");
+        m.append(Arrays.toString(this.decodePaths.toArray()));
+        m.append('}');
+        return m.toString();
+    }
+
+    public LoadPath(Class cls, Class cls2, Class cls3, List list, FactoryPools.FactoryPool factoryPool) {
+        this.listPool = factoryPool;
+        if (!list.isEmpty()) {
+            this.decodePaths = list;
+            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Failed LoadPath{");
+            m.append(cls.getSimpleName());
+            m.append("->");
+            m.append(cls2.getSimpleName());
+            m.append("->");
+            m.append(cls3.getSimpleName());
+            m.append("}");
+            this.failureMessage = m.toString();
+            return;
+        }
+        throw new IllegalArgumentException("Must not be empty.");
     }
 }

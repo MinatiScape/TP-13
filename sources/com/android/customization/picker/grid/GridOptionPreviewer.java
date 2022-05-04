@@ -8,13 +8,13 @@ import android.view.ViewGroup;
 import com.android.customization.model.grid.GridOption;
 import com.android.customization.model.grid.GridOptionsManager;
 import com.android.customization.model.grid.LauncherGridOptionsProvider;
+import com.android.wallpaper.picker.PreviewFragment$$ExternalSyntheticLambda6;
 import com.android.wallpaper.picker.WorkspaceSurfaceHolderCallback;
 import com.android.wallpaper.util.PreviewUtils;
 import com.android.wallpaper.util.PreviewUtils$$ExternalSyntheticLambda1;
 import com.android.wallpaper.util.SurfaceViewUtils;
-import java.util.Objects;
 /* loaded from: classes.dex */
-public class GridOptionPreviewer {
+public final class GridOptionPreviewer {
     public final GridOptionsManager mGridManager;
     public GridOption mGridOption;
     public SurfaceView mGridOptionSurface;
@@ -23,25 +23,25 @@ public class GridOptionPreviewer {
 
     /* loaded from: classes.dex */
     public class GridOptionSurfaceHolderCallback extends WorkspaceSurfaceHolderCallback {
-        public GridOptionSurfaceHolderCallback(SurfaceView surfaceView, Context context, AnonymousClass1 r4) {
+        public GridOptionSurfaceHolderCallback(SurfaceView surfaceView, Context context) {
             super(surfaceView, context, false);
         }
 
         @Override // com.android.wallpaper.picker.WorkspaceSurfaceHolderCallback
-        public void requestPreview(SurfaceView surfaceView, PreviewUtils.WorkspacePreviewCallback workspacePreviewCallback) {
+        public final void requestPreview(SurfaceView surfaceView, PreviewFragment$$ExternalSyntheticLambda6 previewFragment$$ExternalSyntheticLambda6) {
             GridOptionsManager gridOptionsManager = GridOptionPreviewer.this.mGridManager;
             Bundle createSurfaceViewRequest = SurfaceViewUtils.createSurfaceViewRequest(surfaceView);
             String str = GridOptionPreviewer.this.mGridOption.name;
             LauncherGridOptionsProvider launcherGridOptionsProvider = gridOptionsManager.mProvider;
-            Objects.requireNonNull(launcherGridOptionsProvider);
+            launcherGridOptionsProvider.getClass();
             createSurfaceViewRequest.putString("name", str);
             PreviewUtils previewUtils = launcherGridOptionsProvider.mPreviewUtils;
-            Objects.requireNonNull(previewUtils);
-            PreviewUtils.sExecutorService.submit(new PreviewUtils$$ExternalSyntheticLambda1(previewUtils, createSurfaceViewRequest, workspacePreviewCallback));
+            previewUtils.getClass();
+            PreviewUtils.sExecutorService.submit(new PreviewUtils$$ExternalSyntheticLambda1(previewUtils, createSurfaceViewRequest, previewFragment$$ExternalSyntheticLambda6));
         }
 
         @Override // com.android.wallpaper.picker.WorkspaceSurfaceHolderCallback, android.view.SurfaceHolder.Callback
-        public void surfaceCreated(SurfaceHolder surfaceHolder) {
+        public final void surfaceCreated(SurfaceHolder surfaceHolder) {
             if (GridOptionPreviewer.this.mGridOption != null) {
                 super.surfaceCreated(surfaceHolder);
             }

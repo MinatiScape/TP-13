@@ -8,13 +8,14 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.OverScroller;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.math.MathUtils;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.ViewPropertyAnimatorCompat;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.android.material.appbar.AppBarLayout;
-import java.lang.ref.WeakReference;
-import java.util.Objects;
+import java.util.WeakHashMap;
 /* loaded from: classes.dex */
 public abstract class HeaderBehavior<V extends View> extends ViewOffsetBehavior<V> {
-    public Runnable flingRunnable;
+    public FlingRunnable flingRunnable;
     public boolean isBeingDragged;
     public int lastMotionY;
     public OverScroller scroller;
@@ -33,25 +34,18 @@ public abstract class HeaderBehavior<V extends View> extends ViewOffsetBehavior<
         }
 
         @Override // java.lang.Runnable
-        public void run() {
+        public final void run() {
             OverScroller overScroller;
             if (this.layout != null && (overScroller = HeaderBehavior.this.scroller) != null) {
                 if (overScroller.computeScrollOffset()) {
                     HeaderBehavior headerBehavior = HeaderBehavior.this;
                     headerBehavior.setHeaderTopBottomOffset(this.parent, this.layout, headerBehavior.scroller.getCurrY());
-                    this.layout.postOnAnimation(this);
+                    V v = this.layout;
+                    WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
+                    ViewCompat.Api16Impl.postOnAnimation(v, this);
                     return;
                 }
-                HeaderBehavior headerBehavior2 = HeaderBehavior.this;
-                CoordinatorLayout coordinatorLayout = this.parent;
-                V v = this.layout;
-                AppBarLayout.BaseBehavior baseBehavior = (AppBarLayout.BaseBehavior) headerBehavior2;
-                Objects.requireNonNull(baseBehavior);
-                AppBarLayout appBarLayout = (AppBarLayout) v;
-                baseBehavior.snapToChildIfNeeded(coordinatorLayout, appBarLayout);
-                if (appBarLayout.liftOnScroll) {
-                    appBarLayout.setLiftedState(appBarLayout.shouldLift(baseBehavior.findFirstScrollingChild(coordinatorLayout)));
-                }
+                HeaderBehavior.this.onFlingFinished(this.parent, this.layout);
             }
         }
     }
@@ -59,11 +53,21 @@ public abstract class HeaderBehavior<V extends View> extends ViewOffsetBehavior<
     public HeaderBehavior() {
     }
 
-    public abstract int getTopBottomOffsetForScrollingSibling();
+    public boolean canDragView(V v) {
+        return false;
+    }
+
+    public void onFlingFinished(CoordinatorLayout coordinatorLayout, V v) {
+    }
+
+    /* JADX WARN: Multi-variable type inference failed */
+    public final void setHeaderTopBottomOffset(CoordinatorLayout coordinatorLayout, View view, int i) {
+        setHeaderTopBottomOffset(coordinatorLayout, view, i, RecyclerView.UNDEFINED_DURATION, Integer.MAX_VALUE);
+    }
 
     @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
-    public boolean onInterceptTouchEvent(CoordinatorLayout coordinatorLayout, V v, MotionEvent motionEvent) {
-        View view;
+    public final boolean onInterceptTouchEvent(CoordinatorLayout coordinatorLayout, V v, MotionEvent motionEvent) {
+        boolean z;
         int findPointerIndex;
         if (this.touchSlop < 0) {
             this.touchSlop = ViewConfiguration.get(coordinatorLayout.getContext()).getScaledTouchSlop();
@@ -83,9 +87,11 @@ public abstract class HeaderBehavior<V extends View> extends ViewOffsetBehavior<
             this.activePointerId = -1;
             int x = (int) motionEvent.getX();
             int y2 = (int) motionEvent.getY();
-            AppBarLayout appBarLayout = (AppBarLayout) v;
-            WeakReference<View> weakReference = ((AppBarLayout.BaseBehavior) this).lastNestedScrollingChildRef;
-            boolean z = (weakReference == null || ((view = weakReference.get()) != null && view.isShown() && !view.canScrollVertically(-1))) && coordinatorLayout.isPointInChildBounds(v, x, y2);
+            if (!canDragView(v) || !coordinatorLayout.isPointInChildBounds(v, x, y2)) {
+                z = false;
+            } else {
+                z = true;
+            }
             this.isBeingDragged = z;
             if (z) {
                 this.lastMotionY = y2;
@@ -107,32 +113,49 @@ public abstract class HeaderBehavior<V extends View> extends ViewOffsetBehavior<
         return false;
     }
 
-    /* JADX WARN: Removed duplicated region for block: B:38:0x00e0  */
-    /* JADX WARN: Removed duplicated region for block: B:41:0x00e9  */
-    /* JADX WARN: Removed duplicated region for block: B:44:0x00f0 A[ADDED_TO_REGION] */
-    /* JADX WARN: Removed duplicated region for block: B:47:? A[ADDED_TO_REGION, RETURN, SYNTHETIC] */
+    /* JADX WARN: Removed duplicated region for block: B:36:0x00ce  */
+    /* JADX WARN: Removed duplicated region for block: B:39:0x00d7  */
+    /* JADX WARN: Removed duplicated region for block: B:42:0x00de A[ADDED_TO_REGION] */
+    /* JADX WARN: Removed duplicated region for block: B:45:? A[ADDED_TO_REGION, RETURN, SYNTHETIC] */
     @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
     /*
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public boolean onTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout r21, V r22, android.view.MotionEvent r23) {
+    public final boolean onTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout r20, V r21, android.view.MotionEvent r22) {
         /*
-            Method dump skipped, instructions count: 245
+            Method dump skipped, instructions count: 227
             To view this dump add '--comments-level debug' option
         */
         throw new UnsupportedOperationException("Method not decompiled: com.google.android.material.appbar.HeaderBehavior.onTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout, android.view.View, android.view.MotionEvent):boolean");
     }
 
-    public final int scroll(CoordinatorLayout coordinatorLayout, V v, int i, int i2, int i3) {
-        return setHeaderTopBottomOffset(coordinatorLayout, v, getTopBottomOffsetForScrollingSibling() - i, i2, i3);
+    public int setHeaderTopBottomOffset(CoordinatorLayout coordinatorLayout, V v, int i, int i2, int i3) {
+        int clamp;
+        int topAndBottomOffset = getTopAndBottomOffset();
+        if (i2 == 0 || topAndBottomOffset < i2 || topAndBottomOffset > i3 || topAndBottomOffset == (clamp = MathUtils.clamp(i, i2, i3))) {
+            return 0;
+        }
+        ViewOffsetHelper viewOffsetHelper = this.viewOffsetHelper;
+        if (viewOffsetHelper != null) {
+            viewOffsetHelper.setTopAndBottomOffset(clamp);
+        } else {
+            this.tempTopBottomOffset = clamp;
+        }
+        return topAndBottomOffset - clamp;
     }
 
-    public int setHeaderTopBottomOffset(CoordinatorLayout coordinatorLayout, V v, int i) {
-        return setHeaderTopBottomOffset(coordinatorLayout, v, i, RecyclerView.UNDEFINED_DURATION, Integer.MAX_VALUE);
+    public int getMaxDragOffset(V v) {
+        return -v.getHeight();
     }
 
-    public abstract int setHeaderTopBottomOffset(CoordinatorLayout coordinatorLayout, V v, int i, int i2, int i3);
+    public int getScrollRangeForDragFling(V v) {
+        return v.getHeight();
+    }
+
+    public int getTopBottomOffsetForScrollingSibling() {
+        return getTopAndBottomOffset();
+    }
 
     public HeaderBehavior(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);

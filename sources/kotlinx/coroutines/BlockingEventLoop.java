@@ -1,6 +1,7 @@
 package kotlinx.coroutines;
 
 import org.jetbrains.annotations.NotNull;
+/* compiled from: EventLoop.kt */
 /* loaded from: classes.dex */
 public final class BlockingEventLoop extends EventLoopImplBase {
     @NotNull
@@ -12,7 +13,7 @@ public final class BlockingEventLoop extends EventLoopImplBase {
 
     @Override // kotlinx.coroutines.EventLoopImplPlatform
     @NotNull
-    public Thread getThread() {
+    public final Thread getThread() {
         return this.thread;
     }
 }

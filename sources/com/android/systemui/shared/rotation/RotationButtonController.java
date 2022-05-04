@@ -32,7 +32,10 @@ import com.android.systemui.shared.system.ActivityManagerWrapper;
 import com.android.systemui.shared.system.TaskStackChangeListener;
 import com.android.systemui.shared.system.TaskStackChangeListeners;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
-import com.android.wallpaper.picker.AppbarFragment$$ExternalSyntheticLambda0;
+import com.android.wallpaper.picker.PreviewFragment$$ExternalSyntheticLambda2;
+import com.android.wallpaper.picker.PreviewFragment$$ExternalSyntheticLambda8;
+import com.android.wallpaper.widget.LockScreenPreviewer$$ExternalSyntheticLambda2;
+import java.io.PrintWriter;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -69,54 +72,18 @@ public class RotationButtonController {
     private boolean mListenersRegistered = false;
     @SuppressLint({"InlinedApi"})
     private int mBehavior = 1;
-    private final Runnable mRemoveRotationProposal = new Runnable(this) { // from class: com.android.systemui.shared.rotation.RotationButtonController$$ExternalSyntheticLambda1
-        public final /* synthetic */ RotationButtonController f$0;
-
-        {
-            this.f$0 = this;
-        }
-
-        @Override // java.lang.Runnable
-        public final void run() {
-            switch (r2) {
-                case 0:
-                    this.f$0.lambda$new$0();
-                    return;
-                default:
-                    this.f$0.lambda$new$1();
-                    return;
-            }
-        }
-    };
-    private final Runnable mCancelPendingRotationProposal = new Runnable(this) { // from class: com.android.systemui.shared.rotation.RotationButtonController$$ExternalSyntheticLambda1
-        public final /* synthetic */ RotationButtonController f$0;
-
-        {
-            this.f$0 = this;
-        }
-
-        @Override // java.lang.Runnable
-        public final void run() {
-            switch (r2) {
-                case 0:
-                    this.f$0.lambda$new$0();
-                    return;
-                default:
-                    this.f$0.lambda$new$1();
-                    return;
-            }
-        }
-    };
+    private final Runnable mRemoveRotationProposal = new PreviewFragment$$ExternalSyntheticLambda8(this, 1);
+    private final Runnable mCancelPendingRotationProposal = new LockScreenPreviewer$$ExternalSyntheticLambda2(this, 1);
     private final IRotationWatcher.Stub mRotationWatcher = new AnonymousClass1();
     private final TaskStackListenerImpl mTaskStackListener = new TaskStackListenerImpl(this, null);
 
-    /* renamed from: com.android.systemui.shared.rotation.RotationButtonController$1  reason: invalid class name */
+    /* renamed from: com.android.systemui.shared.rotation.RotationButtonController$1 */
     /* loaded from: classes.dex */
     public class AnonymousClass1 extends IRotationWatcher.Stub {
         public AnonymousClass1() {
+            RotationButtonController.this = r1;
         }
 
-        /* JADX INFO: Access modifiers changed from: private */
         public /* synthetic */ void lambda$onRotationChanged$0(int i) {
             if (RotationButtonController.this.isRotationLocked()) {
                 if (RotationButtonController.this.shouldOverrideUserLockPrefs(i)) {
@@ -129,9 +96,92 @@ public class RotationButtonController {
             }
         }
 
-        public void onRotationChanged(int i) {
-            RotationButtonController.this.mMainThreadHandler.postAtFrontOfQueue(new RotationButtonController$1$$ExternalSyntheticLambda0(this, i));
+        public void onRotationChanged(final int i) {
+            RotationButtonController.this.mMainThreadHandler.postAtFrontOfQueue(new Runnable() { // from class: com.android.systemui.shared.rotation.RotationButtonController$1$$ExternalSyntheticLambda0
+                @Override // java.lang.Runnable
+                public final void run() {
+                    RotationButtonController.AnonymousClass1.this.lambda$onRotationChanged$0(i);
+                }
+            });
         }
+    }
+
+    /* loaded from: classes.dex */
+    public class TaskStackListenerImpl extends TaskStackChangeListener {
+        private TaskStackListenerImpl() {
+            RotationButtonController.this = r1;
+        }
+
+        public /* synthetic */ TaskStackListenerImpl(RotationButtonController rotationButtonController, AnonymousClass1 r2) {
+            this();
+        }
+
+        public /* synthetic */ void lambda$onActivityRequestedOrientationChanged$0(int i, ActivityManager.RunningTaskInfo runningTaskInfo) {
+            if (runningTaskInfo.id == i) {
+                RotationButtonController.this.setRotateSuggestionButtonState(false);
+            }
+        }
+
+        @Override // com.android.systemui.shared.system.TaskStackChangeListener
+        public void onTaskMovedToFront(int i) {
+            RotationButtonController.this.setRotateSuggestionButtonState(false);
+        }
+
+        @Override // com.android.systemui.shared.system.TaskStackChangeListener
+        public void onTaskRemoved(int i) {
+            RotationButtonController.this.setRotateSuggestionButtonState(false);
+        }
+
+        @Override // com.android.systemui.shared.system.TaskStackChangeListener
+        public void onTaskStackChanged() {
+            RotationButtonController.this.setRotateSuggestionButtonState(false);
+        }
+
+        @Override // com.android.systemui.shared.system.TaskStackChangeListener
+        public void onActivityRequestedOrientationChanged(final int i, int i2) {
+            Optional.ofNullable(ActivityManagerWrapper.getInstance()).map(RotationButtonController$TaskStackListenerImpl$$ExternalSyntheticLambda1.INSTANCE).ifPresent(new Consumer() { // from class: com.android.systemui.shared.rotation.RotationButtonController$TaskStackListenerImpl$$ExternalSyntheticLambda0
+                @Override // java.util.function.Consumer
+                public final void accept(Object obj) {
+                    RotationButtonController.TaskStackListenerImpl.this.lambda$onActivityRequestedOrientationChanged$0(i, (ActivityManager.RunningTaskInfo) obj);
+                }
+            });
+        }
+    }
+
+    public static /* synthetic */ void $r8$lambda$TN26GBhO0iajE6nDwh6BEL4qwA0(RotationButtonController rotationButtonController) {
+        rotationButtonController.lambda$new$1();
+    }
+
+    /* renamed from: $r8$lambda$YjnDy7AOTuEVJEKSHSjIm0l-gOY */
+    public static /* synthetic */ void m22$r8$lambda$YjnDy7AOTuEVJEKSHSjIm0lgOY(RotationButtonController rotationButtonController) {
+        rotationButtonController.lambda$new$0();
+    }
+
+    public static boolean hasDisable2RotateSuggestionFlag(int i) {
+        return (i & 16) != 0;
+    }
+
+    public /* synthetic */ void lambda$new$0() {
+        setRotateSuggestionButtonState(false);
+    }
+
+    public /* synthetic */ void lambda$new$1() {
+        this.mPendingRotationSuggestion = false;
+    }
+
+    private void onRotationSuggestionsDisabled() {
+        setRotateSuggestionButtonState(false, true);
+        this.mMainThreadHandler.removeCallbacks(this.mRemoveRotationProposal);
+    }
+
+    private void showAndLogRotationSuggestion() {
+        setRotateSuggestionButtonState(true);
+        rescheduleRotationTimeout(false);
+        this.mUiEventLogger.log(RotationButtonEvent.ROTATION_SUGGESTION_SHOWN);
+    }
+
+    public void setRotateSuggestionButtonState(boolean z) {
+        setRotateSuggestionButtonState(z, false);
     }
 
     /* loaded from: classes.dex */
@@ -150,72 +200,23 @@ public class RotationButtonController {
         }
     }
 
-    /* loaded from: classes.dex */
-    public class TaskStackListenerImpl extends TaskStackChangeListener {
-        private TaskStackListenerImpl() {
-        }
-
-        /* JADX INFO: Access modifiers changed from: private */
-        public /* synthetic */ void lambda$onActivityRequestedOrientationChanged$0(int i, ActivityManager.RunningTaskInfo runningTaskInfo) {
-            if (runningTaskInfo.id == i) {
-                RotationButtonController.this.setRotateSuggestionButtonState(false);
-            }
-        }
-
-        @Override // com.android.systemui.shared.system.TaskStackChangeListener
-        public void onActivityRequestedOrientationChanged(final int i, int i2) {
-            Optional.ofNullable(ActivityManagerWrapper.getInstance()).map(RotationButtonController$TaskStackListenerImpl$$ExternalSyntheticLambda1.INSTANCE).ifPresent(new Consumer() { // from class: com.android.systemui.shared.rotation.RotationButtonController$TaskStackListenerImpl$$ExternalSyntheticLambda0
-                @Override // java.util.function.Consumer
-                public final void accept(Object obj) {
-                    RotationButtonController.TaskStackListenerImpl.this.lambda$onActivityRequestedOrientationChanged$0(i, (ActivityManager.RunningTaskInfo) obj);
-                }
-            });
-        }
-
-        @Override // com.android.systemui.shared.system.TaskStackChangeListener
-        public void onTaskMovedToFront(int i) {
-            RotationButtonController.this.setRotateSuggestionButtonState(false);
-        }
-
-        @Override // com.android.systemui.shared.system.TaskStackChangeListener
-        public void onTaskRemoved(int i) {
-            RotationButtonController.this.setRotateSuggestionButtonState(false);
-        }
-
-        @Override // com.android.systemui.shared.system.TaskStackChangeListener
-        public void onTaskStackChanged() {
-            RotationButtonController.this.setRotateSuggestionButtonState(false);
-        }
-
-        public /* synthetic */ TaskStackListenerImpl(RotationButtonController rotationButtonController, AnonymousClass1 r2) {
-            this();
-        }
-    }
-
-    public RotationButtonController(Context context, int i, int i2, int i3, int i4, int i5, int i6, Supplier<Integer> supplier) {
-        this.mContext = context;
-        this.mLightIconColor = i;
-        this.mDarkIconColor = i2;
-        this.mIconCcwStart0ResId = i3;
-        this.mIconCcwStart90ResId = i4;
-        this.mIconCwStart0ResId = i5;
-        this.mIconCwStart90ResId = i6;
-        this.mIconResId = i4;
-        this.mAccessibilityManager = AccessibilityManager.getInstance(context);
-        this.mWindowRotationProvider = supplier;
-    }
-
     @SuppressLint({"InlinedApi"})
     private boolean canShowRotationButton() {
-        return this.mIsNavigationBarShowing || this.mBehavior == 1;
+        if (this.mIsNavigationBarShowing || this.mBehavior == 1) {
+            return true;
+        }
+        return false;
     }
 
     private int computeRotationProposalTimeout() {
-        return this.mAccessibilityManager.getRecommendedTimeoutMillis(this.mHoveringRotationSuggestion ? 16000 : 5000, 4);
-    }
-
-    public static boolean hasDisable2RotateSuggestionFlag(int i) {
-        return (i & 16) != 0;
+        int i;
+        AccessibilityManager accessibilityManager = this.mAccessibilityManager;
+        if (this.mHoveringRotationSuggestion) {
+            i = 16000;
+        } else {
+            i = 5000;
+        }
+        return accessibilityManager.getRecommendedTimeoutMillis(i, 4);
     }
 
     private void incrementNumAcceptedRotationSuggestionsIfNeeded() {
@@ -227,38 +228,17 @@ public class RotationButtonController {
     }
 
     private boolean isRotateSuggestionIntroduced() {
-        return Settings.Secure.getInt(this.mContext.getContentResolver(), "num_rotation_suggestions_accepted", 0) >= 3;
+        if (Settings.Secure.getInt(this.mContext.getContentResolver(), "num_rotation_suggestions_accepted", 0) >= 3) {
+            return true;
+        }
+        return false;
     }
 
-    /* JADX INFO: Access modifiers changed from: private */
-    public /* synthetic */ void lambda$new$0() {
-        setRotateSuggestionButtonState(false);
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public /* synthetic */ void lambda$new$1() {
-        this.mPendingRotationSuggestion = false;
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
     public void onRotateSuggestionClick(View view) {
         this.mUiEventLogger.log(RotationButtonEvent.ROTATION_SUGGESTION_ACCEPTED);
         incrementNumAcceptedRotationSuggestionsIfNeeded();
         setRotationLockedAtAngle(this.mLastRotationSuggestion);
         view.performHapticFeedback(1);
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    public boolean onRotateSuggestionHover(View view, MotionEvent motionEvent) {
-        int actionMasked = motionEvent.getActionMasked();
-        this.mHoveringRotationSuggestion = actionMasked == 9 || actionMasked == 7;
-        rescheduleRotationTimeout(true);
-        return false;
-    }
-
-    private void onRotationSuggestionsDisabled() {
-        setRotateSuggestionButtonState(false, true);
-        this.mMainThreadHandler.removeCallbacks(this.mRemoveRotationProposal);
     }
 
     private void rescheduleRotationTimeout(boolean z) {
@@ -269,24 +249,14 @@ public class RotationButtonController {
         }
     }
 
-    /* JADX INFO: Access modifiers changed from: private */
     public boolean shouldOverrideUserLockPrefs(int i) {
-        if (!this.mSkipOverrideUserLockPrefsOnce) {
-            return i == 0;
-        }
-        this.mSkipOverrideUserLockPrefsOnce = false;
-        return false;
-    }
-
-    private void showAndLogRotationSuggestion() {
-        setRotateSuggestionButtonState(true);
-        rescheduleRotationTimeout(false);
-        this.mUiEventLogger.log(RotationButtonEvent.ROTATION_SUGGESTION_SHOWN);
-    }
-
-    private void showPendingRotationButtonIfNeeded() {
-        if (canShowRotationButton() && this.mPendingRotationSuggestion) {
-            showAndLogRotationSuggestion();
+        if (this.mSkipOverrideUserLockPrefsOnce) {
+            this.mSkipOverrideUserLockPrefsOnce = false;
+            return false;
+        } else if (i == 0) {
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -296,31 +266,19 @@ public class RotationButtonController {
         }
     }
 
-    public Context getContext() {
-        return this.mContext;
-    }
-
-    public int getDarkIconColor() {
-        return this.mDarkIconColor;
-    }
-
-    public int getIconResId() {
-        return this.mIconResId;
-    }
-
-    public int getLightIconColor() {
-        return this.mLightIconColor;
-    }
-
-    public RotationButton getRotationButton() {
-        return this.mRotationButton;
-    }
-
-    public void init() {
-        registerListeners();
-        if (this.mContext.getDisplay().getDisplayId() != 0) {
-            onDisable2FlagChanged(16);
-        }
+    public void dumpLogs(String str, PrintWriter printWriter) {
+        printWriter.println(str + "RotationButtonController:");
+        printWriter.println(String.format("%s\tmIsRecentsAnimationRunning=%b", str, Boolean.valueOf(this.mIsRecentsAnimationRunning)));
+        printWriter.println(String.format("%s\tmHomeRotationEnabled=%b", str, Boolean.valueOf(this.mHomeRotationEnabled)));
+        printWriter.println(String.format("%s\tmLastRotationSuggestion=%d", str, Integer.valueOf(this.mLastRotationSuggestion)));
+        printWriter.println(String.format("%s\tmPendingRotationSuggestion=%b", str, Boolean.valueOf(this.mPendingRotationSuggestion)));
+        printWriter.println(String.format("%s\tmHoveringRotationSuggestion=%b", str, Boolean.valueOf(this.mHoveringRotationSuggestion)));
+        printWriter.println(String.format("%s\tmListenersRegistered=%b", str, Boolean.valueOf(this.mListenersRegistered)));
+        printWriter.println(String.format("%s\tmIsNavigationBarShowing=%b", str, Boolean.valueOf(this.mIsNavigationBarShowing)));
+        printWriter.println(String.format("%s\tmBehavior=%d", str, Integer.valueOf(this.mBehavior)));
+        printWriter.println(String.format("%s\tmSkipOverrideUserLockPrefsOnce=%b", str, Boolean.valueOf(this.mSkipOverrideUserLockPrefsOnce)));
+        printWriter.println(String.format("%s\tmLightIconColor=0x%s", str, Integer.toHexString(this.mLightIconColor)));
+        printWriter.println(String.format("%s\tmDarkIconColor=0x%s", str, Integer.toHexString(this.mDarkIconColor)));
     }
 
     public boolean isRotationLocked() {
@@ -334,16 +292,6 @@ public class RotationButtonController {
         }
     }
 
-    public void onDestroy() {
-        unregisterListeners();
-    }
-
-    public void onDisable2FlagChanged(int i) {
-        if (hasDisable2RotateSuggestionFlag(i)) {
-            onRotationSuggestionsDisabled();
-        }
-    }
-
     public void onNavigationBarWindowVisibilityChange(boolean z) {
         if (this.mIsNavigationBarShowing != z) {
             this.mIsNavigationBarShowing = z;
@@ -352,6 +300,8 @@ public class RotationButtonController {
     }
 
     public void onRotationProposal(int i, boolean z) {
+        int i2;
+        int i3;
         int intValue = this.mWindowRotationProvider.get().intValue();
         if (this.mRotationButton.acceptRotationProposal()) {
             if (!this.mHomeRotationEnabled && this.mIsRecentsAnimationRunning) {
@@ -366,9 +316,19 @@ public class RotationButtonController {
                 this.mLastRotationSuggestion = i;
                 boolean isRotationAnimationCCW = Utilities.isRotationAnimationCCW(intValue, i);
                 if (intValue == 0 || intValue == 2) {
-                    this.mIconResId = isRotationAnimationCCW ? this.mIconCcwStart0ResId : this.mIconCwStart0ResId;
+                    if (isRotationAnimationCCW) {
+                        i2 = this.mIconCcwStart0ResId;
+                    } else {
+                        i2 = this.mIconCwStart0ResId;
+                    }
+                    this.mIconResId = i2;
                 } else {
-                    this.mIconResId = isRotationAnimationCCW ? this.mIconCcwStart90ResId : this.mIconCwStart90ResId;
+                    if (isRotationAnimationCCW) {
+                        i3 = this.mIconCcwStart90ResId;
+                    } else {
+                        i3 = this.mIconCwStart90ResId;
+                    }
+                    this.mIconResId = i3;
                 }
                 this.mRotationButton.updateIcon(this.mLightIconColor, this.mDarkIconColor);
                 if (canShowRotationButton()) {
@@ -382,12 +342,8 @@ public class RotationButtonController {
         }
     }
 
-    public void onTaskbarStateChange(boolean z, boolean z2) {
-        getRotationButton().onTaskbarStateChanged(z, z2);
-    }
-
     public void registerListeners() {
-        if (!this.mListenersRegistered) {
+        if (!this.mListenersRegistered && !getContext().getPackageManager().hasSystemFeature("android.hardware.type.pc")) {
             this.mListenersRegistered = true;
             try {
                 WindowManagerGlobal.getWindowManagerService().watchRotation(this.mRotationWatcher, 0);
@@ -414,49 +370,6 @@ public class RotationButtonController {
     public void setRecentsAnimationRunning(boolean z) {
         this.mIsRecentsAnimationRunning = z;
         updateRotationButtonStateInOverview();
-    }
-
-    public void setRotateSuggestionButtonState(boolean z) {
-        setRotateSuggestionButtonState(z, false);
-    }
-
-    public void setRotationButton(RotationButton rotationButton, RotationButton.RotationButtonUpdatesCallback rotationButtonUpdatesCallback) {
-        this.mRotationButton = rotationButton;
-        rotationButton.setRotationButtonController(this);
-        this.mRotationButton.setOnClickListener(new AppbarFragment$$ExternalSyntheticLambda0(this));
-        this.mRotationButton.setOnHoverListener(new View.OnHoverListener() { // from class: com.android.systemui.shared.rotation.RotationButtonController$$ExternalSyntheticLambda0
-            @Override // android.view.View.OnHoverListener
-            public final boolean onHover(View view, MotionEvent motionEvent) {
-                boolean onRotateSuggestionHover;
-                onRotateSuggestionHover = RotationButtonController.this.onRotateSuggestionHover(view, motionEvent);
-                return onRotateSuggestionHover;
-            }
-        });
-        this.mRotationButton.setUpdatesCallback(rotationButtonUpdatesCallback);
-    }
-
-    public void setRotationCallback(Consumer<Integer> consumer) {
-        this.mRotWatcherListener = consumer;
-    }
-
-    public void setRotationLockedAtAngle(int i) {
-        RotationPolicy.setRotationLockAtAngle(this.mContext, true, i);
-    }
-
-    public void setSkipOverrideUserLockPrefsOnce() {
-        this.mSkipOverrideUserLockPrefsOnce = !this.mIsRecentsAnimationRunning;
-    }
-
-    public void unregisterListeners() {
-        if (this.mListenersRegistered) {
-            this.mListenersRegistered = false;
-            try {
-                WindowManagerGlobal.getWindowManagerService().removeRotationWatcher(this.mRotationWatcher);
-                TaskStackChangeListeners.getInstance().unregisterTaskStackListener(this.mTaskStackListener);
-            } catch (RemoteException e) {
-                Log.e(TAG, "UnregisterListeners caught a RemoteException", e);
-            }
-        }
     }
 
     public void setRotateSuggestionButtonState(boolean z, boolean z2) {
@@ -498,6 +411,10 @@ public class RotationButtonController {
                 ofFloat.setDuration(100L);
                 ofFloat.setInterpolator(LINEAR_INTERPOLATOR);
                 ofFloat.addListener(new AnimatorListenerAdapter() { // from class: com.android.systemui.shared.rotation.RotationButtonController.2
+                    {
+                        RotationButtonController.this = this;
+                    }
+
                     @Override // android.animation.AnimatorListenerAdapter, android.animation.Animator.AnimatorListener
                     public void onAnimationEnd(Animator animator4) {
                         RotationButtonController.this.mRotationButton.hide();
@@ -507,5 +424,119 @@ public class RotationButtonController {
                 ofFloat.start();
             }
         }
+    }
+
+    public void setRotationButton(RotationButton rotationButton, RotationButton.RotationButtonUpdatesCallback rotationButtonUpdatesCallback) {
+        this.mRotationButton = rotationButton;
+        rotationButton.setRotationButtonController(this);
+        this.mRotationButton.setOnClickListener(new PreviewFragment$$ExternalSyntheticLambda2(this, 1));
+        this.mRotationButton.setOnHoverListener(new View.OnHoverListener() { // from class: com.android.systemui.shared.rotation.RotationButtonController$$ExternalSyntheticLambda0
+            @Override // android.view.View.OnHoverListener
+            public final boolean onHover(View view, MotionEvent motionEvent) {
+                boolean onRotateSuggestionHover;
+                onRotateSuggestionHover = RotationButtonController.this.onRotateSuggestionHover(view, motionEvent);
+                return onRotateSuggestionHover;
+            }
+        });
+        this.mRotationButton.setUpdatesCallback(rotationButtonUpdatesCallback);
+    }
+
+    public void setRotationLockedAtAngle(int i) {
+        RotationPolicy.setRotationLockAtAngle(this.mContext, true, i);
+    }
+
+    public void setSkipOverrideUserLockPrefsOnce() {
+        this.mSkipOverrideUserLockPrefsOnce = !this.mIsRecentsAnimationRunning;
+    }
+
+    public void unregisterListeners() {
+        if (this.mListenersRegistered) {
+            this.mListenersRegistered = false;
+            try {
+                WindowManagerGlobal.getWindowManagerService().removeRotationWatcher(this.mRotationWatcher);
+                TaskStackChangeListeners.getInstance().unregisterTaskStackListener(this.mTaskStackListener);
+            } catch (RemoteException e) {
+                Log.e(TAG, "UnregisterListeners caught a RemoteException", e);
+            }
+        }
+    }
+
+    public RotationButtonController(Context context, int i, int i2, int i3, int i4, int i5, int i6, Supplier<Integer> supplier) {
+        this.mContext = context;
+        this.mLightIconColor = i;
+        this.mDarkIconColor = i2;
+        this.mIconCcwStart0ResId = i3;
+        this.mIconCcwStart90ResId = i4;
+        this.mIconCwStart0ResId = i5;
+        this.mIconCwStart90ResId = i6;
+        this.mIconResId = i4;
+        this.mAccessibilityManager = AccessibilityManager.getInstance(context);
+        this.mWindowRotationProvider = supplier;
+    }
+
+    public boolean onRotateSuggestionHover(View view, MotionEvent motionEvent) {
+        boolean z;
+        int actionMasked = motionEvent.getActionMasked();
+        if (actionMasked == 9 || actionMasked == 7) {
+            z = true;
+        } else {
+            z = false;
+        }
+        this.mHoveringRotationSuggestion = z;
+        rescheduleRotationTimeout(true);
+        return false;
+    }
+
+    private void showPendingRotationButtonIfNeeded() {
+        if (canShowRotationButton() && this.mPendingRotationSuggestion) {
+            showAndLogRotationSuggestion();
+        }
+    }
+
+    public void init() {
+        registerListeners();
+        if (this.mContext.getDisplay().getDisplayId() != 0) {
+            onDisable2FlagChanged(16);
+        }
+    }
+
+    public void onDisable2FlagChanged(int i) {
+        if (hasDisable2RotateSuggestionFlag(i)) {
+            onRotationSuggestionsDisabled();
+        }
+    }
+
+    public void onTaskbarStateChange(boolean z, boolean z2) {
+        if (getRotationButton() != null) {
+            getRotationButton().onTaskbarStateChanged(z, z2);
+        }
+    }
+
+    public void setRotationCallback(Consumer<Integer> consumer) {
+        this.mRotWatcherListener = consumer;
+    }
+
+    public Context getContext() {
+        return this.mContext;
+    }
+
+    public int getDarkIconColor() {
+        return this.mDarkIconColor;
+    }
+
+    public int getIconResId() {
+        return this.mIconResId;
+    }
+
+    public int getLightIconColor() {
+        return this.mLightIconColor;
+    }
+
+    public RotationButton getRotationButton() {
+        return this.mRotationButton;
+    }
+
+    public void onDestroy() {
+        unregisterListeners();
     }
 }

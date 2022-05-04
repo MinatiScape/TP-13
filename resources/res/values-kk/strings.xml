@@ -26,17 +26,16 @@
     <string name="abc_searchview_description_voice">Дауыспен іздеу</string>
     <string name="abc_shareactionprovider_share_with">Бөлісу</string>
     <string name="abc_shareactionprovider_share_with_application">%s қолданбасымен бөлісу</string>
-    <string name="abc_slice_error">Байланыс орнатылмады</string>
-    <string name="abc_slice_more">Тағы</string>
+    <string name="abc_slice_error">Қосылмады</string>
+    <string name="abc_slice_more">Жаю</string>
     <string name="abc_slice_more_content">+ %1$d</string>
     <string name="abc_slice_permission_allow">Рұқсат беру</string>
-    <string name="abc_slice_permission_checkbox">%1$s қолданбасына кез келген қолданбаның үзіндісін көрсетуге рұқсат беру</string>
     <string name="abc_slice_permission_deny">Тыйым салу</string>
     <string name="abc_slice_permission_text_1">- %1$s қолданбасындағы ақпаратты оқи алады</string>
     <string name="abc_slice_permission_text_2">- %1$s қолданбасында әрекет ете алады</string>
     <string name="abc_slice_permission_title">%1$s қолданбасына %2$s қолданбасының үзінділерін көрсетуге рұқсат берілсін бе?</string>
-    <string name="abc_slice_show_more">Толығырақ көрсету</string>
-    <string name="abc_slice_updated">Жаңартылған уақыты: %1$s</string>
+    <string name="abc_slice_show_more">Басқаларын көру</string>
+    <string name="abc_slice_updated">Жаңартылған: %1$s</string>
     <string name="abc_slices_permission_request">%1$s қолданбасы %2$s қолданбасының үзінділерін көрсеткісі келеді</string>
     <string name="abc_toolbar_collapse_description">Жию</string>
     <string name="accessibility_custom_color_title">Арнаулы түс</string>
@@ -72,6 +71,7 @@
     <string name="center_wallpaper_position">Ортасы</string>
     <string name="character_counter_content_description">%1$d/%2$d таңба енгізілді</string>
     <string name="character_counter_overflowed_content_description">Таңба саны шегінен асты: %1$d/%2$d</string>
+    <string name="cinematic_effects_toogle">3D тұсқағаздар</string>
     <string name="clear_text_end_icon_content_description">Мәтінді өшіру</string>
     <string name="clock_preview_content_description">%1$s сағатын алдын ала қарау</string>
     <string name="clock_title">Cағат</string>
@@ -117,6 +117,8 @@
     <string name="delete_live_wallpaper">Жою</string>
     <string name="delete_wallpaper_confirmation">Бұл тұсқағаз телефоннан жойылсын ба?</string>
     <string name="edit_custom_theme_lbl">Өзгерту үшін түртіңіз</string>
+    <string name="effect_error_dialog_body">Әсерлерді қолдану мүмкін болмады.\nБасқа фотосуретпен орындап көріңіз.</string>
+    <string name="effect_error_dialog_title">Қап!</string>
     <string name="error_icon_content_description">Қате</string>
     <string name="expand_button_title">Қосымша</string>
     <string name="explore">Шолу</string>
@@ -199,6 +201,7 @@
     <string name="mtrl_picker_toggle_to_day_selection">Күнді таңдауға ауысу үшін түртіңіз.</string>
     <string name="mtrl_picker_toggle_to_text_input_mode">Мәтін енгізу режиміне ауысу</string>
     <string name="mtrl_picker_toggle_to_year_selection">Жылды таңдауға ауысу үшін түртіңіз.</string>
+    <string name="my_photos">Суреттерім</string>
     <string name="my_photos_category_title">Cуреттерім</string>
     <string name="my_photos_generic_wallpaper_title">Cуретім</string>
     <string name="name_component_title">Стиль атауын көрсетіңіз</string>
@@ -236,7 +239,7 @@
     <string name="search_menu_title">Іздеу</string>
     <string name="select_wallpaper_label">Тұсқағаз санаттары</string>
     <string name="set_theme_wallpaper_dialog_message">Тұсқағаздың стилін белгілеу</string>
-    <string name="set_wallpaper_both_destination">Негізгі экран мен құлып экраны</string>
+    <string name="set_wallpaper_both_destination">Негізгі экран мен құлып экрандары</string>
     <string name="set_wallpaper_button_text">Тұсқағаз етіп орнату</string>
     <string name="set_wallpaper_dialog_message">Тұсқағаз ретінде орнату</string>
     <string name="set_wallpaper_error_message">Тұсқағаз орнатылмады.</string>
@@ -244,6 +247,8 @@
     <string name="set_wallpaper_lock_screen_destination">Құлыпталған экран</string>
     <string name="set_wallpaper_progress_message">Тұсқағаз орнатылуда…</string>
     <string name="settings_button_label">Параметрлер</string>
+    <string name="settings_snackbar_description">\"Параметрлер\" бөлімінде \"Файлдар және мультимедиа\" рұқсатын қосыңыз.</string>
+    <string name="settings_snackbar_enable">Қосу</string>
     <string name="shape_component_title">Пішін таңдау</string>
     <string name="shape_preview_content_description">Пішінді алдын ала қарау</string>
     <string name="show_ui_preview_text">Алдын ала қарау экранын көрсету</string>
@@ -261,6 +266,7 @@
     <string name="style_info_description">Қаріпті, белгішелерді, қолданба пішінін алдын ала қарау</string>
     <string name="summary_collapsed_preference_list">%1$s, %2$s</string>
     <string name="tab_customize">Реттеу</string>
+    <string name="tab_effects">Әсерлер</string>
     <string name="tab_info">Ақпарат</string>
     <string name="theme_description">Қарпі: %1$s, белгішелері: %2$s, пішіні: %3$s, түсі: %4$s</string>
     <string name="theme_preview_card_content_description">Стильді алдын ала қарау</string>
@@ -280,6 +286,8 @@
     <string name="wallpaper_destination_both">Негізгі экран және құлып экраны</string>
     <string name="wallpaper_disabled_by_administrator_message">Құрылғы әкімшісі тұсқағаз орнатуға тыйым салған.</string>
     <string name="wallpaper_disabled_message">Бұл құрылғыда тұсқағаз орнатылмайды</string>
+    <string name="wallpaper_effects_subtitle">Фотосуретіңізді телефонмен бір уақытта қозғалатын 3D тұсқағазға айналдырыңыз.</string>
+    <string name="wallpaper_effects_title">3D тұсқағаздар</string>
     <string name="wallpaper_picker_entry_title">Тұсқағазды өзгерту</string>
     <string name="wallpaper_preview_card_content_description">Тұсқағазды алдын ала қарау</string>
     <string name="wallpaper_set_successfully_message">Тұсқағаз орнатылды</string>

@@ -16,27 +16,27 @@ import com.google.android.material.textview.MaterialTextView;
 /* loaded from: classes.dex */
 public class MaterialComponentsViewInflater extends AppCompatViewInflater {
     @Override // androidx.appcompat.app.AppCompatViewInflater
-    public AppCompatAutoCompleteTextView createAutoCompleteTextView(Context context, AttributeSet attributeSet) {
+    public final AppCompatAutoCompleteTextView createAutoCompleteTextView(Context context, AttributeSet attributeSet) {
         return new MaterialAutoCompleteTextView(context, attributeSet);
     }
 
     @Override // androidx.appcompat.app.AppCompatViewInflater
-    public AppCompatButton createButton(Context context, AttributeSet attributeSet) {
+    public final AppCompatButton createButton(Context context, AttributeSet attributeSet) {
         return new MaterialButton(context, attributeSet);
     }
 
     @Override // androidx.appcompat.app.AppCompatViewInflater
-    public AppCompatCheckBox createCheckBox(Context context, AttributeSet attributeSet) {
+    public final AppCompatCheckBox createCheckBox(Context context, AttributeSet attributeSet) {
         return new MaterialCheckBox(context, attributeSet);
     }
 
     @Override // androidx.appcompat.app.AppCompatViewInflater
-    public AppCompatRadioButton createRadioButton(Context context, AttributeSet attributeSet) {
+    public final AppCompatRadioButton createRadioButton(Context context, AttributeSet attributeSet) {
         return new MaterialRadioButton(context, attributeSet);
     }
 
     @Override // androidx.appcompat.app.AppCompatViewInflater
-    public AppCompatTextView createTextView(Context context, AttributeSet attributeSet) {
+    public final AppCompatTextView createTextView(Context context, AttributeSet attributeSet) {
         return new MaterialTextView(context, attributeSet);
     }
 }

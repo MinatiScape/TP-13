@@ -4,7 +4,7 @@ public class ParseError extends VolleyError {
     public ParseError() {
     }
 
-    public ParseError(Throwable th) {
-        super(th);
+    public ParseError(Exception exc) {
+        super(exc);
     }
 }

@@ -9,9 +9,9 @@ public final class StateListAnimator {
     public final ArrayList<Tuple> tuples = new ArrayList<>();
     public Tuple lastMatch = null;
     public ValueAnimator runningAnimator = null;
-    public final Animator.AnimatorListener animationListener = new AnimatorListenerAdapter() { // from class: com.google.android.material.internal.StateListAnimator.1
+    public final AnonymousClass1 animationListener = new AnimatorListenerAdapter() { // from class: com.google.android.material.internal.StateListAnimator.1
         @Override // android.animation.AnimatorListenerAdapter, android.animation.Animator.AnimatorListener
-        public void onAnimationEnd(Animator animator) {
+        public final void onAnimationEnd(Animator animator) {
             StateListAnimator stateListAnimator = StateListAnimator.this;
             if (stateListAnimator.runningAnimator == animator) {
                 stateListAnimator.runningAnimator = null;
@@ -30,7 +30,7 @@ public final class StateListAnimator {
         }
     }
 
-    public void addState(int[] iArr, ValueAnimator valueAnimator) {
+    public final void addState(int[] iArr, ValueAnimator valueAnimator) {
         Tuple tuple = new Tuple(iArr, valueAnimator);
         valueAnimator.addListener(this.animationListener);
         this.tuples.add(tuple);

@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.internal.zzax;
+/* compiled from: SignInResponseCreator.java */
 /* loaded from: classes.dex */
 public final class zzely implements Parcelable.Creator<zzelx> {
     @Override // android.os.Parcelable.Creator

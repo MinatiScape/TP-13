@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:background="?android:attr/colorBackground" android:layout_width="match_parent" android:layout_height="match_parent">
-    <FrameLayout android:id="@+id/preview_header" android:paddingBottom="?android:attr/actionBarSize" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <FrameLayout android:id="@+id/preview_header" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/PreviewHeaderStyle"/>
     <FrameLayout android:layout_gravity="bottom" android:id="@+id/separated_tabs_container" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="@dimen/bottom_actions_height" android:paddingHorizontal="@dimen/separated_tabs_horizontal_padding">
         <include layout="@layout/separated_tabs"/>
     </FrameLayout>
-    <FrameLayout android:id="@+id/screen_preview_layout" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_marginTop="?android:attr/actionBarSize" android:layout_marginBottom="@dimen/bottom_actions_plus_separated_tabs">
-        <androidx.constraintlayout.widget.ConstraintLayout android:layout_gravity="center" android:id="@+id/live_wallpaper_preview" android:padding="@dimen/full_preview_page_default_padding_top" android:clipChildren="false" android:clipToPadding="false" android:layout_width="match_parent" android:layout_height="match_parent">
-            <com.android.wallpaper.picker.TouchForwardingLayout android:id="@+id/touch_forwarding_layout" android:background="@android:color/transparent" android:layout_width="0dp" android:layout_height="0dp" app:layout_constraintBottom_toBottomOf="0" app:layout_constraintLeft_toLeftOf="0" app:layout_constraintRight_toRightOf="0" app:layout_constraintTop_toTopOf="0">
+    <FrameLayout android:id="@+id/screen_preview_layout" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_marginBottom="@dimen/bottom_actions_plus_separated_tabs" style="@style/ScreenPreviewLayoutStyle">
+        <androidx.constraintlayout.widget.ConstraintLayout android:layout_gravity="center" android:id="@+id/live_wallpaper_preview" android:clipChildren="false" android:layout_width="match_parent" android:layout_height="match_parent" android:paddingHorizontal="@dimen/full_preview_page_default_horizontal_padding" android:paddingVertical="@dimen/full_preview_page_default_padding_top">
+            <com.android.wallpaper.picker.TouchForwardingLayout android:id="@+id/touch_forwarding_layout" android:background="@android:color/transparent" android:layout_width="0dp" android:layout_height="0dp" app:layout_constraintBottom_toBottomOf="0" app:layout_constraintLeft_toLeftOf="0" app:layout_constraintRight_toRightOf="0" app:layout_constraintTop_toTopOf="0" app:layout_constraintVertical_bias="@dimen/full_preview_page_vertical_bias">
                 <include android:id="@+id/wallpaper_full_preview_card" layout="@layout/wallpaper_preview_card"/>
             </com.android.wallpaper.picker.TouchForwardingLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>

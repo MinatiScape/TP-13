@@ -26,7 +26,6 @@
     <dimen name="option_tile_padding_horizontal">7dp</dimen>
     <dimen name="option_tile_padding_vertical">8dp</dimen>
     <dimen name="option_tile_width">62dp</dimen>
-    <dimen name="options_container_width">400dp</dimen>
     <dimen name="permissions_needed_metadata_warning_icon_margin_top">0dp</dimen>
     <dimen name="preview_card_padding">8dp</dimen>
     <dimen name="preview_page_gap">60dp</dimen>

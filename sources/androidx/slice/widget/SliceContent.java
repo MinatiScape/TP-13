@@ -4,7 +4,6 @@ import androidx.slice.Slice;
 import androidx.slice.SliceItem;
 import androidx.slice.core.SliceQuery;
 import java.util.Arrays;
-import java.util.List;
 /* loaded from: classes.dex */
 public class SliceContent {
     public SliceItem mColorItem;
@@ -15,17 +14,16 @@ public class SliceContent {
 
     public SliceContent(Slice slice) {
         if (slice != null) {
-            List asList = Arrays.asList(slice.mHints);
-            init(new SliceItem(slice, "slice", null, (String[]) asList.toArray(new String[asList.size()])));
+            init(new SliceItem(slice, "slice", (String) null, Arrays.asList(slice.mHints)));
             this.mRowIndex = -1;
         }
     }
 
-    public int getHeight(SliceStyle style, SliceViewPolicy policy) {
+    public int getHeight(SliceStyle sliceStyle, SliceViewPolicy sliceViewPolicy) {
         return 0;
     }
 
-    public int getLayoutDir() {
+    public final int getLayoutDir() {
         SliceItem sliceItem = this.mLayoutDirItem;
         if (sliceItem == null) {
             return -1;
@@ -37,23 +35,17 @@ public class SliceContent {
         return -1;
     }
 
-    public final void init(SliceItem item) {
-        this.mSliceItem = item;
-        if ("slice".equals(item.mFormat) || "action".equals(item.mFormat)) {
-            this.mColorItem = SliceQuery.findTopLevelItem(item.getSlice(), "int", "color", null, null);
-            this.mLayoutDirItem = SliceQuery.findTopLevelItem(item.getSlice(), "int", "layout_direction", null, null);
+    public final void init(SliceItem sliceItem) {
+        this.mSliceItem = sliceItem;
+        if ("slice".equals(sliceItem.mFormat) || "action".equals(sliceItem.mFormat)) {
+            this.mColorItem = SliceQuery.findTopLevelItem(sliceItem.getSlice(), "int", "color", null);
+            this.mLayoutDirItem = SliceQuery.findTopLevelItem(sliceItem.getSlice(), "int", "layout_direction", null);
         }
-        this.mContentDescr = SliceQuery.findSubtype(item, "text", "content_description");
+        this.mContentDescr = SliceQuery.findSubtype(sliceItem, "text", "content_description");
     }
 
-    public boolean isValid() {
-        return this.mSliceItem != null;
-    }
-
-    public SliceContent(SliceItem item, int rowIndex) {
-        if (item != null) {
-            init(item);
-            this.mRowIndex = rowIndex;
-        }
+    public SliceContent(SliceItem sliceItem, int i) {
+        init(sliceItem);
+        this.mRowIndex = i;
     }
 }

@@ -1,7 +1,9 @@
 package com.bumptech.glide.disklrucache;
 
-import androidx.recyclerview.R$attr$$ExternalSyntheticOutline0;
-import com.adobe.xmp.XMPPathFactory$$ExternalSyntheticOutline0;
+import android.annotation.TargetApi;
+import android.os.StrictMode;
+import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
+import androidx.appcompat.view.SupportMenuInflater$$ExternalSyntheticOutline0;
 import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.EOFException;
@@ -23,22 +25,20 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 /* loaded from: classes.dex */
 public final class DiskLruCache implements Closeable {
-    public final int appVersion;
     public final File directory;
     public final File journalFile;
     public final File journalFileBackup;
     public final File journalFileTmp;
-    public Writer journalWriter;
+    public BufferedWriter journalWriter;
     public long maxSize;
     public int redundantOpCount;
-    public final int valueCount;
     public long size = 0;
     public final LinkedHashMap<String, Entry> lruEntries = new LinkedHashMap<>(0, 0.75f, true);
     public long nextSequenceNumber = 0;
-    public final ThreadPoolExecutor executorService = new ThreadPoolExecutor(0, 1, 60, TimeUnit.SECONDS, new LinkedBlockingQueue(), new DiskLruCacheThreadFactory(null));
-    public final Callable<Void> cleanupCallable = new Callable<Void>() { // from class: com.bumptech.glide.disklrucache.DiskLruCache.1
+    public final ThreadPoolExecutor executorService = new ThreadPoolExecutor(0, 1, 60, TimeUnit.SECONDS, new LinkedBlockingQueue(), new DiskLruCacheThreadFactory());
+    public final AnonymousClass1 cleanupCallable = new Callable<Void>() { // from class: com.bumptech.glide.disklrucache.DiskLruCache.1
         @Override // java.util.concurrent.Callable
-        public Void call() throws Exception {
+        public final Void call() throws Exception {
             synchronized (DiskLruCache.this) {
                 DiskLruCache diskLruCache = DiskLruCache.this;
                 if (diskLruCache.journalWriter == null) {
@@ -53,14 +53,13 @@ public final class DiskLruCache implements Closeable {
             }
         }
     };
+    public final int appVersion = 1;
+    public final int valueCount = 1;
 
     /* loaded from: classes.dex */
     public static final class DiskLruCacheThreadFactory implements ThreadFactory {
-        public DiskLruCacheThreadFactory(AnonymousClass1 r1) {
-        }
-
         @Override // java.util.concurrent.ThreadFactory
-        public synchronized Thread newThread(Runnable runnable) {
+        public final synchronized Thread newThread(Runnable runnable) {
             Thread thread;
             thread = new Thread(runnable, "glide-disk-lru-cache-thread");
             thread.setPriority(1);
@@ -74,27 +73,31 @@ public final class DiskLruCache implements Closeable {
         public final Entry entry;
         public final boolean[] written;
 
-        public Editor(Entry entry, AnonymousClass1 r3) {
+        public Editor(Entry entry) {
+            boolean[] zArr;
             this.entry = entry;
-            this.written = entry.readable ? null : new boolean[DiskLruCache.this.valueCount];
+            if (entry.readable) {
+                zArr = null;
+            } else {
+                zArr = new boolean[DiskLruCache.this.valueCount];
+            }
+            this.written = zArr;
         }
 
-        public void abort() throws IOException {
+        public final void abort() throws IOException {
             DiskLruCache.access$2100(DiskLruCache.this, this, false);
         }
 
-        public File getFile(int index) throws IOException {
+        public final File getFile() throws IOException {
             File file;
             synchronized (DiskLruCache.this) {
                 Entry entry = this.entry;
                 if (entry.currentEditor == this) {
                     if (!entry.readable) {
-                        this.written[index] = true;
+                        this.written[0] = true;
                     }
-                    file = entry.dirtyFiles[index];
-                    if (!DiskLruCache.this.directory.exists()) {
-                        DiskLruCache.this.directory.mkdirs();
-                    }
+                    file = entry.dirtyFiles[0];
+                    DiskLruCache.this.directory.mkdirs();
                 } else {
                     throw new IllegalStateException();
                 }
@@ -113,7 +116,7 @@ public final class DiskLruCache implements Closeable {
         public boolean readable;
         public long sequenceNumber;
 
-        public Entry(String str, AnonymousClass1 r8) {
+        public Entry(String str) {
             this.key = str;
             int i = DiskLruCache.this.valueCount;
             this.lengths = new long[i];
@@ -131,7 +134,7 @@ public final class DiskLruCache implements Closeable {
             }
         }
 
-        public String getLengths() throws IOException {
+        public final String getLengths() throws IOException {
             long[] jArr;
             StringBuilder sb = new StringBuilder();
             for (long j : this.lengths) {
@@ -140,30 +143,6 @@ public final class DiskLruCache implements Closeable {
             }
             return sb.toString();
         }
-
-        public final IOException invalidLengths(String[] strings) throws IOException {
-            String valueOf = String.valueOf(Arrays.toString(strings));
-            throw new IOException(valueOf.length() != 0 ? "unexpected journal line: ".concat(valueOf) : new String("unexpected journal line: "));
-        }
-    }
-
-    /* loaded from: classes.dex */
-    public final class Value {
-        public final File[] files;
-
-        public Value(DiskLruCache diskLruCache, String str, long j, File[] fileArr, long[] jArr, AnonymousClass1 r7) {
-            this.files = fileArr;
-        }
-    }
-
-    public DiskLruCache(File directory, int appVersion, int valueCount, long maxSize) {
-        this.directory = directory;
-        this.appVersion = appVersion;
-        this.journalFile = new File(directory, "journal");
-        this.journalFileTmp = new File(directory, "journal.tmp");
-        this.journalFileBackup = new File(directory, "journal.bkp");
-        this.valueCount = valueCount;
-        this.maxSize = maxSize;
     }
 
     public static void access$2100(DiskLruCache diskLruCache, Editor editor, boolean z) throws IOException {
@@ -174,10 +153,7 @@ public final class DiskLruCache implements Closeable {
                     for (int i = 0; i < diskLruCache.valueCount; i++) {
                         if (!editor.written[i]) {
                             editor.abort();
-                            StringBuilder sb = new StringBuilder(61);
-                            sb.append("Newly created entry didn't create value for index ");
-                            sb.append(i);
-                            throw new IllegalStateException(sb.toString());
+                            throw new IllegalStateException("Newly created entry didn't create value for index " + i);
                         } else if (!entry.dirtyFiles[i].exists()) {
                             editor.abort();
                             return;
@@ -218,7 +194,7 @@ public final class DiskLruCache implements Closeable {
                     diskLruCache.journalWriter.append((CharSequence) entry.key);
                     diskLruCache.journalWriter.append('\n');
                 }
-                diskLruCache.journalWriter.flush();
+                flushWriter(diskLruCache.journalWriter);
                 if (diskLruCache.size > diskLruCache.maxSize || diskLruCache.journalRebuildRequired()) {
                     diskLruCache.executorService.submit(diskLruCache.cleanupCallable);
                 }
@@ -228,68 +204,8 @@ public final class DiskLruCache implements Closeable {
         }
     }
 
-    public static void deleteIfExists(File file) throws IOException {
-        if (file.exists() && !file.delete()) {
-            throw new IOException();
-        }
-    }
-
-    public static DiskLruCache open(File directory, int appVersion, int valueCount, long maxSize) throws IOException {
-        if (maxSize <= 0) {
-            throw new IllegalArgumentException("maxSize <= 0");
-        } else if (valueCount > 0) {
-            File file = new File(directory, "journal.bkp");
-            if (file.exists()) {
-                File file2 = new File(directory, "journal");
-                if (file2.exists()) {
-                    file.delete();
-                } else {
-                    renameTo(file, file2, false);
-                }
-            }
-            DiskLruCache diskLruCache = new DiskLruCache(directory, appVersion, valueCount, maxSize);
-            if (diskLruCache.journalFile.exists()) {
-                try {
-                    diskLruCache.readJournal();
-                    diskLruCache.processJournal();
-                    return diskLruCache;
-                } catch (IOException e) {
-                    PrintStream printStream = System.out;
-                    String valueOf = String.valueOf(directory);
-                    String message = e.getMessage();
-                    StringBuilder m = R$attr$$ExternalSyntheticOutline0.m(XMPPathFactory$$ExternalSyntheticOutline0.m(message, valueOf.length() + 36), "DiskLruCache ", valueOf, " is corrupt: ", message);
-                    m.append(", removing");
-                    printStream.println(m.toString());
-                    diskLruCache.close();
-                    Util.deleteContents(diskLruCache.directory);
-                }
-            }
-            directory.mkdirs();
-            DiskLruCache diskLruCache2 = new DiskLruCache(directory, appVersion, valueCount, maxSize);
-            diskLruCache2.rebuildJournal();
-            return diskLruCache2;
-        } else {
-            throw new IllegalArgumentException("valueCount <= 0");
-        }
-    }
-
-    public static void renameTo(File from, File to, boolean deleteDestination) throws IOException {
-        if (deleteDestination) {
-            deleteIfExists(to);
-        }
-        if (!from.renameTo(to)) {
-            throw new IOException();
-        }
-    }
-
-    public final void checkNotClosed() {
-        if (this.journalWriter == null) {
-            throw new IllegalStateException("cache is closed");
-        }
-    }
-
     @Override // java.io.Closeable, java.lang.AutoCloseable
-    public synchronized void close() throws IOException {
+    public final synchronized void close() throws IOException {
         if (this.journalWriter != null) {
             Iterator it = new ArrayList(this.lruEntries.values()).iterator();
             while (it.hasNext()) {
@@ -299,60 +215,159 @@ public final class DiskLruCache implements Closeable {
                 }
             }
             trimToSize();
-            this.journalWriter.close();
+            closeWriter(this.journalWriter);
             this.journalWriter = null;
         }
     }
 
-    public Editor edit(String key) throws IOException {
+    public final Editor edit(String str) throws IOException {
+        Editor editor;
         synchronized (this) {
-            checkNotClosed();
-            Entry entry = this.lruEntries.get(key);
+            if (this.journalWriter != null) {
+                Entry entry = this.lruEntries.get(str);
+                editor = null;
+                if (entry == null) {
+                    entry = new Entry(str);
+                    this.lruEntries.put(str, entry);
+                } else if (entry.currentEditor != null) {
+                }
+                editor = new Editor(entry);
+                entry.currentEditor = editor;
+                this.journalWriter.append((CharSequence) "DIRTY");
+                this.journalWriter.append(' ');
+                this.journalWriter.append((CharSequence) str);
+                this.journalWriter.append('\n');
+                flushWriter(this.journalWriter);
+            } else {
+                throw new IllegalStateException("cache is closed");
+            }
+        }
+        return editor;
+    }
+
+    public final synchronized Value get(String str) throws IOException {
+        if (this.journalWriter != null) {
+            Entry entry = this.lruEntries.get(str);
             if (entry == null) {
-                entry = new Entry(key, null);
-                this.lruEntries.put(key, entry);
-            } else if (entry.currentEditor != null) {
                 return null;
             }
-            Editor editor = new Editor(entry, null);
-            entry.currentEditor = editor;
-            this.journalWriter.append((CharSequence) "DIRTY");
+            if (!entry.readable) {
+                return null;
+            }
+            for (File file : entry.cleanFiles) {
+                if (!file.exists()) {
+                    return null;
+                }
+            }
+            this.redundantOpCount++;
+            this.journalWriter.append((CharSequence) "READ");
             this.journalWriter.append(' ');
-            this.journalWriter.append((CharSequence) key);
+            this.journalWriter.append((CharSequence) str);
             this.journalWriter.append('\n');
-            this.journalWriter.flush();
-            return editor;
+            if (journalRebuildRequired()) {
+                this.executorService.submit(this.cleanupCallable);
+            }
+            return new Value(entry.cleanFiles);
+        }
+        throw new IllegalStateException("cache is closed");
+    }
+
+    public final synchronized void rebuildJournal() throws IOException {
+        BufferedWriter bufferedWriter = this.journalWriter;
+        if (bufferedWriter != null) {
+            closeWriter(bufferedWriter);
+        }
+        BufferedWriter bufferedWriter2 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.journalFileTmp), Util.US_ASCII));
+        bufferedWriter2.write("libcore.io.DiskLruCache");
+        bufferedWriter2.write("\n");
+        bufferedWriter2.write("1");
+        bufferedWriter2.write("\n");
+        bufferedWriter2.write(Integer.toString(this.appVersion));
+        bufferedWriter2.write("\n");
+        bufferedWriter2.write(Integer.toString(this.valueCount));
+        bufferedWriter2.write("\n");
+        bufferedWriter2.write("\n");
+        for (Entry entry : this.lruEntries.values()) {
+            if (entry.currentEditor != null) {
+                bufferedWriter2.write("DIRTY " + entry.key + '\n');
+            } else {
+                bufferedWriter2.write("CLEAN " + entry.key + entry.getLengths() + '\n');
+            }
+        }
+        closeWriter(bufferedWriter2);
+        if (this.journalFile.exists()) {
+            renameTo(this.journalFile, this.journalFileBackup, true);
+        }
+        renameTo(this.journalFileTmp, this.journalFile, false);
+        this.journalFileBackup.delete();
+        this.journalWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.journalFile, true), Util.US_ASCII));
+    }
+
+    /* loaded from: classes.dex */
+    public final class Value {
+        public final File[] files;
+
+        public Value(File[] fileArr) {
+            this.files = fileArr;
         }
     }
 
-    public synchronized Value get(String key) throws IOException {
-        checkNotClosed();
-        Entry entry = this.lruEntries.get(key);
-        if (entry == null) {
-            return null;
-        }
-        if (!entry.readable) {
-            return null;
-        }
-        for (File file : entry.cleanFiles) {
-            if (!file.exists()) {
-                return null;
+    /* JADX WARN: Type inference failed for: r2v2, types: [com.bumptech.glide.disklrucache.DiskLruCache$1] */
+    public DiskLruCache(File file, long j) {
+        this.directory = file;
+        this.journalFile = new File(file, "journal");
+        this.journalFileTmp = new File(file, "journal.tmp");
+        this.journalFileBackup = new File(file, "journal.bkp");
+        this.maxSize = j;
+    }
+
+    public static DiskLruCache open(File file, long j) throws IOException {
+        if (j > 0) {
+            File file2 = new File(file, "journal.bkp");
+            if (file2.exists()) {
+                File file3 = new File(file, "journal");
+                if (file3.exists()) {
+                    file2.delete();
+                } else {
+                    renameTo(file2, file3, false);
+                }
             }
+            DiskLruCache diskLruCache = new DiskLruCache(file, j);
+            if (diskLruCache.journalFile.exists()) {
+                try {
+                    diskLruCache.readJournal();
+                    diskLruCache.processJournal();
+                    return diskLruCache;
+                } catch (IOException e) {
+                    PrintStream printStream = System.out;
+                    printStream.println("DiskLruCache " + file + " is corrupt: " + e.getMessage() + ", removing");
+                    diskLruCache.close();
+                    Util.deleteContents(diskLruCache.directory);
+                }
+            }
+            file.mkdirs();
+            DiskLruCache diskLruCache2 = new DiskLruCache(file, j);
+            diskLruCache2.rebuildJournal();
+            return diskLruCache2;
         }
-        this.redundantOpCount++;
-        this.journalWriter.append((CharSequence) "READ");
-        this.journalWriter.append(' ');
-        this.journalWriter.append((CharSequence) key);
-        this.journalWriter.append('\n');
-        if (journalRebuildRequired()) {
-            this.executorService.submit(this.cleanupCallable);
+        throw new IllegalArgumentException("maxSize <= 0");
+    }
+
+    public static void renameTo(File file, File file2, boolean z) throws IOException {
+        if (z) {
+            deleteIfExists(file2);
         }
-        return new Value(this, key, entry.sequenceNumber, entry.cleanFiles, entry.lengths, null);
+        if (!file.renameTo(file2)) {
+            throw new IOException();
+        }
     }
 
     public final boolean journalRebuildRequired() {
         int i = this.redundantOpCount;
-        return i >= 2000 && i >= this.lruEntries.size();
+        if (i < 2000 || i < this.lruEntries.size()) {
+            return false;
+        }
+        return true;
     }
 
     public final void processJournal() throws IOException {
@@ -387,17 +402,7 @@ public final class DiskLruCache implements Closeable {
             String readLine4 = strictLineReader.readLine();
             String readLine5 = strictLineReader.readLine();
             if (!"libcore.io.DiskLruCache".equals(readLine) || !"1".equals(readLine2) || !Integer.toString(this.appVersion).equals(readLine3) || !Integer.toString(this.valueCount).equals(readLine4) || !"".equals(readLine5)) {
-                StringBuilder sb = new StringBuilder(String.valueOf(readLine).length() + 35 + String.valueOf(readLine2).length() + String.valueOf(readLine4).length() + String.valueOf(readLine5).length());
-                sb.append("unexpected journal header: [");
-                sb.append(readLine);
-                sb.append(", ");
-                sb.append(readLine2);
-                sb.append(", ");
-                sb.append(readLine4);
-                sb.append(", ");
-                sb.append(readLine5);
-                sb.append("]");
-                throw new IOException(sb.toString());
+                throw new IOException("unexpected journal header: [" + readLine + ", " + readLine2 + ", " + readLine4 + ", " + readLine5 + "]");
             }
             boolean z = false;
             int i = 0;
@@ -436,127 +441,114 @@ public final class DiskLruCache implements Closeable {
         }
     }
 
-    public final void readJournalLine(String line) throws IOException {
-        String str;
-        int indexOf = line.indexOf(32);
-        if (indexOf == -1) {
-            throw new IOException(line.length() != 0 ? "unexpected journal line: ".concat(line) : new String("unexpected journal line: "));
-        }
-        int i = indexOf + 1;
-        int indexOf2 = line.indexOf(32, i);
-        if (indexOf2 == -1) {
-            str = line.substring(i);
-            if (indexOf == 6 && line.startsWith("REMOVE")) {
-                this.lruEntries.remove(str);
-                return;
+    public final void readJournalLine(String str) throws IOException {
+        String str2;
+        int indexOf = str.indexOf(32);
+        if (indexOf != -1) {
+            int i = indexOf + 1;
+            int indexOf2 = str.indexOf(32, i);
+            if (indexOf2 == -1) {
+                str2 = str.substring(i);
+                if (indexOf == 6 && str.startsWith("REMOVE")) {
+                    this.lruEntries.remove(str2);
+                    return;
+                }
+            } else {
+                str2 = str.substring(i, indexOf2);
+            }
+            Entry entry = this.lruEntries.get(str2);
+            if (entry == null) {
+                entry = new Entry(str2);
+                this.lruEntries.put(str2, entry);
+            }
+            if (indexOf2 != -1 && indexOf == 5 && str.startsWith("CLEAN")) {
+                String[] split = str.substring(indexOf2 + 1).split(" ");
+                entry.readable = true;
+                entry.currentEditor = null;
+                if (split.length == DiskLruCache.this.valueCount) {
+                    for (int i2 = 0; i2 < split.length; i2++) {
+                        try {
+                            entry.lengths[i2] = Long.parseLong(split[i2]);
+                        } catch (NumberFormatException unused) {
+                            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("unexpected journal line: ");
+                            m.append(Arrays.toString(split));
+                            throw new IOException(m.toString());
+                        }
+                    }
+                    return;
+                }
+                StringBuilder m2 = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("unexpected journal line: ");
+                m2.append(Arrays.toString(split));
+                throw new IOException(m2.toString());
+            } else if (indexOf2 == -1 && indexOf == 5 && str.startsWith("DIRTY")) {
+                entry.currentEditor = new Editor(entry);
+            } else if (indexOf2 != -1 || indexOf != 4 || !str.startsWith("READ")) {
+                throw new IOException(SupportMenuInflater$$ExternalSyntheticOutline0.m("unexpected journal line: ", str));
             }
         } else {
-            str = line.substring(i, indexOf2);
+            throw new IOException(SupportMenuInflater$$ExternalSyntheticOutline0.m("unexpected journal line: ", str));
         }
-        Entry entry = this.lruEntries.get(str);
-        if (entry == null) {
-            entry = new Entry(str, null);
-            this.lruEntries.put(str, entry);
-        }
-        if (indexOf2 != -1 && indexOf == 5 && line.startsWith("CLEAN")) {
-            String[] split = line.substring(indexOf2 + 1).split(" ");
-            entry.readable = true;
-            entry.currentEditor = null;
-            if (split.length == DiskLruCache.this.valueCount) {
-                for (int i2 = 0; i2 < split.length; i2++) {
-                    try {
-                        entry.lengths[i2] = Long.parseLong(split[i2]);
-                    } catch (NumberFormatException unused) {
-                        entry.invalidLengths(split);
-                        throw null;
-                    }
-                }
-                return;
-            }
-            entry.invalidLengths(split);
-            throw null;
-        } else if (indexOf2 == -1 && indexOf == 5 && line.startsWith("DIRTY")) {
-            entry.currentEditor = new Editor(entry, null);
-        } else if (indexOf2 != -1 || indexOf != 4 || !line.startsWith("READ")) {
-            throw new IOException(line.length() != 0 ? "unexpected journal line: ".concat(line) : new String("unexpected journal line: "));
-        }
-    }
-
-    public final synchronized void rebuildJournal() throws IOException {
-        Writer writer = this.journalWriter;
-        if (writer != null) {
-            writer.close();
-        }
-        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.journalFileTmp), Util.US_ASCII));
-        bufferedWriter.write("libcore.io.DiskLruCache");
-        bufferedWriter.write("\n");
-        bufferedWriter.write("1");
-        bufferedWriter.write("\n");
-        bufferedWriter.write(Integer.toString(this.appVersion));
-        bufferedWriter.write("\n");
-        bufferedWriter.write(Integer.toString(this.valueCount));
-        bufferedWriter.write("\n");
-        bufferedWriter.write("\n");
-        for (Entry entry : this.lruEntries.values()) {
-            if (entry.currentEditor != null) {
-                String str = entry.key;
-                StringBuilder sb = new StringBuilder(String.valueOf(str).length() + 7);
-                sb.append("DIRTY ");
-                sb.append(str);
-                sb.append('\n');
-                bufferedWriter.write(sb.toString());
-            } else {
-                String str2 = entry.key;
-                String lengths = entry.getLengths();
-                StringBuilder sb2 = new StringBuilder(String.valueOf(str2).length() + 7 + String.valueOf(lengths).length());
-                sb2.append("CLEAN ");
-                sb2.append(str2);
-                sb2.append(lengths);
-                sb2.append('\n');
-                bufferedWriter.write(sb2.toString());
-            }
-        }
-        bufferedWriter.close();
-        if (this.journalFile.exists()) {
-            renameTo(this.journalFile, this.journalFileBackup, true);
-        }
-        renameTo(this.journalFileTmp, this.journalFile, false);
-        this.journalFileBackup.delete();
-        this.journalWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.journalFile, true), Util.US_ASCII));
     }
 
     public final void trimToSize() throws IOException {
         while (this.size > this.maxSize) {
             String key = this.lruEntries.entrySet().iterator().next().getKey();
             synchronized (this) {
-                checkNotClosed();
-                Entry entry = this.lruEntries.get(key);
-                if (entry != null && entry.currentEditor == null) {
-                    for (int i = 0; i < this.valueCount; i++) {
-                        File file = entry.cleanFiles[i];
-                        if (file.exists() && !file.delete()) {
-                            String valueOf = String.valueOf(file);
-                            StringBuilder sb = new StringBuilder(valueOf.length() + 17);
-                            sb.append("failed to delete ");
-                            sb.append(valueOf);
-                            throw new IOException(sb.toString());
+                if (this.journalWriter != null) {
+                    Entry entry = this.lruEntries.get(key);
+                    if (entry != null && entry.currentEditor == null) {
+                        for (int i = 0; i < this.valueCount; i++) {
+                            File file = entry.cleanFiles[i];
+                            if (file.exists() && !file.delete()) {
+                                throw new IOException("failed to delete " + file);
+                            }
+                            long j = this.size;
+                            long[] jArr = entry.lengths;
+                            this.size = j - jArr[i];
+                            jArr[i] = 0;
                         }
-                        long j = this.size;
-                        long[] jArr = entry.lengths;
-                        this.size = j - jArr[i];
-                        jArr[i] = 0;
+                        this.redundantOpCount++;
+                        this.journalWriter.append((CharSequence) "REMOVE");
+                        this.journalWriter.append(' ');
+                        this.journalWriter.append((CharSequence) key);
+                        this.journalWriter.append('\n');
+                        this.lruEntries.remove(key);
+                        if (journalRebuildRequired()) {
+                            this.executorService.submit(this.cleanupCallable);
+                        }
                     }
-                    this.redundantOpCount++;
-                    this.journalWriter.append((CharSequence) "REMOVE");
-                    this.journalWriter.append(' ');
-                    this.journalWriter.append((CharSequence) key);
-                    this.journalWriter.append('\n');
-                    this.lruEntries.remove(key);
-                    if (journalRebuildRequired()) {
-                        this.executorService.submit(this.cleanupCallable);
-                    }
+                } else {
+                    throw new IllegalStateException("cache is closed");
                 }
             }
+        }
+    }
+
+    @TargetApi(26)
+    public static void closeWriter(Writer writer) throws IOException {
+        StrictMode.ThreadPolicy threadPolicy = StrictMode.getThreadPolicy();
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder(threadPolicy).permitUnbufferedIo().build());
+        try {
+            writer.close();
+        } finally {
+            StrictMode.setThreadPolicy(threadPolicy);
+        }
+    }
+
+    public static void deleteIfExists(File file) throws IOException {
+        if (file.exists() && !file.delete()) {
+            throw new IOException();
+        }
+    }
+
+    @TargetApi(26)
+    public static void flushWriter(Writer writer) throws IOException {
+        StrictMode.ThreadPolicy threadPolicy = StrictMode.getThreadPolicy();
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder(threadPolicy).permitUnbufferedIo().build());
+        try {
+            writer.flush();
+        } finally {
+            StrictMode.setThreadPolicy(threadPolicy);
         }
     }
 }

@@ -46,8 +46,21 @@ public class RemoteInputView extends LinearLayout implements View.OnClickListene
         public RemoteInputView mRemoteInputView;
         public boolean mShowImeOnInputConnection;
 
-        public RemoteEditText(Context context, AttributeSet attrs) {
-            super(context, attrs);
+        @Override // android.widget.TextView, android.view.View, android.view.KeyEvent.Callback
+        public final boolean onKeyDown(int i, KeyEvent keyEvent) {
+            if (i == 4) {
+                return true;
+            }
+            return super.onKeyDown(i, keyEvent);
+        }
+
+        @Override // android.widget.TextView, android.view.View, android.view.KeyEvent.Callback
+        public final boolean onKeyUp(int i, KeyEvent keyEvent) {
+            if (i != 4) {
+                return super.onKeyUp(i, keyEvent);
+            }
+            defocusIfNeeded();
+            return true;
         }
 
         public final void defocusIfNeeded() {
@@ -63,23 +76,27 @@ public class RemoteInputView extends LinearLayout implements View.OnClickListene
             }
         }
 
+        public RemoteEditText(Context context, AttributeSet attributeSet) {
+            super(context, attributeSet);
+        }
+
         @Override // android.widget.TextView, android.view.View
-        public void getFocusedRect(Rect r) {
-            super.getFocusedRect(r);
-            r.top = getScrollY();
-            r.bottom = (getBottom() - getTop()) + getScrollY();
+        public final void getFocusedRect(Rect rect) {
+            super.getFocusedRect(rect);
+            rect.top = getScrollY();
+            rect.bottom = (getBottom() - getTop()) + getScrollY();
         }
 
         @Override // android.widget.TextView
-        public void onCommitCompletion(CompletionInfo text) {
+        public final void onCommitCompletion(CompletionInfo completionInfo) {
             clearComposingText();
-            setText(text.getText());
+            setText(completionInfo.getText());
             setSelection(getText().length());
         }
 
         @Override // android.widget.TextView, android.view.View
-        public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
-            InputConnection onCreateInputConnection = super.onCreateInputConnection(outAttrs);
+        public final InputConnection onCreateInputConnection(EditorInfo editorInfo) {
+            InputConnection onCreateInputConnection = super.onCreateInputConnection(editorInfo);
             if (this.mShowImeOnInputConnection && onCreateInputConnection != null) {
                 Context context = getContext();
                 Object obj = ContextCompat.sLock;
@@ -87,7 +104,7 @@ public class RemoteInputView extends LinearLayout implements View.OnClickListene
                 if (inputMethodManager != null) {
                     post(new Runnable() { // from class: androidx.slice.widget.RemoteInputView.RemoteEditText.1
                         @Override // java.lang.Runnable
-                        public void run() {
+                        public final void run() {
                             inputMethodManager.viewClicked(RemoteEditText.this);
                             inputMethodManager.showSoftInput(RemoteEditText.this, 0);
                         }
@@ -98,71 +115,105 @@ public class RemoteInputView extends LinearLayout implements View.OnClickListene
         }
 
         @Override // android.widget.TextView, android.view.View
-        public void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
-            super.onFocusChanged(focused, direction, previouslyFocusedRect);
-            if (!focused) {
+        public final void onFocusChanged(boolean z, int i, Rect rect) {
+            super.onFocusChanged(z, i, rect);
+            if (!z) {
                 defocusIfNeeded();
             }
         }
 
-        @Override // android.widget.TextView, android.view.View, android.view.KeyEvent.Callback
-        public boolean onKeyDown(int keyCode, KeyEvent event) {
-            if (keyCode == 4) {
-                return true;
-            }
-            return super.onKeyDown(keyCode, event);
-        }
-
-        @Override // android.widget.TextView, android.view.View, android.view.KeyEvent.Callback
-        public boolean onKeyUp(int keyCode, KeyEvent event) {
-            if (keyCode != 4) {
-                return super.onKeyUp(keyCode, event);
-            }
-            defocusIfNeeded();
-            return true;
-        }
-
         @Override // android.widget.TextView, android.view.View
-        public void onVisibilityChanged(View changedView, int visibility) {
-            super.onVisibilityChanged(changedView, visibility);
+        public final void onVisibilityChanged(View view, int i) {
+            super.onVisibilityChanged(view, i);
             if (!isShown()) {
                 defocusIfNeeded();
             }
         }
 
-        @Override // android.widget.TextView
-        public void setCustomSelectionActionModeCallback(ActionMode.Callback actionModeCallback) {
-            super.setCustomSelectionActionModeCallback(actionModeCallback);
-        }
-
-        public void setInnerFocusable(boolean focusable) {
-            setFocusableInTouchMode(focusable);
-            setFocusable(focusable);
-            setCursorVisible(focusable);
-            if (focusable) {
+        public final void setInnerFocusable(boolean z) {
+            setFocusableInTouchMode(z);
+            setFocusable(z);
+            setCursorVisible(z);
+            if (z) {
                 requestFocus();
                 setBackground(this.mBackground);
                 return;
             }
             setBackground(null);
         }
-    }
 
-    public RemoteInputView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        @Override // android.widget.TextView
+        public final void setCustomSelectionActionModeCallback(ActionMode.Callback callback) {
+            super.setCustomSelectionActionModeCallback(callback);
+        }
     }
 
     @Override // android.text.TextWatcher
-    public void afterTextChanged(Editable s) {
+    public final void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+    }
+
+    @Override // android.text.TextWatcher
+    public final void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+    }
+
+    public final void reset() {
+        this.mResetting = true;
+        this.mEditText.getText().clear();
+        this.mEditText.setEnabled(true);
+        this.mSendButton.setVisibility(0);
+        this.mProgressBar.setVisibility(4);
         updateSendButton();
+        setVisibility(4);
+        this.mResetting = false;
     }
 
-    @Override // android.text.TextWatcher
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    @Override // android.view.View.OnClickListener
+    public final void onClick(View view) {
+        if (view == this.mSendButton) {
+            sendRemoteInput();
+        }
+    }
+
+    @Override // android.view.ViewGroup
+    public final boolean onRequestSendAccessibilityEvent(View view, AccessibilityEvent accessibilityEvent) {
+        if (!this.mResetting || view != this.mEditText) {
+            return super.onRequestSendAccessibilityEvent(view, accessibilityEvent);
+        }
+        return false;
+    }
+
+    public final void sendRemoteInput() {
+        Bundle bundle = new Bundle();
+        bundle.putString(this.mRemoteInput.getResultKey(), this.mEditText.getText().toString());
+        Intent addFlags = new Intent().addFlags(268435456);
+        RemoteInput.addResultsToIntent(this.mRemoteInputs, addFlags, bundle);
+        this.mEditText.setEnabled(false);
+        this.mSendButton.setVisibility(4);
+        this.mProgressBar.setVisibility(0);
+        this.mEditText.mShowImeOnInputConnection = false;
+        try {
+            this.mAction.fireActionInternal(getContext(), addFlags);
+            reset();
+        } catch (PendingIntent.CanceledException e) {
+            Log.i("RemoteInput", "Unable to send remote input result", e);
+            Toast.makeText(getContext(), "Failure sending pending intent for inline reply :(", 0).show();
+            reset();
+        }
+    }
+
+    public final void updateSendButton() {
+        boolean z;
+        ImageButton imageButton = this.mSendButton;
+        if (this.mEditText.getText().length() != 0) {
+            z = true;
+        } else {
+            z = false;
+        }
+        imageButton.setEnabled(z);
     }
 
     @Override // android.view.ViewGroup, android.view.View
-    public void dispatchFinishTemporaryDetach() {
+    public final void dispatchFinishTemporaryDetach() {
         if (isAttachedToWindow()) {
             RemoteEditText remoteEditText = this.mEditText;
             attachViewToParent(remoteEditText, 0, remoteEditText.getLayoutParams());
@@ -173,20 +224,13 @@ public class RemoteInputView extends LinearLayout implements View.OnClickListene
     }
 
     @Override // android.view.ViewGroup, android.view.View
-    public void dispatchStartTemporaryDetach() {
+    public final void dispatchStartTemporaryDetach() {
         super.dispatchStartTemporaryDetach();
         detachViewFromParent(this.mEditText);
     }
 
-    @Override // android.view.View.OnClickListener
-    public void onClick(View v) {
-        if (v == this.mSendButton) {
-            sendRemoteInput();
-        }
-    }
-
     @Override // android.view.View
-    public void onFinishInflate() {
+    public final void onFinishInflate() {
         super.onFinishInflate();
         this.mProgressBar = (ProgressBar) findViewById(R.id.remote_input_progress);
         ImageButton imageButton = (ImageButton) findViewById(R.id.remote_input_send);
@@ -201,7 +245,7 @@ public class RemoteInputView extends LinearLayout implements View.OnClickListene
                 Code decompiled incorrectly, please refer to instructions dump.
                 To view partially-correct add '--show-bad-code' argument
             */
-            public boolean onEditorAction(android.widget.TextView r4, int r5, android.view.KeyEvent r6) {
+            public final boolean onEditorAction(android.widget.TextView r4, int r5, android.view.KeyEvent r6) {
                 /*
                     r3 = this;
                     r4 = 1
@@ -266,55 +310,18 @@ public class RemoteInputView extends LinearLayout implements View.OnClickListene
         this.mEditText.mRemoteInputView = this;
     }
 
-    @Override // android.view.ViewGroup
-    public boolean onRequestSendAccessibilityEvent(View child, AccessibilityEvent event) {
-        if (!this.mResetting || child != this.mEditText) {
-            return super.onRequestSendAccessibilityEvent(child, event);
-        }
-        return false;
-    }
-
-    @Override // android.text.TextWatcher
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-    }
-
     @Override // android.view.View
-    public boolean onTouchEvent(MotionEvent event) {
-        super.onTouchEvent(event);
+    public final boolean onTouchEvent(MotionEvent motionEvent) {
+        super.onTouchEvent(motionEvent);
         return true;
     }
 
-    public final void reset() {
-        this.mResetting = true;
-        this.mEditText.getText().clear();
-        this.mEditText.setEnabled(true);
-        this.mSendButton.setVisibility(0);
-        this.mProgressBar.setVisibility(4);
+    public RemoteInputView(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet);
+    }
+
+    @Override // android.text.TextWatcher
+    public final void afterTextChanged(Editable editable) {
         updateSendButton();
-        setVisibility(4);
-        this.mResetting = false;
-    }
-
-    public void sendRemoteInput() {
-        Bundle bundle = new Bundle();
-        bundle.putString(this.mRemoteInput.getResultKey(), this.mEditText.getText().toString());
-        Intent addFlags = new Intent().addFlags(268435456);
-        RemoteInput.addResultsToIntent(this.mRemoteInputs, addFlags, bundle);
-        this.mEditText.setEnabled(false);
-        this.mSendButton.setVisibility(4);
-        this.mProgressBar.setVisibility(0);
-        this.mEditText.mShowImeOnInputConnection = false;
-        try {
-            this.mAction.fireActionInternal(getContext(), addFlags);
-            reset();
-        } catch (PendingIntent.CanceledException e) {
-            Log.i("RemoteInput", "Unable to send remote input result", e);
-            Toast.makeText(getContext(), "Failure sending pending intent for inline reply :(", 0).show();
-            reset();
-        }
-    }
-
-    public final void updateSendButton() {
-        this.mSendButton.setEnabled(this.mEditText.getText().length() != 0);
     }
 }

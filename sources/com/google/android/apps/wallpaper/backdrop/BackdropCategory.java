@@ -1,9 +1,11 @@
 package com.google.android.apps.wallpaper.backdrop;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 import android.util.Log;
+import androidx.cardview.R$style;
 import com.android.volley.VolleyError;
 import com.android.wallpaper.asset.Asset;
 import com.android.wallpaper.model.WallpaperCategory;
@@ -11,24 +13,24 @@ import com.android.wallpaper.model.WallpaperInfo;
 import com.android.wallpaper.model.WallpaperReceiver;
 import com.android.wallpaper.model.WallpaperRotationInitializer;
 import com.android.wallpaper.module.GoogleWallpapersInjector;
-import com.android.wallpaper.module.InjectorProvider;
-import com.android.wallpaper.network.ServerFetcher;
+import com.android.wallpaper.network.ServerFetcher$ResultsCallback;
 import com.google.android.apps.wallpaper.asset.NetworkAsset;
 import com.google.android.apps.wallpaper.backdrop.BackdropWallpaperRotationInitializer;
 import com.google.android.apps.wallpaper.model.NetworkWallpaperInfo;
 import com.google.chrome.dongle.imax.wallpaper2.protos.ImaxWallpaperProto$Attribution;
 import com.google.chrome.dongle.imax.wallpaper2.protos.ImaxWallpaperProto$Collection;
 import com.google.chrome.dongle.imax.wallpaper2.protos.ImaxWallpaperProto$Image;
+import com.google.protobuf.Internal;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 /* loaded from: classes.dex */
-public class BackdropCategory extends WallpaperCategory {
+public final class BackdropCategory extends WallpaperCategory {
     public final String mCollectionName;
-    public final FifeImageUrlFactory mFifeImageUrlFactory = FifeImageUrlFactory.getInstance();
-    public final List<WallpaperReceiver> mPendingWallpapersReceivers = new ArrayList();
-    public WallpaperRotationInitializer mRotationInitializer;
-    public Asset mThumbAsset;
+    public final FifeImageUrlFactory mFifeImageUrlFactory;
+    public final ArrayList mPendingWallpapersReceivers;
+    public BackdropWallpaperRotationInitializer mRotationInitializer;
+    public NetworkAsset mThumbAsset;
     public final String mThumbUrl;
 
     /* loaded from: classes.dex */
@@ -38,15 +40,15 @@ public class BackdropCategory extends WallpaperCategory {
         public final String mCollectionId;
         public final List<WallpaperInfo> mWallpapers;
 
-        public ParseBackdropImagesAsyncTask(List<ImaxWallpaperProto$Image> list, Context context, List<WallpaperInfo> list2, String str) {
-            this.mBackdropImages = list;
+        public ParseBackdropImagesAsyncTask(Internal.ProtobufList protobufList, Context context, List list, String str) {
+            this.mBackdropImages = protobufList;
             this.mAppContext = context.getApplicationContext();
-            this.mWallpapers = list2;
+            this.mWallpapers = list;
             this.mCollectionId = str;
         }
 
         @Override // android.os.AsyncTask
-        public Void doInBackground(Void[] voidArr) {
+        public final Void doInBackground(Void[] voidArr) {
             synchronized (BackdropCategory.this.mWallpapersLock) {
                 if (this.mWallpapers.size() > 0) {
                     return null;
@@ -59,16 +61,25 @@ public class BackdropCategory extends WallpaperCategory {
                     if (arrayList.size() == 0) {
                         arrayList.add(BackdropCategory.this.mTitle);
                     }
-                    this.mWallpapers.add(new NetworkWallpaperInfo(imaxWallpaperProto$Image.getImageUrl(), BackdropCategory.this.mFifeImageUrlFactory.createFullSizedUri(this.mAppContext, imaxWallpaperProto$Image.getImageUrl()), BackdropCategory.this.mFifeImageUrlFactory.createThumbUri(this.mAppContext, imaxWallpaperProto$Image.getImageUrl()), BackdropCategory.this.mFifeImageUrlFactory.createTinyUri(imaxWallpaperProto$Image.getImageUrl()), BackdropCategory.this.mFifeImageUrlFactory.createDesktopUri(this.mAppContext, imaxWallpaperProto$Image.getImageUrl()), arrayList, imaxWallpaperProto$Image.getActionUrl(), this.mCollectionId, String.valueOf(imaxWallpaperProto$Image.getAssetId()), imaxWallpaperProto$Image.getType().getNumber()));
+                    Uri createFullSizedUri = BackdropCategory.this.mFifeImageUrlFactory.createFullSizedUri(this.mAppContext, imaxWallpaperProto$Image.getImageUrl());
+                    Uri createThumbUri = BackdropCategory.this.mFifeImageUrlFactory.createThumbUri(this.mAppContext, imaxWallpaperProto$Image.getImageUrl());
+                    Uri createTinyUri = BackdropCategory.this.mFifeImageUrlFactory.createTinyUri(imaxWallpaperProto$Image.getImageUrl());
+                    FifeImageUrlFactory fifeImageUrlFactory = BackdropCategory.this.mFifeImageUrlFactory;
+                    Context context = this.mAppContext;
+                    String imageUrl = imaxWallpaperProto$Image.getImageUrl();
+                    fifeImageUrlFactory.getClass();
+                    this.mWallpapers.add(new NetworkWallpaperInfo(imaxWallpaperProto$Image.getImageUrl(), createFullSizedUri, createThumbUri, createTinyUri, FifeImageUrlFactory.createDesktopUri(context, imageUrl), arrayList, imaxWallpaperProto$Image.getActionUrl(), this.mCollectionId, String.valueOf(imaxWallpaperProto$Image.getAssetId()), imaxWallpaperProto$Image.getType().getNumber()));
                 }
                 return null;
             }
         }
 
         @Override // android.os.AsyncTask
-        public void onPostExecute(Void r4) {
+        public final void onPostExecute(Void r4) {
             synchronized (BackdropCategory.this.mWallpapersLock) {
-                for (WallpaperReceiver wallpaperReceiver : BackdropCategory.this.mPendingWallpapersReceivers) {
+                Iterator it = BackdropCategory.this.mPendingWallpapersReceivers.iterator();
+                while (it.hasNext()) {
+                    WallpaperReceiver wallpaperReceiver = (WallpaperReceiver) it.next();
                     if (wallpaperReceiver != null) {
                         wallpaperReceiver.onWallpapersReceived(this.mWallpapers);
                     }
@@ -78,36 +89,77 @@ public class BackdropCategory extends WallpaperCategory {
         }
     }
 
+    @Override // com.android.wallpaper.model.WallpaperCategory, com.android.wallpaper.model.Category
+    public final Asset getThumbnail(Context context) {
+        if (this.mThumbAsset == null) {
+            this.mThumbAsset = new NetworkAsset(context, this.mFifeImageUrlFactory.createThumbUri(context, this.mThumbUrl), this.mFifeImageUrlFactory.createTinyUri(this.mThumbUrl));
+        }
+        return this.mThumbAsset;
+    }
+
+    @Override // com.android.wallpaper.model.Category
+    public final WallpaperRotationInitializer getWallpaperRotationInitializer() {
+        BackdropWallpaperRotationInitializer.Factory factory;
+        String str = this.mCollectionId;
+        if (str != null && str.endsWith("_no_rotate")) {
+            return null;
+        }
+        if (this.mRotationInitializer == null) {
+            synchronized (WallpaperRotationInitializerFactory.class) {
+                if (WallpaperRotationInitializerFactory.sInstance == null) {
+                    WallpaperRotationInitializerFactory.sInstance = new BackdropWallpaperRotationInitializer.Factory();
+                }
+                factory = WallpaperRotationInitializerFactory.sInstance;
+            }
+            String str2 = this.mCollectionId;
+            String str3 = this.mCollectionName;
+            factory.getClass();
+            this.mRotationInitializer = new BackdropWallpaperRotationInitializer(str2, str3);
+        }
+        return this.mRotationInitializer;
+    }
+
     public BackdropCategory(ImaxWallpaperProto$Collection imaxWallpaperProto$Collection, int i) {
         super(imaxWallpaperProto$Collection.getCollectionName(), imaxWallpaperProto$Collection.getCollectionId(), new ArrayList(), i);
         this.mCollectionName = imaxWallpaperProto$Collection.getCollectionName();
-        this.mThumbUrl = imaxWallpaperProto$Collection.getPreview(0).getImageUrl();
+        this.mThumbUrl = imaxWallpaperProto$Collection.getPreview().getImageUrl();
+        if (FifeImageUrlFactory.sInstance == null) {
+            FifeImageUrlFactory.sInstance = new FifeImageUrlFactory();
+        }
+        this.mFifeImageUrlFactory = FifeImageUrlFactory.sInstance;
+        this.mPendingWallpapersReceivers = new ArrayList();
     }
 
+    /* JADX WARN: Type inference failed for: r7v4, types: [com.google.android.apps.wallpaper.backdrop.BackdropCategory$2] */
     @Override // com.android.wallpaper.model.WallpaperCategory
-    public void fetchWallpapers(final Context context, WallpaperReceiver wallpaperReceiver, boolean z) {
-        ServerFetcher serverFetcher = ((GoogleWallpapersInjector) InjectorProvider.getInjector()).getServerFetcher(context);
+    public final void fetchWallpapers(final Context context, WallpaperReceiver wallpaperReceiver, boolean z) {
+        boolean z2;
+        BackdropFetcher serverFetcher = ((GoogleWallpapersInjector) R$style.getInjector()).getServerFetcher(context);
         synchronized (this.mWallpapersLock) {
             final List<WallpaperInfo> list = this.mWallpapers;
             if (list.size() <= 0 || wallpaperReceiver == null || z) {
                 if (z) {
                     list.clear();
                 }
-                boolean z2 = this.mPendingWallpapersReceivers.size() > 0;
+                if (this.mPendingWallpapersReceivers.size() > 0) {
+                    z2 = true;
+                } else {
+                    z2 = false;
+                }
                 this.mPendingWallpapersReceivers.add(wallpaperReceiver);
                 if (!z2) {
                     final String str = this.mCollectionId;
-                    ((BackdropFetcher) serverFetcher).fetchImagesInCollection(context, str, new ServerFetcher.ResultsCallback<ImaxWallpaperProto$Image>() { // from class: com.google.android.apps.wallpaper.backdrop.BackdropCategory.2
-                        @Override // com.android.wallpaper.network.ServerFetcher.ResultsCallback
-                        public void onError(VolleyError volleyError) {
+                    serverFetcher.fetchImagesInCollection(context, str, new ServerFetcher$ResultsCallback<ImaxWallpaperProto$Image>() { // from class: com.google.android.apps.wallpaper.backdrop.BackdropCategory.2
+                        @Override // com.android.wallpaper.network.ServerFetcher$ResultsCallback
+                        public final void onError(VolleyError volleyError) {
                             StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Unable to fetch Backdrop wallpapers for the collection ID: ");
                             m.append(BackdropCategory.this.mCollectionId);
                             Log.e("BackdropCategory", m.toString(), volleyError);
                         }
 
-                        @Override // com.android.wallpaper.network.ServerFetcher.ResultsCallback
-                        public void onSuccess(List<ImaxWallpaperProto$Image> list2) {
-                            new ParseBackdropImagesAsyncTask(list2, context, list, str).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Void[0]);
+                        @Override // com.android.wallpaper.network.ServerFetcher$ResultsCallback
+                        public final void onSuccess(Internal.ProtobufList protobufList) {
+                            new ParseBackdropImagesAsyncTask(protobufList, context, list, str).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Void[0]);
                         }
                     });
                     return;
@@ -116,29 +168,5 @@ public class BackdropCategory extends WallpaperCategory {
             }
             wallpaperReceiver.onWallpapersReceived(list);
         }
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperCategory, com.android.wallpaper.model.Category
-    public Asset getThumbnail(Context context) {
-        if (this.mThumbAsset == null) {
-            this.mThumbAsset = new NetworkAsset(context, this.mFifeImageUrlFactory.createThumbUri(context, this.mThumbUrl), this.mFifeImageUrlFactory.createTinyUri(this.mThumbUrl));
-        }
-        return this.mThumbAsset;
-    }
-
-    @Override // com.android.wallpaper.model.Category
-    public WallpaperRotationInitializer getWallpaperRotationInitializer() {
-        String str = this.mCollectionId;
-        if (str != null && str.endsWith("_no_rotate")) {
-            return null;
-        }
-        if (this.mRotationInitializer == null) {
-            WallpaperRotationInitializerFactory wallpaperRotationInitializerFactory = WallpaperRotationInitializerFactory.getInstance();
-            String str2 = this.mCollectionId;
-            String str3 = this.mCollectionName;
-            Objects.requireNonNull((BackdropWallpaperRotationInitializer.Factory) wallpaperRotationInitializerFactory);
-            this.mRotationInitializer = new BackdropWallpaperRotationInitializer(str2, str3);
-        }
-        return this.mRotationInitializer;
     }
 }

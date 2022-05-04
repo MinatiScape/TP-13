@@ -8,15 +8,17 @@ import android.os.IInterface;
 import android.os.Looper;
 import android.os.RemoteException;
 import android.util.Log;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.internal.zzaa;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.internal.zzdb;
 import com.google.android.gms.common.internal.BaseGmsClient;
 import com.google.android.gms.common.internal.ClientSettings;
 import com.google.android.gms.common.internal.zzav;
 import com.google.android.gms.common.internal.zzl;
 import com.google.android.gms.signin.SignInOptions;
 import com.google.android.gms.signin.zzd;
+/* compiled from: SignInClientImpl.java */
 /* loaded from: classes.dex */
 public final class zzelu extends zzl<zzels> implements zzd {
     public final boolean zzc;
@@ -59,35 +61,29 @@ public final class zzelu extends zzl<zzels> implements zzd {
         return "com.google.android.gms.signin.service.START";
     }
 
-    @Override // com.google.android.gms.common.internal.BaseGmsClient, com.google.android.gms.common.api.Api.Client
-    public final boolean requiresSignIn() {
-        return this.zzc;
-    }
-
     @Override // com.google.android.gms.common.api.Api.Client
-    public final int zza() {
-        return 12529000;
+    public final void zza() {
     }
 
     @Override // com.google.android.gms.signin.zzd
     public final void zza(zzelq zzelqVar) {
-        try {
-            Account account = this.zzd.zza;
-            if (account == null) {
-                account = new Account("<<default account>>", "com.google");
-            }
-            GoogleSignInAccount googleSignInAccount = null;
-            if ("<<default account>>".equals(account.name)) {
-                googleSignInAccount = zzaa.zza(this.zzi).zza();
-            }
-            ((zzels) zzag()).zza(new zzelv(new zzav(account, this.zzf.intValue(), googleSignInAccount)), zzelqVar);
-        } catch (RemoteException e) {
-            Log.w("SignInClientImpl", "Remote service probably died when signIn is called");
+        if (zzelqVar != null) {
             try {
-                zzelqVar.zza(new zzelx());
-            } catch (RemoteException unused) {
-                Log.wtf("SignInClientImpl", "ISignInCallbacks#onSignInComplete should be executed from the same process, unexpected RemoteException.", e);
+                Account account = this.zzd.zza;
+                if (account == null) {
+                    account = new Account("<<default account>>", "com.google");
+                }
+                ((zzels) zzag()).zza(new zzelv(1, new zzav(2, account, this.zzf.intValue(), "<<default account>>".equals(account.name) ? zzaa.zza(this.zzi).zza() : null)), zzelqVar);
+            } catch (RemoteException e) {
+                Log.w("SignInClientImpl", "Remote service probably died when signIn is called");
+                try {
+                    ((zzdb) zzelqVar).zza(new zzelx(1, new ConnectionResult(8, null), null));
+                } catch (RemoteException unused) {
+                    Log.wtf("SignInClientImpl", "ISignInCallbacks#onSignInComplete should be executed from the same process, unexpected RemoteException.", e);
+                }
             }
+        } else {
+            throw new NullPointerException("Expecting a valid ISignInCallbacks");
         }
     }
 
@@ -114,5 +110,10 @@ public final class zzelu extends zzl<zzels> implements zzd {
             return (zzels) queryLocalInterface;
         }
         return new zzelt(iBinder);
+    }
+
+    @Override // com.google.android.gms.common.internal.BaseGmsClient, com.google.android.gms.common.api.Api.Client
+    public final boolean requiresSignIn() {
+        return this.zzc;
     }
 }

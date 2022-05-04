@@ -5,6 +5,7 @@ import com.android.wallpaper.model.WallpaperCategory;
 import com.android.wallpaper.module.DefaultCategoryProvider;
 import java.util.Collections;
 import java.util.function.Function;
+/* compiled from: R8$$SyntheticClass */
 /* loaded from: classes.dex */
 public final /* synthetic */ class DefaultCategoryProvider$FetchCategoriesTask$$ExternalSyntheticLambda1 implements Function {
     public static final /* synthetic */ DefaultCategoryProvider$FetchCategoriesTask$$ExternalSyntheticLambda1 INSTANCE = new DefaultCategoryProvider$FetchCategoriesTask$$ExternalSyntheticLambda1();

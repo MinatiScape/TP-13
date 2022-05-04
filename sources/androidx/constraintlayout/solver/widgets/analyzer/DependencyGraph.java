@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 /* loaded from: classes.dex */
-public class DependencyGraph {
+public final class DependencyGraph {
     public ConstraintWidgetContainer container;
     public ConstraintWidgetContainer mContainer;
     public boolean mNeedBuildGraph = true;
@@ -22,83 +22,91 @@ public class DependencyGraph {
     public BasicMeasure.Measure mMeasure = new BasicMeasure.Measure();
     public ArrayList<RunGroup> mGroups = new ArrayList<>();
 
-    public DependencyGraph(ConstraintWidgetContainer constraintWidgetContainer) {
-        new ArrayList();
-        this.container = constraintWidgetContainer;
-        this.mContainer = constraintWidgetContainer;
-    }
-
-    public final void applyGroup(DependencyNode dependencyNode, int i, int i2, DependencyNode dependencyNode2, ArrayList<RunGroup> arrayList, RunGroup runGroup) {
+    public final void applyGroup(DependencyNode dependencyNode, int i, int i2, ArrayList arrayList, RunGroup runGroup) {
         WidgetRun widgetRun = dependencyNode.run;
         if (widgetRun.runGroup == null) {
             ConstraintWidgetContainer constraintWidgetContainer = this.container;
-            if (!(widgetRun == constraintWidgetContainer.horizontalRun || widgetRun == constraintWidgetContainer.verticalRun)) {
+            if (widgetRun != constraintWidgetContainer.horizontalRun && widgetRun != constraintWidgetContainer.verticalRun) {
                 if (runGroup == null) {
-                    runGroup = new RunGroup(widgetRun, i2);
+                    runGroup = new RunGroup(widgetRun);
                     arrayList.add(runGroup);
                 }
                 widgetRun.runGroup = runGroup;
                 runGroup.runs.add(widgetRun);
-                for (Dependency dependency : widgetRun.start.dependencies) {
+                Iterator it = widgetRun.start.dependencies.iterator();
+                while (it.hasNext()) {
+                    Dependency dependency = (Dependency) it.next();
                     if (dependency instanceof DependencyNode) {
-                        applyGroup((DependencyNode) dependency, i, 0, dependencyNode2, arrayList, runGroup);
+                        applyGroup((DependencyNode) dependency, i, 0, arrayList, runGroup);
                     }
                 }
-                for (Dependency dependency2 : widgetRun.end.dependencies) {
+                Iterator it2 = widgetRun.end.dependencies.iterator();
+                while (it2.hasNext()) {
+                    Dependency dependency2 = (Dependency) it2.next();
                     if (dependency2 instanceof DependencyNode) {
-                        applyGroup((DependencyNode) dependency2, i, 1, dependencyNode2, arrayList, runGroup);
+                        applyGroup((DependencyNode) dependency2, i, 1, arrayList, runGroup);
                     }
                 }
                 if (i == 1 && (widgetRun instanceof VerticalWidgetRun)) {
-                    for (Dependency dependency3 : ((VerticalWidgetRun) widgetRun).baseline.dependencies) {
+                    Iterator it3 = ((VerticalWidgetRun) widgetRun).baseline.dependencies.iterator();
+                    while (it3.hasNext()) {
+                        Dependency dependency3 = (Dependency) it3.next();
                         if (dependency3 instanceof DependencyNode) {
-                            applyGroup((DependencyNode) dependency3, i, 2, dependencyNode2, arrayList, runGroup);
+                            applyGroup((DependencyNode) dependency3, i, 2, arrayList, runGroup);
                         }
                     }
                 }
-                for (DependencyNode dependencyNode3 : widgetRun.start.targets) {
-                    applyGroup(dependencyNode3, i, 0, dependencyNode2, arrayList, runGroup);
+                Iterator it4 = widgetRun.start.targets.iterator();
+                while (it4.hasNext()) {
+                    applyGroup((DependencyNode) it4.next(), i, 0, arrayList, runGroup);
                 }
-                for (DependencyNode dependencyNode4 : widgetRun.end.targets) {
-                    applyGroup(dependencyNode4, i, 1, dependencyNode2, arrayList, runGroup);
+                Iterator it5 = widgetRun.end.targets.iterator();
+                while (it5.hasNext()) {
+                    applyGroup((DependencyNode) it5.next(), i, 1, arrayList, runGroup);
                 }
                 if (i == 1 && (widgetRun instanceof VerticalWidgetRun)) {
-                    for (DependencyNode dependencyNode5 : ((VerticalWidgetRun) widgetRun).baseline.targets) {
-                        applyGroup(dependencyNode5, i, 2, dependencyNode2, arrayList, runGroup);
+                    Iterator it6 = ((VerticalWidgetRun) widgetRun).baseline.targets.iterator();
+                    while (it6.hasNext()) {
+                        applyGroup((DependencyNode) it6.next(), i, 2, arrayList, runGroup);
                     }
                 }
             }
         }
     }
 
-    public final boolean basicMeasureWidgets(ConstraintWidgetContainer constraintWidgetContainer) {
+    public final void basicMeasureWidgets(ConstraintWidgetContainer constraintWidgetContainer) {
+        ConstraintWidget.DimensionBehaviour dimensionBehaviour;
+        ConstraintWidget.DimensionBehaviour[] dimensionBehaviourArr;
+        ConstraintWidget.DimensionBehaviour dimensionBehaviour2;
+        ConstraintWidget.DimensionBehaviour dimensionBehaviour3;
         int i;
-        int i2;
-        int i3;
-        int i4;
+        ConstraintWidget.DimensionBehaviour dimensionBehaviour4;
+        ConstraintWidget.DimensionBehaviour dimensionBehaviour5 = ConstraintWidget.DimensionBehaviour.MATCH_CONSTRAINT;
+        ConstraintWidget.DimensionBehaviour dimensionBehaviour6 = ConstraintWidget.DimensionBehaviour.WRAP_CONTENT;
+        ConstraintWidget.DimensionBehaviour dimensionBehaviour7 = ConstraintWidget.DimensionBehaviour.FIXED;
         Iterator<ConstraintWidget> it = constraintWidgetContainer.mChildren.iterator();
         while (it.hasNext()) {
             ConstraintWidget next = it.next();
-            int[] iArr = next.mListDimensionBehaviors;
-            int i5 = iArr[0];
-            int i6 = iArr[1];
+            ConstraintWidget.DimensionBehaviour[] dimensionBehaviourArr2 = next.mListDimensionBehaviors;
+            ConstraintWidget.DimensionBehaviour dimensionBehaviour8 = dimensionBehaviourArr2[0];
+            ConstraintWidget.DimensionBehaviour dimensionBehaviour9 = dimensionBehaviourArr2[1];
             if (next.mVisibility == 8) {
                 next.measured = true;
             } else {
                 float f = next.mMatchConstraintPercentWidth;
-                if (f < 1.0f && i5 == 3) {
+                if (f < 1.0f && dimensionBehaviour8 == dimensionBehaviour5) {
                     next.mMatchConstraintDefaultWidth = 2;
                 }
                 float f2 = next.mMatchConstraintPercentHeight;
-                if (f2 < 1.0f && i6 == 3) {
+                if (f2 < 1.0f && dimensionBehaviour9 == dimensionBehaviour5) {
                     next.mMatchConstraintDefaultHeight = 2;
                 }
                 if (next.mDimensionRatio > HingeAngleProviderKt.FULLY_CLOSED_DEGREES) {
-                    if (i5 == 3 && (i6 == 2 || i6 == 1)) {
+                    if (dimensionBehaviour8 == dimensionBehaviour5 && (dimensionBehaviour9 == dimensionBehaviour6 || dimensionBehaviour9 == dimensionBehaviour7)) {
                         next.mMatchConstraintDefaultWidth = 3;
-                    } else if (i6 == 3 && (i5 == 2 || i5 == 1)) {
+                    } else if (dimensionBehaviour9 == dimensionBehaviour5 && (dimensionBehaviour8 == dimensionBehaviour6 || dimensionBehaviour8 == dimensionBehaviour7)) {
                         next.mMatchConstraintDefaultHeight = 3;
-                    } else if (i5 == 3 && i6 == 3) {
+                    } else if (dimensionBehaviour8 == dimensionBehaviour5 && dimensionBehaviour9 == dimensionBehaviour5) {
                         if (next.mMatchConstraintDefaultWidth == 0) {
                             next.mMatchConstraintDefaultWidth = 3;
                         }
@@ -107,55 +115,61 @@ public class DependencyGraph {
                         }
                     }
                 }
-                int i7 = (i5 == 3 && next.mMatchConstraintDefaultWidth == 1 && (next.mLeft.mTarget == null || next.mRight.mTarget == null)) ? 2 : i5;
-                int i8 = (i6 == 3 && next.mMatchConstraintDefaultHeight == 1 && (next.mTop.mTarget == null || next.mBottom.mTarget == null)) ? 2 : i6;
+                if (dimensionBehaviour8 == dimensionBehaviour5 && next.mMatchConstraintDefaultWidth == 1 && (next.mLeft.mTarget == null || next.mRight.mTarget == null)) {
+                    dimensionBehaviour8 = dimensionBehaviour6;
+                }
+                if (dimensionBehaviour9 == dimensionBehaviour5 && next.mMatchConstraintDefaultHeight == 1 && (next.mTop.mTarget == null || next.mBottom.mTarget == null)) {
+                    dimensionBehaviour = dimensionBehaviour6;
+                } else {
+                    dimensionBehaviour = dimensionBehaviour9;
+                }
                 HorizontalWidgetRun horizontalWidgetRun = next.horizontalRun;
-                horizontalWidgetRun.dimensionBehavior = i7;
-                int i9 = next.mMatchConstraintDefaultWidth;
-                horizontalWidgetRun.matchConstraintsType = i9;
+                horizontalWidgetRun.dimensionBehavior = dimensionBehaviour8;
+                int i2 = next.mMatchConstraintDefaultWidth;
+                horizontalWidgetRun.matchConstraintsType = i2;
                 VerticalWidgetRun verticalWidgetRun = next.verticalRun;
-                verticalWidgetRun.dimensionBehavior = i8;
-                int i10 = next.mMatchConstraintDefaultHeight;
-                verticalWidgetRun.matchConstraintsType = i10;
-                if ((i7 == 4 || i7 == 1 || i7 == 2) && (i8 == 4 || i8 == 1 || i8 == 2)) {
+                verticalWidgetRun.dimensionBehavior = dimensionBehaviour;
+                int i3 = next.mMatchConstraintDefaultHeight;
+                verticalWidgetRun.matchConstraintsType = i3;
+                ConstraintWidget.DimensionBehaviour dimensionBehaviour10 = ConstraintWidget.DimensionBehaviour.MATCH_PARENT;
+                if ((dimensionBehaviour8 == dimensionBehaviour10 || dimensionBehaviour8 == dimensionBehaviour7 || dimensionBehaviour8 == dimensionBehaviour6) && (dimensionBehaviour == dimensionBehaviour10 || dimensionBehaviour == dimensionBehaviour7 || dimensionBehaviour == dimensionBehaviour6)) {
                     int width = next.getWidth();
-                    if (i7 == 4) {
-                        i = (constraintWidgetContainer.getWidth() - next.mLeft.mMargin) - next.mRight.mMargin;
-                        i2 = 1;
+                    if (dimensionBehaviour8 == dimensionBehaviour10) {
+                        width = (constraintWidgetContainer.getWidth() - next.mLeft.mMargin) - next.mRight.mMargin;
+                        dimensionBehaviour3 = dimensionBehaviour7;
                     } else {
-                        i = width;
-                        i2 = i7;
+                        dimensionBehaviour3 = dimensionBehaviour8;
                     }
                     int height = next.getHeight();
-                    if (i8 == 4) {
-                        i3 = (constraintWidgetContainer.getHeight() - next.mTop.mMargin) - next.mBottom.mMargin;
-                        i4 = 1;
+                    if (dimensionBehaviour == dimensionBehaviour10) {
+                        i = (constraintWidgetContainer.getHeight() - next.mTop.mMargin) - next.mBottom.mMargin;
+                        dimensionBehaviour4 = dimensionBehaviour7;
                     } else {
-                        i3 = height;
-                        i4 = i8;
+                        i = height;
+                        dimensionBehaviour4 = dimensionBehaviour;
                     }
-                    measure$enumunboxing$(next, i2, i, i4, i3);
+                    measure(next, dimensionBehaviour3, width, dimensionBehaviour4, i);
                     next.horizontalRun.dimension.resolve(next.getWidth());
                     next.verticalRun.dimension.resolve(next.getHeight());
                     next.measured = true;
                 } else {
-                    if (i7 == 3 && (i8 == 2 || i8 == 1)) {
-                        if (i9 == 3) {
-                            if (i8 == 2) {
-                                measure$enumunboxing$(next, 2, 0, 2, 0);
+                    if (dimensionBehaviour8 == dimensionBehaviour5 && (dimensionBehaviour == dimensionBehaviour6 || dimensionBehaviour == dimensionBehaviour7)) {
+                        if (i2 == 3) {
+                            if (dimensionBehaviour == dimensionBehaviour6) {
+                                measure(next, dimensionBehaviour6, 0, dimensionBehaviour6, 0);
                             }
                             int height2 = next.getHeight();
-                            measure$enumunboxing$(next, 1, (int) ((height2 * next.mDimensionRatio) + 0.5f), 1, height2);
+                            measure(next, dimensionBehaviour7, (int) ((height2 * next.mDimensionRatio) + 0.5f), dimensionBehaviour7, height2);
                             next.horizontalRun.dimension.resolve(next.getWidth());
                             next.verticalRun.dimension.resolve(next.getHeight());
                             next.measured = true;
-                        } else if (i9 == 1) {
-                            measure$enumunboxing$(next, 2, 0, i8, 0);
+                        } else if (i2 == 1) {
+                            measure(next, dimensionBehaviour6, 0, dimensionBehaviour, 0);
                             next.horizontalRun.dimension.wrapValue = next.getWidth();
-                        } else if (i9 == 2) {
-                            int[] iArr2 = constraintWidgetContainer.mListDimensionBehaviors;
-                            if (iArr2[0] == 1 || iArr2[0] == 4) {
-                                measure$enumunboxing$(next, 1, (int) ((f * constraintWidgetContainer.getWidth()) + 0.5f), i8, next.getHeight());
+                        } else if (i2 == 2) {
+                            ConstraintWidget.DimensionBehaviour dimensionBehaviour11 = constraintWidgetContainer.mListDimensionBehaviors[0];
+                            if (dimensionBehaviour11 == dimensionBehaviour7 || dimensionBehaviour11 == dimensionBehaviour10) {
+                                measure(next, dimensionBehaviour7, (int) ((f * constraintWidgetContainer.getWidth()) + 0.5f), dimensionBehaviour, next.getHeight());
                                 next.horizontalRun.dimension.resolve(next.getWidth());
                                 next.verticalRun.dimension.resolve(next.getHeight());
                                 next.measured = true;
@@ -163,34 +177,34 @@ public class DependencyGraph {
                         } else {
                             ConstraintAnchor[] constraintAnchorArr = next.mListAnchors;
                             if (constraintAnchorArr[0].mTarget == null || constraintAnchorArr[1].mTarget == null) {
-                                measure$enumunboxing$(next, 2, 0, i8, 0);
+                                measure(next, dimensionBehaviour6, 0, dimensionBehaviour, 0);
                                 next.horizontalRun.dimension.resolve(next.getWidth());
                                 next.verticalRun.dimension.resolve(next.getHeight());
                                 next.measured = true;
                             }
                         }
                     }
-                    if (i8 == 3 && (i7 == 2 || i7 == 1)) {
-                        if (i10 == 3) {
-                            if (i7 == 2) {
-                                measure$enumunboxing$(next, 2, 0, 2, 0);
+                    if (dimensionBehaviour == dimensionBehaviour5 && (dimensionBehaviour8 == dimensionBehaviour6 || dimensionBehaviour8 == dimensionBehaviour7)) {
+                        if (i3 == 3) {
+                            if (dimensionBehaviour8 == dimensionBehaviour6) {
+                                measure(next, dimensionBehaviour6, 0, dimensionBehaviour6, 0);
                             }
                             int width2 = next.getWidth();
                             float f3 = next.mDimensionRatio;
                             if (next.mDimensionRatioSide == -1) {
                                 f3 = 1.0f / f3;
                             }
-                            measure$enumunboxing$(next, 1, width2, 1, (int) ((width2 * f3) + 0.5f));
+                            measure(next, dimensionBehaviour7, width2, dimensionBehaviour7, (int) ((width2 * f3) + 0.5f));
                             next.horizontalRun.dimension.resolve(next.getWidth());
                             next.verticalRun.dimension.resolve(next.getHeight());
                             next.measured = true;
-                        } else if (i10 == 1) {
-                            measure$enumunboxing$(next, i7, 0, 2, 0);
+                        } else if (i3 == 1) {
+                            measure(next, dimensionBehaviour8, 0, dimensionBehaviour6, 0);
                             next.verticalRun.dimension.wrapValue = next.getHeight();
-                        } else if (i10 == 2) {
-                            int[] iArr3 = constraintWidgetContainer.mListDimensionBehaviors;
-                            if (iArr3[1] == 1 || iArr3[1] == 4) {
-                                measure$enumunboxing$(next, i7, next.getWidth(), 1, (int) ((f2 * constraintWidgetContainer.getHeight()) + 0.5f));
+                        } else if (i3 == 2) {
+                            ConstraintWidget.DimensionBehaviour dimensionBehaviour12 = constraintWidgetContainer.mListDimensionBehaviors[1];
+                            if (dimensionBehaviour12 == dimensionBehaviour7 || dimensionBehaviour12 == dimensionBehaviour10) {
+                                measure(next, dimensionBehaviour8, next.getWidth(), dimensionBehaviour7, (int) ((f2 * constraintWidgetContainer.getHeight()) + 0.5f));
                                 next.horizontalRun.dimension.resolve(next.getWidth());
                                 next.verticalRun.dimension.resolve(next.getHeight());
                                 next.measured = true;
@@ -198,37 +212,34 @@ public class DependencyGraph {
                         } else {
                             ConstraintAnchor[] constraintAnchorArr2 = next.mListAnchors;
                             if (constraintAnchorArr2[2].mTarget == null || constraintAnchorArr2[3].mTarget == null) {
-                                measure$enumunboxing$(next, 2, 0, i8, 0);
+                                measure(next, dimensionBehaviour6, 0, dimensionBehaviour, 0);
                                 next.horizontalRun.dimension.resolve(next.getWidth());
                                 next.verticalRun.dimension.resolve(next.getHeight());
                                 next.measured = true;
                             }
                         }
                     }
-                    if (i7 == 3 && i8 == 3) {
-                        if (i9 == 1 || i10 == 1) {
-                            measure$enumunboxing$(next, 2, 0, 2, 0);
+                    if (dimensionBehaviour8 == dimensionBehaviour5 && dimensionBehaviour == dimensionBehaviour5) {
+                        if (i2 == 1 || i3 == 1) {
+                            measure(next, dimensionBehaviour6, 0, dimensionBehaviour6, 0);
                             next.horizontalRun.dimension.wrapValue = next.getWidth();
                             next.verticalRun.dimension.wrapValue = next.getHeight();
-                        } else if (i10 == 2 && i9 == 2) {
-                            int[] iArr4 = constraintWidgetContainer.mListDimensionBehaviors;
-                            if (iArr4[0] == 1 || iArr4[0] == 1) {
-                                if (iArr4[1] == 1 || iArr4[1] == 1) {
-                                    measure$enumunboxing$(next, 1, (int) ((f * constraintWidgetContainer.getWidth()) + 0.5f), 1, (int) ((f2 * constraintWidgetContainer.getHeight()) + 0.5f));
-                                    next.horizontalRun.dimension.resolve(next.getWidth());
-                                    next.verticalRun.dimension.resolve(next.getHeight());
-                                    next.measured = true;
-                                }
+                        } else if (i3 == 2 && i2 == 2 && ((dimensionBehaviour2 = (dimensionBehaviourArr = constraintWidgetContainer.mListDimensionBehaviors)[0]) == dimensionBehaviour7 || dimensionBehaviour2 == dimensionBehaviour7)) {
+                            ConstraintWidget.DimensionBehaviour dimensionBehaviour13 = dimensionBehaviourArr[1];
+                            if (dimensionBehaviour13 == dimensionBehaviour7 || dimensionBehaviour13 == dimensionBehaviour7) {
+                                measure(next, dimensionBehaviour7, (int) ((f * constraintWidgetContainer.getWidth()) + 0.5f), dimensionBehaviour7, (int) ((f2 * constraintWidgetContainer.getHeight()) + 0.5f));
+                                next.horizontalRun.dimension.resolve(next.getWidth());
+                                next.verticalRun.dimension.resolve(next.getHeight());
+                                next.measured = true;
                             }
                         }
                     }
                 }
             }
         }
-        return false;
     }
 
-    public void buildGraph() {
+    public final void buildGraph() {
         ArrayList<WidgetRun> arrayList = this.mRuns;
         arrayList.clear();
         this.mContainer.horizontalRun.clear();
@@ -284,7 +295,6 @@ public class DependencyGraph {
             }
         }
         this.mGroups.clear();
-        RunGroup.index = 0;
         findGroup(this.container.horizontalRun, 0, this.mGroups);
         findGroup(this.container.verticalRun, 1, this.mGroups);
         this.mNeedBuildGraph = false;
@@ -310,89 +320,115 @@ public class DependencyGraph {
     }
 
     public final void findGroup(WidgetRun widgetRun, int i, ArrayList<RunGroup> arrayList) {
-        for (Dependency dependency : widgetRun.start.dependencies) {
+        Iterator it = widgetRun.start.dependencies.iterator();
+        while (it.hasNext()) {
+            Dependency dependency = (Dependency) it.next();
             if (dependency instanceof DependencyNode) {
-                applyGroup((DependencyNode) dependency, i, 0, widgetRun.end, arrayList, null);
+                applyGroup((DependencyNode) dependency, i, 0, arrayList, null);
             } else if (dependency instanceof WidgetRun) {
-                applyGroup(((WidgetRun) dependency).start, i, 0, widgetRun.end, arrayList, null);
+                applyGroup(((WidgetRun) dependency).start, i, 0, arrayList, null);
             }
         }
-        for (Dependency dependency2 : widgetRun.end.dependencies) {
+        Iterator it2 = widgetRun.end.dependencies.iterator();
+        while (it2.hasNext()) {
+            Dependency dependency2 = (Dependency) it2.next();
             if (dependency2 instanceof DependencyNode) {
-                applyGroup((DependencyNode) dependency2, i, 1, widgetRun.start, arrayList, null);
+                applyGroup((DependencyNode) dependency2, i, 1, arrayList, null);
             } else if (dependency2 instanceof WidgetRun) {
-                applyGroup(((WidgetRun) dependency2).end, i, 1, widgetRun.start, arrayList, null);
+                applyGroup(((WidgetRun) dependency2).end, i, 1, arrayList, null);
             }
         }
         if (i == 1) {
-            for (Dependency dependency3 : ((VerticalWidgetRun) widgetRun).baseline.dependencies) {
+            Iterator it3 = ((VerticalWidgetRun) widgetRun).baseline.dependencies.iterator();
+            while (it3.hasNext()) {
+                Dependency dependency3 = (Dependency) it3.next();
                 if (dependency3 instanceof DependencyNode) {
-                    applyGroup((DependencyNode) dependency3, i, 2, null, arrayList, null);
+                    applyGroup((DependencyNode) dependency3, i, 2, arrayList, null);
                 }
             }
         }
     }
 
-    public final void measure$enumunboxing$(ConstraintWidget constraintWidget, int i, int i2, int i3, int i4) {
+    public final void measure(ConstraintWidget constraintWidget, ConstraintWidget.DimensionBehaviour dimensionBehaviour, int i, ConstraintWidget.DimensionBehaviour dimensionBehaviour2, int i2) {
+        boolean z;
         BasicMeasure.Measure measure = this.mMeasure;
-        measure.horizontalBehavior = i;
-        measure.verticalBehavior = i3;
-        measure.horizontalDimension = i2;
-        measure.verticalDimension = i4;
+        measure.horizontalBehavior = dimensionBehaviour;
+        measure.verticalBehavior = dimensionBehaviour2;
+        measure.horizontalDimension = i;
+        measure.verticalDimension = i2;
         ((ConstraintLayout.Measurer) this.mMeasurer).measure(constraintWidget, measure);
         constraintWidget.setWidth(this.mMeasure.measuredWidth);
         constraintWidget.setHeight(this.mMeasure.measuredHeight);
         BasicMeasure.Measure measure2 = this.mMeasure;
         constraintWidget.hasBaseline = measure2.measuredHasBaseline;
-        int i5 = measure2.measuredBaseline;
-        constraintWidget.mBaselineDistance = i5;
-        constraintWidget.hasBaseline = i5 > 0;
+        int i3 = measure2.measuredBaseline;
+        constraintWidget.mBaselineDistance = i3;
+        if (i3 > 0) {
+            z = true;
+        } else {
+            z = false;
+        }
+        constraintWidget.hasBaseline = z;
     }
 
-    public void measureWidgets() {
-        DimensionDependency dimensionDependency;
+    public final void measureWidgets() {
+        boolean z;
+        BaselineDimensionDependency baselineDimensionDependency;
+        ConstraintWidget.DimensionBehaviour dimensionBehaviour = ConstraintWidget.DimensionBehaviour.FIXED;
+        ConstraintWidget.DimensionBehaviour dimensionBehaviour2 = ConstraintWidget.DimensionBehaviour.MATCH_CONSTRAINT;
         Iterator<ConstraintWidget> it = this.container.mChildren.iterator();
         while (it.hasNext()) {
             ConstraintWidget next = it.next();
             if (!next.measured) {
-                int[] iArr = next.mListDimensionBehaviors;
-                boolean z = false;
-                int i = iArr[0];
-                int i2 = iArr[1];
-                int i3 = next.mMatchConstraintDefaultWidth;
-                int i4 = next.mMatchConstraintDefaultHeight;
-                boolean z2 = i == 2 || (i == 3 && i3 == 1);
-                if (i2 == 2 || (i2 == 3 && i4 == 1)) {
+                ConstraintWidget.DimensionBehaviour[] dimensionBehaviourArr = next.mListDimensionBehaviors;
+                boolean z2 = false;
+                ConstraintWidget.DimensionBehaviour dimensionBehaviour3 = dimensionBehaviourArr[0];
+                ConstraintWidget.DimensionBehaviour dimensionBehaviour4 = dimensionBehaviourArr[1];
+                int i = next.mMatchConstraintDefaultWidth;
+                int i2 = next.mMatchConstraintDefaultHeight;
+                ConstraintWidget.DimensionBehaviour dimensionBehaviour5 = ConstraintWidget.DimensionBehaviour.WRAP_CONTENT;
+                if (dimensionBehaviour3 == dimensionBehaviour5 || (dimensionBehaviour3 == dimensionBehaviour2 && i == 1)) {
                     z = true;
+                } else {
+                    z = false;
                 }
-                DimensionDependency dimensionDependency2 = next.horizontalRun.dimension;
-                boolean z3 = dimensionDependency2.resolved;
-                DimensionDependency dimensionDependency3 = next.verticalRun.dimension;
-                boolean z4 = dimensionDependency3.resolved;
+                if (dimensionBehaviour4 == dimensionBehaviour5 || (dimensionBehaviour4 == dimensionBehaviour2 && i2 == 1)) {
+                    z2 = true;
+                }
+                DimensionDependency dimensionDependency = next.horizontalRun.dimension;
+                boolean z3 = dimensionDependency.resolved;
+                DimensionDependency dimensionDependency2 = next.verticalRun.dimension;
+                boolean z4 = dimensionDependency2.resolved;
                 if (z3 && z4) {
-                    measure$enumunboxing$(next, 1, dimensionDependency2.value, 1, dimensionDependency3.value);
+                    measure(next, dimensionBehaviour, dimensionDependency.value, dimensionBehaviour, dimensionDependency2.value);
                     next.measured = true;
-                } else if (z3 && z) {
-                    measure$enumunboxing$(next, 1, dimensionDependency2.value, 2, dimensionDependency3.value);
-                    if (i2 == 3) {
+                } else if (z3 && z2) {
+                    measure(next, dimensionBehaviour, dimensionDependency.value, dimensionBehaviour5, dimensionDependency2.value);
+                    if (dimensionBehaviour4 == dimensionBehaviour2) {
                         next.verticalRun.dimension.wrapValue = next.getHeight();
                     } else {
                         next.verticalRun.dimension.resolve(next.getHeight());
                         next.measured = true;
                     }
-                } else if (z4 && z2) {
-                    measure$enumunboxing$(next, 2, dimensionDependency2.value, 1, dimensionDependency3.value);
-                    if (i == 3) {
+                } else if (z4 && z) {
+                    measure(next, dimensionBehaviour5, dimensionDependency.value, dimensionBehaviour, dimensionDependency2.value);
+                    if (dimensionBehaviour3 == dimensionBehaviour2) {
                         next.horizontalRun.dimension.wrapValue = next.getWidth();
                     } else {
                         next.horizontalRun.dimension.resolve(next.getWidth());
                         next.measured = true;
                     }
                 }
-                if (next.measured && (dimensionDependency = next.verticalRun.baselineDimension) != null) {
-                    dimensionDependency.resolve(next.mBaselineDistance);
+                if (next.measured && (baselineDimensionDependency = next.verticalRun.baselineDimension) != null) {
+                    baselineDimensionDependency.resolve(next.mBaselineDistance);
                 }
             }
         }
+    }
+
+    public DependencyGraph(ConstraintWidgetContainer constraintWidgetContainer) {
+        new ArrayList();
+        this.container = constraintWidgetContainer;
+        this.mContainer = constraintWidgetContainer;
     }
 }

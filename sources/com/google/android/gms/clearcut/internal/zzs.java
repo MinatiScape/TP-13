@@ -6,26 +6,43 @@ import com.google.android.gms.clearcut.ClearcutLogger;
 import com.google.android.gms.internal.zzbmk;
 import com.google.android.gms.internal.zzfis;
 import com.google.android.gms.internal.zzfiz;
-import com.google.android.gms.phenotype.Phenotype;
 import java.nio.charset.Charset;
 import java.util.HashMap;
-import java.util.Map;
+/* compiled from: LogSamplerImpl.java */
 /* loaded from: classes.dex */
 public final class zzs implements ClearcutLogger.LogSampler {
     public static final Charset zza = Charset.forName("UTF-8");
     public static final zzfiz zzb;
-    public static Map<String, zzfis<String>> zzd;
+    public static HashMap zzd;
     public static Boolean zze;
     public static Long zzf;
     public final Context zzc;
 
     static {
-        int i = Phenotype.$r8$clinit;
+        String str;
         String valueOf = String.valueOf(Uri.encode("com.google.android.gms.clearcut.public"));
-        zzb = new zzfiz(null, Uri.parse(valueOf.length() != 0 ? "content://com.google.android.gms.phenotype/".concat(valueOf) : new String("content://com.google.android.gms.phenotype/")), "gms:playlog:service:sampling_", "LogSampling__", false, false);
+        if (valueOf.length() != 0) {
+            str = "content://com.google.android.gms.phenotype/".concat(valueOf);
+        } else {
+            str = new String("content://com.google.android.gms.phenotype/");
+        }
+        zzb = new zzfiz(null, Uri.parse(str), "gms:playlog:service:sampling_", "LogSampling__", false, false);
         zzd = null;
         zze = null;
         zzf = null;
+    }
+
+    public static boolean zza(Context context) {
+        boolean z;
+        if (zze == null) {
+            if (zzbmk.zza(context).zza.checkCallingOrSelfPermission("com.google.android.providers.gsf.permission.READ_GSERVICES") == 0) {
+                z = true;
+            } else {
+                z = false;
+            }
+            zze = Boolean.valueOf(z);
+        }
+        return zze.booleanValue();
     }
 
     public zzs(Context context) {
@@ -34,7 +51,7 @@ public final class zzs implements ClearcutLogger.LogSampler {
         if (zzd == null) {
             zzd = new HashMap();
         }
-        if (context != null && zzfis.zzc == null && !zzfis.zzd) {
+        if (context != null && zzfis.zzc == null) {
             synchronized (zzfis.zzb) {
                 if (!context.isDeviceProtectedStorage() && (applicationContext = context.getApplicationContext()) != null) {
                     context = applicationContext;
@@ -44,14 +61,6 @@ public final class zzs implements ClearcutLogger.LogSampler {
                 }
                 zzfis.zzc = context;
             }
-            zzfis.zzd = false;
         }
-    }
-
-    public static boolean zza(Context context) {
-        if (zze == null) {
-            zze = Boolean.valueOf(zzbmk.zza(context).zza.checkCallingOrSelfPermission("com.google.android.providers.gsf.permission.READ_GSERVICES") == 0);
-        }
-        return zze.booleanValue();
     }
 }

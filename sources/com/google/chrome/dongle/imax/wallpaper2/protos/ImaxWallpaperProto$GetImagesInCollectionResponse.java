@@ -6,7 +6,6 @@ import com.google.protobuf.MessageLiteOrBuilder;
 import com.google.protobuf.Parser;
 import com.google.protobuf.ProtobufArrayList;
 import com.google.protobuf.RawMessageInfo;
-import java.util.List;
 /* loaded from: classes.dex */
 public final class ImaxWallpaperProto$GetImagesInCollectionResponse extends GeneratedMessageLite<ImaxWallpaperProto$GetImagesInCollectionResponse, Builder> implements MessageLiteOrBuilder {
     private static final ImaxWallpaperProto$GetImagesInCollectionResponse DEFAULT_INSTANCE;
@@ -16,7 +15,7 @@ public final class ImaxWallpaperProto$GetImagesInCollectionResponse extends Gene
 
     /* loaded from: classes.dex */
     public static final class Builder extends GeneratedMessageLite.Builder<ImaxWallpaperProto$GetImagesInCollectionResponse, Builder> implements MessageLiteOrBuilder {
-        public Builder(ImaxWallpaperProto$1 imaxWallpaperProto$1) {
+        public Builder() {
             super(ImaxWallpaperProto$GetImagesInCollectionResponse.DEFAULT_INSTANCE);
         }
     }
@@ -28,11 +27,11 @@ public final class ImaxWallpaperProto$GetImagesInCollectionResponse extends Gene
     }
 
     public static Parser<ImaxWallpaperProto$GetImagesInCollectionResponse> parser() {
-        return DEFAULT_INSTANCE.getParserForType();
+        return (Parser) DEFAULT_INSTANCE.dynamicMethod(GeneratedMessageLite.MethodToInvoke.GET_PARSER);
     }
 
     @Override // com.google.protobuf.GeneratedMessageLite
-    public final Object dynamicMethod(GeneratedMessageLite.MethodToInvoke methodToInvoke, Object obj, Object obj2) {
+    public final Object dynamicMethod(GeneratedMessageLite.MethodToInvoke methodToInvoke) {
         switch (methodToInvoke.ordinal()) {
             case 0:
                 return (byte) 1;
@@ -43,7 +42,7 @@ public final class ImaxWallpaperProto$GetImagesInCollectionResponse extends Gene
             case 3:
                 return new ImaxWallpaperProto$GetImagesInCollectionResponse();
             case 4:
-                return new Builder(null);
+                return new Builder();
             case 5:
                 return DEFAULT_INSTANCE;
             case 6:
@@ -63,7 +62,7 @@ public final class ImaxWallpaperProto$GetImagesInCollectionResponse extends Gene
         }
     }
 
-    public List<ImaxWallpaperProto$Image> getImagesList() {
+    public final Internal.ProtobufList getImagesList() {
         return this.images_;
     }
 }

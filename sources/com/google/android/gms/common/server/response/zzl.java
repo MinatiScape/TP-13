@@ -3,13 +3,11 @@ package com.google.android.gms.common.server.response;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Base64;
 import android.util.SparseArray;
-import androidx.appcompat.R$attr;
-import androidx.appcompat.R$dimen;
-import androidx.fragment.R$id$$ExternalSyntheticOutline0;
-import androidx.preference.R$string;
-import androidx.savedstate.R$id;
-import androidx.slice.view.R$layout;
+import androidx.cardview.R$style$$ExternalSyntheticOutline0;
+import androidx.core.R$id;
+import com.android.wallpaper.util.LaunchUtils;
 import com.google.android.gms.common.server.response.FastJsonResponse;
 import com.google.android.gms.common.util.zzn;
 import com.google.android.gms.internal.zzbkw;
@@ -19,8 +17,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
+/* compiled from: SafeParcelResponse.java */
 /* loaded from: classes.dex */
 public class zzl extends FastSafeParcelableJsonResponse {
     public static final Parcelable.Creator<zzl> CREATOR = new zzm();
@@ -32,20 +30,40 @@ public class zzl extends FastSafeParcelableJsonResponse {
     public int zzf;
     public int zzg;
 
-    public zzl(int i, Parcel parcel, FieldMappingDictionary fieldMappingDictionary) {
-        this.zza = i;
-        Objects.requireNonNull(parcel, "null reference");
-        this.zzb = parcel;
-        this.zzd = fieldMappingDictionary;
-        if (fieldMappingDictionary == null) {
-            this.zze = null;
-        } else {
-            this.zze = fieldMappingDictionary.zzd;
-        }
-        this.zzf = 2;
+    /* JADX WARN: Code restructure failed: missing block: B:5:0x0005, code lost:
+        if (r0 != 1) goto L8;
+     */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+        To view partially-correct add '--show-bad-code' argument
+    */
+    public final android.os.Parcel zza() {
+        /*
+            r2 = this;
+            int r0 = r2.zzf
+            if (r0 == 0) goto L8
+            r1 = 1
+            if (r0 == r1) goto L12
+            goto L1c
+        L8:
+            android.os.Parcel r0 = r2.zzb
+            r1 = 20293(0x4f45, float:2.8437E-41)
+            int r0 = androidx.core.R$id.zzb(r0, r1)
+            r2.zzg = r0
+        L12:
+            android.os.Parcel r0 = r2.zzb
+            int r1 = r2.zzg
+            androidx.core.R$id.zzc(r0, r1)
+            r0 = 2
+            r2.zzf = r0
+        L1c:
+            android.os.Parcel r2 = r2.zzb
+            return r2
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.common.server.response.zzl.zza():android.os.Parcel");
     }
 
-    private final void zza(StringBuilder sb, FastJsonResponse.Field<?, ?> field, Object obj) {
+    private static void zza$1(StringBuilder sb, FastJsonResponse.Field field, Object obj) {
         if (field.mTypeInArray) {
             ArrayList arrayList = (ArrayList) obj;
             sb.append("[");
@@ -63,46 +81,47 @@ public class zzl extends FastSafeParcelableJsonResponse {
     }
 
     @Override // com.google.android.gms.common.server.response.FastJsonResponse
-    public Map<String, FastJsonResponse.Field<?, ?>> getFieldMappings() {
+    public final Map<String, FastJsonResponse.Field<?, ?>> getFieldMappings() {
         FieldMappingDictionary fieldMappingDictionary = this.zzd;
         if (fieldMappingDictionary == null) {
             return null;
         }
-        return fieldMappingDictionary.getFieldMapping(this.zze);
+        return fieldMappingDictionary.zzb.get(this.zze);
     }
 
     @Override // com.google.android.gms.common.server.response.FastSafeParcelableJsonResponse, com.google.android.gms.common.server.response.FastJsonResponse
-    public Object getValueObject(String str) {
+    public final Object getValueObject() {
         throw new UnsupportedOperationException("Converting to JSON does not require this method.");
     }
 
     @Override // com.google.android.gms.common.server.response.FastSafeParcelableJsonResponse, com.google.android.gms.common.server.response.FastJsonResponse
-    public boolean isPrimitiveFieldSet(String str) {
+    public final boolean isPrimitiveFieldSet() {
         throw new UnsupportedOperationException("Converting to JSON does not require this method.");
     }
 
     @Override // com.google.android.gms.common.server.response.FastJsonResponse
-    public String toString() {
-        R$string.zza(this.zzd, "Cannot convert to JSON on client side.");
+    public final String toString() {
+        LaunchUtils.zza(this.zzd, "Cannot convert to JSON on client side.");
         Parcel zza = zza();
         zza.setDataPosition(0);
         StringBuilder sb = new StringBuilder(100);
-        zza(sb, this.zzd.getFieldMapping(this.zze), zza);
+        FieldMappingDictionary fieldMappingDictionary = this.zzd;
+        zza(sb, fieldMappingDictionary.zzb.get(this.zze), zza);
         return sb.toString();
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
+    public final void writeToParcel(Parcel parcel, int i) {
         FieldMappingDictionary fieldMappingDictionary;
-        int zzb = R$layout.zzb(parcel, 20293);
+        int zzb = R$id.zzb(parcel, 20293);
         int i2 = this.zza;
-        R$layout.zzb(parcel, 1, 4);
+        R$id.zzb(parcel, 1, 4);
         parcel.writeInt(i2);
         Parcel zza = zza();
         if (zza != null) {
-            int zzb2 = R$layout.zzb(parcel, 2);
+            int zzb2 = R$id.zzb(parcel, 2);
             parcel.appendFrom(zza, 0, zza.dataSize());
-            R$layout.zzc(parcel, zzb2);
+            R$id.zzc(parcel, zzb2);
         }
         int i3 = this.zzc;
         if (i3 == 0) {
@@ -112,49 +131,29 @@ public class zzl extends FastSafeParcelableJsonResponse {
         } else if (i3 == 2) {
             fieldMappingDictionary = this.zzd;
         } else {
-            throw new IllegalStateException(R$id$$ExternalSyntheticOutline0.m(34, "Invalid creation type: ", this.zzc));
+            throw new IllegalStateException(R$style$$ExternalSyntheticOutline0.m(34, "Invalid creation type: ", this.zzc));
         }
-        R$layout.zza(parcel, 3, fieldMappingDictionary, i, false);
-        R$layout.zzc(parcel, zzb);
+        R$id.zza(parcel, 3, fieldMappingDictionary, i);
+        R$id.zzc(parcel, zzb);
     }
 
-    /* JADX WARN: Code restructure failed: missing block: B:5:0x0005, code lost:
-        if (r0 != 1) goto L8;
-     */
-    /*
-        Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
-    */
-    public final android.os.Parcel zza() {
-        /*
-            r2 = this;
-            int r0 = r2.zzf
-            if (r0 == 0) goto L8
-            r1 = 1
-            if (r0 == r1) goto L10
-            goto L1a
-        L8:
-            android.os.Parcel r0 = r2.zzb
-            int r0 = androidx.slice.view.R$layout.zza(r0)
-            r2.zzg = r0
-        L10:
-            android.os.Parcel r0 = r2.zzb
-            int r1 = r2.zzg
-            androidx.slice.view.R$layout.zzc(r0, r1)
-            r0 = 2
-            r2.zzf = r0
-        L1a:
-            android.os.Parcel r2 = r2.zzb
-            return r2
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.common.server.response.zzl.zza():android.os.Parcel");
+    public zzl(int i, Parcel parcel, FieldMappingDictionary fieldMappingDictionary) {
+        this.zza = i;
+        LaunchUtils.zza(parcel);
+        this.zzb = parcel;
+        this.zzd = fieldMappingDictionary;
+        if (fieldMappingDictionary == null) {
+            this.zze = null;
+        } else {
+            this.zze = fieldMappingDictionary.zzd;
+        }
+        this.zzf = 2;
     }
 
-    public final void zza(StringBuilder sb, Map<String, FastJsonResponse.Field<?, ?>> map, Parcel parcel) {
-        Parcel[] parcelArr;
+    public static void zza(StringBuilder sb, Map map, Parcel parcel) {
         SparseArray sparseArray = new SparseArray();
-        for (Map.Entry<String, FastJsonResponse.Field<?, ?>> entry : map.entrySet()) {
-            sparseArray.put(entry.getValue().mSafeParcelableFieldId, entry);
+        for (Map.Entry entry : map.entrySet()) {
+            sparseArray.put(((FastJsonResponse.Field) entry.getValue()).mSafeParcelableFieldId, entry);
         }
         sb.append('{');
         int zza = zzbkw.zza(parcel);
@@ -166,52 +165,73 @@ public class zzl extends FastSafeParcelableJsonResponse {
                 if (z) {
                     sb.append(",");
                 }
-                FastJsonResponse.Field<?, ?> field = (FastJsonResponse.Field) entry2.getValue();
+                FastJsonResponse.Field field = (FastJsonResponse.Field) entry2.getValue();
                 sb.append("\"");
                 sb.append((String) entry2.getKey());
                 sb.append("\":");
+                BigInteger bigInteger = null;
+                BigInteger bigInteger2 = null;
+                Parcel[] parcelArr = null;
+                boolean[] zArr = null;
+                BigDecimal[] bigDecimalArr = null;
+                double[] dArr = null;
+                float[] fArr = null;
+                long[] jArr = null;
+                BigInteger[] bigIntegerArr = null;
+                Parcel parcel2 = null;
+                String str = null;
+                String str2 = null;
                 if (field.zzc != null) {
                     switch (field.mTypeOut) {
                         case 0:
-                            zza(sb, field, getOriginalValue(field, Integer.valueOf(zzbkw.zzg(parcel, readInt))));
+                            zza$1(sb, field, FastJsonResponse.getOriginalValue(field, Integer.valueOf(zzbkw.zzg(parcel, readInt))));
                             break;
                         case 1:
-                            zza(sb, field, getOriginalValue(field, zzbkw.zzk(parcel, readInt)));
+                            int zza2 = zzbkw.zza(parcel, readInt);
+                            int dataPosition = parcel.dataPosition();
+                            if (zza2 != 0) {
+                                byte[] createByteArray = parcel.createByteArray();
+                                parcel.setDataPosition(dataPosition + zza2);
+                                bigInteger2 = new BigInteger(createByteArray);
+                            }
+                            zza$1(sb, field, FastJsonResponse.getOriginalValue(field, bigInteger2));
                             break;
                         case 2:
-                            zza(sb, field, getOriginalValue(field, Long.valueOf(zzbkw.zzi(parcel, readInt))));
+                            zza$1(sb, field, FastJsonResponse.getOriginalValue(field, Long.valueOf(zzbkw.zzi(parcel, readInt))));
                             break;
                         case 3:
-                            zza(sb, field, getOriginalValue(field, Float.valueOf(zzbkw.zzl(parcel, readInt))));
+                            zzbkw.zza(parcel, readInt, 4);
+                            zza$1(sb, field, FastJsonResponse.getOriginalValue(field, Float.valueOf(parcel.readFloat())));
                             break;
                         case 4:
-                            zza(sb, field, getOriginalValue(field, Double.valueOf(zzbkw.zzn(parcel, readInt))));
+                            zzbkw.zza(parcel, readInt, 8);
+                            zza$1(sb, field, FastJsonResponse.getOriginalValue(field, Double.valueOf(parcel.readDouble())));
                             break;
                         case 5:
-                            zza(sb, field, getOriginalValue(field, zzbkw.zzp(parcel, readInt)));
+                            zza$1(sb, field, FastJsonResponse.getOriginalValue(field, zzbkw.zzp(parcel, readInt)));
                             break;
                         case 6:
-                            zza(sb, field, getOriginalValue(field, Boolean.valueOf(zzbkw.zzc(parcel, readInt))));
+                            zza$1(sb, field, FastJsonResponse.getOriginalValue(field, Boolean.valueOf(zzbkw.zzc(parcel, readInt))));
                             break;
                         case 7:
-                            zza(sb, field, getOriginalValue(field, zzbkw.zzq(parcel, readInt)));
+                            zza$1(sb, field, FastJsonResponse.getOriginalValue(field, zzbkw.zzq(parcel, readInt)));
                             break;
                         case 8:
                         case 9:
-                            zza(sb, field, getOriginalValue(field, zzbkw.zzt(parcel, readInt)));
+                            zza$1(sb, field, FastJsonResponse.getOriginalValue(field, zzbkw.zzt(parcel, readInt)));
                             break;
                         case 10:
                             Bundle zzs = zzbkw.zzs(parcel, readInt);
                             HashMap hashMap = new HashMap();
-                            for (String str : zzs.keySet()) {
-                                hashMap.put(str, zzs.getString(str));
+                            for (String str3 : zzs.keySet()) {
+                                hashMap.put(str3, zzs.getString(str3));
                             }
-                            zza(sb, field, getOriginalValue(field, hashMap));
+                            zza$1(sb, field, FastJsonResponse.getOriginalValue(field, hashMap));
                             break;
                         case 11:
                             throw new IllegalArgumentException("Method does not accept concrete type.");
                         default:
-                            throw new IllegalArgumentException(R$id$$ExternalSyntheticOutline0.m(36, "Unknown field out type = ", field.mTypeOut));
+                            throw new IllegalArgumentException(R$style$$ExternalSyntheticOutline0.m(36, "Unknown field out type = ", field.mTypeOut));
                     }
                 } else if (field.mTypeOutArray) {
                     sb.append("[");
@@ -227,108 +247,112 @@ public class zzl extends FastSafeParcelableJsonResponse {
                             }
                             break;
                         case 1:
-                            BigInteger[] bigIntegerArr = null;
-                            int zza2 = zzbkw.zza(parcel, readInt);
-                            int dataPosition = parcel.dataPosition();
-                            if (zza2 != 0) {
-                                int readInt2 = parcel.readInt();
-                                BigInteger[] bigIntegerArr2 = new BigInteger[readInt2];
-                                for (int i2 = 0; i2 < readInt2; i2++) {
-                                    bigIntegerArr2[i2] = new BigInteger(parcel.createByteArray());
-                                }
-                                parcel.setDataPosition(dataPosition + zza2);
-                                bigIntegerArr = bigIntegerArr2;
-                            }
-                            R$attr.zza(sb, bigIntegerArr);
-                            break;
-                        case 2:
-                            long[] jArr = null;
                             int zza3 = zzbkw.zza(parcel, readInt);
                             int dataPosition2 = parcel.dataPosition();
                             if (zza3 != 0) {
-                                jArr = parcel.createLongArray();
+                                int readInt2 = parcel.readInt();
+                                bigIntegerArr = new BigInteger[readInt2];
+                                for (int i2 = 0; i2 < readInt2; i2++) {
+                                    bigIntegerArr[i2] = new BigInteger(parcel.createByteArray());
+                                }
                                 parcel.setDataPosition(dataPosition2 + zza3);
                             }
-                            int length2 = jArr.length;
+                            int length2 = bigIntegerArr.length;
                             for (int i3 = 0; i3 < length2; i3++) {
                                 if (i3 != 0) {
                                     sb.append(",");
                                 }
-                                sb.append(Long.toString(jArr[i3]));
+                                sb.append(bigIntegerArr[i3].toString());
                             }
                             break;
-                        case 3:
-                            float[] fArr = null;
+                        case 2:
                             int zza4 = zzbkw.zza(parcel, readInt);
                             int dataPosition3 = parcel.dataPosition();
                             if (zza4 != 0) {
-                                fArr = parcel.createFloatArray();
+                                jArr = parcel.createLongArray();
                                 parcel.setDataPosition(dataPosition3 + zza4);
                             }
-                            int length3 = fArr.length;
+                            int length3 = jArr.length;
                             for (int i4 = 0; i4 < length3; i4++) {
                                 if (i4 != 0) {
                                     sb.append(",");
                                 }
-                                sb.append(Float.toString(fArr[i4]));
+                                sb.append(Long.toString(jArr[i4]));
                             }
                             break;
-                        case 4:
-                            double[] dArr = null;
+                        case 3:
                             int zza5 = zzbkw.zza(parcel, readInt);
                             int dataPosition4 = parcel.dataPosition();
                             if (zza5 != 0) {
-                                dArr = parcel.createDoubleArray();
+                                fArr = parcel.createFloatArray();
                                 parcel.setDataPosition(dataPosition4 + zza5);
                             }
-                            int length4 = dArr.length;
+                            int length4 = fArr.length;
                             for (int i5 = 0; i5 < length4; i5++) {
                                 if (i5 != 0) {
                                     sb.append(",");
                                 }
-                                sb.append(Double.toString(dArr[i5]));
+                                sb.append(Float.toString(fArr[i5]));
                             }
                             break;
-                        case 5:
-                            BigDecimal[] bigDecimalArr = null;
+                        case 4:
                             int zza6 = zzbkw.zza(parcel, readInt);
                             int dataPosition5 = parcel.dataPosition();
                             if (zza6 != 0) {
-                                int readInt3 = parcel.readInt();
-                                BigDecimal[] bigDecimalArr2 = new BigDecimal[readInt3];
-                                for (int i6 = 0; i6 < readInt3; i6++) {
-                                    bigDecimalArr2[i6] = new BigDecimal(new BigInteger(parcel.createByteArray()), parcel.readInt());
-                                }
+                                dArr = parcel.createDoubleArray();
                                 parcel.setDataPosition(dataPosition5 + zza6);
-                                bigDecimalArr = bigDecimalArr2;
                             }
-                            R$attr.zza(sb, bigDecimalArr);
+                            int length5 = dArr.length;
+                            for (int i6 = 0; i6 < length5; i6++) {
+                                if (i6 != 0) {
+                                    sb.append(",");
+                                }
+                                sb.append(Double.toString(dArr[i6]));
+                            }
                             break;
-                        case 6:
-                            boolean[] zArr = null;
+                        case 5:
                             int zza7 = zzbkw.zza(parcel, readInt);
                             int dataPosition6 = parcel.dataPosition();
                             if (zza7 != 0) {
-                                zArr = parcel.createBooleanArray();
+                                int readInt3 = parcel.readInt();
+                                bigDecimalArr = new BigDecimal[readInt3];
+                                for (int i7 = 0; i7 < readInt3; i7++) {
+                                    bigDecimalArr[i7] = new BigDecimal(new BigInteger(parcel.createByteArray()), parcel.readInt());
+                                }
                                 parcel.setDataPosition(dataPosition6 + zza7);
                             }
-                            int length5 = zArr.length;
-                            for (int i7 = 0; i7 < length5; i7++) {
-                                if (i7 != 0) {
-                                    sb.append(",");
-                                }
-                                sb.append(Boolean.toString(zArr[i7]));
-                            }
-                            break;
-                        case 7:
-                            String[] zzaa = zzbkw.zzaa(parcel, readInt);
-                            int length6 = zzaa.length;
+                            int length6 = bigDecimalArr.length;
                             for (int i8 = 0; i8 < length6; i8++) {
                                 if (i8 != 0) {
                                     sb.append(",");
                                 }
+                                sb.append(bigDecimalArr[i8].toString());
+                            }
+                            break;
+                        case 6:
+                            int zza8 = zzbkw.zza(parcel, readInt);
+                            int dataPosition7 = parcel.dataPosition();
+                            if (zza8 != 0) {
+                                zArr = parcel.createBooleanArray();
+                                parcel.setDataPosition(dataPosition7 + zza8);
+                            }
+                            int length7 = zArr.length;
+                            for (int i9 = 0; i9 < length7; i9++) {
+                                if (i9 != 0) {
+                                    sb.append(",");
+                                }
+                                sb.append(Boolean.toString(zArr[i9]));
+                            }
+                            break;
+                        case 7:
+                            String[] zzaa = zzbkw.zzaa(parcel, readInt);
+                            int length8 = zzaa.length;
+                            for (int i10 = 0; i10 < length8; i10++) {
+                                if (i10 != 0) {
+                                    sb.append(",");
+                                }
                                 sb.append("\"");
-                                sb.append(zzaa[i8]);
+                                sb.append(zzaa[i10]);
                                 sb.append("\"");
                             }
                             break;
@@ -337,37 +361,35 @@ public class zzl extends FastSafeParcelableJsonResponse {
                         case 10:
                             throw new UnsupportedOperationException("List of type BASE64, BASE64_URL_SAFE, or STRING_MAP is not supported");
                         case 11:
-                            int zza8 = zzbkw.zza(parcel, readInt);
-                            int dataPosition7 = parcel.dataPosition();
-                            if (zza8 == 0) {
-                                parcelArr = null;
-                            } else {
+                            int zza9 = zzbkw.zza(parcel, readInt);
+                            int dataPosition8 = parcel.dataPosition();
+                            if (zza9 != 0) {
                                 int readInt4 = parcel.readInt();
                                 Parcel[] parcelArr2 = new Parcel[readInt4];
-                                for (int i9 = 0; i9 < readInt4; i9++) {
+                                for (int i11 = 0; i11 < readInt4; i11++) {
                                     int readInt5 = parcel.readInt();
                                     if (readInt5 != 0) {
-                                        int dataPosition8 = parcel.dataPosition();
+                                        int dataPosition9 = parcel.dataPosition();
                                         Parcel obtain = Parcel.obtain();
-                                        obtain.appendFrom(parcel, dataPosition8, readInt5);
-                                        parcelArr2[i9] = obtain;
-                                        parcel.setDataPosition(dataPosition8 + readInt5);
+                                        obtain.appendFrom(parcel, dataPosition9, readInt5);
+                                        parcelArr2[i11] = obtain;
+                                        parcel.setDataPosition(dataPosition9 + readInt5);
                                     } else {
-                                        parcelArr2[i9] = null;
+                                        parcelArr2[i11] = null;
                                     }
                                 }
-                                parcel.setDataPosition(dataPosition7 + zza8);
+                                parcel.setDataPosition(dataPosition8 + zza9);
                                 parcelArr = parcelArr2;
                             }
-                            int length7 = parcelArr.length;
-                            for (int i10 = 0; i10 < length7; i10++) {
-                                if (i10 > 0) {
+                            int length9 = parcelArr.length;
+                            for (int i12 = 0; i12 < length9; i12++) {
+                                if (i12 > 0) {
                                     sb.append(",");
                                 }
-                                parcelArr[i10].setDataPosition(0);
-                                Objects.requireNonNull(field.mConcreteTypeName, "null reference");
-                                Objects.requireNonNull(field.zzb, "null reference");
-                                zza(sb, field.zzb.getFieldMapping(field.mConcreteTypeName), parcelArr[i10]);
+                                parcelArr[i12].setDataPosition(0);
+                                LaunchUtils.zza(field.mConcreteTypeName);
+                                LaunchUtils.zza(field.zzb);
+                                zza(sb, field.zzb.zzb.get(field.mConcreteTypeName), parcelArr[i12]);
                             }
                             break;
                         default:
@@ -380,16 +402,25 @@ public class zzl extends FastSafeParcelableJsonResponse {
                             sb.append(zzbkw.zzg(parcel, readInt));
                             break;
                         case 1:
-                            sb.append(zzbkw.zzk(parcel, readInt));
+                            int zza10 = zzbkw.zza(parcel, readInt);
+                            int dataPosition10 = parcel.dataPosition();
+                            if (zza10 != 0) {
+                                byte[] createByteArray2 = parcel.createByteArray();
+                                parcel.setDataPosition(dataPosition10 + zza10);
+                                bigInteger = new BigInteger(createByteArray2);
+                            }
+                            sb.append(bigInteger);
                             break;
                         case 2:
                             sb.append(zzbkw.zzi(parcel, readInt));
                             break;
                         case 3:
-                            sb.append(zzbkw.zzl(parcel, readInt));
+                            zzbkw.zza(parcel, readInt, 4);
+                            sb.append(parcel.readFloat());
                             break;
                         case 4:
-                            sb.append(zzbkw.zzn(parcel, readInt));
+                            zzbkw.zza(parcel, readInt, 8);
+                            sb.append(parcel.readDouble());
                             break;
                         case 5:
                             sb.append(zzbkw.zzp(parcel, readInt));
@@ -406,42 +437,54 @@ public class zzl extends FastSafeParcelableJsonResponse {
                         case 8:
                             byte[] zzt = zzbkw.zzt(parcel, readInt);
                             sb.append("\"");
-                            sb.append(R$id.zza(zzt));
+                            if (zzt != null) {
+                                str2 = Base64.encodeToString(zzt, 0);
+                            }
+                            sb.append(str2);
                             sb.append("\"");
                             break;
                         case 9:
                             byte[] zzt2 = zzbkw.zzt(parcel, readInt);
                             sb.append("\"");
-                            sb.append(R$id.zzb(zzt2));
+                            if (zzt2 != null) {
+                                str = Base64.encodeToString(zzt2, 10);
+                            }
+                            sb.append(str);
                             sb.append("\"");
                             break;
                         case 10:
-                            r6 = false;
                             Bundle zzs2 = zzbkw.zzs(parcel, readInt);
                             Set<String> keySet = zzs2.keySet();
                             keySet.size();
                             sb.append("{");
                             boolean z2 = true;
-                            for (String str2 : keySet) {
+                            for (String str4 : keySet) {
                                 if (!z2) {
                                     sb.append(",");
                                 }
                                 sb.append("\"");
-                                sb.append(str2);
+                                sb.append(str4);
                                 sb.append("\"");
                                 sb.append(":");
                                 sb.append("\"");
-                                sb.append(zzn.zzb(zzs2.getString(str2)));
+                                sb.append(zzn.zzb(zzs2.getString(str4)));
                                 sb.append("\"");
+                                z2 = false;
                             }
                             sb.append("}");
                             break;
                         case 11:
-                            Parcel zzad = zzbkw.zzad(parcel, readInt);
-                            zzad.setDataPosition(0);
-                            Objects.requireNonNull(field.mConcreteTypeName, "null reference");
-                            Objects.requireNonNull(field.zzb, "null reference");
-                            zza(sb, field.zzb.getFieldMapping(field.mConcreteTypeName), zzad);
+                            int zza11 = zzbkw.zza(parcel, readInt);
+                            int dataPosition11 = parcel.dataPosition();
+                            if (zza11 != 0) {
+                                parcel2 = Parcel.obtain();
+                                parcel2.appendFrom(parcel, dataPosition11, zza11);
+                                parcel.setDataPosition(dataPosition11 + zza11);
+                            }
+                            parcel2.setDataPosition(0);
+                            LaunchUtils.zza(field.mConcreteTypeName);
+                            LaunchUtils.zza(field.zzb);
+                            zza(sb, field.zzb.zzb.get(field.mConcreteTypeName), parcel2);
                             break;
                         default:
                             throw new IllegalStateException("Unknown field type out");
@@ -454,10 +497,11 @@ public class zzl extends FastSafeParcelableJsonResponse {
             sb.append('}');
             return;
         }
-        throw new zzbkx(R$id$$ExternalSyntheticOutline0.m(37, "Overread allowed size end=", zza), parcel);
+        throw new zzbkx(R$style$$ExternalSyntheticOutline0.m(37, "Overread allowed size end=", zza), parcel);
     }
 
     public static void zza(StringBuilder sb, int i, Object obj) {
+        String str = null;
         switch (i) {
             case 0:
             case 1:
@@ -475,21 +519,29 @@ public class zzl extends FastSafeParcelableJsonResponse {
                 return;
             case 8:
                 sb.append("\"");
-                sb.append(R$id.zza((byte[]) obj));
+                byte[] bArr = (byte[]) obj;
+                if (bArr != null) {
+                    str = Base64.encodeToString(bArr, 0);
+                }
+                sb.append(str);
                 sb.append("\"");
                 return;
             case 9:
                 sb.append("\"");
-                sb.append(R$id.zzb((byte[]) obj));
+                byte[] bArr2 = (byte[]) obj;
+                if (bArr2 != null) {
+                    str = Base64.encodeToString(bArr2, 10);
+                }
+                sb.append(str);
                 sb.append("\"");
                 return;
             case 10:
-                R$dimen.zza(sb, (HashMap<String, String>) obj);
+                androidx.appcompat.R$id.zza(sb, (HashMap) obj);
                 return;
             case 11:
                 throw new IllegalArgumentException("Method does not accept concrete type.");
             default:
-                throw new IllegalArgumentException(R$id$$ExternalSyntheticOutline0.m(26, "Unknown type = ", i));
+                throw new IllegalArgumentException(R$style$$ExternalSyntheticOutline0.m(26, "Unknown type = ", i));
         }
     }
 }

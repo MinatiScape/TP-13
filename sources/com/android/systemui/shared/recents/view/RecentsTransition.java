@@ -9,12 +9,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IRemoteCallback;
 import android.os.RemoteException;
+import android.view.IAppTransitionAnimationSpecsFuture;
 import android.view.View;
 import java.util.function.Consumer;
 /* loaded from: classes.dex */
 public class RecentsTransition {
     public static ActivityOptions createAspectScaleAnimation(Context context, Handler handler, boolean z, AppTransitionAnimationSpecsFuture appTransitionAnimationSpecsFuture, final Runnable runnable) {
-        return ActivityOptions.makeMultiThumbFutureAspectScaleAnimation(context, handler, appTransitionAnimationSpecsFuture != null ? appTransitionAnimationSpecsFuture.getFuture() : null, new ActivityOptions.OnAnimationStartedListener() { // from class: com.android.systemui.shared.recents.view.RecentsTransition.1
+        IAppTransitionAnimationSpecsFuture iAppTransitionAnimationSpecsFuture;
+        ActivityOptions.OnAnimationStartedListener onAnimationStartedListener = new ActivityOptions.OnAnimationStartedListener() { // from class: com.android.systemui.shared.recents.view.RecentsTransition.1
             private boolean mHandled;
 
             public void onAnimationStarted() {
@@ -26,7 +28,13 @@ public class RecentsTransition {
                     }
                 }
             }
-        }, z);
+        };
+        if (appTransitionAnimationSpecsFuture != null) {
+            iAppTransitionAnimationSpecsFuture = appTransitionAnimationSpecsFuture.getFuture();
+        } else {
+            iAppTransitionAnimationSpecsFuture = null;
+        }
+        return ActivityOptions.makeMultiThumbFutureAspectScaleAnimation(context, handler, iAppTransitionAnimationSpecsFuture, onAnimationStartedListener, z);
     }
 
     public static Bitmap createHardwareBitmap(int i, int i2, Consumer<Canvas> consumer) {

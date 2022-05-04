@@ -4,16 +4,17 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
 import java.util.ArrayList;
+/* compiled from: BackStackRecord.java */
 /* loaded from: classes.dex */
-public final class BackStackState implements Parcelable {
+final class BackStackState implements Parcelable {
     public static final Parcelable.Creator<BackStackState> CREATOR = new Parcelable.Creator<BackStackState>() { // from class: android.support.v4.app.BackStackState.1
         @Override // android.os.Parcelable.Creator
-        public BackStackState createFromParcel(Parcel parcel) {
+        public final BackStackState createFromParcel(Parcel parcel) {
             return new BackStackState(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public BackStackState[] newArray(int i) {
+        public final BackStackState[] newArray(int i) {
             return new BackStackState[i];
         }
     };
@@ -30,28 +31,13 @@ public final class BackStackState implements Parcelable {
     public final int mTransition;
     public final int mTransitionStyle;
 
-    public BackStackState(Parcel parcel) {
-        this.mOps = parcel.createIntArray();
-        this.mTransition = parcel.readInt();
-        this.mTransitionStyle = parcel.readInt();
-        this.mName = parcel.readString();
-        this.mIndex = parcel.readInt();
-        this.mBreadCrumbTitleRes = parcel.readInt();
-        this.mBreadCrumbTitleText = (CharSequence) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel);
-        this.mBreadCrumbShortTitleRes = parcel.readInt();
-        this.mBreadCrumbShortTitleText = (CharSequence) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel);
-        this.mSharedElementSourceNames = parcel.createStringArrayList();
-        this.mSharedElementTargetNames = parcel.createStringArrayList();
-        this.mReorderingAllowed = parcel.readInt() != 0;
-    }
-
     @Override // android.os.Parcelable
-    public int describeContents() {
+    public final int describeContents() {
         return 0;
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
+    public final void writeToParcel(Parcel parcel, int i) {
         parcel.writeIntArray(this.mOps);
         parcel.writeInt(this.mTransition);
         parcel.writeInt(this.mTransitionStyle);
@@ -64,5 +50,26 @@ public final class BackStackState implements Parcelable {
         parcel.writeStringList(this.mSharedElementSourceNames);
         parcel.writeStringList(this.mSharedElementTargetNames);
         parcel.writeInt(this.mReorderingAllowed ? 1 : 0);
+    }
+
+    public BackStackState(Parcel parcel) {
+        boolean z;
+        this.mOps = parcel.createIntArray();
+        this.mTransition = parcel.readInt();
+        this.mTransitionStyle = parcel.readInt();
+        this.mName = parcel.readString();
+        this.mIndex = parcel.readInt();
+        this.mBreadCrumbTitleRes = parcel.readInt();
+        this.mBreadCrumbTitleText = (CharSequence) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel);
+        this.mBreadCrumbShortTitleRes = parcel.readInt();
+        this.mBreadCrumbShortTitleText = (CharSequence) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel);
+        this.mSharedElementSourceNames = parcel.createStringArrayList();
+        this.mSharedElementTargetNames = parcel.createStringArrayList();
+        if (parcel.readInt() != 0) {
+            z = true;
+        } else {
+            z = false;
+        }
+        this.mReorderingAllowed = z;
     }
 }

@@ -4,67 +4,76 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.EncodeStrategy;
 /* loaded from: classes.dex */
 public abstract class DiskCacheStrategy {
-    public static final DiskCacheStrategy NONE = new DiskCacheStrategy() { // from class: com.bumptech.glide.load.engine.DiskCacheStrategy.2
+    public static final AnonymousClass2 NONE = new DiskCacheStrategy() { // from class: com.bumptech.glide.load.engine.DiskCacheStrategy.2
         @Override // com.bumptech.glide.load.engine.DiskCacheStrategy
-        public boolean decodeCachedData() {
+        public final boolean decodeCachedData() {
             return false;
         }
 
         @Override // com.bumptech.glide.load.engine.DiskCacheStrategy
-        public boolean decodeCachedResource() {
+        public final boolean decodeCachedResource() {
             return false;
         }
 
         @Override // com.bumptech.glide.load.engine.DiskCacheStrategy
-        public boolean isDataCacheable(DataSource dataSource) {
+        public final boolean isDataCacheable(DataSource dataSource) {
             return false;
         }
 
         @Override // com.bumptech.glide.load.engine.DiskCacheStrategy
-        public boolean isResourceCacheable(boolean isFromAlternateCacheKey, DataSource dataSource, EncodeStrategy encodeStrategy) {
-            return false;
-        }
-    };
-    public static final DiskCacheStrategy DATA = new DiskCacheStrategy() { // from class: com.bumptech.glide.load.engine.DiskCacheStrategy.3
-        @Override // com.bumptech.glide.load.engine.DiskCacheStrategy
-        public boolean decodeCachedData() {
-            return true;
-        }
-
-        @Override // com.bumptech.glide.load.engine.DiskCacheStrategy
-        public boolean decodeCachedResource() {
-            return false;
-        }
-
-        @Override // com.bumptech.glide.load.engine.DiskCacheStrategy
-        public boolean isDataCacheable(DataSource dataSource) {
-            return (dataSource == DataSource.DATA_DISK_CACHE || dataSource == DataSource.MEMORY_CACHE) ? false : true;
-        }
-
-        @Override // com.bumptech.glide.load.engine.DiskCacheStrategy
-        public boolean isResourceCacheable(boolean isFromAlternateCacheKey, DataSource dataSource, EncodeStrategy encodeStrategy) {
+        public final boolean isResourceCacheable(boolean z, DataSource dataSource, EncodeStrategy encodeStrategy) {
             return false;
         }
     };
-    public static final DiskCacheStrategy AUTOMATIC = new DiskCacheStrategy() { // from class: com.bumptech.glide.load.engine.DiskCacheStrategy.5
+    public static final AnonymousClass3 DATA = new DiskCacheStrategy() { // from class: com.bumptech.glide.load.engine.DiskCacheStrategy.3
         @Override // com.bumptech.glide.load.engine.DiskCacheStrategy
-        public boolean decodeCachedData() {
+        public final boolean decodeCachedData() {
             return true;
         }
 
         @Override // com.bumptech.glide.load.engine.DiskCacheStrategy
-        public boolean decodeCachedResource() {
+        public final boolean decodeCachedResource() {
+            return false;
+        }
+
+        @Override // com.bumptech.glide.load.engine.DiskCacheStrategy
+        public final boolean isResourceCacheable(boolean z, DataSource dataSource, EncodeStrategy encodeStrategy) {
+            return false;
+        }
+
+        @Override // com.bumptech.glide.load.engine.DiskCacheStrategy
+        public final boolean isDataCacheable(DataSource dataSource) {
+            if (dataSource == DataSource.DATA_DISK_CACHE || dataSource == DataSource.MEMORY_CACHE) {
+                return false;
+            }
+            return true;
+        }
+    };
+    public static final AnonymousClass5 AUTOMATIC = new DiskCacheStrategy() { // from class: com.bumptech.glide.load.engine.DiskCacheStrategy.5
+        @Override // com.bumptech.glide.load.engine.DiskCacheStrategy
+        public final boolean decodeCachedData() {
             return true;
         }
 
         @Override // com.bumptech.glide.load.engine.DiskCacheStrategy
-        public boolean isDataCacheable(DataSource dataSource) {
-            return dataSource == DataSource.REMOTE;
+        public final boolean decodeCachedResource() {
+            return true;
         }
 
         @Override // com.bumptech.glide.load.engine.DiskCacheStrategy
-        public boolean isResourceCacheable(boolean isFromAlternateCacheKey, DataSource dataSource, EncodeStrategy encodeStrategy) {
-            return ((isFromAlternateCacheKey && dataSource == DataSource.DATA_DISK_CACHE) || dataSource == DataSource.LOCAL) && encodeStrategy == EncodeStrategy.TRANSFORMED;
+        public final boolean isDataCacheable(DataSource dataSource) {
+            if (dataSource == DataSource.REMOTE) {
+                return true;
+            }
+            return false;
+        }
+
+        @Override // com.bumptech.glide.load.engine.DiskCacheStrategy
+        public final boolean isResourceCacheable(boolean z, DataSource dataSource, EncodeStrategy encodeStrategy) {
+            if (((!z || dataSource != DataSource.DATA_DISK_CACHE) && dataSource != DataSource.LOCAL) || encodeStrategy != EncodeStrategy.TRANSFORMED) {
+                return false;
+            }
+            return true;
         }
     };
 
@@ -74,5 +83,5 @@ public abstract class DiskCacheStrategy {
 
     public abstract boolean isDataCacheable(DataSource dataSource);
 
-    public abstract boolean isResourceCacheable(boolean isFromAlternateCacheKey, DataSource dataSource, EncodeStrategy encodeStrategy);
+    public abstract boolean isResourceCacheable(boolean z, DataSource dataSource, EncodeStrategy encodeStrategy);
 }

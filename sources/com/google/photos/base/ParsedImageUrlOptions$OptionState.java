@@ -1,6 +1,6 @@
 package com.google.photos.base;
 /* loaded from: classes.dex */
-public class ParsedImageUrlOptions$OptionState {
+public final class ParsedImageUrlOptions$OptionState {
     public final boolean signed;
     public final Object value;
 

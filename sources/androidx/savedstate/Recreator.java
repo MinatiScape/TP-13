@@ -8,13 +8,12 @@ import androidx.concurrent.futures.AbstractResolvableFuture$$ExternalSyntheticOu
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LifecycleRegistry;
 import androidx.savedstate.SavedStateRegistry;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
+/* JADX INFO: Access modifiers changed from: package-private */
 @SuppressLint({"RestrictedApi"})
 /* loaded from: classes.dex */
 public final class Recreator implements LifecycleEventObserver {
@@ -22,31 +21,25 @@ public final class Recreator implements LifecycleEventObserver {
 
     /* loaded from: classes.dex */
     public static final class SavedStateProvider implements SavedStateRegistry.SavedStateProvider {
-        public final Set<String> mClasses = new HashSet();
-
-        public SavedStateProvider(SavedStateRegistry savedStateRegistry) {
-            savedStateRegistry.registerSavedStateProvider("androidx.savedstate.Restarter", this);
-        }
+        public final HashSet mClasses = new HashSet();
 
         @Override // androidx.savedstate.SavedStateRegistry.SavedStateProvider
-        public Bundle saveState() {
+        public final Bundle saveState() {
             Bundle bundle = new Bundle();
             bundle.putStringArrayList("classes_to_restore", new ArrayList<>(this.mClasses));
             return bundle;
         }
-    }
 
-    public Recreator(SavedStateRegistryOwner savedStateRegistryOwner) {
-        this.mOwner = savedStateRegistryOwner;
+        public SavedStateProvider(SavedStateRegistry savedStateRegistry) {
+            savedStateRegistry.registerSavedStateProvider("androidx.savedstate.Restarter", this);
+        }
     }
 
     @Override // androidx.lifecycle.LifecycleEventObserver
-    public void onStateChanged(LifecycleOwner lifecycleOwner, Lifecycle.Event event) {
+    public final void onStateChanged(LifecycleOwner lifecycleOwner, Lifecycle.Event event) {
         Class cls;
         if (event == Lifecycle.Event.ON_CREATE) {
-            LifecycleRegistry lifecycleRegistry = (LifecycleRegistry) lifecycleOwner.getLifecycle();
-            lifecycleRegistry.enforceMainThreadIfNeeded("removeObserver");
-            lifecycleRegistry.mObserverMap.remove(this);
+            lifecycleOwner.getLifecycle().removeObserver(this);
             Bundle consumeRestoredStateForKey = this.mOwner.getSavedStateRegistry().consumeRestoredStateForKey("androidx.savedstate.Restarter");
             if (consumeRestoredStateForKey != null) {
                 ArrayList<String> stringArrayList = consumeRestoredStateForKey.getStringArrayList("classes_to_restore");
@@ -80,5 +73,9 @@ public final class Recreator implements LifecycleEventObserver {
             return;
         }
         throw new AssertionError("Next event must be ON_CREATE");
+    }
+
+    public Recreator(SavedStateRegistryOwner savedStateRegistryOwner) {
+        this.mOwner = savedStateRegistryOwner;
     }
 }

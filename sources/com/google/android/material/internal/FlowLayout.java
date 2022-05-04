@@ -10,7 +10,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.ViewPropertyAnimatorCompat;
 import com.android.systemui.shared.R;
 import com.google.android.material.R$styleable;
-import com.google.android.material.chip.ChipGroup;
 import com.google.common.math.IntMath;
 import java.util.WeakHashMap;
 /* loaded from: classes.dex */
@@ -24,78 +23,28 @@ public class FlowLayout extends ViewGroup {
         this(context, null);
     }
 
-    public final void loadFromAttributes(Context context, AttributeSet attributeSet) {
-        TypedArray obtainStyledAttributes = context.getTheme().obtainStyledAttributes(attributeSet, R$styleable.FlowLayout, 0, 0);
-        this.lineSpacing = obtainStyledAttributes.getDimensionPixelSize(1, 0);
-        this.itemSpacing = obtainStyledAttributes.getDimensionPixelSize(0, 0);
-        obtainStyledAttributes.recycle();
-    }
-
-    @Override // android.view.ViewGroup, android.view.View
-    public void onLayout(boolean z, int i, int i2, int i3, int i4) {
-        int i5;
-        int i6;
-        if (getChildCount() == 0) {
-            this.rowCount = 0;
-            return;
-        }
-        this.rowCount = 1;
-        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-        boolean z2 = getLayoutDirection() == 1;
-        int paddingRight = z2 ? getPaddingRight() : getPaddingLeft();
-        int paddingLeft = z2 ? getPaddingLeft() : getPaddingRight();
-        int paddingTop = getPaddingTop();
-        int i7 = (i3 - i) - paddingLeft;
-        int i8 = paddingRight;
-        int i9 = paddingTop;
-        for (int i10 = 0; i10 < getChildCount(); i10++) {
-            View childAt = getChildAt(i10);
-            if (childAt.getVisibility() == 8) {
-                childAt.setTag(R.id.row_index_key, -1);
-            } else {
-                ViewGroup.LayoutParams layoutParams = childAt.getLayoutParams();
-                if (layoutParams instanceof ViewGroup.MarginLayoutParams) {
-                    ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) layoutParams;
-                    i5 = marginLayoutParams.getMarginStart();
-                    i6 = marginLayoutParams.getMarginEnd();
-                } else {
-                    i6 = 0;
-                    i5 = 0;
-                }
-                int measuredWidth = childAt.getMeasuredWidth() + i8 + i5;
-                if (!this.singleLine && measuredWidth > i7) {
-                    i9 = this.lineSpacing + paddingTop;
-                    this.rowCount++;
-                    i8 = paddingRight;
-                }
-                childAt.setTag(R.id.row_index_key, Integer.valueOf(this.rowCount - 1));
-                int i11 = i8 + i5;
-                int measuredWidth2 = childAt.getMeasuredWidth() + i11;
-                int measuredHeight = childAt.getMeasuredHeight() + i9;
-                if (z2) {
-                    childAt.layout(i7 - measuredWidth2, i9, (i7 - i8) - i5, measuredHeight);
-                } else {
-                    childAt.layout(i11, i9, measuredWidth2, measuredHeight);
-                }
-                i8 += childAt.getMeasuredWidth() + i5 + i6 + this.itemSpacing;
-                paddingTop = measuredHeight;
-            }
-        }
+    public FlowLayout(Context context, AttributeSet attributeSet) {
+        this(context, attributeSet, 0);
     }
 
     @Override // android.view.View
-    public void onMeasure(int i, int i2) {
+    public final void onMeasure(int i, int i2) {
         int i3;
         int i4;
         int i5;
+        int i6;
         int size = View.MeasureSpec.getSize(i);
         int mode = View.MeasureSpec.getMode(i);
         int size2 = View.MeasureSpec.getSize(i2);
         int mode2 = View.MeasureSpec.getMode(i2);
-        int i6 = (mode == Integer.MIN_VALUE || mode == 1073741824) ? size : Integer.MAX_VALUE;
+        if (mode == Integer.MIN_VALUE || mode == 1073741824) {
+            i3 = size;
+        } else {
+            i3 = Integer.MAX_VALUE;
+        }
         int paddingLeft = getPaddingLeft();
         int paddingTop = getPaddingTop();
-        int paddingRight = i6 - getPaddingRight();
+        int paddingRight = i3 - getPaddingRight();
         int i7 = paddingTop;
         int i8 = 0;
         for (int i9 = 0; i9 < getChildCount(); i9++) {
@@ -105,60 +54,135 @@ public class FlowLayout extends ViewGroup {
                 ViewGroup.LayoutParams layoutParams = childAt.getLayoutParams();
                 if (layoutParams instanceof ViewGroup.MarginLayoutParams) {
                     ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) layoutParams;
-                    i4 = marginLayoutParams.leftMargin + 0;
-                    i5 = marginLayoutParams.rightMargin + 0;
+                    i5 = marginLayoutParams.leftMargin + 0;
+                    i6 = marginLayoutParams.rightMargin + 0;
                 } else {
+                    i6 = 0;
                     i5 = 0;
-                    i4 = 0;
                 }
-                if (childAt.getMeasuredWidth() + paddingLeft + i4 > paddingRight && !((ChipGroup) this).singleLine) {
+                if (childAt.getMeasuredWidth() + paddingLeft + i5 > paddingRight && !isSingleLine()) {
                     paddingLeft = getPaddingLeft();
-                    i7 = paddingTop + this.lineSpacing;
+                    i7 = this.lineSpacing + paddingTop;
                 }
-                int measuredWidth = childAt.getMeasuredWidth() + paddingLeft + i4;
-                paddingTop = childAt.getMeasuredHeight() + i7;
+                int measuredWidth = childAt.getMeasuredWidth() + paddingLeft + i5;
+                int measuredHeight = childAt.getMeasuredHeight() + i7;
                 if (measuredWidth > i8) {
                     i8 = measuredWidth;
                 }
-                paddingLeft = childAt.getMeasuredWidth() + i4 + i5 + this.itemSpacing + paddingLeft;
+                int measuredWidth2 = childAt.getMeasuredWidth() + i5 + i6 + this.itemSpacing + paddingLeft;
                 if (i9 == getChildCount() - 1) {
-                    i8 += i5;
+                    i8 += i6;
                 }
+                paddingLeft = measuredWidth2;
+                paddingTop = measuredHeight;
             }
         }
         int paddingRight2 = getPaddingRight() + i8;
         int paddingBottom = getPaddingBottom() + paddingTop;
         if (mode != Integer.MIN_VALUE) {
-            i3 = IntMath.MAX_SIGNED_POWER_OF_TWO;
+            i4 = IntMath.MAX_SIGNED_POWER_OF_TWO;
             if (mode != 1073741824) {
                 size = paddingRight2;
             }
         } else {
-            i3 = IntMath.MAX_SIGNED_POWER_OF_TWO;
+            i4 = IntMath.MAX_SIGNED_POWER_OF_TWO;
             size = Math.min(paddingRight2, size);
         }
         if (mode2 == Integer.MIN_VALUE) {
             size2 = Math.min(paddingBottom, size2);
-        } else if (mode2 != i3) {
+        } else if (mode2 != i4) {
             size2 = paddingBottom;
         }
         setMeasuredDimension(size, size2);
     }
 
-    public FlowLayout(Context context, AttributeSet attributeSet) {
-        this(context, attributeSet, 0);
-    }
-
     public FlowLayout(Context context, AttributeSet attributeSet, int i) {
         super(context, attributeSet, i);
         this.singleLine = false;
-        loadFromAttributes(context, attributeSet);
+        TypedArray obtainStyledAttributes = context.getTheme().obtainStyledAttributes(attributeSet, R$styleable.FlowLayout, 0, 0);
+        this.lineSpacing = obtainStyledAttributes.getDimensionPixelSize(1, 0);
+        this.itemSpacing = obtainStyledAttributes.getDimensionPixelSize(0, 0);
+        obtainStyledAttributes.recycle();
+    }
+
+    @Override // android.view.ViewGroup, android.view.View
+    public final void onLayout(boolean z, int i, int i2, int i3, int i4) {
+        boolean z2;
+        int i5;
+        int i6;
+        int i7;
+        int i8;
+        if (getChildCount() == 0) {
+            this.rowCount = 0;
+            return;
+        }
+        this.rowCount = 1;
+        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
+        if (ViewCompat.Api17Impl.getLayoutDirection(this) == 1) {
+            z2 = true;
+        } else {
+            z2 = false;
+        }
+        if (z2) {
+            i5 = getPaddingRight();
+        } else {
+            i5 = getPaddingLeft();
+        }
+        if (z2) {
+            i6 = getPaddingLeft();
+        } else {
+            i6 = getPaddingRight();
+        }
+        int paddingTop = getPaddingTop();
+        int i9 = (i3 - i) - i6;
+        int i10 = i5;
+        int i11 = paddingTop;
+        for (int i12 = 0; i12 < getChildCount(); i12++) {
+            View childAt = getChildAt(i12);
+            if (childAt.getVisibility() == 8) {
+                childAt.setTag(R.id.row_index_key, -1);
+            } else {
+                ViewGroup.LayoutParams layoutParams = childAt.getLayoutParams();
+                if (layoutParams instanceof ViewGroup.MarginLayoutParams) {
+                    ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) layoutParams;
+                    i7 = marginLayoutParams.getMarginStart();
+                    i8 = marginLayoutParams.getMarginEnd();
+                } else {
+                    i8 = 0;
+                    i7 = 0;
+                }
+                int measuredWidth = childAt.getMeasuredWidth() + i10 + i7;
+                if (!this.singleLine && measuredWidth > i9) {
+                    i11 = this.lineSpacing + paddingTop;
+                    this.rowCount++;
+                    i10 = i5;
+                }
+                childAt.setTag(R.id.row_index_key, Integer.valueOf(this.rowCount - 1));
+                int i13 = i10 + i7;
+                int measuredWidth2 = childAt.getMeasuredWidth() + i13;
+                int measuredHeight = childAt.getMeasuredHeight() + i11;
+                if (z2) {
+                    childAt.layout(i9 - measuredWidth2, i11, (i9 - i10) - i7, measuredHeight);
+                } else {
+                    childAt.layout(i13, i11, measuredWidth2, measuredHeight);
+                }
+                i10 += childAt.getMeasuredWidth() + i7 + i8 + this.itemSpacing;
+                paddingTop = measuredHeight;
+            }
+        }
     }
 
     @TargetApi(21)
     public FlowLayout(Context context, AttributeSet attributeSet, int i, int i2) {
         super(context, attributeSet, i, i2);
         this.singleLine = false;
-        loadFromAttributes(context, attributeSet);
+        TypedArray obtainStyledAttributes = context.getTheme().obtainStyledAttributes(attributeSet, R$styleable.FlowLayout, 0, 0);
+        this.lineSpacing = obtainStyledAttributes.getDimensionPixelSize(1, 0);
+        this.itemSpacing = obtainStyledAttributes.getDimensionPixelSize(0, 0);
+        obtainStyledAttributes.recycle();
+    }
+
+    public boolean isSingleLine() {
+        return this.singleLine;
     }
 }

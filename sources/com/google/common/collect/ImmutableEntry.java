@@ -2,10 +2,15 @@ package com.google.common.collect;
 
 import java.io.Serializable;
 /* loaded from: classes.dex */
-public class ImmutableEntry<K, V> extends AbstractMapEntry<K, V> implements Serializable {
+class ImmutableEntry<K, V> extends AbstractMapEntry<K, V> implements Serializable {
     private static final long serialVersionUID = 0;
     public final K key;
     public final V value;
+
+    @Override // com.google.common.collect.AbstractMapEntry, java.util.Map.Entry
+    public final V setValue(V value) {
+        throw new UnsupportedOperationException();
+    }
 
     public ImmutableEntry(K key, V value) {
         this.key = key;
@@ -20,10 +25,5 @@ public class ImmutableEntry<K, V> extends AbstractMapEntry<K, V> implements Seri
     @Override // com.google.common.collect.AbstractMapEntry, java.util.Map.Entry
     public final V getValue() {
         return this.value;
-    }
-
-    @Override // java.util.Map.Entry
-    public final V setValue(V value) {
-        throw new UnsupportedOperationException();
     }
 }

@@ -1,36 +1,14 @@
 package kotlin.ranges;
 
-import androidx.lifecycle.viewmodel.R$id;
 import java.util.Iterator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: Progressions.kt */
 /* loaded from: classes.dex */
 public class IntProgression implements Iterable<Integer> {
     public final int first;
     public final int last;
     public final int step;
-
-    public IntProgression(int i, int i2, int i3) {
-        if (i3 == 0) {
-            throw new IllegalArgumentException("Step must be non-zero.");
-        } else if (i3 != Integer.MIN_VALUE) {
-            this.first = i;
-            if (i3 > 0) {
-                if (i < i2) {
-                    i2 -= R$id.mod(R$id.mod(i2, i3) - R$id.mod(i, i3), i3);
-                }
-            } else if (i3 >= 0) {
-                throw new IllegalArgumentException("Step is zero.");
-            } else if (i > i2) {
-                int i4 = -i3;
-                i2 += R$id.mod(R$id.mod(i, i4) - R$id.mod(i2, i4), i4);
-            }
-            this.last = i2;
-            this.step = i3;
-        } else {
-            throw new IllegalArgumentException("Step must be greater than Int.MIN_VALUE to avoid overflow on negation.");
-        }
-    }
 
     public boolean equals(@Nullable Object obj) {
         if (obj instanceof IntProgression) {
@@ -42,13 +20,6 @@ public class IntProgression implements Iterable<Integer> {
             return true;
         }
         return false;
-    }
-
-    public int hashCode() {
-        if (isEmpty()) {
-            return -1;
-        }
-        return this.step + (((this.first * 31) + this.last) * 31);
     }
 
     public boolean isEmpty() {
@@ -63,7 +34,7 @@ public class IntProgression implements Iterable<Integer> {
     }
 
     @Override // java.lang.Iterable
-    public Iterator<Integer> iterator() {
+    public final Iterator<Integer> iterator() {
         return new IntProgressionIterator(this.first, this.last, this.step);
     }
 
@@ -88,5 +59,40 @@ public class IntProgression implements Iterable<Integer> {
         }
         sb.append(i);
         return sb.toString();
+    }
+
+    public IntProgression(int i, int i2, int i3) {
+        if (i3 == 0) {
+            throw new IllegalArgumentException("Step must be non-zero.");
+        } else if (i3 != Integer.MIN_VALUE) {
+            this.first = i;
+            if (i3 > 0) {
+                if (i < i2) {
+                    int i4 = i2 % i3;
+                    int i5 = i % i3;
+                    int i6 = ((i4 < 0 ? i4 + i3 : i4) - (i5 < 0 ? i5 + i3 : i5)) % i3;
+                    i2 -= i6 < 0 ? i6 + i3 : i6;
+                }
+            } else if (i3 >= 0) {
+                throw new IllegalArgumentException("Step is zero.");
+            } else if (i > i2) {
+                int i7 = -i3;
+                int i8 = i % i7;
+                int i9 = i2 % i7;
+                int i10 = ((i8 < 0 ? i8 + i7 : i8) - (i9 < 0 ? i9 + i7 : i9)) % i7;
+                i2 += i10 < 0 ? i10 + i7 : i10;
+            }
+            this.last = i2;
+            this.step = i3;
+        } else {
+            throw new IllegalArgumentException("Step must be greater than Int.MIN_VALUE to avoid overflow on negation.");
+        }
+    }
+
+    public int hashCode() {
+        if (isEmpty()) {
+            return -1;
+        }
+        return this.step + (((this.first * 31) + this.last) * 31);
     }
 }

@@ -24,7 +24,58 @@ public abstract class WallpaperInfo implements Parcelable {
         this.mPlaceholderColor = 0;
     }
 
-    public Future<Integer> computePlaceholderColor(Context context) {
+    @Override // android.os.Parcelable
+    public final int describeContents() {
+        return 0;
+    }
+
+    public int getActionIconRes() {
+        return R.drawable.ic_explore_24px;
+    }
+
+    public int getActionLabelRes() {
+        return R.string.explore;
+    }
+
+    public String getActionUrl(Context context) {
+        return null;
+    }
+
+    public abstract Asset getAsset(Context context);
+
+    public abstract List<String> getAttributions(Context context);
+
+    public int getBackupPermission() {
+        return 1;
+    }
+
+    public String getBaseImageUrl() {
+        return null;
+    }
+
+    public abstract String getCollectionId(Context context);
+
+    public abstract Asset getThumbAsset(Context context);
+
+    public String getTitle(Activity activity) {
+        return null;
+    }
+
+    public Uri getUri() {
+        return null;
+    }
+
+    public android.app.WallpaperInfo getWallpaperComponent() {
+        return null;
+    }
+
+    public String getWallpaperId() {
+        return null;
+    }
+
+    public abstract void showPreview(Activity activity, InlinePreviewIntentFactory inlinePreviewIntentFactory, int i);
+
+    public final Future<Integer> computePlaceholderColor(Context context) {
         int i = this.mPlaceholderColor;
         if (i != 0) {
             return CompletableFuture.completedFuture(Integer.valueOf(i));
@@ -58,61 +109,6 @@ public abstract class WallpaperInfo implements Parcelable {
     }
 
     @Override // android.os.Parcelable
-    public int describeContents() {
-        return 0;
-    }
-
-    public int getActionIconRes(Context context) {
-        return R.drawable.ic_explore_24px;
-    }
-
-    public int getActionLabelRes(Context context) {
-        return R.string.explore;
-    }
-
-    public String getActionUrl(Context context) {
-        return null;
-    }
-
-    public abstract Asset getAsset(Context context);
-
-    public abstract List<String> getAttributions(Context context);
-
-    public int getBackupPermission() {
-        return 1;
-    }
-
-    public String getBaseImageUrl() {
-        return null;
-    }
-
-    public abstract String getCollectionId(Context context);
-
-    public Asset getDesktopAsset(Context context) {
-        return getAsset(context);
-    }
-
-    public abstract Asset getThumbAsset(Context context);
-
-    public String getTitle(Context context) {
-        return null;
-    }
-
-    public Uri getUri() {
-        return null;
-    }
-
-    public android.app.WallpaperInfo getWallpaperComponent() {
-        return null;
-    }
-
-    public String getWallpaperId() {
-        return null;
-    }
-
-    public abstract void showPreview(Activity activity, InlinePreviewIntentFactory inlinePreviewIntentFactory, int i);
-
-    @Override // android.os.Parcelable
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeInt(this.mPlaceholderColor);
     }
@@ -120,5 +116,12 @@ public abstract class WallpaperInfo implements Parcelable {
     public WallpaperInfo(Parcel parcel) {
         this.mPlaceholderColor = 0;
         this.mPlaceholderColor = parcel.readInt();
+    }
+
+    public String getStoredWallpaperId(Context context) {
+        if (getWallpaperId() == null) {
+            return null;
+        }
+        return getCollectionId(context) + "-" + getWallpaperId();
     }
 }

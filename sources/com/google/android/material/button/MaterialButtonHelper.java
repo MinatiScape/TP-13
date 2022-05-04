@@ -2,14 +2,14 @@ package com.google.android.material.button;
 
 import android.content.res.ColorStateList;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.RippleDrawable;
 import com.google.android.material.shape.MaterialShapeDrawable;
 import com.google.android.material.shape.ShapeAppearanceModel;
 import com.google.android.material.shape.Shapeable;
 /* loaded from: classes.dex */
-public class MaterialButtonHelper {
+public final class MaterialButtonHelper {
     public ColorStateList backgroundTint;
     public PorterDuff.Mode backgroundTintMode;
     public boolean checkable;
@@ -18,24 +18,19 @@ public class MaterialButtonHelper {
     public int insetLeft;
     public int insetRight;
     public int insetTop;
-    public Drawable maskDrawable;
+    public MaterialShapeDrawable maskDrawable;
     public final MaterialButton materialButton;
     public ColorStateList rippleColor;
-    public LayerDrawable rippleDrawable;
+    public RippleDrawable rippleDrawable;
     public ShapeAppearanceModel shapeAppearanceModel;
     public ColorStateList strokeColor;
     public int strokeWidth;
     public boolean shouldDrawSurfaceColorStroke = false;
     public boolean backgroundOverwritten = false;
 
-    public MaterialButtonHelper(MaterialButton materialButton, ShapeAppearanceModel shapeAppearanceModel) {
-        this.materialButton = materialButton;
-        this.shapeAppearanceModel = shapeAppearanceModel;
-    }
-
-    public Shapeable getMaskDrawable() {
-        LayerDrawable layerDrawable = this.rippleDrawable;
-        if (layerDrawable == null || layerDrawable.getNumberOfLayers() <= 1) {
+    public final Shapeable getMaskDrawable() {
+        RippleDrawable rippleDrawable = this.rippleDrawable;
+        if (rippleDrawable == null || rippleDrawable.getNumberOfLayers() <= 1) {
             return null;
         }
         if (this.rippleDrawable.getNumberOfLayers() > 2) {
@@ -45,35 +40,28 @@ public class MaterialButtonHelper {
     }
 
     public final MaterialShapeDrawable getMaterialShapeDrawable(boolean z) {
-        LayerDrawable layerDrawable = this.rippleDrawable;
-        if (layerDrawable == null || layerDrawable.getNumberOfLayers() <= 0) {
+        RippleDrawable rippleDrawable = this.rippleDrawable;
+        if (rippleDrawable == null || rippleDrawable.getNumberOfLayers() <= 0) {
             return null;
         }
         return (MaterialShapeDrawable) ((LayerDrawable) ((InsetDrawable) this.rippleDrawable.getDrawable(0)).getDrawable()).getDrawable(!z ? 1 : 0);
     }
 
-    public final MaterialShapeDrawable getSurfaceColorStrokeDrawable() {
-        return getMaterialShapeDrawable(true);
-    }
-
-    public void setShapeAppearanceModel(ShapeAppearanceModel shapeAppearanceModel) {
+    public final void setShapeAppearanceModel(ShapeAppearanceModel shapeAppearanceModel) {
         this.shapeAppearanceModel = shapeAppearanceModel;
-        if (getMaterialShapeDrawable() != null) {
-            MaterialShapeDrawable materialShapeDrawable = getMaterialShapeDrawable();
-            materialShapeDrawable.drawableState.shapeAppearanceModel = shapeAppearanceModel;
-            materialShapeDrawable.invalidateSelf();
+        if (getMaterialShapeDrawable(false) != null) {
+            getMaterialShapeDrawable(false).setShapeAppearanceModel(shapeAppearanceModel);
         }
-        if (getSurfaceColorStrokeDrawable() != null) {
-            MaterialShapeDrawable surfaceColorStrokeDrawable = getSurfaceColorStrokeDrawable();
-            surfaceColorStrokeDrawable.drawableState.shapeAppearanceModel = shapeAppearanceModel;
-            surfaceColorStrokeDrawable.invalidateSelf();
+        if (getMaterialShapeDrawable(true) != null) {
+            getMaterialShapeDrawable(true).setShapeAppearanceModel(shapeAppearanceModel);
         }
         if (getMaskDrawable() != null) {
             getMaskDrawable().setShapeAppearanceModel(shapeAppearanceModel);
         }
     }
 
-    public MaterialShapeDrawable getMaterialShapeDrawable() {
-        return getMaterialShapeDrawable(false);
+    public MaterialButtonHelper(MaterialButton materialButton, ShapeAppearanceModel shapeAppearanceModel) {
+        this.materialButton = materialButton;
+        this.shapeAppearanceModel = shapeAppearanceModel;
     }
 }

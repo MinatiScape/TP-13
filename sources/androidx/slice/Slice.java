@@ -16,54 +16,53 @@ public final class Slice extends CustomVersionedParcelable {
     public SliceSpec mSpec;
     public String mUri;
 
-    public Slice(ArrayList<SliceItem> items, String[] hints, Uri uri, SliceSpec spec) {
+    public Slice(ArrayList<SliceItem> arrayList, String[] strArr, Uri uri, SliceSpec sliceSpec) {
         this.mSpec = null;
         this.mItems = NO_ITEMS;
-        this.mHints = NO_HINTS;
         this.mUri = null;
-        this.mHints = hints;
-        this.mItems = (SliceItem[]) items.toArray(new SliceItem[items.size()]);
+        this.mHints = strArr;
+        this.mItems = (SliceItem[]) arrayList.toArray(new SliceItem[arrayList.size()]);
         this.mUri = uri.toString();
-        this.mSpec = spec;
+        this.mSpec = sliceSpec;
     }
 
-    public static void appendHints(StringBuilder sb, String[] hints) {
-        if (!(hints == null || hints.length == 0)) {
+    public final String toString() {
+        return toString("");
+    }
+
+    public static void appendHints(StringBuilder sb, String[] strArr) {
+        if (!(strArr == null || strArr.length == 0)) {
             sb.append('(');
-            int length = hints.length - 1;
+            int length = strArr.length - 1;
             for (int i = 0; i < length; i++) {
-                sb.append(hints[i]);
+                sb.append(strArr[i]);
                 sb.append(", ");
             }
-            sb.append(hints[length]);
+            sb.append(strArr[length]);
             sb.append(")");
         }
     }
 
-    public static boolean isValidIcon(IconCompat icon) {
-        if (icon.mType != 2 || icon.getResId() != 0) {
+    public static boolean isValidIcon(IconCompat iconCompat) {
+        if (iconCompat.mType != 2 || iconCompat.getResId() != 0) {
             return true;
         }
         StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Failed to add icon, invalid resource id: ");
-        m.append(icon.getResId());
+        m.append(iconCompat.getResId());
         throw new IllegalArgumentException(m.toString());
     }
 
-    public List<SliceItem> getItems() {
+    public final List<SliceItem> getItems() {
         return Arrays.asList(this.mItems);
     }
 
-    public Uri getUri() {
+    public final Uri getUri() {
         return Uri.parse(this.mUri);
     }
 
-    public String toString() {
-        return toString("");
-    }
-
-    public String toString(String indent) {
+    public final String toString(String str) {
         StringBuilder sb = new StringBuilder();
-        sb.append(indent);
+        sb.append(str);
         sb.append("Slice ");
         String[] strArr = this.mHints;
         if (strArr.length > 0) {
@@ -73,15 +72,15 @@ public final class Slice extends CustomVersionedParcelable {
         sb.append('[');
         sb.append(this.mUri);
         sb.append("] {\n");
-        String str = indent + "  ";
+        String str2 = str + "  ";
         int i = 0;
         while (true) {
             SliceItem[] sliceItemArr = this.mItems;
             if (i < sliceItemArr.length) {
-                sb.append(sliceItemArr[i].toString(str));
+                sb.append(sliceItemArr[i].toString(str2));
                 i++;
             } else {
-                sb.append(indent);
+                sb.append(str);
                 sb.append('}');
                 return sb.toString();
             }

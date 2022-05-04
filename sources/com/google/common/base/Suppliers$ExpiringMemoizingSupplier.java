@@ -2,7 +2,7 @@ package com.google.common.base;
 
 import java.io.Serializable;
 /* loaded from: classes.dex */
-public class Suppliers$ExpiringMemoizingSupplier<T> implements Supplier<T>, Serializable {
+class Suppliers$ExpiringMemoizingSupplier<T> implements Supplier<T>, Serializable {
     private static final long serialVersionUID = 0;
     public final Supplier<T> delegate;
     public final long durationNanos;
@@ -10,7 +10,7 @@ public class Suppliers$ExpiringMemoizingSupplier<T> implements Supplier<T>, Seri
     public volatile transient T value;
 
     @Override // com.google.common.base.Supplier
-    public T get() {
+    public final T get() {
         long j = this.expirationNanos;
         int i = Platform.$r8$clinit;
         long nanoTime = System.nanoTime();
@@ -31,7 +31,7 @@ public class Suppliers$ExpiringMemoizingSupplier<T> implements Supplier<T>, Seri
         return this.value;
     }
 
-    public String toString() {
+    public final String toString() {
         String valueOf = String.valueOf(this.delegate);
         long j = this.durationNanos;
         StringBuilder sb = new StringBuilder(valueOf.length() + 62);

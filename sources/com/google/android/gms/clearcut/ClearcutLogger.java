@@ -10,16 +10,12 @@ import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.util.Clock;
 import com.google.android.gms.common.util.zzh;
 import com.google.android.gms.internal.zzgsv;
-import com.google.android.gms.phenotype.ExperimentTokens;
-import java.util.Objects;
 import java.util.TimeZone;
 /* loaded from: classes.dex */
 public final class ClearcutLogger {
     @Deprecated
-    public static final Api<?> API = new Api<>("ClearcutLogger.API", new zzd(), new Api.ClientKey());
-    public static final ExperimentTokens[] zzc = new ExperimentTokens[0];
-    public static final String[] zzd = new String[0];
-    public static final byte[][] zze = new byte[0];
+    public static final Api<Object> API;
+    public static final zzd zzb;
     public final String zzf;
     public final int zzg;
     public String zzh;
@@ -38,7 +34,6 @@ public final class ClearcutLogger {
         public String zzd;
         public final MessageProducer zzf;
         public final zzgsv zzn;
-        public boolean zzm = true;
         public boolean zzo = false;
 
         public LogEventBuilder(byte[] bArr, MessageProducer messageProducer) {
@@ -50,13 +45,13 @@ public final class ClearcutLogger {
             this.zzn = zzgsvVar;
             this.zzc = ClearcutLogger.this.zzj;
             this.zzd = null;
-            Objects.requireNonNull((zzh) ClearcutLogger.this.zzo);
+            ((zzh) ClearcutLogger.this.zzo).getClass();
             zzgsvVar.zza = System.currentTimeMillis();
-            Objects.requireNonNull((zzh) ClearcutLogger.this.zzo);
+            ((zzh) ClearcutLogger.this.zzo).getClass();
             zzgsvVar.zzb = SystemClock.elapsedRealtime();
             TimeZoneOffsetProvider timeZoneOffsetProvider = ClearcutLogger.this.zzp;
             long j = zzgsvVar.zza;
-            Objects.requireNonNull(timeZoneOffsetProvider);
+            timeZoneOffsetProvider.getClass();
             zzgsvVar.zzg = TimeZone.getDefault().getOffset(j) / 1000;
             if (bArr != null) {
                 zzgsvVar.zzf = bArr;
@@ -64,23 +59,24 @@ public final class ClearcutLogger {
             this.zzf = messageProducer;
         }
 
-        /* JADX WARN: Code restructure failed: missing block: B:113:0x021a, code lost:
-            if (r2 < r10) goto L114;
+        /* JADX WARN: Code restructure failed: missing block: B:140:0x0247, code lost:
+            if (r2 < r4) goto L75;
          */
-        /* JADX WARN: Removed duplicated region for block: B:117:0x0221  */
-        /* JADX WARN: Removed duplicated region for block: B:119:0x0236  */
-        /* JADX WARN: Removed duplicated region for block: B:73:0x015b  */
+        /* JADX WARN: Removed duplicated region for block: B:143:0x024e  */
+        /* JADX WARN: Removed duplicated region for block: B:151:0x0296  */
+        /* JADX WARN: Removed duplicated region for block: B:161:0x01c0 A[EXC_TOP_SPLITTER, SYNTHETIC] */
+        /* JADX WARN: Removed duplicated region for block: B:76:0x0164  */
         @java.lang.Deprecated
         /*
             Code decompiled incorrectly, please refer to instructions dump.
             To view partially-correct add '--show-bad-code' argument
         */
-        public com.google.android.gms.common.api.PendingResult<com.google.android.gms.common.api.Status> logAsync() {
+        public final com.google.android.gms.common.api.internal.BasePendingResult logAsync() {
             /*
-                Method dump skipped, instructions count: 621
+                Method dump skipped, instructions count: 720
                 To view this dump add '--comments-level debug' option
             */
-            throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.clearcut.ClearcutLogger.LogEventBuilder.logAsync():com.google.android.gms.common.api.PendingResult");
+            throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.clearcut.ClearcutLogger.LogEventBuilder.logAsync():com.google.android.gms.common.api.internal.BasePendingResult");
         }
     }
 
@@ -96,7 +92,14 @@ public final class ClearcutLogger {
     public static class TimeZoneOffsetProvider {
     }
 
-    public ClearcutLogger(Context context, String str, String str2) {
+    static {
+        Api.ClientKey clientKey = new Api.ClientKey();
+        zzd zzdVar = new zzd();
+        zzb = zzdVar;
+        API = new Api<>(zzdVar, clientKey);
+    }
+
+    public ClearcutLogger(Context context) {
         zzb zzbVar = new zzb(context);
         zzh zzhVar = zzh.zza;
         zzs zzsVar = new zzs(context);
@@ -110,7 +113,7 @@ public final class ClearcutLogger {
         }
         this.zzg = i;
         this.zzi = -1;
-        this.zzh = str;
+        this.zzh = "WALLPAPER_PICKER";
         this.zzj = null;
         this.zzn = zzbVar;
         this.zzo = zzhVar;

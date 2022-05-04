@@ -1,4 +1,5 @@
 package com.google.android.gms.common.api.internal;
+/* compiled from: ActivityLifecycleObserverImpl.java */
 /* loaded from: classes.dex */
-public class zza$zza extends LifecycleCallback {
+class zza$zza extends LifecycleCallback {
 }

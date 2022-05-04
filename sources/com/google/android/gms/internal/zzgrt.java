@@ -2,6 +2,7 @@ package com.google.android.gms.internal;
 
 import com.google.android.gms.internal.zzgrt;
 import java.io.IOException;
+/* compiled from: ExtendableMessageNano.java */
 /* loaded from: classes.dex */
 public abstract class zzgrt<M extends zzgrt<M>> extends zzgrz {
     public zzgrv zzay;
@@ -33,7 +34,6 @@ public abstract class zzgrt<M extends zzgrt<M>> extends zzgrz {
         return 0;
     }
 
-    @Override // com.google.android.gms.internal.zzgrz
     public void writeTo(zzgrr zzgrrVar) throws IOException {
         if (this.zzay != null) {
             int i = 0;

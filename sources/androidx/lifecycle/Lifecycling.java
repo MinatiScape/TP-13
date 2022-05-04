@@ -8,21 +8,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 /* loaded from: classes.dex */
-public class Lifecycling {
-    public static Map<Class<?>, Integer> sCallbackCache = new HashMap();
-    public static Map<Class<?>, List<Constructor<? extends GeneratedAdapter>>> sClassToAdapters = new HashMap();
-
-    /* renamed from: androidx.lifecycle.Lifecycling$1  reason: invalid class name */
-    /* loaded from: classes.dex */
-    public class AnonymousClass1 implements LifecycleEventObserver {
-        @Override // androidx.lifecycle.LifecycleEventObserver
-        public void onStateChanged(LifecycleOwner lifecycleOwner, Lifecycle.Event event) {
-            throw null;
-        }
-    }
+public final class Lifecycling {
+    public static HashMap sCallbackCache = new HashMap();
+    public static HashMap sClassToAdapters = new HashMap();
 
     public static GeneratedAdapter createGeneratedAdapter(Constructor<? extends GeneratedAdapter> constructor, Object obj) {
         try {
@@ -43,7 +32,10 @@ public class Lifecycling {
     public static int getObserverConstructorType(Class<?> cls) {
         Constructor<?> constructor;
         boolean z;
-        Integer num = (Integer) ((HashMap) sCallbackCache).get(cls);
+        boolean z2;
+        boolean z3;
+        String str;
+        Integer num = (Integer) sCallbackCache.get(cls);
         if (num != null) {
             return num.intValue();
         }
@@ -53,13 +45,17 @@ public class Lifecycling {
             try {
                 Package r4 = cls.getPackage();
                 String canonicalName = cls.getCanonicalName();
-                String name = r4 != null ? r4.getName() : "";
-                if (!name.isEmpty()) {
-                    canonicalName = canonicalName.substring(name.length() + 1);
+                if (r4 != null) {
+                    str = r4.getName();
+                } else {
+                    str = "";
+                }
+                if (!str.isEmpty()) {
+                    canonicalName = canonicalName.substring(str.length() + 1);
                 }
                 String adapterName = getAdapterName(canonicalName);
-                if (!name.isEmpty()) {
-                    adapterName = name + "." + adapterName;
+                if (!str.isEmpty()) {
+                    adapterName = str + "." + adapterName;
                 }
                 constructor = Class.forName(adapterName).getDeclaredConstructor(cls);
                 if (!constructor.isAccessible()) {
@@ -70,12 +66,11 @@ public class Lifecycling {
             } catch (NoSuchMethodException e) {
                 throw new RuntimeException(e);
             }
-            i = 2;
             if (constructor != null) {
-                ((HashMap) sClassToAdapters).put(cls, Collections.singletonList(constructor));
+                sClassToAdapters.put(cls, Collections.singletonList(constructor));
             } else {
                 ClassesInfoCache classesInfoCache = ClassesInfoCache.sInstance;
-                Boolean bool = classesInfoCache.mHasLifecycleMethods.get(cls);
+                Boolean bool = (Boolean) classesInfoCache.mHasLifecycleMethods.get(cls);
                 if (bool != null) {
                     z = bool.booleanValue();
                 } else {
@@ -102,9 +97,14 @@ public class Lifecycling {
                 }
                 if (!z) {
                     Class<? super Object> superclass = cls.getSuperclass();
-                    if (superclass != null && LifecycleObserver.class.isAssignableFrom(superclass)) {
+                    if (superclass == null || !LifecycleObserver.class.isAssignableFrom(superclass)) {
+                        z2 = false;
+                    } else {
+                        z2 = true;
+                    }
+                    if (z2) {
                         if (getObserverConstructorType(superclass) != 1) {
-                            arrayList = new ArrayList((Collection) ((HashMap) sClassToAdapters).get(superclass));
+                            arrayList = new ArrayList((Collection) sClassToAdapters.get(superclass));
                         }
                     }
                     Class<?>[] interfaces = cls.getInterfaces();
@@ -113,24 +113,39 @@ public class Lifecycling {
                     while (true) {
                         if (i3 < length2) {
                             Class<?> cls2 = interfaces[i3];
-                            if (cls2 != null && LifecycleObserver.class.isAssignableFrom(cls2)) {
+                            if (cls2 == null || !LifecycleObserver.class.isAssignableFrom(cls2)) {
+                                z3 = false;
+                            } else {
+                                z3 = true;
+                            }
+                            if (z3) {
                                 if (getObserverConstructorType(cls2) == 1) {
                                     break;
                                 }
                                 if (arrayList == null) {
                                     arrayList = new ArrayList();
                                 }
-                                arrayList.addAll((Collection) ((HashMap) sClassToAdapters).get(cls2));
+                                arrayList.addAll((Collection) sClassToAdapters.get(cls2));
                             }
                             i3++;
                         } else if (arrayList != null) {
-                            ((HashMap) sClassToAdapters).put(cls, arrayList);
+                            sClassToAdapters.put(cls, arrayList);
                         }
                     }
                 }
             }
+            i = 2;
         }
-        ((HashMap) sCallbackCache).put(cls, Integer.valueOf(i));
+        sCallbackCache.put(cls, Integer.valueOf(i));
         return i;
+    }
+
+    /* renamed from: androidx.lifecycle.Lifecycling$1  reason: invalid class name */
+    /* loaded from: classes.dex */
+    class AnonymousClass1 implements LifecycleEventObserver {
+        @Override // androidx.lifecycle.LifecycleEventObserver
+        public final void onStateChanged(LifecycleOwner lifecycleOwner, Lifecycle.Event event) {
+            throw null;
+        }
     }
 }

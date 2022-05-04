@@ -8,28 +8,28 @@ import android.os.Parcelable;
 public class ParcelImpl implements Parcelable {
     public static final Parcelable.Creator<ParcelImpl> CREATOR = new Parcelable.Creator<ParcelImpl>() { // from class: androidx.versionedparcelable.ParcelImpl.1
         @Override // android.os.Parcelable.Creator
-        public ParcelImpl createFromParcel(Parcel parcel) {
+        public final ParcelImpl createFromParcel(Parcel parcel) {
             return new ParcelImpl(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public ParcelImpl[] newArray(int i) {
+        public final ParcelImpl[] newArray(int i) {
             return new ParcelImpl[i];
         }
     };
     public final VersionedParcelable mParcel;
 
-    public ParcelImpl(Parcel parcel) {
-        this.mParcel = new VersionedParcelParcel(parcel).readVersionedParcelable();
-    }
-
     @Override // android.os.Parcelable
-    public int describeContents() {
+    public final int describeContents() {
         return 0;
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
+    public final void writeToParcel(Parcel parcel, int i) {
         new VersionedParcelParcel(parcel).writeVersionedParcelable(this.mParcel);
+    }
+
+    public ParcelImpl(Parcel parcel) {
+        this.mParcel = new VersionedParcelParcel(parcel).readVersionedParcelable();
     }
 }

@@ -1,7 +1,6 @@
 package com.bumptech.glide.load.engine.cache;
 
-import androidx.core.util.Pools$Pool;
-import androidx.core.util.Pools$SynchronizedPool;
+import androidx.collection.ContainerHelpers;
 import com.bumptech.glide.load.Key;
 import com.bumptech.glide.util.LruCache;
 import com.bumptech.glide.util.Util;
@@ -9,47 +8,47 @@ import com.bumptech.glide.util.pool.FactoryPools;
 import com.bumptech.glide.util.pool.StateVerifier;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Objects;
 /* loaded from: classes.dex */
-public class SafeKeyGenerator {
+public final class SafeKeyGenerator {
     public final LruCache<Key, String> loadIdToSafeHash = new LruCache<>(1000);
-    public final Pools$Pool<PoolableDigestContainer> digestPool = new FactoryPools.FactoryPool(new Pools$SynchronizedPool(10), new FactoryPools.Factory<PoolableDigestContainer>() { // from class: com.bumptech.glide.load.engine.cache.SafeKeyGenerator.1
+    public final FactoryPools.FactoryPool digestPool = FactoryPools.threadSafe(10, new FactoryPools.Factory<PoolableDigestContainer>() { // from class: com.bumptech.glide.load.engine.cache.SafeKeyGenerator.1
         @Override // com.bumptech.glide.util.pool.FactoryPools.Factory
-        public PoolableDigestContainer create() {
+        public final PoolableDigestContainer create() {
             try {
                 return new PoolableDigestContainer(MessageDigest.getInstance("SHA-256"));
             } catch (NoSuchAlgorithmException e) {
                 throw new RuntimeException(e);
             }
         }
-    }, FactoryPools.EMPTY_RESETTER);
+    });
 
     /* loaded from: classes.dex */
     public static final class PoolableDigestContainer implements FactoryPools.Poolable {
         public final MessageDigest messageDigest;
-        public final StateVerifier stateVerifier = new StateVerifier.DefaultStateVerifier();
+        public final StateVerifier.DefaultStateVerifier stateVerifier = new StateVerifier.DefaultStateVerifier();
 
         public PoolableDigestContainer(MessageDigest messageDigest) {
             this.messageDigest = messageDigest;
         }
 
         @Override // com.bumptech.glide.util.pool.FactoryPools.Poolable
-        public StateVerifier getVerifier() {
+        public final StateVerifier.DefaultStateVerifier getVerifier() {
             return this.stateVerifier;
         }
     }
 
-    public String getSafeKey(Key key) {
+    public final String getSafeKey(Key key) {
         String str;
         synchronized (this.loadIdToSafeHash) {
             str = this.loadIdToSafeHash.get(key);
         }
         if (str == null) {
-            PoolableDigestContainer acquire = this.digestPool.acquire();
-            Objects.requireNonNull(acquire, "Argument must not be null");
+            Object acquire = this.digestPool.acquire();
+            ContainerHelpers.checkNotNull(acquire);
+            PoolableDigestContainer poolableDigestContainer = (PoolableDigestContainer) acquire;
             try {
-                key.updateDiskCacheKey(acquire.messageDigest);
-                byte[] digest = acquire.messageDigest.digest();
+                key.updateDiskCacheKey(poolableDigestContainer.messageDigest);
+                byte[] digest = poolableDigestContainer.messageDigest.digest();
                 char[] cArr = Util.SHA_256_CHARS;
                 synchronized (cArr) {
                     for (int i = 0; i < digest.length; i++) {
@@ -62,7 +61,7 @@ public class SafeKeyGenerator {
                     str = new String(cArr);
                 }
             } finally {
-                this.digestPool.release(acquire);
+                this.digestPool.release(poolableDigestContainer);
             }
         }
         synchronized (this.loadIdToSafeHash) {

@@ -1,19 +1,12 @@
 package androidx.savedstate;
 
-import android.util.Base64;
+import android.net.Uri;
 /* loaded from: classes.dex */
-public class R$id {
-    public static String zza(byte[] bArr) {
-        if (bArr == null) {
-            return null;
+public final class R$id {
+    public static boolean isMediaStoreUri(Uri uri) {
+        if (uri == null || !"content".equals(uri.getScheme()) || !"media".equals(uri.getAuthority())) {
+            return false;
         }
-        return Base64.encodeToString(bArr, 0);
-    }
-
-    public static String zzb(byte[] bArr) {
-        if (bArr == null) {
-            return null;
-        }
-        return Base64.encodeToString(bArr, 10);
+        return true;
     }
 }

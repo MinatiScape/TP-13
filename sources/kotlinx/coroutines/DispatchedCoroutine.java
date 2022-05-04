@@ -1,42 +1,49 @@
 package kotlinx.coroutines;
 
-import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import kotlin.coroutines.Continuation;
 import kotlin.coroutines.CoroutineContext;
+import kotlin.coroutines.intrinsics.IntrinsicsKt__IntrinsicsKt;
+import kotlin.jvm.internal.Intrinsics;
+import kotlinx.atomicfu.AtomicInt;
+import kotlinx.coroutines.internal.DispatchedContinuationKt;
 import kotlinx.coroutines.internal.ScopeCoroutine;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: Builders.common.kt */
 /* loaded from: classes.dex */
 public final class DispatchedCoroutine<T> extends ScopeCoroutine<T> {
-    public static final AtomicIntegerFieldUpdater _decision$FU = AtomicIntegerFieldUpdater.newUpdater(DispatchedCoroutine.class, "_decision");
-    public volatile int _decision = 0;
+    @NotNull
+    public final AtomicInt _decision = new AtomicInt();
 
-    public DispatchedCoroutine(@NotNull CoroutineContext coroutineContext, @NotNull Continuation<? super T> continuation) {
-        super(coroutineContext, continuation);
+    /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+    public DispatchedCoroutine(@NotNull CoroutineContext coroutineContext, @NotNull Continuation<? super T> uCont) {
+        super(coroutineContext, uCont);
+        Intrinsics.checkNotNullParameter(uCont, "uCont");
     }
 
-    @Override // kotlinx.coroutines.internal.ScopeCoroutine, kotlinx.coroutines.JobSupport
-    public void afterCompletionInternal(@Nullable Object obj, int i) {
+    @Override // kotlinx.coroutines.internal.ScopeCoroutine, kotlinx.coroutines.AbstractCoroutine
+    public final void afterResume(@Nullable Object obj) {
         boolean z;
+        AtomicInt atomicInt = this._decision;
         while (true) {
-            int i2 = this._decision;
+            int i = atomicInt.value;
             z = false;
-            if (i2 == 0) {
-                if (_decision$FU.compareAndSet(this, 0, 2)) {
+            if (i == 0) {
+                if (this._decision.compareAndSet(0, 2)) {
                     z = true;
                     break;
                 }
-            } else if (i2 != 1) {
+            } else if (i != 1) {
                 throw new IllegalStateException("Already resumed".toString());
             }
         }
         if (!z) {
-            super.afterCompletionInternal(obj, i);
+            DispatchedContinuationKt.resumeCancellableWith(IntrinsicsKt__IntrinsicsKt.intercepted(this.uCont), CompletionStateKt.recoverResult(obj, this.uCont), null);
         }
     }
 
-    @Override // kotlinx.coroutines.internal.ScopeCoroutine, kotlinx.coroutines.AbstractCoroutine
-    public int getDefaultResumeMode$kotlinx_coroutines_core() {
-        return 1;
+    @Override // kotlinx.coroutines.internal.ScopeCoroutine, kotlinx.coroutines.JobSupport
+    public final void afterCompletion(@Nullable Object obj) {
+        afterResume(obj);
     }
 }

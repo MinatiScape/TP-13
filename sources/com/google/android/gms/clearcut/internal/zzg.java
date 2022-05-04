@@ -5,29 +5,25 @@ import android.util.Log;
 import com.google.android.gms.clearcut.ClearcutLogger;
 import com.google.android.gms.clearcut.Counters;
 import com.google.android.gms.clearcut.LogEventParcelable;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.common.api.internal.zzbx;
 import com.google.android.gms.common.api.internal.zzn;
 import com.google.android.gms.internal.zzgrz;
 import com.google.android.gms.internal.zzgsv;
+/* compiled from: ClearcutLoggerApiImpl.java */
 /* loaded from: classes.dex */
 public final class zzg extends zzn<Status, zzi> {
     public final LogEventParcelable zza;
 
-    public zzg(LogEventParcelable logEventParcelable, GoogleApiClient googleApiClient) {
-        super(ClearcutLogger.API, googleApiClient);
-        this.zza = logEventParcelable;
-    }
-
     @Override // com.google.android.gms.common.api.internal.BasePendingResult
-    public final /* synthetic */ Result zza(Status status) {
+    public final /* synthetic */ Status zza(Status status) {
         return status;
     }
 
     @Override // com.google.android.gms.common.api.internal.zzn
-    public final void zza(zzi zziVar) throws RemoteException {
-        zzi zziVar2 = zziVar;
+    public final void zza(Api.Client client) throws RemoteException {
+        zzi zziVar = (zzi) client;
         zzh zzhVar = new zzh(this);
         try {
             LogEventParcelable logEventParcelable = this.zza;
@@ -46,10 +42,15 @@ public final class zzg extends zzn<Status, zzi> {
                 }
             }
             logEventParcelable.logEventBytes = zzgrz.toByteArray(logEventParcelable.logEvent);
-            ((zzq) zziVar2.zzag()).zza(zzhVar, this.zza);
+            ((zzq) zziVar.zzag()).zza(zzhVar, this.zza);
         } catch (RuntimeException e) {
             Log.e("ClearcutLoggerApiImpl", "derived ClearcutLogger.MessageProducer ", e);
             zzc(new Status(10, "MessageProducer"));
         }
+    }
+
+    public zzg(LogEventParcelable logEventParcelable, zzbx zzbxVar) {
+        super(ClearcutLogger.API, zzbxVar);
+        this.zza = logEventParcelable;
     }
 }

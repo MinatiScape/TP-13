@@ -26,7 +26,7 @@ public class WidgetContainer extends ConstraintWidget {
     }
 
     @Override // androidx.constraintlayout.solver.widgets.ConstraintWidget
-    public void resetSolverVariables(Cache cache) {
+    public final void resetSolverVariables(Cache cache) {
         super.resetSolverVariables(cache);
         int size = this.mChildren.size();
         for (int i = 0; i < size; i++) {

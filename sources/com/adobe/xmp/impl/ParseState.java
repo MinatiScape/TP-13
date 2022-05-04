@@ -1,23 +1,20 @@
 package com.adobe.xmp.impl;
 
 import com.adobe.xmp.XMPException;
+/* compiled from: ISO8601Converter.java */
 /* loaded from: classes.dex */
-public class ParseState {
+public final class ParseState {
     public int pos = 0;
     public String str;
 
-    public ParseState(String str) {
-        this.str = str;
-    }
-
-    public char ch(int index) {
+    public final char ch(int index) {
         if (index < this.str.length()) {
             return this.str.charAt(index);
         }
         return (char) 0;
     }
 
-    public int gatherInt(String errorMsg, int maxValue) throws XMPException {
+    public final int gatherInt(String errorMsg, int maxValue) throws XMPException {
         char ch = ch(this.pos);
         int i = 0;
         boolean z = false;
@@ -40,15 +37,22 @@ public class ParseState {
         }
     }
 
-    public boolean hasNext() {
-        return this.pos < this.str.length();
+    public final boolean hasNext() {
+        if (this.pos < this.str.length()) {
+            return true;
+        }
+        return false;
     }
 
-    public void skip() {
+    public final void skip() {
         this.pos++;
     }
 
-    public char ch() {
+    public ParseState(String str) {
+        this.str = str;
+    }
+
+    public final char ch() {
         if (this.pos < this.str.length()) {
             return this.str.charAt(this.pos);
         }

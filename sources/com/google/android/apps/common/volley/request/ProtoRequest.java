@@ -14,7 +14,7 @@ import java.util.Map;
 /* loaded from: classes.dex */
 public final class ProtoRequest<ReqT extends MessageLite, ResT extends MessageLite> extends Request<ResT> {
     public final Callback<ResT> mCallback;
-    public final Map<String, String> mHeaders;
+    public final HashMap mHeaders;
     public final ReqT mRequestBody;
     public final Parser<ResT> mResponseParser;
 
@@ -30,6 +30,10 @@ public final class ProtoRequest<ReqT extends MessageLite, ResT extends MessageLi
 
     /* loaded from: classes.dex */
     public interface Callback<T extends MessageLite> extends Response.Listener<T>, Response.ErrorListener {
+    }
+
+    public ProtoRequest() {
+        throw null;
     }
 
     /* JADX WARN: Illegal instructions before constructor call */
@@ -59,7 +63,12 @@ public final class ProtoRequest<ReqT extends MessageLite, ResT extends MessageLi
     }
 
     @Override // com.android.volley.Request
-    public void deliverError(VolleyError volleyError) {
+    public final String getBodyContentType() {
+        return "application/protobuf";
+    }
+
+    @Override // com.android.volley.Request
+    public final void deliverError(VolleyError volleyError) {
         Callback<ResT> callback = this.mCallback;
         if (callback != null) {
             callback.onErrorResponse(volleyError);
@@ -69,7 +78,7 @@ public final class ProtoRequest<ReqT extends MessageLite, ResT extends MessageLi
     }
 
     @Override // com.android.volley.Request
-    public void deliverResponse(Object obj) {
+    public final void deliverResponse(Object obj) {
         MessageLite messageLite = (MessageLite) obj;
         Callback<ResT> callback = this.mCallback;
         if (callback != null) {
@@ -78,7 +87,7 @@ public final class ProtoRequest<ReqT extends MessageLite, ResT extends MessageLi
     }
 
     @Override // com.android.volley.Request
-    public byte[] getBody() throws AuthFailureError {
+    public final byte[] getBody() throws AuthFailureError {
         ReqT reqt = this.mRequestBody;
         if (reqt != null) {
             return reqt.toByteArray();
@@ -87,21 +96,7 @@ public final class ProtoRequest<ReqT extends MessageLite, ResT extends MessageLi
     }
 
     @Override // com.android.volley.Request
-    public String getBodyContentType() {
-        return "application/protobuf";
-    }
-
-    @Override // com.android.volley.Request
-    public Map<String, String> getHeaders() {
-        return this.mHeaders;
-    }
-
-    public ReqT getRequestBody() {
-        return this.mRequestBody;
-    }
-
-    @Override // com.android.volley.Request
-    public Response<ResT> parseNetworkResponse(NetworkResponse networkResponse) {
+    public final Response<ResT> parseNetworkResponse(NetworkResponse networkResponse) {
         Parser<ResT> parser = this.mResponseParser;
         if (parser != null) {
             try {
@@ -112,5 +107,14 @@ public final class ProtoRequest<ReqT extends MessageLite, ResT extends MessageLi
         } else {
             throw new IllegalStateException("must provide a praser to parse response message");
         }
+    }
+
+    @Override // com.android.volley.Request
+    public final Map<String, String> getHeaders() {
+        return this.mHeaders;
+    }
+
+    public ReqT getRequestBody() {
+        return this.mRequestBody;
     }
 }

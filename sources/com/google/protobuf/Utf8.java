@@ -6,96 +6,90 @@ public final class Utf8 {
     public static final Processor processor;
 
     /* loaded from: classes.dex */
-    public static class DecodeUtil {
-        public static void access$1000(byte b, byte b2, byte b3, byte b4, char[] cArr, int i) throws InvalidProtocolBufferException {
-            if (!isNotTrailingByte(b2)) {
-                if ((((b2 + 112) + (b << 28)) >> 30) == 0 && !isNotTrailingByte(b3) && !isNotTrailingByte(b4)) {
-                    int i2 = ((b & 7) << 18) | ((b2 & 63) << 12) | ((b3 & 63) << 6) | (b4 & 63);
-                    cArr[i] = (char) ((i2 >>> 10) + 55232);
-                    cArr[i + 1] = (char) ((i2 & 1023) + 56320);
-                    return;
-                }
-            }
-            throw InvalidProtocolBufferException.invalidUtf8();
-        }
-
-        public static boolean access$400(byte b) {
-            return b >= 0;
-        }
-
-        public static void access$700(byte b, byte b2, char[] cArr, int i) throws InvalidProtocolBufferException {
-            if (b < -62 || isNotTrailingByte(b2)) {
-                throw InvalidProtocolBufferException.invalidUtf8();
-            }
-            cArr[i] = (char) (((b & 31) << 6) | (b2 & 63));
-        }
-
-        public static void access$900(byte b, byte b2, byte b3, char[] cArr, int i) throws InvalidProtocolBufferException {
-            if (isNotTrailingByte(b2) || ((b == -32 && b2 < -96) || ((b == -19 && b2 >= -96) || isNotTrailingByte(b3)))) {
-                throw InvalidProtocolBufferException.invalidUtf8();
-            }
-            cArr[i] = (char) (((b & 15) << 12) | ((b2 & 63) << 6) | (b3 & 63));
-        }
-
-        public static boolean isNotTrailingByte(byte b) {
-            return b > -65;
-        }
-    }
-
-    /* loaded from: classes.dex */
     public static abstract class Processor {
         public abstract String decodeUtf8(byte[] bArr, int i, int i2) throws InvalidProtocolBufferException;
 
         public abstract int encodeUtf8(CharSequence charSequence, byte[] bArr, int i, int i2);
 
-        public abstract int partialIsValidUtf8(int i, byte[] bArr, int i2, int i3);
+        public abstract int partialIsValidUtf8(byte[] bArr, int i, int i2);
     }
 
     /* loaded from: classes.dex */
     public static final class SafeProcessor extends Processor {
         @Override // com.google.protobuf.Utf8.Processor
-        public String decodeUtf8(byte[] bArr, int i, int i2) throws InvalidProtocolBufferException {
+        public final String decodeUtf8(byte[] bArr, int i, int i2) throws InvalidProtocolBufferException {
+            boolean z;
+            boolean z2;
+            boolean z3;
+            boolean z4;
+            boolean z5;
             if ((i | i2 | ((bArr.length - i) - i2)) >= 0) {
                 int i3 = i + i2;
                 char[] cArr = new char[i2];
                 int i4 = 0;
                 while (i < i3) {
                     byte b = bArr[i];
-                    if (!DecodeUtil.access$400(b)) {
+                    if (b >= 0) {
+                        z5 = true;
+                    } else {
+                        z5 = false;
+                    }
+                    if (!z5) {
                         break;
                     }
                     i++;
-                    i4++;
                     cArr[i4] = (char) b;
+                    i4++;
                 }
                 int i5 = i4;
                 while (i < i3) {
                     int i6 = i + 1;
                     byte b2 = bArr[i];
-                    if (DecodeUtil.access$400(b2)) {
+                    if (b2 >= 0) {
+                        z = true;
+                    } else {
+                        z = false;
+                    }
+                    if (z) {
                         int i7 = i5 + 1;
                         cArr[i5] = (char) b2;
                         i = i6;
                         while (true) {
                             i5 = i7;
-                            if (i < i3) {
-                                byte b3 = bArr[i];
-                                if (!DecodeUtil.access$400(b3)) {
-                                    break;
-                                }
-                                i++;
-                                i7 = i5 + 1;
-                                cArr[i5] = (char) b3;
+                            if (i >= i3) {
+                                break;
                             }
+                            byte b3 = bArr[i];
+                            if (b3 >= 0) {
+                                z2 = true;
+                            } else {
+                                z2 = false;
+                            }
+                            if (!z2) {
+                                break;
+                            }
+                            i++;
+                            i7 = i5 + 1;
+                            cArr[i5] = (char) b3;
                         }
                     } else {
-                        if (!(b2 < -32)) {
+                        if (b2 < -32) {
+                            z3 = true;
+                        } else {
+                            z3 = false;
+                        }
+                        if (!z3) {
                             if (b2 < -16) {
+                                z4 = true;
+                            } else {
+                                z4 = false;
+                            }
+                            if (z4) {
                                 if (i6 < i3 - 1) {
                                     int i8 = i6 + 1;
+                                    DecodeUtil.access$900(b2, bArr[i6], bArr[i8], cArr, i5);
                                     i = i8 + 1;
                                     i5++;
-                                    DecodeUtil.access$900(b2, bArr[i6], bArr[i8], cArr, i5);
                                 } else {
                                     throw InvalidProtocolBufferException.invalidUtf8();
                                 }
@@ -103,16 +97,22 @@ public final class Utf8 {
                                 int i9 = i6 + 1;
                                 byte b4 = bArr[i6];
                                 int i10 = i9 + 1;
-                                i = i10 + 1;
                                 DecodeUtil.access$1000(b2, b4, bArr[i9], bArr[i10], cArr, i5);
                                 i5 = i5 + 1 + 1;
+                                i = i10 + 1;
                             } else {
                                 throw InvalidProtocolBufferException.invalidUtf8();
                             }
                         } else if (i6 < i3) {
-                            i = i6 + 1;
-                            i5++;
-                            DecodeUtil.access$700(b2, bArr[i6], cArr, i5);
+                            int i11 = i6 + 1;
+                            byte b5 = bArr[i6];
+                            int i12 = i5 + 1;
+                            if (b2 < -62 || DecodeUtil.isNotTrailingByte(b5)) {
+                                throw InvalidProtocolBufferException.invalidUtf8();
+                            }
+                            cArr[i5] = (char) (((b2 & 31) << 6) | (b5 & 63));
+                            i = i11;
+                            i5 = i12;
                         } else {
                             throw InvalidProtocolBufferException.invalidUtf8();
                         }
@@ -123,6 +123,61 @@ public final class Utf8 {
             throw new ArrayIndexOutOfBoundsException(String.format("buffer length=%d, index=%d, size=%d", Integer.valueOf(bArr.length), Integer.valueOf(i), Integer.valueOf(i2)));
         }
 
+        @Override // com.google.protobuf.Utf8.Processor
+        public final int partialIsValidUtf8(byte[] bArr, int i, int i2) {
+            while (i < i2 && bArr[i] >= 0) {
+                i++;
+            }
+            if (i < i2) {
+                while (i < i2) {
+                    int i3 = i + 1;
+                    byte b = bArr[i];
+                    if (b >= 0) {
+                        i = i3;
+                    } else if (b < -32) {
+                        if (i3 >= i2) {
+                            return b;
+                        }
+                        if (b >= -62) {
+                            i = i3 + 1;
+                            if (bArr[i3] > -65) {
+                            }
+                        }
+                        return -1;
+                    } else if (b < -16) {
+                        if (i3 >= i2 - 1) {
+                            return Utf8.access$1100(bArr, i3, i2);
+                        }
+                        int i4 = i3 + 1;
+                        byte b2 = bArr[i3];
+                        if (b2 <= -65 && ((b != -32 || b2 >= -96) && (b != -19 || b2 < -96))) {
+                            i = i4 + 1;
+                            if (bArr[i4] > -65) {
+                            }
+                        }
+                        return -1;
+                    } else if (i3 >= i2 - 2) {
+                        return Utf8.access$1100(bArr, i3, i2);
+                    } else {
+                        int i5 = i3 + 1;
+                        byte b3 = bArr[i3];
+                        if (b3 <= -65) {
+                            if ((((b3 + 112) + (b << 28)) >> 30) == 0) {
+                                int i6 = i5 + 1;
+                                if (bArr[i5] <= -65) {
+                                    i = i6 + 1;
+                                    if (bArr[i6] > -65) {
+                                    }
+                                }
+                            }
+                        }
+                        return -1;
+                    }
+                }
+            }
+            return 0;
+        }
+
         /* JADX WARN: Code restructure failed: missing block: B:12:0x001d, code lost:
             return r9 + r6;
          */
@@ -131,34 +186,12 @@ public final class Utf8 {
             Code decompiled incorrectly, please refer to instructions dump.
             To view partially-correct add '--show-bad-code' argument
         */
-        public int encodeUtf8(java.lang.CharSequence r7, byte[] r8, int r9, int r10) {
+        public final int encodeUtf8(java.lang.CharSequence r7, byte[] r8, int r9, int r10) {
             /*
-                Method dump skipped, instructions count: 254
+                Method dump skipped, instructions count: 253
                 To view this dump add '--comments-level debug' option
             */
             throw new UnsupportedOperationException("Method not decompiled: com.google.protobuf.Utf8.SafeProcessor.encodeUtf8(java.lang.CharSequence, byte[], int, int):int");
-        }
-
-        /* JADX WARN: Code restructure failed: missing block: B:10:0x001c, code lost:
-            if (r12[r13] > (-65)) goto L12;
-         */
-        /* JADX WARN: Code restructure failed: missing block: B:27:0x0047, code lost:
-            if (r12[r13] > (-65)) goto L28;
-         */
-        /* JADX WARN: Code restructure failed: missing block: B:48:0x0082, code lost:
-            if (r12[r13] > (-65)) goto L49;
-         */
-        @Override // com.google.protobuf.Utf8.Processor
-        /*
-            Code decompiled incorrectly, please refer to instructions dump.
-            To view partially-correct add '--show-bad-code' argument
-        */
-        public int partialIsValidUtf8(int r11, byte[] r12, int r13, int r14) {
-            /*
-                Method dump skipped, instructions count: 242
-                To view this dump add '--comments-level debug' option
-            */
-            throw new UnsupportedOperationException("Method not decompiled: com.google.protobuf.Utf8.SafeProcessor.partialIsValidUtf8(int, byte[], int, int):int");
         }
     }
 
@@ -179,7 +212,7 @@ public final class Utf8 {
                 }
                 return i;
             } else if (i2 == 1) {
-                return Utf8.access$000(i, UnsafeUtil.getByte(bArr, j));
+                return Utf8.incompleteStateFor(i, UnsafeUtil.getByte(bArr, j));
             } else {
                 if (i2 == 2) {
                     return Utf8.incompleteStateFor(i, UnsafeUtil.getByte(bArr, j), UnsafeUtil.getByte(bArr, j + 1));
@@ -189,64 +222,101 @@ public final class Utf8 {
         }
 
         @Override // com.google.protobuf.Utf8.Processor
-        public String decodeUtf8(byte[] bArr, int i, int i2) throws InvalidProtocolBufferException {
+        public final String decodeUtf8(byte[] bArr, int i, int i2) throws InvalidProtocolBufferException {
+            boolean z;
+            boolean z2;
+            boolean z3;
+            boolean z4;
+            boolean z5;
             if ((i | i2 | ((bArr.length - i) - i2)) >= 0) {
                 int i3 = i + i2;
                 char[] cArr = new char[i2];
                 int i4 = 0;
                 while (i < i3) {
                     byte b = UnsafeUtil.getByte(bArr, i);
-                    if (!DecodeUtil.access$400(b)) {
+                    if (b >= 0) {
+                        z5 = true;
+                    } else {
+                        z5 = false;
+                    }
+                    if (!z5) {
                         break;
                     }
                     i++;
-                    i4++;
                     cArr[i4] = (char) b;
+                    i4++;
                 }
                 int i5 = i4;
                 while (i < i3) {
                     int i6 = i + 1;
                     byte b2 = UnsafeUtil.getByte(bArr, i);
-                    if (DecodeUtil.access$400(b2)) {
+                    if (b2 >= 0) {
+                        z = true;
+                    } else {
+                        z = false;
+                    }
+                    if (z) {
                         int i7 = i5 + 1;
                         cArr[i5] = (char) b2;
                         i = i6;
                         while (true) {
                             i5 = i7;
-                            if (i < i3) {
-                                byte b3 = UnsafeUtil.getByte(bArr, i);
-                                if (!DecodeUtil.access$400(b3)) {
-                                    break;
-                                }
-                                i++;
-                                i7 = i5 + 1;
-                                cArr[i5] = (char) b3;
+                            if (i >= i3) {
+                                break;
                             }
+                            byte b3 = UnsafeUtil.getByte(bArr, i);
+                            if (b3 >= 0) {
+                                z2 = true;
+                            } else {
+                                z2 = false;
+                            }
+                            if (!z2) {
+                                break;
+                            }
+                            i++;
+                            i7 = i5 + 1;
+                            cArr[i5] = (char) b3;
                         }
                     } else {
-                        if (!(b2 < -32)) {
+                        if (b2 < -32) {
+                            z3 = true;
+                        } else {
+                            z3 = false;
+                        }
+                        if (!z3) {
                             if (b2 < -16) {
+                                z4 = true;
+                            } else {
+                                z4 = false;
+                            }
+                            if (z4) {
                                 if (i6 < i3 - 1) {
                                     int i8 = i6 + 1;
+                                    DecodeUtil.access$900(b2, UnsafeUtil.getByte(bArr, i6), UnsafeUtil.getByte(bArr, i8), cArr, i5);
                                     i = i8 + 1;
                                     i5++;
-                                    DecodeUtil.access$900(b2, UnsafeUtil.getByte(bArr, i6), UnsafeUtil.getByte(bArr, i8), cArr, i5);
                                 } else {
                                     throw InvalidProtocolBufferException.invalidUtf8();
                                 }
                             } else if (i6 < i3 - 2) {
                                 int i9 = i6 + 1;
                                 int i10 = i9 + 1;
-                                i = i10 + 1;
                                 DecodeUtil.access$1000(b2, UnsafeUtil.getByte(bArr, i6), UnsafeUtil.getByte(bArr, i9), UnsafeUtil.getByte(bArr, i10), cArr, i5);
                                 i5 = i5 + 1 + 1;
+                                i = i10 + 1;
                             } else {
                                 throw InvalidProtocolBufferException.invalidUtf8();
                             }
                         } else if (i6 < i3) {
-                            i = i6 + 1;
-                            i5++;
-                            DecodeUtil.access$700(b2, UnsafeUtil.getByte(bArr, i6), cArr, i5);
+                            int i11 = i6 + 1;
+                            byte b4 = UnsafeUtil.getByte(bArr, i6);
+                            int i12 = i5 + 1;
+                            if (b2 < -62 || DecodeUtil.isNotTrailingByte(b4)) {
+                                throw InvalidProtocolBufferException.invalidUtf8();
+                            }
+                            cArr[i5] = (char) (((b2 & 31) << 6) | (b4 & 63));
+                            i = i11;
+                            i5 = i12;
                         } else {
                             throw InvalidProtocolBufferException.invalidUtf8();
                         }
@@ -258,9 +328,9 @@ public final class Utf8 {
         }
 
         @Override // com.google.protobuf.Utf8.Processor
-        public int encodeUtf8(CharSequence charSequence, byte[] bArr, int i, int i2) {
-            char c;
+        public final int encodeUtf8(CharSequence charSequence, byte[] bArr, int i, int i2) {
             long j;
+            char c;
             int i3;
             long j2;
             char charAt;
@@ -276,14 +346,14 @@ public final class Utf8 {
             }
             int i4 = 0;
             while (true) {
-                c = 128;
                 j = 1;
+                c = 128;
                 if (i4 >= length || (charAt = charSequence.charAt(i4)) >= 128) {
                     break;
                 }
-                j3 = 1 + j3;
                 UnsafeUtil.putByte(bArr, j3, (byte) charAt);
                 i4++;
+                j3 = 1 + j3;
             }
             if (i4 == length) {
                 return (int) j3;
@@ -317,10 +387,10 @@ public final class Utf8 {
                                 long j10 = 1 + j9;
                                 UnsafeUtil.putByte(bArr, j9, (byte) (((codePoint >>> 6) & 63) | 128));
                                 j = 1;
-                                j3 = j10 + 1;
                                 UnsafeUtil.putByte(bArr, j10, (byte) ((codePoint & 63) | 128));
                                 i4 = i5;
                                 c = 128;
+                                j3 = j10 + 1;
                             } else {
                                 i4 = i5;
                             }
@@ -331,72 +401,196 @@ public final class Utf8 {
                     } else {
                         throw new UnpairedSurrogateException(i4, length);
                     }
+                    long j11 = j2;
                     c = 128;
-                    j3 = j2;
+                    j3 = j11;
                 } else {
-                    j3 += j;
                     UnsafeUtil.putByte(bArr, j3, (byte) charAt2);
+                    j3 += j;
                 }
                 i4++;
             }
             return (int) j3;
         }
 
-        /* JADX WARN: Code restructure failed: missing block: B:13:0x0036, code lost:
-            if (com.google.protobuf.UnsafeUtil.getByte(r24, r8) > (-65)) goto L15;
-         */
-        /* JADX WARN: Code restructure failed: missing block: B:30:0x0067, code lost:
-            if (com.google.protobuf.UnsafeUtil.getByte(r24, r8) > (-65)) goto L31;
-         */
         @Override // com.google.protobuf.Utf8.Processor
-        /*
-            Code decompiled incorrectly, please refer to instructions dump.
-            To view partially-correct add '--show-bad-code' argument
-        */
-        public int partialIsValidUtf8(int r23, byte[] r24, int r25, int r26) {
-            /*
-                Method dump skipped, instructions count: 375
-                To view this dump add '--comments-level debug' option
-            */
-            throw new UnsupportedOperationException("Method not decompiled: com.google.protobuf.Utf8.UnsafeProcessor.partialIsValidUtf8(int, byte[], int, int):int");
+        public final int partialIsValidUtf8(byte[] bArr, int i, int i2) {
+            int i3;
+            long j;
+            if ((i | i2 | (bArr.length - i2)) >= 0) {
+                long j2 = i;
+                int i4 = (int) (i2 - j2);
+                if (i4 >= 16) {
+                    long j3 = j2;
+                    i3 = 0;
+                    while (true) {
+                        if (i3 >= i4) {
+                            i3 = i4;
+                            break;
+                        }
+                        long j4 = j3 + 1;
+                        if (UnsafeUtil.getByte(bArr, j3) < 0) {
+                            break;
+                        }
+                        i3++;
+                        j3 = j4;
+                    }
+                } else {
+                    i3 = 0;
+                }
+                int i5 = i4 - i3;
+                long j5 = j2 + i3;
+                while (true) {
+                    byte b = 0;
+                    while (true) {
+                        if (i5 <= 0) {
+                            break;
+                        }
+                        long j6 = j5 + 1;
+                        b = UnsafeUtil.getByte(bArr, j5);
+                        if (b < 0) {
+                            j5 = j6;
+                            break;
+                        }
+                        i5--;
+                        j5 = j6;
+                    }
+                    if (i5 != 0) {
+                        int i6 = i5 - 1;
+                        if (b >= -32) {
+                            if (b >= -16) {
+                                if (i6 >= 3) {
+                                    i5 = i6 - 3;
+                                    long j7 = j5 + 1;
+                                    byte b2 = UnsafeUtil.getByte(bArr, j5);
+                                    if (b2 > -65 || (((b2 + 112) + (b << 28)) >> 30) != 0) {
+                                        break;
+                                    }
+                                    long j8 = j7 + 1;
+                                    if (UnsafeUtil.getByte(bArr, j7) > -65) {
+                                        break;
+                                    }
+                                    j = j8 + 1;
+                                    if (UnsafeUtil.getByte(bArr, j8) > -65) {
+                                        break;
+                                    }
+                                    j5 = j;
+                                } else {
+                                    return unsafeIncompleteStateFor(bArr, b, j5, i6);
+                                }
+                            } else if (i6 >= 2) {
+                                i5 = i6 - 2;
+                                long j9 = j5 + 1;
+                                byte b3 = UnsafeUtil.getByte(bArr, j5);
+                                if (b3 > -65 || ((b == -32 && b3 < -96) || (b == -19 && b3 >= -96))) {
+                                    break;
+                                }
+                                j5 = j9 + 1;
+                                if (UnsafeUtil.getByte(bArr, j9) > -65) {
+                                    break;
+                                }
+                            } else {
+                                return unsafeIncompleteStateFor(bArr, b, j5, i6);
+                            }
+                        } else if (i6 != 0) {
+                            i5 = i6 - 1;
+                            if (b < -62) {
+                                break;
+                            }
+                            j = j5 + 1;
+                            if (UnsafeUtil.getByte(bArr, j5) > -65) {
+                                break;
+                            }
+                            j5 = j;
+                        } else {
+                            return b;
+                        }
+                    } else {
+                        return 0;
+                    }
+                }
+                return -1;
+            }
+            throw new ArrayIndexOutOfBoundsException(String.format("Array length=%d, index=%d, limit=%d", Integer.valueOf(bArr.length), Integer.valueOf(i), Integer.valueOf(i2)));
         }
     }
 
-    static {
-        Processor processor2;
-        if (!(UnsafeUtil.HAS_UNSAFE_ARRAY_OPERATIONS && UnsafeUtil.HAS_UNSAFE_BYTEBUFFER_OPERATIONS) || Android.isOnAndroidDevice()) {
-            processor2 = new SafeProcessor();
-        } else {
-            processor2 = new UnsafeProcessor();
-        }
-        processor = processor2;
-    }
-
-    public static int access$000(int i, int i2) {
+    public static int incompleteStateFor(int i, int i2) {
         if (i > -12 || i2 > -65) {
             return -1;
         }
         return i ^ (i2 << 8);
     }
 
+    public static int incompleteStateFor(int i, int i2, int i3) {
+        if (i > -12 || i2 > -65 || i3 > -65) {
+            return -1;
+        }
+        return (i ^ (i2 << 8)) ^ (i3 << 16);
+    }
+
+    /* loaded from: classes.dex */
+    public static class DecodeUtil {
+        public static boolean isNotTrailingByte(byte b) {
+            return b > -65;
+        }
+
+        public static void access$1000(byte b, byte b2, byte b3, byte b4, char[] cArr, int i) throws InvalidProtocolBufferException {
+            if (!isNotTrailingByte(b2)) {
+                if ((((b2 + 112) + (b << 28)) >> 30) == 0 && !isNotTrailingByte(b3) && !isNotTrailingByte(b4)) {
+                    int i2 = ((b & 7) << 18) | ((b2 & 63) << 12) | ((b3 & 63) << 6) | (b4 & 63);
+                    cArr[i] = (char) ((i2 >>> 10) + 55232);
+                    cArr[i + 1] = (char) ((i2 & 1023) + 56320);
+                    return;
+                }
+            }
+            throw InvalidProtocolBufferException.invalidUtf8();
+        }
+
+        public static void access$900(byte b, byte b2, byte b3, char[] cArr, int i) throws InvalidProtocolBufferException {
+            if (isNotTrailingByte(b2) || ((b == -32 && b2 < -96) || ((b == -19 && b2 >= -96) || isNotTrailingByte(b3)))) {
+                throw InvalidProtocolBufferException.invalidUtf8();
+            }
+            cArr[i] = (char) (((b & 15) << 12) | ((b2 & 63) << 6) | (b3 & 63));
+        }
+    }
+
+    static {
+        boolean z;
+        Processor processor2;
+        boolean z2 = true;
+        if (!UnsafeUtil.HAS_UNSAFE_ARRAY_OPERATIONS || !UnsafeUtil.HAS_UNSAFE_BYTEBUFFER_OPERATIONS) {
+            z = false;
+        } else {
+            z = true;
+        }
+        if (z) {
+            if (Android.MEMORY_CLASS == null || Android.IS_ROBOLECTRIC) {
+                z2 = false;
+            }
+            if (!z2) {
+                processor2 = new UnsafeProcessor();
+                processor = processor2;
+            }
+        }
+        processor2 = new SafeProcessor();
+        processor = processor2;
+    }
+
     public static int access$1100(byte[] bArr, int i, int i2) {
         byte b = bArr[i - 1];
         int i3 = i2 - i;
-        int i4 = -1;
         if (i3 == 0) {
             if (b > -12) {
                 b = -1;
             }
             return b;
         } else if (i3 == 1) {
-            byte b2 = bArr[i];
-            if (b <= -12 && b2 <= -65) {
-                i4 = b ^ (b2 << 8);
-            }
-            return i4;
-        } else if (i3 == 2) {
-            return incompleteStateFor(b, bArr[i], bArr[i + 1]);
+            return incompleteStateFor(b, bArr[i]);
         } else {
+            if (i3 == 2) {
+                return incompleteStateFor(b, bArr[i], bArr[i + 1]);
+            }
             throw new AssertionError();
         }
     }
@@ -444,16 +638,5 @@ public final class Utf8 {
         StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("UTF-8 length does not fit in int: ");
         m.append(i3 + 4294967296L);
         throw new IllegalArgumentException(m.toString());
-    }
-
-    public static int incompleteStateFor(int i, int i2, int i3) {
-        if (i > -12 || i2 > -65 || i3 > -65) {
-            return -1;
-        }
-        return (i ^ (i2 << 8)) ^ (i3 << 16);
-    }
-
-    public static boolean isValidUtf8(byte[] bArr, int i, int i2) {
-        return processor.partialIsValidUtf8(0, bArr, i, i2) == 0;
     }
 }

@@ -61,10 +61,6 @@ public class SyncRtSurfaceTransactionApplierCompat {
             public boolean visible;
             public Rect windowCrop;
 
-            public Builder(SurfaceControlCompat surfaceControlCompat) {
-                this(surfaceControlCompat.mSurfaceControl);
-            }
-
             public SurfaceParams build() {
                 return new SurfaceParams(this.surface, this.flags, this.alpha, this.matrix, this.windowCrop, this.layer, this.relativeTo, this.relativeLayer, this.cornerRadius, this.backgroundBlurRadius, this.visible, this.shadowRadius);
             }
@@ -129,6 +125,22 @@ public class SyncRtSurfaceTransactionApplierCompat {
             }
         }
 
+        private SurfaceParams(SurfaceControl surfaceControl, int i, float f, Matrix matrix, Rect rect, int i2, SurfaceControl surfaceControl2, int i3, float f2, int i4, boolean z, float f3) {
+            this.mTmpValues = new float[9];
+            this.flags = i;
+            this.surface = surfaceControl;
+            this.alpha = f;
+            this.matrix = matrix;
+            this.windowCrop = rect;
+            this.layer = i2;
+            this.relativeTo = surfaceControl2;
+            this.relativeLayer = i3;
+            this.cornerRadius = f2;
+            this.backgroundBlurRadius = i4;
+            this.visible = z;
+            this.shadowRadius = f3;
+        }
+
         public void applyTo(SurfaceControl.Transaction transaction) {
             if ((this.flags & 2) != 0) {
                 transaction.setMatrix(this.surface, this.matrix, this.mTmpValues);
@@ -162,39 +174,6 @@ public class SyncRtSurfaceTransactionApplierCompat {
                 transaction.setShadowRadius(this.surface, this.shadowRadius);
             }
         }
-
-        private SurfaceParams(SurfaceControl surfaceControl, int i, float f, Matrix matrix, Rect rect, int i2, SurfaceControl surfaceControl2, int i3, float f2, int i4, boolean z, float f3) {
-            this.mTmpValues = new float[9];
-            this.flags = i;
-            this.surface = surfaceControl;
-            this.alpha = f;
-            this.matrix = matrix;
-            this.windowCrop = rect;
-            this.layer = i2;
-            this.relativeTo = surfaceControl2;
-            this.relativeLayer = i3;
-            this.cornerRadius = f2;
-            this.backgroundBlurRadius = i4;
-            this.visible = z;
-            this.shadowRadius = f3;
-        }
-    }
-
-    public SyncRtSurfaceTransactionApplierCompat(View view) {
-        SurfaceControl surfaceControl = null;
-        ViewRootImpl viewRootImpl = view != null ? view.getViewRootImpl() : null;
-        this.mTargetViewRootImpl = viewRootImpl;
-        this.mBarrierSurfaceControl = viewRootImpl != null ? viewRootImpl.getSurfaceControl() : surfaceControl;
-        this.mApplyHandler = new Handler(new Handler.Callback() { // from class: com.android.systemui.shared.system.SyncRtSurfaceTransactionApplierCompat.1
-            @Override // android.os.Handler.Callback
-            public boolean handleMessage(Message message) {
-                if (message.what != 0) {
-                    return false;
-                }
-                SyncRtSurfaceTransactionApplierCompat.this.onApplyMessage(message.arg1);
-                return true;
-            }
-        });
     }
 
     public static void applyParams(TransactionCompat transactionCompat, SurfaceParams surfaceParams) {
@@ -209,13 +188,13 @@ public class SyncRtSurfaceTransactionApplierCompat {
         } else {
             view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() { // from class: com.android.systemui.shared.system.SyncRtSurfaceTransactionApplierCompat.4
                 @Override // android.view.View.OnAttachStateChangeListener
-                public void onViewAttachedToWindow(View view2) {
-                    view.removeOnAttachStateChangeListener(this);
-                    consumer.accept(new SyncRtSurfaceTransactionApplierCompat(view));
+                public void onViewDetachedFromWindow(View view2) {
                 }
 
                 @Override // android.view.View.OnAttachStateChangeListener
-                public void onViewDetachedFromWindow(View view2) {
+                public void onViewAttachedToWindow(View view2) {
+                    view.removeOnAttachStateChangeListener(this);
+                    consumer.accept(new SyncRtSurfaceTransactionApplierCompat(view));
                 }
             });
         }
@@ -277,5 +256,27 @@ public class SyncRtSurfaceTransactionApplierCompat {
             });
             this.mTargetViewRootImpl.getView().invalidate();
         }
+    }
+
+    public SyncRtSurfaceTransactionApplierCompat(View view) {
+        ViewRootImpl viewRootImpl;
+        SurfaceControl surfaceControl = null;
+        if (view != null) {
+            viewRootImpl = view.getViewRootImpl();
+        } else {
+            viewRootImpl = null;
+        }
+        this.mTargetViewRootImpl = viewRootImpl;
+        this.mBarrierSurfaceControl = viewRootImpl != null ? viewRootImpl.getSurfaceControl() : surfaceControl;
+        this.mApplyHandler = new Handler(new Handler.Callback() { // from class: com.android.systemui.shared.system.SyncRtSurfaceTransactionApplierCompat.1
+            @Override // android.os.Handler.Callback
+            public boolean handleMessage(Message message) {
+                if (message.what != 0) {
+                    return false;
+                }
+                SyncRtSurfaceTransactionApplierCompat.this.onApplyMessage(message.arg1);
+                return true;
+            }
+        });
     }
 }

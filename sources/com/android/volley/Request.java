@@ -9,10 +9,11 @@ import com.android.volley.Cache;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyLog;
+import com.google.android.apps.common.volley.request.ProtoRequest;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public abstract class Request<T> implements Comparable<Request<T>> {
     public Cache.Entry mCacheEntry;
@@ -44,35 +45,28 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         IMMEDIATE
     }
 
-    public Request(int i, String str, Response.ErrorListener errorListener) {
-        Uri parse;
-        String host;
-        this.mEventLog = VolleyLog.MarkerLog.ENABLED ? new VolleyLog.MarkerLog() : null;
-        this.mLock = new Object();
-        this.mShouldCache = true;
-        int i2 = 0;
-        this.mResponseDelivered = false;
-        this.mCacheEntry = null;
-        this.mMethod = i;
-        this.mUrl = str;
-        this.mErrorListener = errorListener;
-        this.mRetryPolicy = new DefaultRetryPolicy();
-        if (!(TextUtils.isEmpty(str) || (parse = Uri.parse(str)) == null || (host = parse.getHost()) == null)) {
-            i2 = host.hashCode();
-        }
-        this.mDefaultTrafficStatsTag = i2;
+    public abstract void deliverResponse(T t);
+
+    public byte[] getBody() throws AuthFailureError {
+        return null;
     }
 
-    public void addMarker(String str) {
+    public String getBodyContentType() {
+        return "application/x-www-form-urlencoded; charset=UTF-8";
+    }
+
+    public abstract Response<T> parseNetworkResponse(NetworkResponse networkResponse);
+
+    public final void addMarker(String str) {
         if (VolleyLog.MarkerLog.ENABLED) {
             this.mEventLog.add(str, Thread.currentThread().getId());
         }
     }
 
     @Override // java.lang.Comparable
-    public int compareTo(Object obj) {
+    public final int compareTo(Object obj) {
         Request request = (Request) obj;
-        Objects.requireNonNull(request);
+        request.getClass();
         return this.mSequence.intValue() - request.mSequence.intValue();
     }
 
@@ -86,17 +80,16 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         }
     }
 
-    public abstract void deliverResponse(T t);
-
-    public void finish(final String str) {
+    public final void finish(final String str) {
         RequestQueue requestQueue = this.mRequestQueue;
         if (requestQueue != null) {
             synchronized (requestQueue.mCurrentRequests) {
                 requestQueue.mCurrentRequests.remove(this);
             }
             synchronized (requestQueue.mFinishedListeners) {
-                for (RequestQueue.RequestFinishedListener requestFinishedListener : requestQueue.mFinishedListeners) {
-                    requestFinishedListener.onRequestFinished(this);
+                Iterator it = requestQueue.mFinishedListeners.iterator();
+                while (it.hasNext()) {
+                    ((RequestQueue.RequestFinishedListener) it.next()).onRequestFinished();
                 }
             }
             requestQueue.sendRequestEvent(this, 5);
@@ -106,7 +99,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
             if (Looper.myLooper() != Looper.getMainLooper()) {
                 new Handler(Looper.getMainLooper()).post(new Runnable() { // from class: com.android.volley.Request.1
                     @Override // java.lang.Runnable
-                    public void run() {
+                    public final void run() {
                         Request.this.mEventLog.add(str, id);
                         Request request = Request.this;
                         request.mEventLog.finish(request.toString());
@@ -119,15 +112,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         }
     }
 
-    public byte[] getBody() throws AuthFailureError {
-        return null;
-    }
-
-    public String getBodyContentType() {
-        return "application/x-www-form-urlencoded; charset=UTF-8";
-    }
-
-    public String getCacheKey() {
+    public final String getCacheKey() {
         String str = this.mUrl;
         int i = this.mMethod;
         if (i == 0 || i == -1) {
@@ -136,11 +121,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         return Integer.toString(i) + '-' + str;
     }
 
-    public Map<String, String> getHeaders() throws AuthFailureError {
-        return Collections.emptyMap();
-    }
-
-    public boolean hasHadResponseDelivered() {
+    public final boolean hasHadResponseDelivered() {
         boolean z;
         synchronized (this.mLock) {
             z = this.mResponseDelivered;
@@ -148,19 +129,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         return z;
     }
 
-    public boolean isCanceled() {
-        synchronized (this.mLock) {
-        }
-        return false;
-    }
-
-    public void markDelivered() {
-        synchronized (this.mLock) {
-            this.mResponseDelivered = true;
-        }
-    }
-
-    public void notifyListenerResponseNotUsable() {
+    public final void notifyListenerResponseNotUsable() {
         NetworkRequestCompleteListener networkRequestCompleteListener;
         synchronized (this.mLock) {
             networkRequestCompleteListener = this.mRequestCompleteListener;
@@ -170,9 +139,10 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         }
     }
 
-    public void notifyListenerResponseReceived(Response<?> response) {
+    public final void notifyListenerResponseReceived(Response<?> response) {
         NetworkRequestCompleteListener networkRequestCompleteListener;
-        List<Request<?>> remove;
+        boolean z;
+        List<Request> list;
         synchronized (this.mLock) {
             networkRequestCompleteListener = this.mRequestCompleteListener;
         }
@@ -180,16 +150,21 @@ public abstract class Request<T> implements Comparable<Request<T>> {
             WaitingRequestManager waitingRequestManager = (WaitingRequestManager) networkRequestCompleteListener;
             Cache.Entry entry = response.cacheEntry;
             if (entry != null) {
-                if (!(entry.ttl < System.currentTimeMillis())) {
+                if (entry.ttl < System.currentTimeMillis()) {
+                    z = true;
+                } else {
+                    z = false;
+                }
+                if (!z) {
                     String cacheKey = getCacheKey();
                     synchronized (waitingRequestManager) {
-                        remove = waitingRequestManager.mWaitingRequests.remove(cacheKey);
+                        list = (List) waitingRequestManager.mWaitingRequests.remove(cacheKey);
                     }
-                    if (remove != null) {
+                    if (list != null) {
                         if (VolleyLog.DEBUG) {
-                            VolleyLog.v("Releasing %d waiting requests for cacheKey=%s.", Integer.valueOf(remove.size()), cacheKey);
+                            VolleyLog.v("Releasing %d waiting requests for cacheKey=%s.", Integer.valueOf(list.size()), cacheKey);
                         }
-                        for (Request<?> request : remove) {
+                        for (Request request : list) {
                             ((ExecutorDelivery) waitingRequestManager.mResponseDelivery).postResponse(request, response, null);
                         }
                         return;
@@ -201,21 +176,20 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         }
     }
 
-    public abstract Response<T> parseNetworkResponse(NetworkResponse networkResponse);
-
-    public void sendEvent(int i) {
+    public final void sendEvent(int i) {
         RequestQueue requestQueue = this.mRequestQueue;
         if (requestQueue != null) {
             requestQueue.sendRequestEvent(this, i);
         }
     }
 
-    public String toString() {
+    public final String toString() {
         StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("0x");
         m.append(Integer.toHexString(this.mDefaultTrafficStatsTag));
         String sb = m.toString();
         StringBuilder sb2 = new StringBuilder();
-        isCanceled();
+        synchronized (this.mLock) {
+        }
         sb2.append("[ ] ");
         sb2.append(this.mUrl);
         sb2.append(" ");
@@ -225,5 +199,34 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         sb2.append(" ");
         sb2.append(this.mSequence);
         return sb2.toString();
+    }
+
+    public Request(int i, String str, ProtoRequest.Callback callback) {
+        VolleyLog.MarkerLog markerLog;
+        Uri parse;
+        String host;
+        if (VolleyLog.MarkerLog.ENABLED) {
+            markerLog = new VolleyLog.MarkerLog();
+        } else {
+            markerLog = null;
+        }
+        this.mEventLog = markerLog;
+        this.mLock = new Object();
+        this.mShouldCache = true;
+        int i2 = 0;
+        this.mResponseDelivered = false;
+        this.mCacheEntry = null;
+        this.mMethod = i;
+        this.mUrl = str;
+        this.mErrorListener = callback;
+        this.mRetryPolicy = new DefaultRetryPolicy(1, 1.0f);
+        if (!(TextUtils.isEmpty(str) || (parse = Uri.parse(str)) == null || (host = parse.getHost()) == null)) {
+            i2 = host.hashCode();
+        }
+        this.mDefaultTrafficStatsTag = i2;
+    }
+
+    public Map<String, String> getHeaders() throws AuthFailureError {
+        return Collections.emptyMap();
     }
 }

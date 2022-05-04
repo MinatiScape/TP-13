@@ -15,19 +15,19 @@ public class LoadWallpaperErrorDialogFragment extends DialogFragment {
     }
 
     @Override // androidx.fragment.app.DialogFragment
-    public Dialog onCreateDialog(Bundle bundle) {
+    public final Dialog onCreateDialog(Bundle bundle) {
         super.onCreateDialog(bundle);
         return new AlertDialog.Builder(getActivity(), R.style.LightDialogTheme).setMessage(R.string.load_wallpaper_error_message).setPositiveButton(17039370, new DialogInterface.OnClickListener() { // from class: com.android.wallpaper.picker.LoadWallpaperErrorDialogFragment.1
             @Override // android.content.DialogInterface.OnClickListener
-            public void onClick(DialogInterface dialogInterface, int i) {
-                ((Listener) LoadWallpaperErrorDialogFragment.this.getTargetFragment()).onClickOk();
+            public final void onClick(DialogInterface dialogInterface, int i) {
+                ((Listener) LoadWallpaperErrorDialogFragment.this.getTargetFragment(true)).onClickOk();
             }
         }).create();
     }
 
     @Override // androidx.fragment.app.DialogFragment, android.content.DialogInterface.OnDismissListener
-    public void onDismiss(DialogInterface dialogInterface) {
+    public final void onDismiss(DialogInterface dialogInterface) {
         super.onDismiss(dialogInterface);
-        ((Listener) getTargetFragment()).onClickOk();
+        ((Listener) getTargetFragment(true)).onClickOk();
     }
 }

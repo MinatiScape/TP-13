@@ -2,216 +2,150 @@ package com.google.android.apps.wallpaper.asset;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 import android.util.Log;
 import android.widget.ImageView;
+import androidx.cardview.R$style;
+import androidx.fragment.app.FragmentActivity;
 import com.android.wallpaper.asset.Asset;
+import com.android.wallpaper.asset.Asset$$ExternalSyntheticLambda1;
 import com.android.wallpaper.asset.StreamableAsset;
-import com.android.wallpaper.module.InjectorProvider;
+import com.android.wallpaper.network.WallpaperRequester;
+import com.android.wallpaper.picker.WallpaperPreviewBitmapTransformation;
+import com.android.wallpaper.util.WallpaperConnection$$ExternalSyntheticLambda0;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.model.stream.HttpGlideUrlLoader;
-import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
 import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.BaseRequestOptions;
-import com.bumptech.glide.request.RequestFutureTarget;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.BitmapTransitionFactory;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.bumptech.glide.request.transition.Transition;
-import com.google.android.gms.common.internal.zzam;
+import com.google.android.apps.wallpaper.asset.NetworkAsset;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 /* loaded from: classes.dex */
-public class NetworkAsset extends StreamableAsset {
-    public zzam mRequester;
+public final class NetworkAsset extends StreamableAsset {
+    public static final ExecutorService sExecutorService = Executors.newCachedThreadPool();
+    public WallpaperRequester mRequester;
     public Uri mTinyUri;
     public Uri mUri;
 
+    /* renamed from: com.google.android.apps.wallpaper.asset.NetworkAsset$1  reason: invalid class name */
     /* loaded from: classes.dex */
-    public class DecodeDimensionsAsyncTask extends AsyncTask<Void, Void, Point> {
-        public File mFile;
-        public Asset.DimensionsReceiver mReceiver;
+    public class AnonymousClass1 extends SimpleTarget<File> {
+        public final /* synthetic */ Asset.DimensionsReceiver val$receiver;
 
-        public DecodeDimensionsAsyncTask(File file, Asset.DimensionsReceiver dimensionsReceiver) {
-            this.mFile = file;
-            this.mReceiver = dimensionsReceiver;
+        public AnonymousClass1(Asset.DimensionsReceiver dimensionsReceiver) {
+            this.val$receiver = dimensionsReceiver;
         }
 
-        @Override // android.os.AsyncTask
-        public Point doInBackground(Void[] voidArr) {
-            FileInputStream fileInputStream;
-            try {
-                fileInputStream = new FileInputStream(this.mFile.getAbsolutePath());
-            } catch (FileNotFoundException e) {
-                StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("File not found for network asset with URL: ");
-                m.append(NetworkAsset.this.mUri);
-                Log.e("NetworkAsset", m.toString(), e);
-                fileInputStream = null;
-            }
-            if (fileInputStream == null) {
-                return null;
-            }
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(fileInputStream, null, options);
-            try {
-                fileInputStream.close();
-            } catch (IOException e2) {
-                StringBuilder m2 = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Unable to close input stream for NetworkAsset with URL: ");
-                m2.append(NetworkAsset.this.mUri);
-                Log.e("NetworkAsset", m2.toString(), e2);
-            }
-            return new Point(options.outWidth, options.outHeight);
+        @Override // com.bumptech.glide.request.target.Target
+        public final void onLoadFailed(Drawable drawable) {
+            this.val$receiver.onDimensionsDecoded(null);
         }
 
-        @Override // android.os.AsyncTask
-        public void onPostExecute(Point point) {
-            this.mReceiver.onDimensionsDecoded(point);
+        @Override // com.bumptech.glide.request.target.Target
+        public final void onResourceReady(Object obj, Transition transition) {
+            final File file = (File) obj;
+            ExecutorService executorService = NetworkAsset.sExecutorService;
+            final Asset.DimensionsReceiver dimensionsReceiver = this.val$receiver;
+            executorService.execute(new Runnable() { // from class: com.google.android.apps.wallpaper.asset.NetworkAsset$1$$ExternalSyntheticLambda0
+                @Override // java.lang.Runnable
+                public final void run() {
+                    FileInputStream fileInputStream;
+                    NetworkAsset.AnonymousClass1 r0 = NetworkAsset.AnonymousClass1.this;
+                    File file2 = file;
+                    Asset.DimensionsReceiver dimensionsReceiver2 = dimensionsReceiver;
+                    r0.getClass();
+                    try {
+                        fileInputStream = new FileInputStream(file2.getAbsolutePath());
+                    } catch (FileNotFoundException e) {
+                        StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("File not found for network asset with URL: ");
+                        m.append(NetworkAsset.this.mUri);
+                        Log.e("NetworkAsset", m.toString(), e);
+                        fileInputStream = null;
+                    }
+                    if (fileInputStream == null) {
+                        new Handler(Looper.getMainLooper()).post(new WallpaperConnection$$ExternalSyntheticLambda0(dimensionsReceiver2, 1));
+                        return;
+                    }
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inJustDecodeBounds = true;
+                    BitmapFactory.decodeStream(fileInputStream, null, options);
+                    try {
+                        fileInputStream.close();
+                    } catch (IOException e2) {
+                        StringBuilder m2 = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Unable to close input stream for NetworkAsset with URL: ");
+                        m2.append(NetworkAsset.this.mUri);
+                        Log.e("NetworkAsset", m2.toString(), e2);
+                    }
+                    new Handler(Looper.getMainLooper()).post(new Asset$$ExternalSyntheticLambda1(dimensionsReceiver2, options, 3));
+                }
+            });
         }
-    }
-
-    public NetworkAsset(Context context, Uri uri) {
-        this.mUri = uri;
-        this.mTinyUri = null;
-        this.mRequester = InjectorProvider.getInjector().getRequester(context.getApplicationContext());
     }
 
     @Override // com.android.wallpaper.asset.StreamableAsset, com.android.wallpaper.asset.Asset
-    public void decodeRawDimensions(Activity activity, final Asset.DimensionsReceiver dimensionsReceiver) {
+    public final void decodeRawDimensions(Activity activity, Asset.DimensionsReceiver dimensionsReceiver) {
         if (activity == null) {
             super.decodeRawDimensions(null, dimensionsReceiver);
             return;
         }
-        zzam zzamVar = this.mRequester;
+        WallpaperRequester wallpaperRequester = this.mRequester;
         Uri uri = this.mUri;
-        SimpleTarget<File> simpleTarget = new SimpleTarget<File>() { // from class: com.google.android.apps.wallpaper.asset.NetworkAsset.1
-            @Override // com.bumptech.glide.request.target.BaseTarget, com.bumptech.glide.request.target.Target
-            public void onLoadFailed(Drawable drawable) {
-                dimensionsReceiver.onDimensionsDecoded(null);
-            }
-
-            @Override // com.bumptech.glide.request.target.Target
-            public void onResourceReady(Object obj, Transition transition) {
-                new DecodeDimensionsAsyncTask((File) obj, dimensionsReceiver).execute(new Void[0]);
-            }
-        };
-        Objects.requireNonNull(zzamVar);
-        RequestManager with = Glide.with(activity);
-        Objects.requireNonNull(with);
-        RequestBuilder as = with.as(File.class);
+        Target target = new AnonymousClass1(dimensionsReceiver);
+        wallpaperRequester.getClass();
+        RequestManager requestManager = Glide.getRetriever(activity).get(activity);
+        requestManager.getClass();
+        RequestBuilder requestBuilder = new RequestBuilder(requestManager.glide, requestManager, File.class, requestManager.context);
         if (RequestOptions.skipMemoryCacheTrueOptions == null) {
             RequestOptions skipMemoryCache = new RequestOptions().skipMemoryCache(true);
             skipMemoryCache.autoClone();
             RequestOptions.skipMemoryCacheTrueOptions = skipMemoryCache;
         }
-        RequestBuilder apply = as.apply((BaseRequestOptions<?>) RequestOptions.skipMemoryCacheTrueOptions);
-        apply.model = uri;
-        apply.isModelSet = true;
-        RequestBuilder apply2 = apply.apply((BaseRequestOptions<?>) RequestOptions.option(HttpGlideUrlLoader.TIMEOUT, 10000));
-        apply2.into(simpleTarget, null, apply2);
-    }
-
-    @Override // com.android.wallpaper.asset.Asset
-    public Bitmap getLowResBitmap(Context context) {
-        try {
-            RequestBuilder<Bitmap> asBitmap = Glide.with(context).asBitmap();
-            asBitmap.load(this.mTinyUri);
-            return (Bitmap) ((RequestFutureTarget) asBitmap.apply((BaseRequestOptions<?>) RequestOptions.noTransformation().set(HttpGlideUrlLoader.TIMEOUT, 10000)).submit()).get();
-        } catch (InterruptedException | ExecutionException e) {
-            Log.w("NetworkAsset", "Couldn't obtain low res bitmap", e);
-            return null;
-        }
-    }
-
-    @Override // com.android.wallpaper.asset.Asset
-    public void loadDrawable(Context context, ImageView imageView, int i) {
-        RequestBuilder<Drawable> asDrawable = Glide.with(context).asDrawable();
-        if (this.mTinyUri != null) {
-            RequestBuilder asDrawable2 = Glide.with(context).asDrawable();
-            asDrawable2.load(this.mTinyUri);
-            asDrawable2.transition(DrawableTransitionOptions.withCrossFade());
-            asDrawable.thumbnailBuilder = asDrawable2;
-        }
-        asDrawable.load(this.mUri);
-        RequestBuilder<Drawable> apply = asDrawable.apply((BaseRequestOptions<?>) RequestOptions.noTransformation().placeholder(new ColorDrawable(i)).set(HttpGlideUrlLoader.TIMEOUT, 10000));
-        apply.transition(DrawableTransitionOptions.withCrossFade());
-        apply.into(imageView);
-    }
-
-    @Override // com.android.wallpaper.asset.Asset
-    public void loadDrawableWithTransition(final Context context, final ImageView imageView, final int i, final Asset.DrawableLoadedListener drawableLoadedListener, int i2) {
-        if (imageView.getDrawable() == null) {
-            imageView.setImageDrawable(Asset.getPlaceholderDrawable(context, imageView, i2));
-        }
-        InjectorProvider.getInjector().getRequester(context).loadImageBitmap(this.mUri, new SimpleTarget<Bitmap>(this) { // from class: com.google.android.apps.wallpaper.asset.NetworkAsset.2
-            @Override // com.bumptech.glide.request.target.Target
-            public void onResourceReady(Object obj, Transition transition) {
-                final Resources resources = context.getResources();
-                new Asset.CenterCropBitmapTask((Bitmap) obj, imageView, new Asset.BitmapReceiver() { // from class: com.google.android.apps.wallpaper.asset.NetworkAsset.2.1
-                    @Override // com.android.wallpaper.asset.Asset.BitmapReceiver
-                    public void onBitmapDecoded(Bitmap bitmap) {
-                        Drawable[] drawableArr = new Drawable[2];
-                        Drawable drawable = imageView.getDrawable();
-                        if (drawable instanceof TransitionDrawable) {
-                            TransitionDrawable transitionDrawable = (TransitionDrawable) drawable;
-                            drawableArr[0] = transitionDrawable.findDrawableByLayerId(transitionDrawable.getId(1));
-                        } else {
-                            drawableArr[0] = drawable;
-                        }
-                        drawableArr[1] = new BitmapDrawable(resources, bitmap);
-                        TransitionDrawable transitionDrawable2 = new TransitionDrawable(drawableArr);
-                        transitionDrawable2.setCrossFadeEnabled(true);
-                        imageView.setImageDrawable(transitionDrawable2);
-                        transitionDrawable2.startTransition(i);
-                        Asset.DrawableLoadedListener drawableLoadedListener2 = drawableLoadedListener;
-                        if (drawableLoadedListener2 != null) {
-                            drawableLoadedListener2.onDrawableLoaded();
-                        }
-                    }
-                }).execute(new Void[0]);
-            }
-        });
-    }
-
-    @Override // com.android.wallpaper.asset.Asset
-    public void loadLowResDrawable(Activity activity, ImageView imageView, int i, BitmapTransformation bitmapTransformation) {
-        RequestBuilder<Bitmap> asBitmap = Glide.with(activity).asBitmap();
-        asBitmap.load(this.mTinyUri);
-        RequestBuilder<Bitmap> apply = asBitmap.apply((BaseRequestOptions<?>) RequestOptions.bitmapTransform(bitmapTransformation).placeholder(new ColorDrawable(i)).set(HttpGlideUrlLoader.TIMEOUT, 10000));
-        BitmapTransitionOptions bitmapTransitionOptions = new BitmapTransitionOptions();
-        bitmapTransitionOptions.transitionFactory = new BitmapTransitionFactory(new DrawableCrossFadeFactory(300, false));
-        apply.transition(bitmapTransitionOptions);
-        apply.into(imageView);
+        RequestBuilder apply = requestBuilder.mo32apply((BaseRequestOptions<?>) RequestOptions.skipMemoryCacheTrueOptions).loadGeneric(uri).mo32apply((BaseRequestOptions<?>) new RequestOptions().set(HttpGlideUrlLoader.TIMEOUT, 10000));
+        apply.into(target, null, apply, com.bumptech.glide.util.Executors.MAIN_THREAD_EXECUTOR);
     }
 
     @Override // com.android.wallpaper.asset.StreamableAsset
-    public InputStream openInputStream() {
-        File loadImageFile = this.mRequester.loadImageFile(this.mUri);
-        if (loadImageFile == null) {
+    public final InputStream openInputStream() {
+        File file;
+        WallpaperRequester wallpaperRequester = this.mRequester;
+        Uri uri = this.mUri;
+        wallpaperRequester.getClass();
+        try {
+            RequestManager with = Glide.with(wallpaperRequester.mAppContext);
+            with.getClass();
+            file = (File) new RequestBuilder(with.glide, with, File.class, with.context).mo32apply((BaseRequestOptions<?>) RequestManager.DOWNLOAD_ONLY_OPTIONS).loadGeneric(uri).mo32apply((BaseRequestOptions<?>) new RequestOptions().set(HttpGlideUrlLoader.TIMEOUT, 10000)).submit().get();
+        } catch (Exception unused) {
+            Log.e("WallpaperRequester", "Unable to get File for image with url: " + uri);
+            file = null;
+        }
+        if (file == null) {
             return null;
         }
         try {
-            return new FileInputStream(loadImageFile.getAbsolutePath());
-        } catch (FileNotFoundException unused) {
+            return new FileInputStream(file.getAbsolutePath());
+        } catch (FileNotFoundException unused2) {
             StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("File not found for the image at URL: ");
             m.append(this.mUri);
             Log.e("NetworkAsset", m.toString());
@@ -222,6 +156,34 @@ public class NetworkAsset extends StreamableAsset {
     public NetworkAsset(Context context, Uri uri, Uri uri2) {
         this.mUri = uri;
         this.mTinyUri = uri2;
-        this.mRequester = InjectorProvider.getInjector().getRequester(context.getApplicationContext());
+        this.mRequester = R$style.getInjector().getRequester(context.getApplicationContext());
+    }
+
+    @Override // com.android.wallpaper.asset.Asset
+    public final Bitmap getLowResBitmap(Context context) {
+        try {
+            return (Bitmap) Glide.getRetriever(context).get(context).asBitmap().loadGeneric(this.mTinyUri).mo32apply((BaseRequestOptions<?>) RequestOptions.noTransformation().set(HttpGlideUrlLoader.TIMEOUT, 10000)).submit().get();
+        } catch (InterruptedException | ExecutionException e) {
+            Log.w("NetworkAsset", "Couldn't obtain low res bitmap", e);
+            return null;
+        }
+    }
+
+    @Override // com.android.wallpaper.asset.Asset
+    public final void loadDrawable(Activity activity, ImageView imageView, int i) {
+        RequestBuilder<Drawable> asDrawable = Glide.getRetriever(activity).get((Context) activity).asDrawable();
+        if (this.mTinyUri != null) {
+            asDrawable.thumbnail(Glide.getRetriever(activity).get((Context) activity).asDrawable().loadGeneric(this.mTinyUri).transition(DrawableTransitionOptions.withCrossFade()));
+        }
+        imageView.setBackgroundColor(i);
+        asDrawable.loadGeneric(this.mUri).mo32apply((BaseRequestOptions<?>) ((RequestOptions) RequestOptions.noTransformation().placeholder(new ColorDrawable(i))).set(HttpGlideUrlLoader.TIMEOUT, 10000)).transition(DrawableTransitionOptions.withCrossFade()).into(imageView);
+    }
+
+    @Override // com.android.wallpaper.asset.Asset
+    public final void loadLowResDrawable(FragmentActivity fragmentActivity, ImageView imageView, int i, WallpaperPreviewBitmapTransformation wallpaperPreviewBitmapTransformation) {
+        RequestBuilder<Bitmap> apply = Glide.getRetriever(fragmentActivity).get((Activity) fragmentActivity).asBitmap().loadGeneric(this.mTinyUri).mo32apply((BaseRequestOptions<?>) ((RequestOptions) RequestOptions.bitmapTransform(wallpaperPreviewBitmapTransformation).placeholder(new ColorDrawable(i))).set(HttpGlideUrlLoader.TIMEOUT, 10000));
+        BitmapTransitionOptions bitmapTransitionOptions = new BitmapTransitionOptions();
+        bitmapTransitionOptions.transitionFactory = new BitmapTransitionFactory(new DrawableCrossFadeFactory(300));
+        apply.transition(bitmapTransitionOptions).into(imageView);
     }
 }

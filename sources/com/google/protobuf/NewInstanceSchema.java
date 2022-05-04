@@ -1,5 +1,5 @@
 package com.google.protobuf;
 /* loaded from: classes.dex */
 public interface NewInstanceSchema {
-    Object newInstance(Object obj);
+    Object newInstance(MessageLite messageLite);
 }

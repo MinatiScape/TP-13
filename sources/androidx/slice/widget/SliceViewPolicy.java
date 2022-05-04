@@ -1,6 +1,6 @@
 package androidx.slice.widget;
 /* loaded from: classes.dex */
-public class SliceViewPolicy {
+public final class SliceViewPolicy {
     public PolicyChangeListener mListener;
     public int mMaxHeight = 0;
     public int mMaxSmallHeight = 0;

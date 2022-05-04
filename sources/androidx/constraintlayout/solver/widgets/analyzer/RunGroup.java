@@ -2,18 +2,11 @@ package androidx.constraintlayout.solver.widgets.analyzer;
 
 import java.util.ArrayList;
 /* loaded from: classes.dex */
-public class RunGroup {
-    public static int index;
+public final class RunGroup {
     public WidgetRun firstRun;
     public ArrayList<WidgetRun> runs = new ArrayList<>();
 
-    public RunGroup(WidgetRun widgetRun, int i) {
-        this.firstRun = null;
-        index++;
-        this.firstRun = widgetRun;
-    }
-
-    public final long traverseEnd(DependencyNode dependencyNode, long j) {
+    public static long traverseEnd(DependencyNode dependencyNode, long j) {
         WidgetRun widgetRun = dependencyNode.run;
         if (widgetRun instanceof HelperReferences) {
             return j;
@@ -21,7 +14,7 @@ public class RunGroup {
         int size = dependencyNode.dependencies.size();
         long j2 = j;
         for (int i = 0; i < size; i++) {
-            Dependency dependency = dependencyNode.dependencies.get(i);
+            Dependency dependency = (Dependency) dependencyNode.dependencies.get(i);
             if (dependency instanceof DependencyNode) {
                 DependencyNode dependencyNode2 = (DependencyNode) dependency;
                 if (dependencyNode2.run != widgetRun) {
@@ -36,7 +29,7 @@ public class RunGroup {
         return Math.min(Math.min(j2, traverseEnd(widgetRun.start, wrapDimension)), wrapDimension - widgetRun.start.margin);
     }
 
-    public final long traverseStart(DependencyNode dependencyNode, long j) {
+    public static long traverseStart(DependencyNode dependencyNode, long j) {
         WidgetRun widgetRun = dependencyNode.run;
         if (widgetRun instanceof HelperReferences) {
             return j;
@@ -44,7 +37,7 @@ public class RunGroup {
         int size = dependencyNode.dependencies.size();
         long j2 = j;
         for (int i = 0; i < size; i++) {
-            Dependency dependency = dependencyNode.dependencies.get(i);
+            Dependency dependency = (Dependency) dependencyNode.dependencies.get(i);
             if (dependency instanceof DependencyNode) {
                 DependencyNode dependencyNode2 = (DependencyNode) dependency;
                 if (dependencyNode2.run != widgetRun) {
@@ -57,5 +50,10 @@ public class RunGroup {
         }
         long wrapDimension = j + widgetRun.getWrapDimension();
         return Math.max(Math.max(j2, traverseStart(widgetRun.end, wrapDimension)), wrapDimension - widgetRun.end.margin);
+    }
+
+    public RunGroup(WidgetRun widgetRun) {
+        this.firstRun = null;
+        this.firstRun = widgetRun;
     }
 }

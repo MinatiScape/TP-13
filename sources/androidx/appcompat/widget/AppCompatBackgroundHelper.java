@@ -12,7 +12,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.ViewPropertyAnimatorCompat;
 import java.util.WeakHashMap;
 /* loaded from: classes.dex */
-public class AppCompatBackgroundHelper {
+public final class AppCompatBackgroundHelper {
     public TintInfo mBackgroundTint;
     public TintInfo mInternalBackgroundTint;
     public TintInfo mTmpInfo;
@@ -20,15 +20,23 @@ public class AppCompatBackgroundHelper {
     public int mBackgroundResId = -1;
     public final AppCompatDrawableManager mDrawableManager = AppCompatDrawableManager.get();
 
-    public AppCompatBackgroundHelper(View view) {
-        this.mView = view;
+    public final void onSetBackgroundDrawable() {
+        this.mBackgroundResId = -1;
+        setInternalBackgroundTint(null);
+        applySupportBackgroundTint();
     }
 
-    public void applySupportBackgroundTint() {
+    public final void applySupportBackgroundTint() {
+        boolean z;
         Drawable background = this.mView.getBackground();
         if (background != null) {
-            boolean z = true;
+            boolean z2 = true;
             if (this.mInternalBackgroundTint != null) {
+                z = true;
+            } else {
+                z = false;
+            }
+            if (z) {
                 if (this.mTmpInfo == null) {
                     this.mTmpInfo = new TintInfo();
                 }
@@ -39,12 +47,12 @@ public class AppCompatBackgroundHelper {
                 tintInfo.mHasTintMode = false;
                 View view = this.mView;
                 WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-                ColorStateList backgroundTintList = view.getBackgroundTintList();
+                ColorStateList backgroundTintList = ViewCompat.Api21Impl.getBackgroundTintList(view);
                 if (backgroundTintList != null) {
                     tintInfo.mHasTintList = true;
                     tintInfo.mTintList = backgroundTintList;
                 }
-                PorterDuff.Mode backgroundTintMode = this.mView.getBackgroundTintMode();
+                PorterDuff.Mode backgroundTintMode = ViewCompat.Api21Impl.getBackgroundTintMode(this.mView);
                 if (backgroundTintMode != null) {
                     tintInfo.mHasTintMode = true;
                     tintInfo.mTintMode = backgroundTintMode;
@@ -52,9 +60,9 @@ public class AppCompatBackgroundHelper {
                 if (tintInfo.mHasTintList || tintInfo.mHasTintMode) {
                     AppCompatDrawableManager.tintDrawable(background, tintInfo, this.mView.getDrawableState());
                 } else {
-                    z = false;
+                    z2 = false;
                 }
-                if (z) {
+                if (z2) {
                     return;
                 }
             }
@@ -70,7 +78,7 @@ public class AppCompatBackgroundHelper {
         }
     }
 
-    public ColorStateList getSupportBackgroundTintList() {
+    public final ColorStateList getSupportBackgroundTintList() {
         TintInfo tintInfo = this.mBackgroundTint;
         if (tintInfo != null) {
             return tintInfo.mTintList;
@@ -78,7 +86,7 @@ public class AppCompatBackgroundHelper {
         return null;
     }
 
-    public PorterDuff.Mode getSupportBackgroundTintMode() {
+    public final PorterDuff.Mode getSupportBackgroundTintMode() {
         TintInfo tintInfo = this.mBackgroundTint;
         if (tintInfo != null) {
             return tintInfo.mTintMode;
@@ -86,10 +94,11 @@ public class AppCompatBackgroundHelper {
         return null;
     }
 
-    public void loadFromAttributes(AttributeSet attributeSet, int i) {
+    public final void loadFromAttributes(AttributeSet attributeSet, int i) {
+        ColorStateList tintList;
         Context context = this.mView.getContext();
         int[] iArr = R$styleable.ViewBackgroundHelper;
-        TintTypedArray obtainStyledAttributes = TintTypedArray.obtainStyledAttributes(context, attributeSet, iArr, i, 0);
+        TintTypedArray obtainStyledAttributes = TintTypedArray.obtainStyledAttributes(context, attributeSet, iArr, i);
         View view = this.mView;
         Context context2 = view.getContext();
         TypedArray typedArray = obtainStyledAttributes.mWrapped;
@@ -98,38 +107,44 @@ public class AppCompatBackgroundHelper {
         try {
             if (obtainStyledAttributes.hasValue(0)) {
                 this.mBackgroundResId = obtainStyledAttributes.getResourceId(0, -1);
-                ColorStateList tintList = this.mDrawableManager.getTintList(this.mView.getContext(), this.mBackgroundResId);
+                AppCompatDrawableManager appCompatDrawableManager = this.mDrawableManager;
+                Context context3 = this.mView.getContext();
+                int i2 = this.mBackgroundResId;
+                synchronized (appCompatDrawableManager) {
+                    tintList = appCompatDrawableManager.mResourceManager.getTintList(context3, i2);
+                }
                 if (tintList != null) {
                     setInternalBackgroundTint(tintList);
                 }
             }
             if (obtainStyledAttributes.hasValue(1)) {
-                this.mView.setBackgroundTintList(obtainStyledAttributes.getColorStateList(1));
+                ViewCompat.Api21Impl.setBackgroundTintList(this.mView, obtainStyledAttributes.getColorStateList(1));
             }
             if (obtainStyledAttributes.hasValue(2)) {
-                this.mView.setBackgroundTintMode(DrawableUtils.parseTintMode(obtainStyledAttributes.getInt(2, -1), null));
+                ViewCompat.Api21Impl.setBackgroundTintMode(this.mView, DrawableUtils.parseTintMode(obtainStyledAttributes.getInt(2, -1), null));
             }
-            obtainStyledAttributes.mWrapped.recycle();
-        } catch (Throwable th) {
-            obtainStyledAttributes.mWrapped.recycle();
-            throw th;
+        } finally {
+            obtainStyledAttributes.recycle();
         }
     }
 
-    public void onSetBackgroundDrawable() {
-        this.mBackgroundResId = -1;
-        setInternalBackgroundTint(null);
-        applySupportBackgroundTint();
-    }
-
-    public void onSetBackgroundResource(int i) {
+    public final void onSetBackgroundResource(int i) {
+        ColorStateList colorStateList;
         this.mBackgroundResId = i;
         AppCompatDrawableManager appCompatDrawableManager = this.mDrawableManager;
-        setInternalBackgroundTint(appCompatDrawableManager != null ? appCompatDrawableManager.getTintList(this.mView.getContext(), i) : null);
+        if (appCompatDrawableManager != null) {
+            Context context = this.mView.getContext();
+            synchronized (appCompatDrawableManager) {
+                colorStateList = appCompatDrawableManager.mResourceManager.getTintList(context, i);
+            }
+        } else {
+            colorStateList = null;
+        }
+        setInternalBackgroundTint(colorStateList);
         applySupportBackgroundTint();
     }
 
-    public void setInternalBackgroundTint(ColorStateList colorStateList) {
+    public final void setInternalBackgroundTint(ColorStateList colorStateList) {
         if (colorStateList != null) {
             if (this.mInternalBackgroundTint == null) {
                 this.mInternalBackgroundTint = new TintInfo();
@@ -143,7 +158,7 @@ public class AppCompatBackgroundHelper {
         applySupportBackgroundTint();
     }
 
-    public void setSupportBackgroundTintList(ColorStateList colorStateList) {
+    public final void setSupportBackgroundTintList(ColorStateList colorStateList) {
         if (this.mBackgroundTint == null) {
             this.mBackgroundTint = new TintInfo();
         }
@@ -153,7 +168,7 @@ public class AppCompatBackgroundHelper {
         applySupportBackgroundTint();
     }
 
-    public void setSupportBackgroundTintMode(PorterDuff.Mode mode) {
+    public final void setSupportBackgroundTintMode(PorterDuff.Mode mode) {
         if (this.mBackgroundTint == null) {
             this.mBackgroundTint = new TintInfo();
         }
@@ -161,5 +176,9 @@ public class AppCompatBackgroundHelper {
         tintInfo.mTintMode = mode;
         tintInfo.mHasTintMode = true;
         applySupportBackgroundTint();
+    }
+
+    public AppCompatBackgroundHelper(View view) {
+        this.mView = view;
     }
 }

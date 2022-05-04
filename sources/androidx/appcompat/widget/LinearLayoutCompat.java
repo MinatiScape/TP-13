@@ -40,8 +40,8 @@ public class LinearLayoutCompat extends ViewGroup {
             super(context, attributeSet);
         }
 
-        public LayoutParams(int i, int i2) {
-            super(i, i2);
+        public LayoutParams(int i) {
+            super(i, -2);
         }
 
         public LayoutParams(ViewGroup.LayoutParams layoutParams) {
@@ -53,23 +53,58 @@ public class LinearLayoutCompat extends ViewGroup {
         this(context, null);
     }
 
-    @Override // android.view.ViewGroup
-    public boolean checkLayoutParams(ViewGroup.LayoutParams layoutParams) {
-        return layoutParams instanceof LayoutParams;
+    public final boolean hasDividerBeforeChildAt(int i) {
+        if (i == 0) {
+            return (this.mShowDividers & 1) != 0;
+        }
+        if (i == getChildCount()) {
+            return (this.mShowDividers & 4) != 0;
+        }
+        if ((this.mShowDividers & 2) == 0) {
+            return false;
+        }
+        for (int i2 = i - 1; i2 >= 0; i2--) {
+            if (getChildAt(i2).getVisibility() != 8) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    void drawHorizontalDivider(Canvas canvas, int i) {
+    @Override // android.view.ViewGroup
+    public final boolean shouldDelayChildPressedState() {
+        return false;
+    }
+
+    public LinearLayoutCompat(Context context, AttributeSet attributeSet) {
+        this(context, attributeSet, 0);
+    }
+
+    final void drawHorizontalDivider(Canvas canvas, int i) {
         this.mDivider.setBounds(getPaddingLeft() + this.mDividerPadding, i, (getWidth() - getPaddingRight()) - this.mDividerPadding, this.mDividerHeight + i);
         this.mDivider.draw(canvas);
     }
 
-    void drawVerticalDivider(Canvas canvas, int i) {
+    final void drawVerticalDivider(Canvas canvas, int i) {
         this.mDivider.setBounds(i, getPaddingTop() + this.mDividerPadding, this.mDividerWidth + i, (getHeight() - getPaddingBottom()) - this.mDividerPadding);
         this.mDivider.draw(canvas);
     }
 
+    @Override // android.view.ViewGroup
+    /* renamed from: generateDefaultLayoutParams */
+    public LayoutParams mo2generateDefaultLayoutParams() {
+        int i = this.mOrientation;
+        if (i == 0) {
+            return new LayoutParams(-2);
+        }
+        if (i == 1) {
+            return new LayoutParams(-1);
+        }
+        return null;
+    }
+
     @Override // android.view.View
-    public int getBaseline() {
+    public final int getBaseline() {
         int i;
         if (this.mBaselineAlignedChildIndex < 0) {
             return super.getBaseline();
@@ -99,26 +134,8 @@ public class LinearLayoutCompat extends ViewGroup {
         }
     }
 
-    public boolean hasDividerBeforeChildAt(int i) {
-        if (i == 0) {
-            return (this.mShowDividers & 1) != 0;
-        }
-        if (i == getChildCount()) {
-            return (this.mShowDividers & 4) != 0;
-        }
-        if ((this.mShowDividers & 2) == 0) {
-            return false;
-        }
-        for (int i2 = i - 1; i2 >= 0; i2--) {
-            if (getChildAt(i2).getVisibility() != 8) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     @Override // android.view.View
-    public void onDraw(Canvas canvas) {
+    public final void onDraw(Canvas canvas) {
         int i;
         int i2;
         int i3;
@@ -187,18 +204,6 @@ public class LinearLayoutCompat extends ViewGroup {
         }
     }
 
-    @Override // android.view.View
-    public void onInitializeAccessibilityEvent(AccessibilityEvent accessibilityEvent) {
-        super.onInitializeAccessibilityEvent(accessibilityEvent);
-        accessibilityEvent.setClassName("androidx.appcompat.widget.LinearLayoutCompat");
-    }
-
-    @Override // android.view.View
-    public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo accessibilityNodeInfo) {
-        super.onInitializeAccessibilityNodeInfo(accessibilityNodeInfo);
-        accessibilityNodeInfo.setClassName("androidx.appcompat.widget.LinearLayoutCompat");
-    }
-
     /* JADX WARN: Removed duplicated region for block: B:29:0x009e  */
     /* JADX WARN: Removed duplicated region for block: B:60:0x0160  */
     /* JADX WARN: Removed duplicated region for block: B:63:0x0169  */
@@ -209,7 +214,7 @@ public class LinearLayoutCompat extends ViewGroup {
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public void onLayout(boolean r25, int r26, int r27, int r28, int r29) {
+    public void onLayout(boolean r26, int r27, int r28, int r29, int r30) {
         /*
             Method dump skipped, instructions count: 470
             To view this dump add '--comments-level debug' option
@@ -217,54 +222,34 @@ public class LinearLayoutCompat extends ViewGroup {
         throw new UnsupportedOperationException("Method not decompiled: androidx.appcompat.widget.LinearLayoutCompat.onLayout(boolean, int, int, int, int):void");
     }
 
-    /* JADX WARN: Removed duplicated region for block: B:144:0x02fb  */
-    /* JADX WARN: Removed duplicated region for block: B:210:0x049e  */
-    /* JADX WARN: Removed duplicated region for block: B:211:0x04a3  */
-    /* JADX WARN: Removed duplicated region for block: B:214:0x04cb  */
-    /* JADX WARN: Removed duplicated region for block: B:215:0x04d0  */
-    /* JADX WARN: Removed duplicated region for block: B:218:0x04d8  */
-    /* JADX WARN: Removed duplicated region for block: B:219:0x04e6  */
-    /* JADX WARN: Removed duplicated region for block: B:221:0x04fa  */
-    /* JADX WARN: Removed duplicated region for block: B:245:0x0569  */
-    /* JADX WARN: Removed duplicated region for block: B:248:0x0574  */
-    /* JADX WARN: Removed duplicated region for block: B:276:0x060b  */
-    /* JADX WARN: Removed duplicated region for block: B:310:0x06ca  */
-    /* JADX WARN: Removed duplicated region for block: B:313:0x06e7  */
-    /* JADX WARN: Removed duplicated region for block: B:375:0x0877  */
-    /* JADX WARN: Removed duplicated region for block: B:380:0x089e  */
-    /* JADX WARN: Removed duplicated region for block: B:430:? A[RETURN, SYNTHETIC] */
+    /* JADX WARN: Removed duplicated region for block: B:145:0x02ed  */
+    /* JADX WARN: Removed duplicated region for block: B:211:0x0492  */
+    /* JADX WARN: Removed duplicated region for block: B:212:0x0497  */
+    /* JADX WARN: Removed duplicated region for block: B:215:0x04bf  */
+    /* JADX WARN: Removed duplicated region for block: B:216:0x04c4  */
+    /* JADX WARN: Removed duplicated region for block: B:219:0x04cc  */
+    /* JADX WARN: Removed duplicated region for block: B:220:0x04da  */
+    /* JADX WARN: Removed duplicated region for block: B:222:0x04ee  */
+    /* JADX WARN: Removed duplicated region for block: B:235:0x051f  */
+    /* JADX WARN: Removed duplicated region for block: B:245:0x0552  */
+    /* JADX WARN: Removed duplicated region for block: B:248:0x055f  */
+    /* JADX WARN: Removed duplicated region for block: B:276:0x05f4  */
+    /* JADX WARN: Removed duplicated region for block: B:310:0x06b1  */
+    /* JADX WARN: Removed duplicated region for block: B:313:0x06cf  */
+    /* JADX WARN: Removed duplicated region for block: B:375:0x085c  */
+    /* JADX WARN: Removed duplicated region for block: B:380:0x0883  */
+    /* JADX WARN: Removed duplicated region for block: B:427:? A[RETURN, SYNTHETIC] */
     @Override // android.view.View
     /*
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public void onMeasure(int r39, int r40) {
+    public void onMeasure(int r38, int r39) {
         /*
-            Method dump skipped, instructions count: 2271
+            Method dump skipped, instructions count: 2241
             To view this dump add '--comments-level debug' option
         */
         throw new UnsupportedOperationException("Method not decompiled: androidx.appcompat.widget.LinearLayoutCompat.onMeasure(int, int):void");
-    }
-
-    @Override // android.view.ViewGroup
-    public boolean shouldDelayChildPressedState() {
-        return false;
-    }
-
-    public LinearLayoutCompat(Context context, AttributeSet attributeSet) {
-        this(context, attributeSet, 0);
-    }
-
-    @Override // android.view.ViewGroup
-    public LayoutParams generateDefaultLayoutParams() {
-        int i = this.mOrientation;
-        if (i == 0) {
-            return new LayoutParams(-2, -2);
-        }
-        if (i == 1) {
-            return new LayoutParams(-1, -2);
-        }
-        return null;
     }
 
     public LinearLayoutCompat(Context context, AttributeSet attributeSet, int i) {
@@ -322,12 +307,29 @@ public class LinearLayoutCompat extends ViewGroup {
 
     @Override // android.view.ViewGroup
     /* renamed from: generateLayoutParams */
-    public LayoutParams mo4generateLayoutParams(AttributeSet attributeSet) {
+    public LayoutParams mo3generateLayoutParams(AttributeSet attributeSet) {
         return new LayoutParams(getContext(), attributeSet);
+    }
+
+    @Override // android.view.View
+    public final void onInitializeAccessibilityEvent(AccessibilityEvent accessibilityEvent) {
+        super.onInitializeAccessibilityEvent(accessibilityEvent);
+        accessibilityEvent.setClassName("androidx.appcompat.widget.LinearLayoutCompat");
+    }
+
+    @Override // android.view.View
+    public final void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo accessibilityNodeInfo) {
+        super.onInitializeAccessibilityNodeInfo(accessibilityNodeInfo);
+        accessibilityNodeInfo.setClassName("androidx.appcompat.widget.LinearLayoutCompat");
     }
 
     @Override // android.view.ViewGroup
     public LayoutParams generateLayoutParams(ViewGroup.LayoutParams layoutParams) {
         return new LayoutParams(layoutParams);
+    }
+
+    @Override // android.view.ViewGroup
+    public boolean checkLayoutParams(ViewGroup.LayoutParams layoutParams) {
+        return layoutParams instanceof LayoutParams;
     }
 }

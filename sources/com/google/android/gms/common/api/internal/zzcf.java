@@ -1,7 +1,5 @@
 package com.google.android.gms.common.api.internal;
-
-import android.content.Intent;
+/* compiled from: LifecycleFragment.java */
 /* loaded from: classes.dex */
 public interface zzcf {
-    void startActivityForResult(Intent intent, int i);
 }

@@ -7,18 +7,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.android.customization.model.CustomizationManager;
-import com.android.customization.model.grid.GridOptionsManager;
-import com.android.customization.picker.grid.GridFragment$$ExternalSyntheticLambda2;
+import com.android.customization.picker.grid.GridFragment;
 import com.android.customization.picker.grid.GridSectionView;
 import com.android.systemui.shared.R;
 import com.android.wallpaper.model.CustomizationSectionController;
-import com.android.wallpaper.picker.AppbarFragment$$ExternalSyntheticLambda0;
+import com.android.wallpaper.picker.CustomizationPickerFragment;
 import java.util.List;
-import java.util.Objects;
+import java.util.function.Predicate;
 /* loaded from: classes.dex */
-public class GridSectionController implements CustomizationSectionController<GridSectionView> {
+public final class GridSectionController implements CustomizationSectionController<GridSectionView> {
     public final GridOptionsManager mGridOptionsManager;
     public final CustomizationSectionController.CustomizationSectionNavigationController mSectionNavigationController;
+
+    @Override // com.android.wallpaper.model.CustomizationSectionController
+    public final boolean isAvailable(Context context) {
+        if (this.mGridOptionsManager.mProvider.mPreviewUtils.mProviderInfo != null) {
+            return true;
+        }
+        return false;
+    }
 
     public GridSectionController(GridOptionsManager gridOptionsManager, CustomizationSectionController.CustomizationSectionNavigationController customizationSectionNavigationController) {
         this.mGridOptionsManager = gridOptionsManager;
@@ -26,14 +33,14 @@ public class GridSectionController implements CustomizationSectionController<Gri
     }
 
     @Override // com.android.wallpaper.model.CustomizationSectionController
-    public GridSectionView createView(Context context) {
+    public final GridSectionView createView(Context context) {
         GridSectionView gridSectionView = (GridSectionView) LayoutInflater.from(context).inflate(R.layout.grid_section_view, (ViewGroup) null);
         final TextView textView = (TextView) gridSectionView.findViewById(R.id.grid_section_description);
         final View findViewById = gridSectionView.findViewById(R.id.grid_section_tile);
         GridOptionsManager gridOptionsManager = this.mGridOptionsManager;
         CustomizationManager.OptionsFetchedListener<GridOption> optionsFetchedListener = new CustomizationManager.OptionsFetchedListener<GridOption>() { // from class: com.android.customization.model.grid.GridSectionController.1
             @Override // com.android.customization.model.CustomizationManager.OptionsFetchedListener
-            public void onError(Throwable th) {
+            public final void onError(Throwable th) {
                 if (th != null) {
                     Log.e("GridSectionController", "Error loading grid options", th);
                 }
@@ -42,21 +49,27 @@ public class GridSectionController implements CustomizationSectionController<Gri
             }
 
             @Override // com.android.customization.model.CustomizationManager.OptionsFetchedListener
-            public void onOptionsLoaded(List<GridOption> list) {
+            public final void onOptionsLoaded(List<GridOption> list) {
                 TextView textView2 = textView;
-                GridSectionController gridSectionController = GridSectionController.this;
-                Objects.requireNonNull(gridSectionController);
-                textView2.setText(list.stream().filter(new GridFragment$$ExternalSyntheticLambda2(gridSectionController)).findAny().orElse(list.get(0)).mTitle);
+                final GridSectionController gridSectionController = GridSectionController.this;
+                gridSectionController.getClass();
+                textView2.setText(list.stream().filter(new Predicate() { // from class: com.android.customization.model.grid.GridSectionController$$ExternalSyntheticLambda1
+                    @Override // java.util.function.Predicate
+                    public final boolean test(Object obj) {
+                        GridSectionController.this.getClass();
+                        return ((GridOption) obj).mIsCurrent;
+                    }
+                }).findAny().orElse(list.get(0)).mTitle);
             }
         };
-        Objects.requireNonNull(gridOptionsManager);
-        new GridOptionsManager.FetchTask(gridOptionsManager.mProvider, optionsFetchedListener, true, null).execute(new Void[0]);
-        gridSectionView.setOnClickListener(new AppbarFragment$$ExternalSyntheticLambda0(this));
+        gridOptionsManager.getClass();
+        GridOptionsManager.sExecutorService.submit(new GridOptionsManager$$ExternalSyntheticLambda1(gridOptionsManager, optionsFetchedListener));
+        gridSectionView.setOnClickListener(new View.OnClickListener() { // from class: com.android.customization.model.grid.GridSectionController$$ExternalSyntheticLambda0
+            @Override // android.view.View.OnClickListener
+            public final void onClick(View view) {
+                ((CustomizationPickerFragment) GridSectionController.this.mSectionNavigationController).navigateTo(new GridFragment());
+            }
+        });
         return gridSectionView;
-    }
-
-    @Override // com.android.wallpaper.model.CustomizationSectionController
-    public boolean isAvailable(Context context) {
-        return this.mGridOptionsManager.mProvider.mPreviewUtils.mProviderInfo != null;
     }
 }

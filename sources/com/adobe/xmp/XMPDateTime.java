@@ -1,10 +1,10 @@
 package com.adobe.xmp;
 
-import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 /* loaded from: classes.dex */
 public interface XMPDateTime extends Comparable {
-    Calendar getCalendar();
+    GregorianCalendar getCalendar();
 
     int getDay();
 

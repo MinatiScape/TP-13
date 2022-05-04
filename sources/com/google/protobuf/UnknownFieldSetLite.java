@@ -2,7 +2,6 @@ package com.google.protobuf;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public final class UnknownFieldSetLite {
     public static final UnknownFieldSetLite DEFAULT_INSTANCE = new UnknownFieldSetLite(0, new int[0], new Object[0], false);
@@ -16,32 +15,7 @@ public final class UnknownFieldSetLite {
         this(0, new int[8], new Object[8], true);
     }
 
-    public static UnknownFieldSetLite newInstance() {
-        return new UnknownFieldSetLite(0, new int[8], new Object[8], true);
-    }
-
-    public static void writeField(int i, Object obj, Writer writer) throws IOException {
-        int i2 = i >>> 3;
-        int i3 = i & 7;
-        if (i3 == 0) {
-            ((CodedOutputStreamWriter) writer).output.writeUInt64(i2, ((Long) obj).longValue());
-        } else if (i3 == 1) {
-            ((CodedOutputStreamWriter) writer).output.writeFixed64(i2, ((Long) obj).longValue());
-        } else if (i3 == 2) {
-            ((CodedOutputStreamWriter) writer).output.writeBytes(i2, (ByteString) obj);
-        } else if (i3 == 3) {
-            CodedOutputStreamWriter codedOutputStreamWriter = (CodedOutputStreamWriter) writer;
-            codedOutputStreamWriter.output.writeTag(i2, 3);
-            ((UnknownFieldSetLite) obj).writeTo(writer);
-            codedOutputStreamWriter.output.writeTag(i2, 4);
-        } else if (i3 == 5) {
-            ((CodedOutputStreamWriter) writer).output.writeFixed32(i2, ((Integer) obj).intValue());
-        } else {
-            throw new RuntimeException(InvalidProtocolBufferException.invalidWireType());
-        }
-    }
-
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         boolean z;
         boolean z2;
         if (this == obj) {
@@ -91,7 +65,15 @@ public final class UnknownFieldSetLite {
         return false;
     }
 
-    public int getSerializedSize() {
+    public UnknownFieldSetLite(int i, int[] iArr, Object[] objArr, boolean z) {
+        this.memoizedSerializedSize = -1;
+        this.count = i;
+        this.tags = iArr;
+        this.objects = objArr;
+        this.isMutable = z;
+    }
+
+    public final int getSerializedSize() {
         int i;
         int i2 = this.memoizedSerializedSize;
         if (i2 != -1) {
@@ -103,15 +85,17 @@ public final class UnknownFieldSetLite {
             int i6 = i5 >>> 3;
             int i7 = i5 & 7;
             if (i7 == 0) {
-                i = CodedOutputStream.computeUInt64Size(i6, ((Long) this.objects[i4]).longValue());
+                i = CodedOutputStream.computeTagSize(i6) + CodedOutputStream.computeUInt64SizeNoTag(((Long) this.objects[i4]).longValue());
             } else if (i7 == 1) {
-                i = CodedOutputStream.computeFixed64Size(i6, ((Long) this.objects[i4]).longValue());
+                ((Long) this.objects[i4]).longValue();
+                i = CodedOutputStream.computeFixed64Size(i6);
             } else if (i7 == 2) {
                 i = CodedOutputStream.computeBytesSize(i6, (ByteString) this.objects[i4]);
             } else if (i7 == 3) {
                 i3 = ((UnknownFieldSetLite) this.objects[i4]).getSerializedSize() + (CodedOutputStream.computeTagSize(i6) * 2) + i3;
             } else if (i7 == 5) {
-                i = CodedOutputStream.computeFixed32Size(i6, ((Integer) this.objects[i4]).intValue());
+                ((Integer) this.objects[i4]).intValue();
+                i = CodedOutputStream.computeFixed32Size(i6);
             } else {
                 throw new IllegalStateException(InvalidProtocolBufferException.invalidWireType());
             }
@@ -121,7 +105,7 @@ public final class UnknownFieldSetLite {
         return i3;
     }
 
-    public int hashCode() {
+    public final int hashCode() {
         int i = this.count;
         int i2 = (527 + i) * 31;
         int[] iArr = this.tags;
@@ -139,39 +123,55 @@ public final class UnknownFieldSetLite {
         return i6 + i3;
     }
 
-    public void storeField(int i, Object obj) {
+    public final void storeField(int i, Object obj) {
+        int i2;
         if (this.isMutable) {
-            int i2 = this.count;
+            int i3 = this.count;
             int[] iArr = this.tags;
-            if (i2 == iArr.length) {
-                int i3 = i2 + (i2 < 4 ? 8 : i2 >> 1);
-                this.tags = Arrays.copyOf(iArr, i3);
-                this.objects = Arrays.copyOf(this.objects, i3);
+            if (i3 == iArr.length) {
+                if (i3 < 4) {
+                    i2 = 8;
+                } else {
+                    i2 = i3 >> 1;
+                }
+                int i4 = i3 + i2;
+                this.tags = Arrays.copyOf(iArr, i4);
+                this.objects = Arrays.copyOf(this.objects, i4);
             }
             int[] iArr2 = this.tags;
-            int i4 = this.count;
-            iArr2[i4] = i;
-            this.objects[i4] = obj;
-            this.count = i4 + 1;
+            int i5 = this.count;
+            iArr2[i5] = i;
+            this.objects[i5] = obj;
+            this.count = i5 + 1;
             return;
         }
         throw new UnsupportedOperationException();
     }
 
-    public void writeTo(Writer writer) throws IOException {
+    public final void writeTo(CodedOutputStreamWriter codedOutputStreamWriter) throws IOException {
         if (this.count != 0) {
-            Objects.requireNonNull(writer);
+            codedOutputStreamWriter.getClass();
             for (int i = 0; i < this.count; i++) {
-                writeField(this.tags[i], this.objects[i], writer);
+                int i2 = this.tags[i];
+                Object obj = this.objects[i];
+                int i3 = i2 >>> 3;
+                int i4 = i2 & 7;
+                if (i4 == 0) {
+                    codedOutputStreamWriter.output.writeUInt64(i3, ((Long) obj).longValue());
+                } else if (i4 == 1) {
+                    codedOutputStreamWriter.output.writeFixed64(i3, ((Long) obj).longValue());
+                } else if (i4 == 2) {
+                    codedOutputStreamWriter.writeBytes(i3, (ByteString) obj);
+                } else if (i4 == 3) {
+                    codedOutputStreamWriter.output.writeTag(i3, 3);
+                    ((UnknownFieldSetLite) obj).writeTo(codedOutputStreamWriter);
+                    codedOutputStreamWriter.output.writeTag(i3, 4);
+                } else if (i4 == 5) {
+                    codedOutputStreamWriter.output.writeFixed32(i3, ((Integer) obj).intValue());
+                } else {
+                    throw new RuntimeException(InvalidProtocolBufferException.invalidWireType());
+                }
             }
         }
-    }
-
-    public UnknownFieldSetLite(int i, int[] iArr, Object[] objArr, boolean z) {
-        this.memoizedSerializedSize = -1;
-        this.count = i;
-        this.tags = iArr;
-        this.objects = objArr;
-        this.isMutable = z;
     }
 }

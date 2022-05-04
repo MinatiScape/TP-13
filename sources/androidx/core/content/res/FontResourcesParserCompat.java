@@ -2,6 +2,7 @@ package androidx.core.content.res;
 
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.content.res.XmlResourceParser;
 import android.util.Base64;
 import android.util.Xml;
 import androidx.core.R$styleable;
@@ -10,40 +11,49 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 /* loaded from: classes.dex */
-public class FontResourcesParserCompat {
+public final class FontResourcesParserCompat {
 
     /* loaded from: classes.dex */
     public interface FamilyResourceEntry {
+    }
+
+    public static void skip(XmlResourceParser xmlResourceParser) throws XmlPullParserException, IOException {
+        int i = 1;
+        while (i > 0) {
+            int next = xmlResourceParser.next();
+            if (next == 2) {
+                i++;
+            } else if (next == 3) {
+                i--;
+            }
+        }
     }
 
     /* loaded from: classes.dex */
     public static final class FontFamilyFilesResourceEntry implements FamilyResourceEntry {
         public final FontFileResourceEntry[] mEntries;
 
-        public FontFamilyFilesResourceEntry(FontFileResourceEntry[] entries) {
-            this.mEntries = entries;
+        public FontFamilyFilesResourceEntry(FontFileResourceEntry[] fontFileResourceEntryArr) {
+            this.mEntries = fontFileResourceEntryArr;
         }
     }
 
     /* loaded from: classes.dex */
     public static final class FontFileResourceEntry {
-        public final String mFileName;
         public boolean mItalic;
         public int mResourceId;
         public int mTtcIndex;
         public String mVariationSettings;
         public int mWeight;
 
-        public FontFileResourceEntry(String fileName, int weight, boolean italic, String variationSettings, int ttcIndex, int resourceId) {
-            this.mFileName = fileName;
-            this.mWeight = weight;
-            this.mItalic = italic;
-            this.mVariationSettings = variationSettings;
-            this.mTtcIndex = ttcIndex;
-            this.mResourceId = resourceId;
+        public FontFileResourceEntry(String str, int i, boolean z, String str2, int i2, int i3) {
+            this.mWeight = i;
+            this.mItalic = z;
+            this.mVariationSettings = str2;
+            this.mTtcIndex = i2;
+            this.mResourceId = i3;
         }
     }
 
@@ -54,26 +64,29 @@ public class FontResourcesParserCompat {
         public final String mSystemFontFamilyName;
         public final int mTimeoutMs;
 
-        public ProviderResourceEntry(FontRequest request, int strategy, int timeoutMs, String systemFontFamilyName) {
-            this.mRequest = request;
-            this.mStrategy = strategy;
-            this.mTimeoutMs = timeoutMs;
-            this.mSystemFontFamilyName = systemFontFamilyName;
+        public ProviderResourceEntry(FontRequest fontRequest, int i, int i2, String str) {
+            this.mRequest = fontRequest;
+            this.mStrategy = i;
+            this.mTimeoutMs = i2;
+            this.mSystemFontFamilyName = str;
         }
     }
 
-    public static FamilyResourceEntry parse(XmlPullParser parser, Resources resources) throws XmlPullParserException, IOException {
+    public static FamilyResourceEntry parse(XmlResourceParser xmlResourceParser, Resources resources) throws XmlPullParserException, IOException {
         int next;
+        int i;
+        boolean z;
+        int i2;
         do {
-            next = parser.next();
+            next = xmlResourceParser.next();
             if (next == 2) {
                 break;
             }
         } while (next != 1);
         if (next == 2) {
-            parser.require(2, null, "font-family");
-            if (parser.getName().equals("font-family")) {
-                TypedArray obtainAttributes = resources.obtainAttributes(Xml.asAttributeSet(parser), R$styleable.FontFamily);
+            xmlResourceParser.require(2, null, "font-family");
+            if (xmlResourceParser.getName().equals("font-family")) {
+                TypedArray obtainAttributes = resources.obtainAttributes(Xml.asAttributeSet(xmlResourceParser), R$styleable.FontFamily);
                 String string = obtainAttributes.getString(0);
                 String string2 = obtainAttributes.getString(4);
                 String string3 = obtainAttributes.getString(5);
@@ -84,36 +97,49 @@ public class FontResourcesParserCompat {
                 obtainAttributes.recycle();
                 if (string == null || string2 == null || string3 == null) {
                     ArrayList arrayList = new ArrayList();
-                    while (parser.next() != 3) {
-                        if (parser.getEventType() == 2) {
-                            if (parser.getName().equals("font")) {
-                                TypedArray obtainAttributes2 = resources.obtainAttributes(Xml.asAttributeSet(parser), R$styleable.FontFamilyFont);
-                                int i = 8;
+                    while (xmlResourceParser.next() != 3) {
+                        if (xmlResourceParser.getEventType() == 2) {
+                            if (xmlResourceParser.getName().equals("font")) {
+                                TypedArray obtainAttributes2 = resources.obtainAttributes(Xml.asAttributeSet(xmlResourceParser), R$styleable.FontFamilyFont);
+                                int i3 = 8;
                                 if (!obtainAttributes2.hasValue(8)) {
-                                    i = 1;
+                                    i3 = 1;
                                 }
-                                int i2 = obtainAttributes2.getInt(i, 400);
-                                boolean z = 1 == obtainAttributes2.getInt(obtainAttributes2.hasValue(6) ? 6 : 2, 0);
-                                int i3 = 9;
+                                int i4 = obtainAttributes2.getInt(i3, 400);
+                                if (obtainAttributes2.hasValue(6)) {
+                                    i = 6;
+                                } else {
+                                    i = 2;
+                                }
+                                if (1 == obtainAttributes2.getInt(i, 0)) {
+                                    z = true;
+                                } else {
+                                    z = false;
+                                }
+                                int i5 = 9;
                                 if (!obtainAttributes2.hasValue(9)) {
-                                    i3 = 3;
+                                    i5 = 3;
                                 }
-                                int i4 = 7;
+                                int i6 = 7;
                                 if (!obtainAttributes2.hasValue(7)) {
-                                    i4 = 4;
+                                    i6 = 4;
                                 }
-                                String string5 = obtainAttributes2.getString(i4);
-                                int i5 = obtainAttributes2.getInt(i3, 0);
-                                int i6 = obtainAttributes2.hasValue(5) ? 5 : 0;
-                                int resourceId2 = obtainAttributes2.getResourceId(i6, 0);
-                                String string6 = obtainAttributes2.getString(i6);
+                                String string5 = obtainAttributes2.getString(i6);
+                                int i7 = obtainAttributes2.getInt(i5, 0);
+                                if (obtainAttributes2.hasValue(5)) {
+                                    i2 = 5;
+                                } else {
+                                    i2 = 0;
+                                }
+                                int resourceId2 = obtainAttributes2.getResourceId(i2, 0);
+                                String string6 = obtainAttributes2.getString(i2);
                                 obtainAttributes2.recycle();
-                                while (parser.next() != 3) {
-                                    skip(parser);
+                                while (xmlResourceParser.next() != 3) {
+                                    skip(xmlResourceParser);
                                 }
-                                arrayList.add(new FontFileResourceEntry(string6, i2, z, string5, i5, resourceId2));
+                                arrayList.add(new FontFileResourceEntry(string6, i4, z, string5, i7, resourceId2));
                             } else {
-                                skip(parser);
+                                skip(xmlResourceParser);
                             }
                         }
                     }
@@ -121,62 +147,52 @@ public class FontResourcesParserCompat {
                         return new FontFamilyFilesResourceEntry((FontFileResourceEntry[]) arrayList.toArray(new FontFileResourceEntry[arrayList.size()]));
                     }
                 } else {
-                    while (parser.next() != 3) {
-                        skip(parser);
+                    while (xmlResourceParser.next() != 3) {
+                        skip(xmlResourceParser);
                     }
                     return new ProviderResourceEntry(new FontRequest(string, string2, string3, readCerts(resources, resourceId)), integer, integer2, string4);
                 }
             } else {
-                skip(parser);
+                skip(xmlResourceParser);
             }
             return null;
         }
         throw new XmlPullParserException("No start tag found");
     }
 
-    public static List<List<byte[]>> readCerts(Resources resources, int certsId) {
-        if (certsId == 0) {
+    public static List<List<byte[]>> readCerts(Resources resources, int i) {
+        if (i == 0) {
             return Collections.emptyList();
         }
-        TypedArray obtainTypedArray = resources.obtainTypedArray(certsId);
+        TypedArray obtainTypedArray = resources.obtainTypedArray(i);
         try {
             if (obtainTypedArray.length() == 0) {
                 return Collections.emptyList();
             }
             ArrayList arrayList = new ArrayList();
             if (obtainTypedArray.getType(0) == 1) {
-                for (int i = 0; i < obtainTypedArray.length(); i++) {
-                    int resourceId = obtainTypedArray.getResourceId(i, 0);
+                for (int i2 = 0; i2 < obtainTypedArray.length(); i2++) {
+                    int resourceId = obtainTypedArray.getResourceId(i2, 0);
                     if (resourceId != 0) {
-                        arrayList.add(toByteArrayList(resources.getStringArray(resourceId)));
+                        String[] stringArray = resources.getStringArray(resourceId);
+                        ArrayList arrayList2 = new ArrayList();
+                        for (String str : stringArray) {
+                            arrayList2.add(Base64.decode(str, 0));
+                        }
+                        arrayList.add(arrayList2);
                     }
                 }
             } else {
-                arrayList.add(toByteArrayList(resources.getStringArray(certsId)));
+                String[] stringArray2 = resources.getStringArray(i);
+                ArrayList arrayList3 = new ArrayList();
+                for (String str2 : stringArray2) {
+                    arrayList3.add(Base64.decode(str2, 0));
+                }
+                arrayList.add(arrayList3);
             }
             return arrayList;
         } finally {
             obtainTypedArray.recycle();
         }
-    }
-
-    public static void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
-        int i = 1;
-        while (i > 0) {
-            int next = parser.next();
-            if (next == 2) {
-                i++;
-            } else if (next == 3) {
-                i--;
-            }
-        }
-    }
-
-    public static List<byte[]> toByteArrayList(String[] stringArray) {
-        ArrayList arrayList = new ArrayList();
-        for (String str : stringArray) {
-            arrayList.add(Base64.decode(str, 0));
-        }
-        return arrayList;
     }
 }

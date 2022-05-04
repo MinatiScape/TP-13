@@ -3,28 +3,28 @@ package androidx.recyclerview.widget;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 /* loaded from: classes.dex */
-public class ItemTouchHelper$RecoverAnimation implements Animator.AnimatorListener {
+class ItemTouchHelper$RecoverAnimation implements Animator.AnimatorListener {
     public boolean mEnded;
     public final ValueAnimator mValueAnimator;
 
     @Override // android.animation.Animator.AnimatorListener
-    public void onAnimationCancel(Animator animation) {
+    public final void onAnimationCancel(Animator animator) {
     }
 
     @Override // android.animation.Animator.AnimatorListener
-    public void onAnimationEnd(Animator animation) {
+    public final void onAnimationRepeat(Animator animator) {
+    }
+
+    @Override // android.animation.Animator.AnimatorListener
+    public final void onAnimationStart(Animator animator) {
+    }
+
+    @Override // android.animation.Animator.AnimatorListener
+    public final void onAnimationEnd(Animator animator) {
         if (this.mEnded) {
             this.mEnded = true;
             return;
         }
         throw null;
-    }
-
-    @Override // android.animation.Animator.AnimatorListener
-    public void onAnimationRepeat(Animator animation) {
-    }
-
-    @Override // android.animation.Animator.AnimatorListener
-    public void onAnimationStart(Animator animation) {
     }
 }

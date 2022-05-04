@@ -1,6 +1,8 @@
 package androidx.slice;
 
+import androidx.core.R$attr;
 import androidx.versionedparcelable.VersionedParcel;
+import androidx.versionedparcelable.VersionedParcelable;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Objects;
@@ -8,17 +10,21 @@ import java.util.Objects;
 public final class SliceParcelizer {
     /* JADX WARN: Multi-variable type inference failed */
     /* JADX WARN: Type inference failed for: r3v7, types: [java.lang.Object[], java.lang.Object] */
-    public static Slice read(VersionedParcel parcel) {
+    public static Slice read(VersionedParcel versionedParcel) {
         Slice slice = new Slice();
-        slice.mSpec = (SliceSpec) parcel.readVersionedParcelable(slice.mSpec, 1);
-        slice.mItems = (SliceItem[]) parcel.readArray(slice.mItems, 2);
-        slice.mHints = (String[]) parcel.readArray(slice.mHints, 3);
-        slice.mUri = parcel.readString(slice.mUri, 4);
+        VersionedParcelable versionedParcelable = slice.mSpec;
+        if (versionedParcel.readField(1)) {
+            versionedParcelable = versionedParcel.readVersionedParcelable();
+        }
+        slice.mSpec = (SliceSpec) versionedParcelable;
+        slice.mItems = (SliceItem[]) versionedParcel.readArray(slice.mItems, 2);
+        slice.mHints = (String[]) versionedParcel.readArray(slice.mHints, 3);
+        slice.mUri = versionedParcel.readString(slice.mUri, 4);
         for (int length = slice.mItems.length - 1; length >= 0; length--) {
             SliceItem[] sliceItemArr = slice.mItems;
-            if (sliceItemArr[length].mObj == null) {
-                SliceItem sliceItem = sliceItemArr[length];
-                if (ArrayUtils.contains(sliceItemArr, sliceItem)) {
+            SliceItem sliceItem = sliceItemArr[length];
+            if (sliceItem.mObj == null) {
+                if (R$attr.contains(sliceItemArr, sliceItem)) {
                     int length2 = sliceItemArr.length;
                     int i = 0;
                     while (true) {
@@ -46,24 +52,23 @@ public final class SliceParcelizer {
         return slice;
     }
 
-    public static void write(Slice obj, VersionedParcel parcel) {
-        Objects.requireNonNull(parcel);
-        Objects.requireNonNull(obj);
-        SliceSpec sliceSpec = obj.mSpec;
+    public static void write(Slice slice, VersionedParcel versionedParcel) {
+        versionedParcel.getClass();
+        slice.getClass();
+        SliceSpec sliceSpec = slice.mSpec;
         if (sliceSpec != null) {
-            parcel.setOutputField(1);
-            parcel.writeVersionedParcelable(sliceSpec);
+            versionedParcel.setOutputField(1);
+            versionedParcel.writeVersionedParcelable(sliceSpec);
         }
-        if (!Arrays.equals(Slice.NO_ITEMS, obj.mItems)) {
-            parcel.writeArray(obj.mItems, 2);
+        if (!Arrays.equals(Slice.NO_ITEMS, slice.mItems)) {
+            versionedParcel.writeArray(slice.mItems, 2);
         }
-        if (!Arrays.equals(Slice.NO_HINTS, obj.mHints)) {
-            parcel.writeArray(obj.mHints, 3);
+        if (!Arrays.equals(Slice.NO_HINTS, slice.mHints)) {
+            versionedParcel.writeArray(slice.mHints, 3);
         }
-        String str = obj.mUri;
+        String str = slice.mUri;
         if (str != null) {
-            parcel.setOutputField(4);
-            parcel.writeString(str);
+            versionedParcel.writeString(str, 4);
         }
     }
 }

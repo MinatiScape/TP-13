@@ -7,7 +7,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 /* loaded from: classes.dex */
-public class InsetDialogOnTouchListener implements View.OnTouchListener {
+public final class InsetDialogOnTouchListener implements View.OnTouchListener {
     public final Dialog dialog;
     public final int leftInset;
     public final int topInset;
@@ -20,7 +20,7 @@ public class InsetDialogOnTouchListener implements View.OnTouchListener {
     }
 
     @Override // android.view.View.OnTouchListener
-    public boolean onTouch(View view, MotionEvent motionEvent) {
+    public final boolean onTouch(View view, MotionEvent motionEvent) {
         View findViewById = view.findViewById(16908290);
         int left = findViewById.getLeft() + this.leftInset;
         int width = findViewById.getWidth() + left;

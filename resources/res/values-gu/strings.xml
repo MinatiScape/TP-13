@@ -30,14 +30,13 @@
     <string name="abc_slice_more">વધુ</string>
     <string name="abc_slice_more_content">+ %1$d</string>
     <string name="abc_slice_permission_allow">મંજૂરી આપો</string>
-    <string name="abc_slice_permission_checkbox">%1$sને કોઈપણ ઍપના સ્લાઇસ બતાવવાની મંજૂરી આપો</string>
     <string name="abc_slice_permission_deny">નકારો</string>
     <string name="abc_slice_permission_text_1">- તે %1$sમાંથી માહિતી વાંચી શકે છે</string>
     <string name="abc_slice_permission_text_2">- તે %1$sની અંદર ક્રિયાઓ કરી શકે છે</string>
     <string name="abc_slice_permission_title">%1$sને %2$s સ્લાઇસ બતાવવાની મંજૂરી આપીએ?</string>
     <string name="abc_slice_show_more">વધુ બતાવો</string>
-    <string name="abc_slice_updated">%1$s અપડેટ થયું</string>
-    <string name="abc_slices_permission_request">%1$s %2$s સ્લાઇસ બતાવવા માગે છે</string>
+    <string name="abc_slice_updated">અપડેટ કરાયાનો સમય %1$s</string>
+    <string name="abc_slices_permission_request">%1$s, %2$s સ્લાઇસ બતાવવા માગે છે</string>
     <string name="abc_toolbar_collapse_description">સંકુચિત કરો</string>
     <string name="accessibility_custom_color_title">કસ્ટમ રંગ</string>
     <string name="accessibility_custom_font_title">કસ્ટમ ફૉન્ટ</string>
@@ -72,6 +71,7 @@
     <string name="center_wallpaper_position">મધ્ય</string>
     <string name="character_counter_content_description">%2$dમાંથી %1$d અક્ષરો દાખલ કર્યા</string>
     <string name="character_counter_overflowed_content_description">%2$dમાંથી %1$dની વર્ણ મર્યાદા ઓળંગાઈ ગઈ છે</string>
+    <string name="cinematic_effects_toogle">3D વૉલપેપર</string>
     <string name="clear_text_end_icon_content_description">ટેક્સ્ટ સાફ કરો</string>
     <string name="clock_preview_content_description">%1$s ઘડિયાળનું પ્રીવ્યૂ</string>
     <string name="clock_title">ઘડિયાળ</string>
@@ -117,6 +117,8 @@
     <string name="delete_live_wallpaper">ડિલીટ કરો</string>
     <string name="delete_wallpaper_confirmation">તમારા ફોનમાંથી આ વૉલપેપર ડિલીટ કરીએ?</string>
     <string name="edit_custom_theme_lbl">ફેરફાર કરવા માટે ટૅપ કરો</string>
+    <string name="effect_error_dialog_body">અમે ઇફેક્ટ લાગુ કરી શક્યાં નથી.\nઅન્ય ફોટો વડે અજમાવી જુઓ.</string>
+    <string name="effect_error_dialog_title">અરે નહીં!</string>
     <string name="error_icon_content_description">ભૂલ</string>
     <string name="expand_button_title">વિગતવાર</string>
     <string name="explore">શોધખોળ કરો</string>
@@ -199,6 +201,7 @@
     <string name="mtrl_picker_toggle_to_day_selection">દિવસની પસંદગી પર સ્વિચ કરવા માટે ટૅપ કરો</string>
     <string name="mtrl_picker_toggle_to_text_input_mode">ટેક્સ્ટ ઇનપુટ મોડ પર સ્વિચ કરો</string>
     <string name="mtrl_picker_toggle_to_year_selection">વર્ષની પસંદગી પર સ્વિચ કરવા માટે ટૅપ કરો</string>
+    <string name="my_photos">મારા ફોટા</string>
     <string name="my_photos_category_title">મારા ફોટા</string>
     <string name="my_photos_generic_wallpaper_title">મારો ફોટો</string>
     <string name="name_component_title">તમારી શૈલીને નામ આપો</string>
@@ -236,7 +239,7 @@
     <string name="search_menu_title">શોધો</string>
     <string name="select_wallpaper_label">વૉલપેપરની કૅટેગરી</string>
     <string name="set_theme_wallpaper_dialog_message">વૉલપેપરની શૈલી સેટ કરો</string>
-    <string name="set_wallpaper_both_destination">હોમ સ્ક્રીન અને લૉક સ્ક્રીન</string>
+    <string name="set_wallpaper_both_destination">હોમ અને લૉક સ્ક્રીન</string>
     <string name="set_wallpaper_button_text">વૉલપેપર સેટ કરો</string>
     <string name="set_wallpaper_dialog_message">આના પર વૉલપેપર સેટ કરો</string>
     <string name="set_wallpaper_error_message">વૉલપેપર સેટ કરવામાં અસમર્થ છીએ.</string>
@@ -244,6 +247,8 @@
     <string name="set_wallpaper_lock_screen_destination">લૉક સ્ક્રીન</string>
     <string name="set_wallpaper_progress_message">વૉલપેપર સેટ કરી રહ્યાં છીએ…</string>
     <string name="settings_button_label">સેટિંગ</string>
+    <string name="settings_snackbar_description">કૃપા કરીને સેટિંગમાં ફાઇલો અને મીડિયાનો ઍક્સેસ ચાલુ કરો.</string>
+    <string name="settings_snackbar_enable">ચાલુ કરો</string>
     <string name="shape_component_title">આકાર પસંદ કરો</string>
     <string name="shape_preview_content_description">આકારનો પ્રીવ્યૂ</string>
     <string name="show_ui_preview_text">UIનો પ્રીવ્યૂ બતાવો</string>
@@ -261,6 +266,7 @@
     <string name="style_info_description">ફૉન્ટ, આઇકન, ઍપના આકાર અને રંગનો પ્રીવ્યૂ</string>
     <string name="summary_collapsed_preference_list">%1$s, %2$s</string>
     <string name="tab_customize">કસ્ટમાઇઝ કરો</string>
+    <string name="tab_effects">ઇફેક્ટ</string>
     <string name="tab_info">માહિતી</string>
     <string name="theme_description">ફોન્ટ: %1$s, આઇકન: %2$s, આકાર: %3$s, રંગ: %4$s</string>
     <string name="theme_preview_card_content_description">શૈલીનો પ્રીવ્યૂ કરો</string>
@@ -280,6 +286,8 @@
     <string name="wallpaper_destination_both">હોમ અને લૉક સ્ક્રીન</string>
     <string name="wallpaper_disabled_by_administrator_message">તમારા ઉપકરણ વ્યવસ્થાપકે વૉલપેપર સેટ કરવાની સુવિધા બંધ કરી છે</string>
     <string name="wallpaper_disabled_message">આ ઉપકરણ પર વૉલપેપર સેટ કરવાની સુવિધા બંધ કરવામાં આવી છે</string>
+    <string name="wallpaper_effects_subtitle">તમારા ફોટોને એવું 3D વૉલપેપર બનાવો કે તમારા ફોનમાં હિલચાલ થાય ત્યારે તે પણ હલવા લાગે</string>
+    <string name="wallpaper_effects_title">3D વૉલપેપર</string>
     <string name="wallpaper_picker_entry_title">વૉલપેપર બદલો</string>
     <string name="wallpaper_preview_card_content_description">વૉલપેપરનો પ્રીવ્યૂ કરો</string>
     <string name="wallpaper_set_successfully_message">વૉલપેપર સફળતાપૂર્વક સેટ કર્યું</string>

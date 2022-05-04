@@ -8,48 +8,47 @@ import java.util.Arrays;
 public class DateValidatorPointForward implements CalendarConstraints.DateValidator {
     public static final Parcelable.Creator<DateValidatorPointForward> CREATOR = new Parcelable.Creator<DateValidatorPointForward>() { // from class: com.google.android.material.datepicker.DateValidatorPointForward.1
         @Override // android.os.Parcelable.Creator
-        public DateValidatorPointForward createFromParcel(Parcel parcel) {
-            return new DateValidatorPointForward(parcel.readLong(), null);
+        public final DateValidatorPointForward createFromParcel(Parcel parcel) {
+            return new DateValidatorPointForward(parcel.readLong());
         }
 
         @Override // android.os.Parcelable.Creator
-        public DateValidatorPointForward[] newArray(int i) {
+        public final DateValidatorPointForward[] newArray(int i) {
             return new DateValidatorPointForward[i];
         }
     };
     public final long point;
 
-    public DateValidatorPointForward(long j) {
-        this.point = j;
-    }
-
     @Override // android.os.Parcelable
-    public int describeContents() {
+    public final int describeContents() {
         return 0;
     }
 
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
         return (obj instanceof DateValidatorPointForward) && this.point == ((DateValidatorPointForward) obj).point;
     }
 
-    public int hashCode() {
+    public final int hashCode() {
         return Arrays.hashCode(new Object[]{Long.valueOf(this.point)});
     }
 
     @Override // com.google.android.material.datepicker.CalendarConstraints.DateValidator
-    public boolean isValid(long j) {
-        return j >= this.point;
+    public final boolean isValid(long j) {
+        if (j >= this.point) {
+            return true;
+        }
+        return false;
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
+    public final void writeToParcel(Parcel parcel, int i) {
         parcel.writeLong(this.point);
     }
 
-    public DateValidatorPointForward(long j, AnonymousClass1 r3) {
+    public DateValidatorPointForward(long j) {
         this.point = j;
     }
 }

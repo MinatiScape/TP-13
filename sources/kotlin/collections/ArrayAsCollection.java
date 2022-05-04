@@ -7,63 +7,86 @@ import kotlin.jvm.internal.ArrayIterator;
 import kotlin.jvm.internal.CollectionToArray;
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
+/* compiled from: Collections.kt */
 /* loaded from: classes.dex */
 public final class ArrayAsCollection<T> implements Collection<T> {
-    public final boolean isVarargs;
+    public final boolean isVarargs = false;
     @NotNull
     public final T[] values;
 
-    public ArrayAsCollection(@NotNull T[] tArr, boolean z) {
-        this.values = tArr;
-        this.isVarargs = z;
-    }
-
     @Override // java.util.Collection
-    public boolean add(T t) {
+    public final boolean add(T t) {
         throw new UnsupportedOperationException("Operation is not supported for read-only collection");
     }
 
     @Override // java.util.Collection
-    public boolean addAll(Collection<? extends T> collection) {
+    public final boolean addAll(Collection<? extends T> collection) {
         throw new UnsupportedOperationException("Operation is not supported for read-only collection");
     }
 
     @Override // java.util.Collection
-    public void clear() {
+    public final void clear() {
         throw new UnsupportedOperationException("Operation is not supported for read-only collection");
     }
 
     @Override // java.util.Collection
-    public boolean contains(Object obj) {
+    public final boolean remove(Object obj) {
+        throw new UnsupportedOperationException("Operation is not supported for read-only collection");
+    }
+
+    @Override // java.util.Collection
+    public final boolean removeAll(Collection<? extends Object> collection) {
+        throw new UnsupportedOperationException("Operation is not supported for read-only collection");
+    }
+
+    @Override // java.util.Collection
+    public final boolean retainAll(Collection<? extends Object> collection) {
+        throw new UnsupportedOperationException("Operation is not supported for read-only collection");
+    }
+
+    @Override // java.util.Collection
+    public final <T> T[] toArray(T[] array) {
+        Intrinsics.checkNotNullParameter(array, "array");
+        return (T[]) CollectionToArray.toArray(this, array);
+    }
+
+    @Override // java.util.Collection
+    public final boolean contains(Object obj) {
         int i;
-        T[] indexOf = this.values;
-        Intrinsics.checkNotNullParameter(indexOf, "$this$contains");
-        Intrinsics.checkNotNullParameter(indexOf, "$this$indexOf");
+        T[] tArr = this.values;
+        Intrinsics.checkNotNullParameter(tArr, "<this>");
         if (obj == null) {
-            int length = indexOf.length;
+            int length = tArr.length;
             i = 0;
             while (i < length) {
-                if (indexOf[i] == null) {
+                int i2 = i + 1;
+                if (tArr[i] == null) {
                     break;
                 }
-                i++;
+                i = i2;
             }
             i = -1;
         } else {
-            int length2 = indexOf.length;
-            for (int i2 = 0; i2 < length2; i2++) {
-                if (Intrinsics.areEqual(obj, indexOf[i2])) {
-                    i = i2;
+            int length2 = tArr.length;
+            int i3 = 0;
+            while (i3 < length2) {
+                int i4 = i3 + 1;
+                if (Intrinsics.areEqual(obj, tArr[i3])) {
+                    i = i3;
                     break;
                 }
+                i3 = i4;
             }
             i = -1;
         }
-        return i >= 0;
+        if (i >= 0) {
+            return true;
+        }
+        return false;
     }
 
     @Override // java.util.Collection
-    public boolean containsAll(@NotNull Collection<? extends Object> elements) {
+    public final boolean containsAll(@NotNull Collection<? extends Object> elements) {
         Intrinsics.checkNotNullParameter(elements, "elements");
         if (elements.isEmpty()) {
             return true;
@@ -78,31 +101,19 @@ public final class ArrayAsCollection<T> implements Collection<T> {
     }
 
     @Override // java.util.Collection
-    public boolean isEmpty() {
-        return this.values.length == 0;
+    public final boolean isEmpty() {
+        if (this.values.length == 0) {
+            return true;
+        }
+        return false;
     }
 
     @Override // java.util.Collection, java.lang.Iterable
     @NotNull
-    public Iterator<T> iterator() {
+    public final Iterator<T> iterator() {
         T[] array = this.values;
         Intrinsics.checkNotNullParameter(array, "array");
         return new ArrayIterator(array);
-    }
-
-    @Override // java.util.Collection
-    public boolean remove(Object obj) {
-        throw new UnsupportedOperationException("Operation is not supported for read-only collection");
-    }
-
-    @Override // java.util.Collection
-    public boolean removeAll(Collection<? extends Object> collection) {
-        throw new UnsupportedOperationException("Operation is not supported for read-only collection");
-    }
-
-    @Override // java.util.Collection
-    public boolean retainAll(Collection<? extends Object> collection) {
-        throw new UnsupportedOperationException("Operation is not supported for read-only collection");
     }
 
     @Override // java.util.Collection
@@ -113,19 +124,19 @@ public final class ArrayAsCollection<T> implements Collection<T> {
     @Override // java.util.Collection
     @NotNull
     public final Object[] toArray() {
-        T[] copyToArrayOfAny = this.values;
+        T[] tArr = this.values;
         boolean z = this.isVarargs;
-        Intrinsics.checkNotNullParameter(copyToArrayOfAny, "$this$copyToArrayOfAny");
-        if (z && Intrinsics.areEqual(copyToArrayOfAny.getClass(), Object[].class)) {
-            return copyToArrayOfAny;
+        Intrinsics.checkNotNullParameter(tArr, "<this>");
+        if (z && Intrinsics.areEqual(tArr.getClass(), Object[].class)) {
+            return tArr;
         }
-        Object[] copyOf = Arrays.copyOf(copyToArrayOfAny, copyToArrayOfAny.length, Object[].class);
-        Intrinsics.checkNotNullExpressionValue(copyOf, "java.util.Arrays.copyOf(… Array<Any?>::class.java)");
+        Object[] copyOf = Arrays.copyOf(tArr, tArr.length, Object[].class);
+        Intrinsics.checkNotNullExpressionValue(copyOf, "copyOf(this, this.size, Array<Any?>::class.java)");
         return copyOf;
     }
 
-    @Override // java.util.Collection
-    public <T> T[] toArray(T[] tArr) {
-        return (T[]) CollectionToArray.toArray(this, tArr);
+    /* JADX WARN: Multi-variable type inference failed */
+    public ArrayAsCollection(@NotNull Object[] objArr) {
+        this.values = objArr;
     }
 }

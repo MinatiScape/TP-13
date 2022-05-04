@@ -12,10 +12,8 @@ import android.graphics.Shader;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 import com.google.android.material.shadow.ShadowRenderer;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 /* loaded from: classes.dex */
-public class ShapePath {
+public final class ShapePath {
     @Deprecated
     public float currentShadowAngle;
     @Deprecated
@@ -24,8 +22,8 @@ public class ShapePath {
     public float endX;
     @Deprecated
     public float endY;
-    public final List<PathOperation> operations = new ArrayList();
-    public final List<ShadowCompatOperation> shadowCompatOperations = new ArrayList();
+    public final ArrayList operations = new ArrayList();
+    public final ArrayList shadowCompatOperations = new ArrayList();
     @Deprecated
     public float startX;
     @Deprecated
@@ -35,18 +33,19 @@ public class ShapePath {
     public static class ArcShadowOperation extends ShadowCompatOperation {
         public final PathArcOperation operation;
 
-        public ArcShadowOperation(PathArcOperation pathArcOperation) {
-            this.operation = pathArcOperation;
-        }
-
         @Override // com.google.android.material.shape.ShapePath.ShadowCompatOperation
-        public void draw(Matrix matrix, ShadowRenderer shadowRenderer, int i, Canvas canvas) {
+        public final void draw(Matrix matrix, ShadowRenderer shadowRenderer, int i, Canvas canvas) {
+            boolean z;
             PathArcOperation pathArcOperation = this.operation;
             float f = pathArcOperation.startAngle;
             float f2 = pathArcOperation.sweepAngle;
             PathArcOperation pathArcOperation2 = this.operation;
             RectF rectF = new RectF(pathArcOperation2.left, pathArcOperation2.top, pathArcOperation2.right, pathArcOperation2.bottom);
-            boolean z = f2 < HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
+            if (f2 < HingeAngleProviderKt.FULLY_CLOSED_DEGREES) {
+                z = true;
+            } else {
+                z = false;
+            }
             Path path = shadowRenderer.scratch;
             if (z) {
                 int[] iArr = ShadowRenderer.cornerColors;
@@ -85,6 +84,10 @@ public class ShapePath {
                 canvas.restore();
             }
         }
+
+        public ArcShadowOperation(PathArcOperation pathArcOperation) {
+            this.operation = pathArcOperation;
+        }
     }
 
     /* loaded from: classes.dex */
@@ -93,20 +96,14 @@ public class ShapePath {
         public final float startX;
         public final float startY;
 
-        public LineShadowOperation(PathLineOperation pathLineOperation, float f, float f2) {
-            this.operation = pathLineOperation;
-            this.startX = f;
-            this.startY = f2;
-        }
-
         @Override // com.google.android.material.shape.ShapePath.ShadowCompatOperation
-        public void draw(Matrix matrix, ShadowRenderer shadowRenderer, int i, Canvas canvas) {
+        public final void draw(Matrix matrix, ShadowRenderer shadowRenderer, int i, Canvas canvas) {
             PathLineOperation pathLineOperation = this.operation;
             RectF rectF = new RectF(HingeAngleProviderKt.FULLY_CLOSED_DEGREES, HingeAngleProviderKt.FULLY_CLOSED_DEGREES, (float) Math.hypot(pathLineOperation.y - this.startY, pathLineOperation.x - this.startX), HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
             Matrix matrix2 = new Matrix(matrix);
             matrix2.preTranslate(this.startX, this.startY);
             matrix2.preRotate(getAngle());
-            Objects.requireNonNull(shadowRenderer);
+            shadowRenderer.getClass();
             rectF.bottom += i;
             rectF.offset(HingeAngleProviderKt.FULLY_CLOSED_DEGREES, -i);
             int[] iArr = ShadowRenderer.edgeColors;
@@ -122,9 +119,15 @@ public class ShapePath {
             canvas.restore();
         }
 
-        public float getAngle() {
+        public final float getAngle() {
             PathLineOperation pathLineOperation = this.operation;
             return (float) Math.toDegrees(Math.atan((pathLineOperation.y - this.startY) / (pathLineOperation.x - this.startX)));
+        }
+
+        public LineShadowOperation(PathLineOperation pathLineOperation, float f, float f2) {
+            this.operation = pathLineOperation;
+            this.startX = f;
+            this.startY = f2;
         }
     }
 
@@ -144,15 +147,8 @@ public class ShapePath {
         @Deprecated
         public float top;
 
-        public PathArcOperation(float f, float f2, float f3, float f4) {
-            this.left = f;
-            this.top = f2;
-            this.right = f3;
-            this.bottom = f4;
-        }
-
         @Override // com.google.android.material.shape.ShapePath.PathOperation
-        public void applyToPath(Matrix matrix, Path path) {
+        public final void applyToPath(Matrix matrix, Path path) {
             Matrix matrix2 = this.matrix;
             matrix.invert(matrix2);
             path.transform(matrix2);
@@ -160,6 +156,13 @@ public class ShapePath {
             rectF2.set(this.left, this.top, this.right, this.bottom);
             path.arcTo(rectF2, this.startAngle, this.sweepAngle, false);
             path.transform(matrix);
+        }
+
+        public PathArcOperation(float f, float f2, float f3, float f4) {
+            this.left = f;
+            this.top = f2;
+            this.right = f3;
+            this.bottom = f4;
         }
     }
 
@@ -169,7 +172,7 @@ public class ShapePath {
         public float y;
 
         @Override // com.google.android.material.shape.ShapePath.PathOperation
-        public void applyToPath(Matrix matrix, Path path) {
+        public final void applyToPath(Matrix matrix, Path path) {
             Matrix matrix2 = this.matrix;
             matrix.invert(matrix2);
             path.transform(matrix2);
@@ -192,26 +195,43 @@ public class ShapePath {
         public abstract void draw(Matrix matrix, ShadowRenderer shadowRenderer, int i, Canvas canvas);
     }
 
-    public ShapePath() {
-        reset(HingeAngleProviderKt.FULLY_CLOSED_DEGREES, HingeAngleProviderKt.FULLY_CLOSED_DEGREES, 270.0f, HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
+    public final void reset(float f, float f2, float f3) {
+        this.startX = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
+        this.startY = f;
+        this.endX = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
+        this.endY = f;
+        this.currentShadowAngle = f2;
+        this.endShadowAngle = (f2 + f3) % 360.0f;
+        this.operations.clear();
+        this.shadowCompatOperations.clear();
     }
 
-    public void addArc(float f, float f2, float f3, float f4, float f5, float f6) {
+    public final void addArc(float f, float f2, float f3, float f4, float f5, float f6) {
+        boolean z;
+        float f7;
         PathArcOperation pathArcOperation = new PathArcOperation(f, f2, f3, f4);
         pathArcOperation.startAngle = f5;
         pathArcOperation.sweepAngle = f6;
         this.operations.add(pathArcOperation);
         ArcShadowOperation arcShadowOperation = new ArcShadowOperation(pathArcOperation);
-        float f7 = f5 + f6;
-        boolean z = f6 < HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
+        float f8 = f5 + f6;
+        if (f6 < HingeAngleProviderKt.FULLY_CLOSED_DEGREES) {
+            z = true;
+        } else {
+            z = false;
+        }
         if (z) {
             f5 = (f5 + 180.0f) % 360.0f;
         }
-        float f8 = z ? (180.0f + f7) % 360.0f : f7;
+        if (z) {
+            f7 = (180.0f + f8) % 360.0f;
+        } else {
+            f7 = f8;
+        }
         addConnectingShadowIfNecessary(f5);
         this.shadowCompatOperations.add(arcShadowOperation);
-        this.currentShadowAngle = f8;
-        double d = f7;
+        this.currentShadowAngle = f7;
+        double d = f8;
         this.endX = (((f3 - f) / 2.0f) * ((float) Math.cos(Math.toRadians(d)))) + ((f + f3) * 0.5f);
         this.endY = (((f4 - f2) / 2.0f) * ((float) Math.sin(Math.toRadians(d)))) + ((f2 + f4) * 0.5f);
     }
@@ -232,14 +252,14 @@ public class ShapePath {
         }
     }
 
-    public void applyToPath(Matrix matrix, Path path) {
+    public final void applyToPath(Matrix matrix, Path path) {
         int size = this.operations.size();
         for (int i = 0; i < size; i++) {
-            this.operations.get(i).applyToPath(matrix, path);
+            ((PathOperation) this.operations.get(i)).applyToPath(matrix, path);
         }
     }
 
-    public void lineTo(float f, float f2) {
+    public final void lineTo(float f, float f2) {
         PathLineOperation pathLineOperation = new PathLineOperation();
         pathLineOperation.x = f;
         pathLineOperation.y = f2;
@@ -252,14 +272,7 @@ public class ShapePath {
         this.endY = f2;
     }
 
-    public void reset(float f, float f2, float f3, float f4) {
-        this.startX = f;
-        this.startY = f2;
-        this.endX = f;
-        this.endY = f2;
-        this.currentShadowAngle = f3;
-        this.endShadowAngle = (f3 + f4) % 360.0f;
-        this.operations.clear();
-        this.shadowCompatOperations.clear();
+    public ShapePath() {
+        reset(HingeAngleProviderKt.FULLY_CLOSED_DEGREES, 270.0f, HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
     }
 }

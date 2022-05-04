@@ -16,7 +16,7 @@ public final class ImaxWallpaperProto$GetImageFromCollectionResponse extends Gen
 
     /* loaded from: classes.dex */
     public static final class Builder extends GeneratedMessageLite.Builder<ImaxWallpaperProto$GetImageFromCollectionResponse, Builder> implements MessageLiteOrBuilder {
-        public Builder(ImaxWallpaperProto$1 imaxWallpaperProto$1) {
+        public Builder() {
             super(ImaxWallpaperProto$GetImageFromCollectionResponse.DEFAULT_INSTANCE);
         }
     }
@@ -28,11 +28,19 @@ public final class ImaxWallpaperProto$GetImageFromCollectionResponse extends Gen
     }
 
     public static Parser<ImaxWallpaperProto$GetImageFromCollectionResponse> parser() {
-        return DEFAULT_INSTANCE.getParserForType();
+        return (Parser) DEFAULT_INSTANCE.dynamicMethod(GeneratedMessageLite.MethodToInvoke.GET_PARSER);
+    }
+
+    public final ImaxWallpaperProto$Image getImage() {
+        ImaxWallpaperProto$Image imaxWallpaperProto$Image = this.image_;
+        if (imaxWallpaperProto$Image == null) {
+            return ImaxWallpaperProto$Image.getDefaultInstance();
+        }
+        return imaxWallpaperProto$Image;
     }
 
     @Override // com.google.protobuf.GeneratedMessageLite
-    public final Object dynamicMethod(GeneratedMessageLite.MethodToInvoke methodToInvoke, Object obj, Object obj2) {
+    public final Object dynamicMethod(GeneratedMessageLite.MethodToInvoke methodToInvoke) {
         switch (methodToInvoke.ordinal()) {
             case 0:
                 return (byte) 1;
@@ -43,7 +51,7 @@ public final class ImaxWallpaperProto$GetImageFromCollectionResponse extends Gen
             case 3:
                 return new ImaxWallpaperProto$GetImageFromCollectionResponse();
             case 4:
-                return new Builder(null);
+                return new Builder();
             case 5:
                 return DEFAULT_INSTANCE;
             case 6:
@@ -63,12 +71,7 @@ public final class ImaxWallpaperProto$GetImageFromCollectionResponse extends Gen
         }
     }
 
-    public ImaxWallpaperProto$Image getImage() {
-        ImaxWallpaperProto$Image imaxWallpaperProto$Image = this.image_;
-        return imaxWallpaperProto$Image == null ? ImaxWallpaperProto$Image.getDefaultInstance() : imaxWallpaperProto$Image;
-    }
-
-    public String getResumeToken() {
+    public final String getResumeToken() {
         return this.resumeToken_;
     }
 }

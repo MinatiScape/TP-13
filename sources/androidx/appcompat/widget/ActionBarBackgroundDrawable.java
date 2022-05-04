@@ -5,15 +5,24 @@ import android.graphics.ColorFilter;
 import android.graphics.Outline;
 import android.graphics.drawable.Drawable;
 /* loaded from: classes.dex */
-public class ActionBarBackgroundDrawable extends Drawable {
+public final class ActionBarBackgroundDrawable extends Drawable {
     public final ActionBarContainer mContainer;
 
-    public ActionBarBackgroundDrawable(ActionBarContainer actionBarContainer) {
-        this.mContainer = actionBarContainer;
+    @Override // android.graphics.drawable.Drawable
+    public final int getOpacity() {
+        return 0;
     }
 
     @Override // android.graphics.drawable.Drawable
-    public void draw(Canvas canvas) {
+    public final void setAlpha(int i) {
+    }
+
+    @Override // android.graphics.drawable.Drawable
+    public final void setColorFilter(ColorFilter colorFilter) {
+    }
+
+    @Override // android.graphics.drawable.Drawable
+    public final void draw(Canvas canvas) {
         ActionBarContainer actionBarContainer = this.mContainer;
         if (actionBarContainer.mIsSplit) {
             Drawable drawable = actionBarContainer.mSplitBackground;
@@ -35,12 +44,7 @@ public class ActionBarBackgroundDrawable extends Drawable {
     }
 
     @Override // android.graphics.drawable.Drawable
-    public int getOpacity() {
-        return 0;
-    }
-
-    @Override // android.graphics.drawable.Drawable
-    public void getOutline(Outline outline) {
+    public final void getOutline(Outline outline) {
         ActionBarContainer actionBarContainer = this.mContainer;
         if (actionBarContainer.mIsSplit) {
             Drawable drawable = actionBarContainer.mSplitBackground;
@@ -56,11 +60,7 @@ public class ActionBarBackgroundDrawable extends Drawable {
         }
     }
 
-    @Override // android.graphics.drawable.Drawable
-    public void setAlpha(int i) {
-    }
-
-    @Override // android.graphics.drawable.Drawable
-    public void setColorFilter(ColorFilter colorFilter) {
+    public ActionBarBackgroundDrawable(ActionBarContainer actionBarContainer) {
+        this.mContainer = actionBarContainer;
     }
 }

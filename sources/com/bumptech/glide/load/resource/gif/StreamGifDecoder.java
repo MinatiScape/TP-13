@@ -14,26 +14,20 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.List;
 /* loaded from: classes.dex */
-public class StreamGifDecoder implements ResourceDecoder<InputStream, GifDrawable> {
+public final class StreamGifDecoder implements ResourceDecoder<InputStream, GifDrawable> {
     public final ArrayPool byteArrayPool;
     public final ResourceDecoder<ByteBuffer, GifDrawable> byteBufferDecoder;
     public final List<ImageHeaderParser> parsers;
 
-    public StreamGifDecoder(List<ImageHeaderParser> parsers, ResourceDecoder<ByteBuffer, GifDrawable> byteBufferDecoder, ArrayPool byteArrayPool) {
-        this.parsers = parsers;
-        this.byteBufferDecoder = byteBufferDecoder;
-        this.byteArrayPool = byteArrayPool;
-    }
-
     @Override // com.bumptech.glide.load.ResourceDecoder
-    public Resource<GifDrawable> decode(InputStream source, int width, int height, Options options) throws IOException {
+    public final Resource<GifDrawable> decode(InputStream inputStream, int i, int i2, Options options) throws IOException {
         byte[] bArr;
-        InputStream inputStream = source;
+        InputStream inputStream2 = inputStream;
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(QuickStepContract.SYSUI_STATE_BUBBLES_EXPANDED);
         try {
             byte[] bArr2 = new byte[QuickStepContract.SYSUI_STATE_BUBBLES_EXPANDED];
             while (true) {
-                int read = inputStream.read(bArr2);
+                int read = inputStream2.read(bArr2);
                 if (read == -1) {
                     break;
                 }
@@ -50,11 +44,21 @@ public class StreamGifDecoder implements ResourceDecoder<InputStream, GifDrawabl
         if (bArr == null) {
             return null;
         }
-        return this.byteBufferDecoder.decode(ByteBuffer.wrap(bArr), width, height, options);
+        return this.byteBufferDecoder.decode(ByteBuffer.wrap(bArr), i, i2, options);
     }
 
     @Override // com.bumptech.glide.load.ResourceDecoder
-    public boolean handles(InputStream source, Options options) throws IOException {
-        return !((Boolean) options.get(GifOptions.DISABLE_ANIMATION)).booleanValue() && ImageHeaderParserUtils.getType(this.parsers, source, this.byteArrayPool) == ImageHeaderParser.ImageType.GIF;
+    public final boolean handles(InputStream inputStream, Options options) throws IOException {
+        InputStream inputStream2 = inputStream;
+        if (((Boolean) options.get(GifOptions.DISABLE_ANIMATION)).booleanValue() || ImageHeaderParserUtils.getType(this.parsers, inputStream2, this.byteArrayPool) != ImageHeaderParser.ImageType.GIF) {
+            return false;
+        }
+        return true;
+    }
+
+    public StreamGifDecoder(List list, ByteBufferGifDecoder byteBufferGifDecoder, ArrayPool arrayPool) {
+        this.parsers = list;
+        this.byteBufferDecoder = byteBufferGifDecoder;
+        this.byteArrayPool = arrayPool;
     }
 }

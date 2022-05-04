@@ -3,32 +3,36 @@ package com.google.protobuf;
 import java.util.Iterator;
 import java.util.Map;
 /* loaded from: classes.dex */
-public class LazyField extends LazyFieldLite {
+public final class LazyField extends LazyFieldLite {
 
     /* loaded from: classes.dex */
     public static class LazyEntry<K> implements Map.Entry<K, Object> {
         public Map.Entry<K, LazyField> entry;
 
-        public LazyEntry(Map.Entry entry, AnonymousClass1 r2) {
+        public LazyEntry() {
+            throw null;
+        }
+
+        public LazyEntry(Map.Entry entry) {
             this.entry = entry;
         }
 
         @Override // java.util.Map.Entry
-        public K getKey() {
+        public final K getKey() {
             return this.entry.getKey();
         }
 
         @Override // java.util.Map.Entry
-        public Object getValue() {
+        public final Object getValue() {
             LazyField value = this.entry.getValue();
             if (value == null) {
                 return null;
             }
-            return value.getValue();
+            return value.getValue(null);
         }
 
         @Override // java.util.Map.Entry
-        public Object setValue(Object obj) {
+        public final Object setValue(Object obj) {
             if (obj instanceof MessageLite) {
                 LazyField value = this.entry.getValue();
                 MessageLite messageLite = value.value;
@@ -44,42 +48,41 @@ public class LazyField extends LazyFieldLite {
     public static class LazyIterator<K> implements Iterator<Map.Entry<K, Object>> {
         public Iterator<Map.Entry<K, Object>> iterator;
 
-        public LazyIterator(Iterator<Map.Entry<K, Object>> it) {
-            this.iterator = it;
-        }
-
         @Override // java.util.Iterator
-        public boolean hasNext() {
+        public final boolean hasNext() {
             return this.iterator.hasNext();
         }
 
         @Override // java.util.Iterator
-        public Object next() {
+        public final Object next() {
             Map.Entry<K, Object> next = this.iterator.next();
-            return next.getValue() instanceof LazyField ? new LazyEntry(next, null) : next;
+            if (next.getValue() instanceof LazyField) {
+                return new LazyEntry(next);
+            }
+            return next;
         }
 
         @Override // java.util.Iterator
-        public void remove() {
+        public final void remove() {
             this.iterator.remove();
+        }
+
+        public LazyIterator(Iterator<Map.Entry<K, Object>> it) {
+            this.iterator = it;
         }
     }
 
     @Override // com.google.protobuf.LazyFieldLite
-    public boolean equals(Object obj) {
-        return getValue().equals(obj);
-    }
-
-    public MessageLite getValue() {
-        return getValue(null);
+    public final boolean equals(Object obj) {
+        return getValue(null).equals(obj);
     }
 
     @Override // com.google.protobuf.LazyFieldLite
-    public int hashCode() {
-        return getValue().hashCode();
+    public final int hashCode() {
+        return getValue(null).hashCode();
     }
 
-    public String toString() {
-        return getValue().toString();
+    public final String toString() {
+        return getValue(null).toString();
     }
 }

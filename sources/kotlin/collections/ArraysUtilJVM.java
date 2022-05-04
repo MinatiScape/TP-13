@@ -1,16 +1,27 @@
 package kotlin.collections;
+
+import java.util.Collections;
+import java.util.List;
+import kotlin.jvm.internal.Intrinsics;
+import org.jetbrains.annotations.NotNull;
 /* loaded from: classes.dex */
 public class ArraysUtilJVM {
-    public static final int mapCapacity(int i) {
-        if (i < 0) {
-            return i;
+    @NotNull
+    public static final List listOf(Object obj) {
+        List singletonList = Collections.singletonList(obj);
+        Intrinsics.checkNotNullExpressionValue(singletonList, "singletonList(element)");
+        return singletonList;
+    }
+
+    @NotNull
+    public static final List optimizeReadOnlyList(@NotNull List list) {
+        int size = list.size();
+        if (size == 0) {
+            return EmptyList.INSTANCE;
         }
-        if (i < 3) {
-            return i + 1;
+        if (size != 1) {
+            return list;
         }
-        if (i < 1073741824) {
-            return (int) ((i / 0.75f) + 1.0f);
-        }
-        return Integer.MAX_VALUE;
+        return listOf(list.get(0));
     }
 }

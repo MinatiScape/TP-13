@@ -8,36 +8,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public final class ClassesInfoCache {
     public static ClassesInfoCache sInstance = new ClassesInfoCache();
-    public final Map<Class<?>, CallbackInfo> mCallbackMap = new HashMap();
-    public final Map<Class<?>, Boolean> mHasLifecycleMethods = new HashMap();
+    public final HashMap mCallbackMap = new HashMap();
+    public final HashMap mHasLifecycleMethods = new HashMap();
 
     /* loaded from: classes.dex */
     public static class CallbackInfo {
-        public final Map<Lifecycle.Event, List<MethodReference>> mEventToHandlers = new HashMap();
+        public final HashMap mEventToHandlers = new HashMap();
         public final Map<MethodReference, Lifecycle.Event> mHandlerToEvent;
-
-        public CallbackInfo(Map<MethodReference, Lifecycle.Event> map) {
-            this.mHandlerToEvent = map;
-            for (Map.Entry<MethodReference, Lifecycle.Event> entry : map.entrySet()) {
-                Lifecycle.Event value = entry.getValue();
-                List<MethodReference> list = this.mEventToHandlers.get(value);
-                if (list == null) {
-                    list = new ArrayList<>();
-                    this.mEventToHandlers.put(value, list);
-                }
-                list.add(entry.getKey());
-            }
-        }
 
         public static void invokeMethodsForEvent(List<MethodReference> list, LifecycleOwner lifecycleOwner, Lifecycle.Event event, Object obj) {
             if (list != null) {
                 for (int size = list.size() - 1; size >= 0; size--) {
                     MethodReference methodReference = list.get(size);
-                    Objects.requireNonNull(methodReference);
+                    methodReference.getClass();
                     try {
                         int i = methodReference.mCallType;
                         if (i == 0) {
@@ -55,6 +41,19 @@ public final class ClassesInfoCache {
                 }
             }
         }
+
+        public CallbackInfo(HashMap hashMap) {
+            this.mHandlerToEvent = hashMap;
+            for (Map.Entry entry : hashMap.entrySet()) {
+                Lifecycle.Event event = (Lifecycle.Event) entry.getValue();
+                List list = (List) this.mEventToHandlers.get(event);
+                if (list == null) {
+                    list = new ArrayList();
+                    this.mEventToHandlers.put(event, list);
+                }
+                list.add((MethodReference) entry.getKey());
+            }
+        }
     }
 
     /* loaded from: classes.dex */
@@ -62,13 +61,7 @@ public final class ClassesInfoCache {
         public final int mCallType;
         public final Method mMethod;
 
-        public MethodReference(int i, Method method) {
-            this.mCallType = i;
-            this.mMethod = method;
-            method.setAccessible(true);
-        }
-
-        public boolean equals(Object obj) {
+        public final boolean equals(Object obj) {
             if (this == obj) {
                 return true;
             }
@@ -79,18 +72,49 @@ public final class ClassesInfoCache {
             return this.mCallType == methodReference.mCallType && this.mMethod.getName().equals(methodReference.mMethod.getName());
         }
 
-        public int hashCode() {
+        public final int hashCode() {
             return this.mMethod.getName().hashCode() + (this.mCallType * 31);
+        }
+
+        public MethodReference(int i, Method method) {
+            this.mCallType = i;
+            this.mMethod = method;
+            method.setAccessible(true);
+        }
+    }
+
+    public final CallbackInfo getInfo(Class<?> cls) {
+        CallbackInfo callbackInfo = (CallbackInfo) this.mCallbackMap.get(cls);
+        if (callbackInfo != null) {
+            return callbackInfo;
+        }
+        return createInfo(cls, null);
+    }
+
+    public static void verifyAndPutHandler(HashMap hashMap, MethodReference methodReference, Lifecycle.Event event, Class cls) {
+        Lifecycle.Event event2 = (Lifecycle.Event) hashMap.get(methodReference);
+        if (event2 != null && event != event2) {
+            Method method = methodReference.mMethod;
+            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Method ");
+            m.append(method.getName());
+            m.append(" in ");
+            m.append(cls.getName());
+            m.append(" already declared with different @OnLifecycleEvent value: previous value ");
+            m.append(event2);
+            m.append(", new value ");
+            m.append(event);
+            throw new IllegalArgumentException(m.toString());
+        } else if (event2 == null) {
+            hashMap.put(methodReference, event);
         }
     }
 
     public final CallbackInfo createInfo(Class<?> cls, Method[] methodArr) {
         int i;
-        CallbackInfo info;
-        Class<?> superclass = cls.getSuperclass();
+        Class<? super Object> superclass = cls.getSuperclass();
         HashMap hashMap = new HashMap();
-        if (!(superclass == null || (info = getInfo(superclass)) == null)) {
-            hashMap.putAll(info.mHandlerToEvent);
+        if (superclass != null) {
+            hashMap.putAll(getInfo(superclass).mHandlerToEvent);
         }
         for (Class<?> cls2 : cls.getInterfaces()) {
             for (Map.Entry<MethodReference, Lifecycle.Event> entry : getInfo(cls2).mHandlerToEvent.entrySet()) {
@@ -138,28 +162,5 @@ public final class ClassesInfoCache {
         this.mCallbackMap.put(cls, callbackInfo);
         this.mHasLifecycleMethods.put(cls, Boolean.valueOf(z));
         return callbackInfo;
-    }
-
-    public CallbackInfo getInfo(Class<?> cls) {
-        CallbackInfo callbackInfo = this.mCallbackMap.get(cls);
-        return callbackInfo != null ? callbackInfo : createInfo(cls, null);
-    }
-
-    public final void verifyAndPutHandler(Map<MethodReference, Lifecycle.Event> map, MethodReference methodReference, Lifecycle.Event event, Class<?> cls) {
-        Lifecycle.Event event2 = map.get(methodReference);
-        if (event2 != null && event != event2) {
-            Method method = methodReference.mMethod;
-            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Method ");
-            m.append(method.getName());
-            m.append(" in ");
-            m.append(cls.getName());
-            m.append(" already declared with different @OnLifecycleEvent value: previous value ");
-            m.append(event2);
-            m.append(", new value ");
-            m.append(event);
-            throw new IllegalArgumentException(m.toString());
-        } else if (event2 == null) {
-            map.put(methodReference, event);
-        }
     }
 }

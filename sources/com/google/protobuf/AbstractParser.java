@@ -8,29 +8,15 @@ import java.io.IOException;
 public abstract class AbstractParser<MessageType extends MessageLite> implements Parser<MessageType> {
     public static final ExtensionRegistryLite EMPTY_REGISTRY = ExtensionRegistryLite.getEmptyRegistry();
 
-    public final MessageType checkMessageInitialized(MessageType messagetype) throws InvalidProtocolBufferException {
-        UninitializedMessageException uninitializedMessageException;
-        if (messagetype.isInitialized()) {
-            return messagetype;
-        }
-        if (messagetype instanceof AbstractMessageLite) {
-            AbstractMessageLite abstractMessageLite = (AbstractMessageLite) messagetype;
-            uninitializedMessageException = new UninitializedMessageException();
-        } else {
-            uninitializedMessageException = new UninitializedMessageException();
-        }
-        InvalidProtocolBufferException invalidProtocolBufferException = new InvalidProtocolBufferException(uninitializedMessageException.getMessage());
-        invalidProtocolBufferException.setUnfinishedMessage(messagetype);
-        throw invalidProtocolBufferException;
-    }
-
     @Override // com.google.protobuf.Parser
-    public Object parseFrom(byte[] bArr) throws InvalidProtocolBufferException {
+    public final GeneratedMessageLite parseFrom(byte[] bArr) throws InvalidProtocolBufferException {
         ExtensionRegistryLite extensionRegistryLite = EMPTY_REGISTRY;
         int length = bArr.length;
-        GeneratedMessageLite generatedMessageLite = (GeneratedMessageLite) ((GeneratedMessageLite.DefaultInstanceBasedParser) this).defaultInstance.dynamicMethod(GeneratedMessageLite.MethodToInvoke.NEW_MUTABLE_INSTANCE, null, null);
+        GeneratedMessageLite generatedMessageLite = (GeneratedMessageLite) ((GeneratedMessageLite.DefaultInstanceBasedParser) this).defaultInstance.dynamicMethod(GeneratedMessageLite.MethodToInvoke.NEW_MUTABLE_INSTANCE);
         try {
-            Schema schemaFor = Protobuf.INSTANCE.schemaFor((Protobuf) generatedMessageLite);
+            Protobuf protobuf = Protobuf.INSTANCE;
+            protobuf.getClass();
+            Schema schemaFor = protobuf.schemaFor(generatedMessageLite.getClass());
             schemaFor.mergeFrom(generatedMessageLite, bArr, 0, length + 0, new ArrayDecoders.Registers(extensionRegistryLite));
             schemaFor.makeImmutable(generatedMessageLite);
             if (generatedMessageLite.memoizedHashCode == 0) {
@@ -49,6 +35,21 @@ public abstract class AbstractParser<MessageType extends MessageLite> implements
             InvalidProtocolBufferException truncatedMessage = InvalidProtocolBufferException.truncatedMessage();
             truncatedMessage.setUnfinishedMessage(generatedMessageLite);
             throw truncatedMessage;
+        }
+    }
+
+    public static void checkMessageInitialized(MessageLite messageLite) throws InvalidProtocolBufferException {
+        UninitializedMessageException uninitializedMessageException;
+        if (!messageLite.isInitialized()) {
+            if (messageLite instanceof AbstractMessageLite) {
+                AbstractMessageLite abstractMessageLite = (AbstractMessageLite) messageLite;
+                uninitializedMessageException = new UninitializedMessageException();
+            } else {
+                uninitializedMessageException = new UninitializedMessageException();
+            }
+            InvalidProtocolBufferException invalidProtocolBufferException = new InvalidProtocolBufferException(uninitializedMessageException.getMessage());
+            invalidProtocolBufferException.setUnfinishedMessage(messageLite);
+            throw invalidProtocolBufferException;
         }
     }
 }

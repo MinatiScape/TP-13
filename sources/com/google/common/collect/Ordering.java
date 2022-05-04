@@ -1,8 +1,10 @@
 package com.google.common.collect;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.MapMakerInternalMap;
+import com.google.common.util.concurrent.FuturesGetChecked;
+import java.util.AbstractMap;
 import java.util.Comparator;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 /* loaded from: classes.dex */
 public abstract class Ordering<T> implements Comparator<T> {
@@ -10,16 +12,14 @@ public abstract class Ordering<T> implements Comparator<T> {
     /* loaded from: classes.dex */
     public static class ArbitraryOrdering extends Ordering<Object> {
         public final AtomicInteger counter = new AtomicInteger(0);
-        public final ConcurrentMap<Object, Integer> uids;
+        public final AbstractMap uids;
 
-        public ArbitraryOrdering() {
-            MapMaker mapMaker = new MapMaker();
-            mapMaker.setKeyStrength(MapMakerInternalMap.Strength.WEAK);
-            this.uids = mapMaker.makeMap();
+        public final String toString() {
+            return "Ordering.arbitrary()";
         }
 
         @Override // com.google.common.collect.Ordering, java.util.Comparator
-        public int compare(Object left, Object right) {
+        public final int compare(Object left, Object right) {
             if (left == right) {
                 return 0;
             }
@@ -31,28 +31,42 @@ public abstract class Ordering<T> implements Comparator<T> {
             }
             int identityHashCode = System.identityHashCode(left);
             int identityHashCode2 = System.identityHashCode(right);
-            if (identityHashCode != identityHashCode2) {
-                return identityHashCode < identityHashCode2 ? -1 : 1;
+            if (identityHashCode == identityHashCode2) {
+                int compareTo = getUid(left).compareTo(getUid(right));
+                if (compareTo != 0) {
+                    return compareTo;
+                }
+                throw new AssertionError();
+            } else if (identityHashCode < identityHashCode2) {
+                return -1;
+            } else {
+                return 1;
             }
-            int compareTo = getUid(left).compareTo(getUid(right));
-            if (compareTo != 0) {
-                return compareTo;
-            }
-            throw new AssertionError();
         }
 
+        /* JADX WARN: Type inference failed for: r1v1, types: [java.util.AbstractMap, java.util.concurrent.ConcurrentMap] */
         public final Integer getUid(Object obj) {
-            Integer num = this.uids.get(obj);
+            Integer num = (Integer) this.uids.get(obj);
             if (num != null) {
                 return num;
             }
             Integer valueOf = Integer.valueOf(this.counter.getAndIncrement());
-            Integer putIfAbsent = this.uids.putIfAbsent(obj, valueOf);
-            return putIfAbsent != null ? putIfAbsent : valueOf;
+            Integer num2 = (Integer) this.uids.putIfAbsent(obj, valueOf);
+            if (num2 != null) {
+                return num2;
+            }
+            return valueOf;
         }
 
-        public String toString() {
-            return "Ordering.arbitrary()";
+        public ArbitraryOrdering() {
+            boolean z = false;
+            MapMaker mapMaker = new MapMaker();
+            MapMakerInternalMap.Strength.AnonymousClass2 r2 = MapMakerInternalMap.Strength.WEAK;
+            MapMakerInternalMap.Strength strength = mapMaker.keyStrength;
+            Preconditions.checkState(strength == null ? true : z, "Key strength was already set to %s", strength);
+            mapMaker.keyStrength = r2;
+            mapMaker.useCustomMap = true;
+            this.uids = (AbstractMap) mapMaker.makeMap();
         }
     }
 
@@ -62,17 +76,18 @@ public abstract class Ordering<T> implements Comparator<T> {
         public final Object value;
     }
 
-    public static <T> Ordering<T> from(Comparator<T> comparator) {
-        if (comparator instanceof Ordering) {
-            return (Ordering) comparator;
-        }
-        return new ComparatorOrdering(comparator);
-    }
-
     @Override // java.util.Comparator
     public abstract int compare(T left, T right);
 
+    public final Ordering onResultOf(FuturesGetChecked.AnonymousClass1 function) {
+        return new ByFunctionOrdering(function, this);
+    }
+
     public <S extends T> Ordering<S> reverse() {
         return new ReverseOrdering(this);
+    }
+
+    public static <C extends Comparable> Ordering<C> natural() {
+        return NaturalOrdering.INSTANCE;
     }
 }

@@ -4,10 +4,11 @@ import android.content.Context;
 import com.google.android.gms.clearcut.ClearcutLogger;
 import com.google.android.gms.clearcut.ClearcutLoggerApi;
 import com.google.android.gms.common.api.GoogleApi;
-import com.google.android.gms.common.api.internal.zzh;
+import kotlin.jvm.internal.Intrinsics;
+/* compiled from: ClearcutLoggerApiImpl.java */
 /* loaded from: classes.dex */
-public final class zzb extends GoogleApi<?> implements ClearcutLoggerApi {
+public final class zzb extends GoogleApi<Object> implements ClearcutLoggerApi {
     public zzb(Context context) {
-        super(context, ClearcutLogger.API, null, new zzh());
+        super(context, ClearcutLogger.API, new Intrinsics());
     }
 }

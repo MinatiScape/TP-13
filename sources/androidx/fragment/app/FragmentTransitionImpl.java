@@ -6,52 +6,17 @@ import android.graphics.RectF;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import androidx.collection.SimpleArrayMap;
 import androidx.core.os.CancellationSignal;
-import androidx.core.view.OneShotPreDrawListener;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.ViewPropertyAnimatorCompat;
+import androidx.fragment.app.DefaultSpecialEffectsController;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.WeakHashMap;
 @SuppressLint({"UnknownNullness"})
 /* loaded from: classes.dex */
 public abstract class FragmentTransitionImpl {
-    public static void bfsAddViewChildren(List<View> list, View view) {
-        int size = list.size();
-        if (!containedBeforeIndex(list, view, size)) {
-            list.add(view);
-            for (int i = size; i < list.size(); i++) {
-                View view2 = list.get(i);
-                if (view2 instanceof ViewGroup) {
-                    ViewGroup viewGroup = (ViewGroup) view2;
-                    int childCount = viewGroup.getChildCount();
-                    for (int i2 = 0; i2 < childCount; i2++) {
-                        View childAt = viewGroup.getChildAt(i2);
-                        if (!containedBeforeIndex(list, childAt, size)) {
-                            list.add(childAt);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public static boolean containedBeforeIndex(List<View> list, View view, int i) {
-        for (int i2 = 0; i2 < i; i2++) {
-            if (list.get(i2) == view) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean isNullOrEmpty(List list) {
-        return list == null || list.isEmpty();
-    }
-
     public abstract void addTarget(Object obj, View view);
 
     public abstract void addTargets(Object obj, ArrayList<View> arrayList);
@@ -60,47 +25,29 @@ public abstract class FragmentTransitionImpl {
 
     public abstract boolean canHandle(Object obj);
 
-    public void captureTransitioningViews(ArrayList<View> arrayList, View view) {
-        if (view.getVisibility() != 0) {
-            return;
-        }
-        if (view instanceof ViewGroup) {
-            ViewGroup viewGroup = (ViewGroup) view;
-            if (viewGroup.isTransitionGroup()) {
-                arrayList.add(viewGroup);
-                return;
-            }
-            int childCount = viewGroup.getChildCount();
-            for (int i = 0; i < childCount; i++) {
-                captureTransitioningViews(arrayList, viewGroup.getChildAt(i));
-            }
-            return;
-        }
-        arrayList.add(view);
-    }
-
     public abstract Object cloneTransition(Object obj);
 
-    public void findNamedViews(Map<String, View> map, View view) {
-        if (view.getVisibility() == 0) {
-            WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-            String transitionName = view.getTransitionName();
-            if (transitionName != null) {
-                map.put(transitionName, view);
-            }
-            if (view instanceof ViewGroup) {
-                ViewGroup viewGroup = (ViewGroup) view;
-                int childCount = viewGroup.getChildCount();
-                for (int i = 0; i < childCount; i++) {
-                    findNamedViews(map, viewGroup.getChildAt(i));
-                }
-            }
-        }
-    }
+    public abstract Object mergeTransitionsInSequence(Object obj, Object obj2, Object obj3);
 
-    public void getBoundsOnScreen(View view, Rect rect) {
+    public abstract Object mergeTransitionsTogether(Object obj, Object obj2);
+
+    public abstract void scheduleHideFragmentView(Object obj, View view, ArrayList<View> arrayList);
+
+    public abstract void scheduleRemoveTargets(Object obj, Object obj2, ArrayList arrayList, Object obj3, ArrayList arrayList2);
+
+    public abstract void setEpicenter(Object obj, Rect rect);
+
+    public abstract void setEpicenter(Object obj, View view);
+
+    public abstract void setSharedElementTargets(Object obj, View view, ArrayList<View> arrayList);
+
+    public abstract void swapSharedElementTargets(Object obj, ArrayList<View> arrayList, ArrayList<View> arrayList2);
+
+    public abstract Object wrapTransitionInSet(Object obj);
+
+    public static void getBoundsOnScreen(View view, Rect rect) {
         WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-        if (view.isAttachedToWindow()) {
+        if (ViewCompat.Api19Impl.isAttachedToWindow(view)) {
             RectF rectF = new RectF();
             rectF.set(HingeAngleProviderKt.FULLY_CLOSED_DEGREES, HingeAngleProviderKt.FULLY_CLOSED_DEGREES, view.getWidth(), view.getHeight());
             view.getMatrix().mapRect(rectF);
@@ -120,77 +67,63 @@ public abstract class FragmentTransitionImpl {
         }
     }
 
-    public abstract Object mergeTransitionsInSequence(Object obj, Object obj2, Object obj3);
-
-    public abstract Object mergeTransitionsTogether(Object obj, Object obj2, Object obj3);
-
-    public ArrayList<String> prepareSetNameOverridesReordered(ArrayList<View> arrayList) {
-        ArrayList<String> arrayList2 = new ArrayList<>();
-        int size = arrayList.size();
-        for (int i = 0; i < size; i++) {
-            View view = arrayList.get(i);
-            WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-            arrayList2.add(view.getTransitionName());
-            view.setTransitionName(null);
+    public static boolean isNullOrEmpty(List list) {
+        if (list == null || list.isEmpty()) {
+            return true;
         }
-        return arrayList2;
+        return false;
     }
 
-    public abstract void removeTarget(Object obj, View view);
-
-    public abstract void replaceTargets(Object obj, ArrayList<View> arrayList, ArrayList<View> arrayList2);
-
-    public abstract void scheduleHideFragmentView(Object obj, View view, ArrayList<View> arrayList);
-
-    public abstract void scheduleRemoveTargets(Object obj, Object obj2, ArrayList<View> arrayList, Object obj3, ArrayList<View> arrayList2, Object obj4, ArrayList<View> arrayList3);
-
-    public abstract void setEpicenter(Object obj, Rect rect);
-
-    public abstract void setEpicenter(Object obj, View view);
-
-    public void setListenerForTransitionEnd(Fragment fragment, Object obj, CancellationSignal cancellationSignal, Runnable runnable) {
-        runnable.run();
-    }
-
-    public void setNameOverridesReordered(View view, final ArrayList<View> arrayList, final ArrayList<View> arrayList2, final ArrayList<String> arrayList3, Map<String, String> map) {
-        final int size = arrayList2.size();
-        final ArrayList arrayList4 = new ArrayList();
-        for (int i = 0; i < size; i++) {
-            View view2 = arrayList.get(i);
+    public static void bfsAddViewChildren(List<View> list, View view) {
+        boolean z;
+        boolean z2;
+        int size = list.size();
+        int i = 0;
+        while (true) {
+            if (i >= size) {
+                z = false;
+                break;
+            } else if (list.get(i) == view) {
+                z = true;
+                break;
+            } else {
+                i++;
+            }
+        }
+        if (!z) {
             WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-            String transitionName = view2.getTransitionName();
-            arrayList4.add(transitionName);
-            if (transitionName != null) {
-                view2.setTransitionName(null);
-                String str = (String) ((SimpleArrayMap) map).getOrDefault(transitionName, null);
-                int i2 = 0;
-                while (true) {
-                    if (i2 >= size) {
-                        break;
-                    } else if (str.equals(arrayList3.get(i2))) {
-                        arrayList2.get(i2).setTransitionName(transitionName);
-                        break;
-                    } else {
-                        i2++;
+            if (ViewCompat.Api21Impl.getTransitionName(view) != null) {
+                list.add(view);
+            }
+            for (int i2 = size; i2 < list.size(); i2++) {
+                View view2 = list.get(i2);
+                if (view2 instanceof ViewGroup) {
+                    ViewGroup viewGroup = (ViewGroup) view2;
+                    int childCount = viewGroup.getChildCount();
+                    for (int i3 = 0; i3 < childCount; i3++) {
+                        View childAt = viewGroup.getChildAt(i3);
+                        int i4 = 0;
+                        while (true) {
+                            if (i4 >= size) {
+                                z2 = false;
+                                break;
+                            } else if (list.get(i4) == childAt) {
+                                z2 = true;
+                                break;
+                            } else {
+                                i4++;
+                            }
+                        }
+                        if (!z2 && ViewCompat.Api21Impl.getTransitionName(childAt) != null) {
+                            list.add(childAt);
+                        }
                     }
                 }
             }
         }
-        OneShotPreDrawListener.add(view, new Runnable(this) { // from class: androidx.fragment.app.FragmentTransitionImpl.1
-            @Override // java.lang.Runnable
-            public void run() {
-                for (int i3 = 0; i3 < size; i3++) {
-                    WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap2 = ViewCompat.sViewPropertyAnimatorMap;
-                    ((View) arrayList2.get(i3)).setTransitionName((String) arrayList3.get(i3));
-                    ((View) arrayList.get(i3)).setTransitionName((String) arrayList4.get(i3));
-                }
-            }
-        });
     }
 
-    public abstract void setSharedElementTargets(Object obj, View view, ArrayList<View> arrayList);
-
-    public abstract void swapSharedElementTargets(Object obj, ArrayList<View> arrayList, ArrayList<View> arrayList2);
-
-    public abstract Object wrapTransitionInSet(Object obj);
+    public void setListenerForTransitionEnd(Object obj, CancellationSignal cancellationSignal, DefaultSpecialEffectsController.AnonymousClass9 r3) {
+        r3.run();
+    }
 }

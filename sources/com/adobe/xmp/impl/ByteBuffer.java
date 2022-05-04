@@ -1,11 +1,10 @@
 package com.adobe.xmp.impl;
 
 import com.android.systemui.shared.system.QuickStepContract;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 /* loaded from: classes.dex */
-public class ByteBuffer {
+public final class ByteBuffer {
     public byte[] buffer;
     public String encoding;
     public int length;
@@ -14,13 +13,6 @@ public class ByteBuffer {
         this.encoding = null;
         this.buffer = new byte[initialCapacity];
         this.length = 0;
-    }
-
-    public void append(byte[] bytes) {
-        int length = bytes.length;
-        ensureCapacity(this.length + length);
-        System.arraycopy(bytes, 0, this.buffer, this.length, length);
-        this.length += length;
     }
 
     public final void ensureCapacity(int requestedLength) {
@@ -32,18 +24,15 @@ public class ByteBuffer {
         }
     }
 
-    public InputStream getByteStream() {
-        return new ByteArrayInputStream(this.buffer, 0, this.length);
-    }
-
-    public String getEncoding() {
+    public final String getEncoding() {
         if (this.encoding == null) {
             int i = this.length;
             if (i < 2) {
                 this.encoding = "UTF-8";
             } else {
                 byte[] bArr = this.buffer;
-                if (bArr[0] == 0) {
+                byte b = bArr[0];
+                if (b == 0) {
                     if (i < 4 || bArr[1] != 0) {
                         this.encoding = "UTF-16BE";
                     } else if ((bArr[2] & 255) == 254 && (bArr[3] & 255) == 255) {
@@ -51,7 +40,7 @@ public class ByteBuffer {
                     } else {
                         this.encoding = "UTF-32";
                     }
-                } else if ((bArr[0] & 255) < 128) {
+                } else if ((b & 255) < 128) {
                     if (bArr[1] != 0) {
                         this.encoding = "UTF-8";
                     } else if (i < 4 || bArr[2] != 0) {
@@ -59,9 +48,9 @@ public class ByteBuffer {
                     } else {
                         this.encoding = "UTF-32LE";
                     }
-                } else if ((bArr[0] & 255) == 239) {
+                } else if ((b & 255) == 239) {
                     this.encoding = "UTF-8";
-                } else if ((bArr[0] & 255) == 254) {
+                } else if ((b & 255) == 254) {
                     this.encoding = "UTF-16";
                 } else if (i < 4 || bArr[2] != 0) {
                     this.encoding = "UTF-16";

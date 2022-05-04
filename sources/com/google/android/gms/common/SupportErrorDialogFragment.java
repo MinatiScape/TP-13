@@ -11,7 +11,7 @@ public class SupportErrorDialogFragment extends DialogFragment {
     public DialogInterface.OnCancelListener zzb = null;
 
     @Override // androidx.fragment.app.DialogFragment, android.content.DialogInterface.OnCancelListener
-    public void onCancel(DialogInterface dialogInterface) {
+    public final void onCancel(DialogInterface dialogInterface) {
         DialogInterface.OnCancelListener onCancelListener = this.zzb;
         if (onCancelListener != null) {
             onCancelListener.onCancel(dialogInterface);
@@ -19,7 +19,7 @@ public class SupportErrorDialogFragment extends DialogFragment {
     }
 
     @Override // androidx.fragment.app.DialogFragment
-    public Dialog onCreateDialog(Bundle bundle) {
+    public final Dialog onCreateDialog(Bundle bundle) {
         Dialog dialog = this.zza;
         if (dialog == null) {
             this.mShowsDialog = false;
@@ -28,7 +28,7 @@ public class SupportErrorDialogFragment extends DialogFragment {
     }
 
     @Override // androidx.fragment.app.DialogFragment
-    public void show(FragmentManager fragmentManager, String str) {
-        super.show(fragmentManager, str);
+    public final void show(FragmentManager fragmentManager, String str) {
+        super.show(fragmentManager, "GooglePlayServicesErrorDialog");
     }
 }

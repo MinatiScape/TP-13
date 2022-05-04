@@ -1,20 +1,34 @@
 package kotlinx.coroutines;
 
 import androidx.recyclerview.widget.RecyclerView;
-import kotlin.TypeCastException;
 import kotlin.collections.ArraysKt___ArraysKt;
+import kotlin.jvm.internal.Intrinsics;
 import kotlinx.coroutines.internal.ArrayQueue;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+/* compiled from: EventLoop.common.kt */
 /* loaded from: classes.dex */
 public abstract class EventLoop extends CoroutineDispatcher {
+    public static final /* synthetic */ int $r8$clinit = 0;
     public boolean shared;
+    @Nullable
     public ArrayQueue<DispatchedTask<?>> unconfinedQueue;
     public long useCount;
 
+    public void shutdown() {
+    }
+
     public final void decrementUseCount(boolean z) {
-        long delta = this.useCount - delta(z);
-        this.useCount = delta;
-        if (delta <= 0) {
+        long j;
+        long j2 = this.useCount;
+        if (z) {
+            j = 4294967296L;
+        } else {
+            j = 1;
+        }
+        long j3 = j2 - j;
+        this.useCount = j3;
+        if (j3 <= 0) {
             boolean z2 = DebugKt.DEBUG;
             if (this.shared) {
                 shutdown();
@@ -22,11 +36,8 @@ public abstract class EventLoop extends CoroutineDispatcher {
         }
     }
 
-    public final long delta(boolean z) {
-        return z ? 4294967296L : 1L;
-    }
-
-    public final void dispatchUnconfined(@NotNull DispatchedTask<?> dispatchedTask) {
+    public final void dispatchUnconfined(@NotNull DispatchedTask<?> task) {
+        Intrinsics.checkNotNullParameter(task, "task");
         ArrayQueue<DispatchedTask<?>> arrayQueue = this.unconfinedQueue;
         if (arrayQueue == null) {
             arrayQueue = new ArrayQueue<>();
@@ -34,7 +45,7 @@ public abstract class EventLoop extends CoroutineDispatcher {
         }
         Object[] objArr = arrayQueue.elements;
         int i = arrayQueue.tail;
-        objArr[i] = dispatchedTask;
+        objArr[i] = task;
         int length = (i + 1) & (objArr.length - 1);
         arrayQueue.tail = length;
         int i2 = arrayQueue.head;
@@ -52,29 +63,18 @@ public abstract class EventLoop extends CoroutineDispatcher {
         }
     }
 
-    public long getNextTime() {
-        ArrayQueue<DispatchedTask<?>> arrayQueue = this.unconfinedQueue;
-        if (arrayQueue != null) {
-            if (!(arrayQueue.head == arrayQueue.tail)) {
-                return 0L;
-            }
-        }
-        return RecyclerView.FOREVER_NS;
-    }
-
     public final void incrementUseCount(boolean z) {
-        this.useCount = delta(z) + this.useCount;
+        long j;
+        long j2 = this.useCount;
+        if (z) {
+            j = 4294967296L;
+        } else {
+            j = 1;
+        }
+        this.useCount = j + j2;
         if (!z) {
             this.shared = true;
         }
-    }
-
-    public final boolean isUnconfinedLoopActive() {
-        return this.useCount >= delta(true);
-    }
-
-    public long processNextEvent() {
-        return !processUnconfinedEvent() ? RecyclerView.FOREVER_NS : getNextTime();
     }
 
     /* JADX WARN: Multi-variable type inference failed */
@@ -95,7 +95,7 @@ public abstract class EventLoop extends CoroutineDispatcher {
             if (r5 != 0) {
                 dispatchedTask = r5;
             } else {
-                throw new TypeCastException("null cannot be cast to non-null type T");
+                throw new NullPointerException("null cannot be cast to non-null type T of kotlinx.coroutines.internal.ArrayQueue");
             }
         }
         DispatchedTask dispatchedTask2 = dispatchedTask;
@@ -106,6 +106,10 @@ public abstract class EventLoop extends CoroutineDispatcher {
         return true;
     }
 
-    public void shutdown() {
+    public long processNextEvent() {
+        if (!processUnconfinedEvent()) {
+            return RecyclerView.FOREVER_NS;
+        }
+        return 0L;
     }
 }

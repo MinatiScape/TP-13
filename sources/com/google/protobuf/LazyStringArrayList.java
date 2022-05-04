@@ -1,58 +1,54 @@
 package com.google.protobuf;
 
 import com.google.protobuf.Internal;
+import java.nio.charset.Charset;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.RandomAccess;
 /* loaded from: classes.dex */
-public class LazyStringArrayList extends AbstractProtobufList<String> implements LazyStringList, RandomAccess {
-    public final List<Object> list;
-
-    static {
-        new LazyStringArrayList(10).isMutable = false;
-    }
+public final class LazyStringArrayList extends AbstractProtobufList<String> implements LazyStringList, RandomAccess {
+    public final ArrayList list;
 
     public LazyStringArrayList(int i) {
-        this.list = new ArrayList(i);
-    }
-
-    public static String asString(Object obj) {
-        if (obj instanceof String) {
-            return (String) obj;
-        }
-        if (!(obj instanceof ByteString)) {
-            return new String((byte[]) obj, Internal.UTF_8);
-        }
-        ByteString byteString = (ByteString) obj;
-        Objects.requireNonNull(byteString);
-        return byteString.size() == 0 ? "" : byteString.toStringInternal(Internal.UTF_8);
+        this(new ArrayList(i));
     }
 
     @Override // java.util.AbstractList, java.util.List
-    public void add(int i, Object obj) {
+    public final void add(int i, Object obj) {
         ensureIsMutable();
         this.list.add(i, (String) obj);
         ((AbstractList) this).modCount++;
     }
 
     @Override // com.google.protobuf.AbstractProtobufList, java.util.AbstractCollection, java.util.Collection, java.util.List
-    public boolean addAll(Collection<? extends String> collection) {
+    public final boolean addAll(Collection<? extends String> collection) {
         return addAll(size(), collection);
     }
 
-    @Override // com.google.protobuf.AbstractProtobufList, java.util.AbstractList, java.util.AbstractCollection, java.util.Collection, java.util.List
-    public void clear() {
+    static {
+        new LazyStringArrayList(10).isMutable = false;
+    }
+
+    public LazyStringArrayList(ArrayList<Object> arrayList) {
+        this.list = arrayList;
+    }
+
+    @Override // com.google.protobuf.AbstractProtobufList, java.util.AbstractList, java.util.List
+    public final boolean addAll(int i, Collection<? extends String> collection) {
         ensureIsMutable();
-        this.list.clear();
+        if (collection instanceof LazyStringList) {
+            collection = ((LazyStringList) collection).getUnderlyingElements();
+        }
+        boolean addAll = this.list.addAll(i, collection);
         ((AbstractList) this).modCount++;
+        return addAll;
     }
 
     @Override // java.util.AbstractList, java.util.List
-    public Object get(int i) {
+    public final Object get(int i) {
         String str;
         Object obj = this.list.get(i);
         if (obj instanceof String) {
@@ -60,8 +56,13 @@ public class LazyStringArrayList extends AbstractProtobufList<String> implements
         }
         if (obj instanceof ByteString) {
             ByteString byteString = (ByteString) obj;
-            Objects.requireNonNull(byteString);
-            str = byteString.size() == 0 ? "" : byteString.toStringInternal(Internal.UTF_8);
+            byteString.getClass();
+            Charset charset = Internal.UTF_8;
+            if (byteString.size() == 0) {
+                str = "";
+            } else {
+                str = byteString.toStringInternal(charset);
+            }
             if (byteString.isValidUtf8()) {
                 this.list.set(i, str);
             }
@@ -69,7 +70,7 @@ public class LazyStringArrayList extends AbstractProtobufList<String> implements
             byte[] bArr = (byte[]) obj;
             str = new String(bArr, Internal.UTF_8);
             boolean z = false;
-            if (Utf8.processor.partialIsValidUtf8(0, bArr, 0, bArr.length) == 0) {
+            if (Utf8.processor.partialIsValidUtf8(bArr, 0, bArr.length) == 0) {
                 z = true;
             }
             if (z) {
@@ -80,22 +81,56 @@ public class LazyStringArrayList extends AbstractProtobufList<String> implements
     }
 
     @Override // com.google.protobuf.LazyStringList
-    public Object getRaw(int i) {
+    public final Object getRaw(int i) {
         return this.list.get(i);
     }
 
     @Override // com.google.protobuf.LazyStringList
-    public List<?> getUnderlyingElements() {
+    public final List<?> getUnderlyingElements() {
         return Collections.unmodifiableList(this.list);
     }
 
     @Override // com.google.protobuf.LazyStringList
-    public LazyStringList getUnmodifiableView() {
-        return this.isMutable ? new UnmodifiableLazyStringList(this) : this;
+    public final LazyStringList getUnmodifiableView() {
+        if (this.isMutable) {
+            return new UnmodifiableLazyStringList(this);
+        }
+        return this;
+    }
+
+    @Override // java.util.AbstractList, java.util.List
+    public final Object set(int i, Object obj) {
+        ensureIsMutable();
+        Object obj2 = this.list.set(i, (String) obj);
+        if (obj2 instanceof String) {
+            return (String) obj2;
+        }
+        if (!(obj2 instanceof ByteString)) {
+            return new String((byte[]) obj2, Internal.UTF_8);
+        }
+        ByteString byteString = (ByteString) obj2;
+        byteString.getClass();
+        Charset charset = Internal.UTF_8;
+        if (byteString.size() == 0) {
+            return "";
+        }
+        return byteString.toStringInternal(charset);
+    }
+
+    @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
+    public final int size() {
+        return this.list.size();
+    }
+
+    @Override // com.google.protobuf.AbstractProtobufList, java.util.AbstractList, java.util.AbstractCollection, java.util.Collection, java.util.List
+    public final void clear() {
+        ensureIsMutable();
+        this.list.clear();
+        ((AbstractList) this).modCount++;
     }
 
     @Override // com.google.protobuf.Internal.ProtobufList
-    public Internal.ProtobufList mutableCopyWithCapacity(int i) {
+    public final Internal.ProtobufList mutableCopyWithCapacity(int i) {
         if (i >= size()) {
             ArrayList arrayList = new ArrayList(i);
             arrayList.addAll(this.list);
@@ -105,41 +140,31 @@ public class LazyStringArrayList extends AbstractProtobufList<String> implements
     }
 
     @Override // java.util.AbstractList, java.util.List
-    public Object remove(int i) {
+    public final Object remove(int i) {
+        String str;
         ensureIsMutable();
         Object remove = this.list.remove(i);
         ((AbstractList) this).modCount++;
-        return asString(remove);
-    }
-
-    @Override // java.util.AbstractList, java.util.List
-    public Object set(int i, Object obj) {
-        ensureIsMutable();
-        return asString(this.list.set(i, (String) obj));
-    }
-
-    @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
-    public int size() {
-        return this.list.size();
-    }
-
-    @Override // com.google.protobuf.AbstractProtobufList, java.util.AbstractList, java.util.List
-    public boolean addAll(int i, Collection<? extends String> collection) {
-        ensureIsMutable();
-        if (collection instanceof LazyStringList) {
-            collection = ((LazyStringList) collection).getUnderlyingElements();
+        if (remove instanceof String) {
+            return (String) remove;
         }
-        boolean addAll = this.list.addAll(i, collection);
-        ((AbstractList) this).modCount++;
-        return addAll;
-    }
-
-    public LazyStringArrayList(ArrayList<Object> arrayList) {
-        this.list = arrayList;
+        if (remove instanceof ByteString) {
+            ByteString byteString = (ByteString) remove;
+            byteString.getClass();
+            Charset charset = Internal.UTF_8;
+            if (byteString.size() == 0) {
+                str = "";
+            } else {
+                str = byteString.toStringInternal(charset);
+            }
+        } else {
+            str = new String((byte[]) remove, Internal.UTF_8);
+        }
+        return str;
     }
 
     @Override // com.google.protobuf.LazyStringList
-    public void add(ByteString byteString) {
+    public final void add(ByteString byteString) {
         ensureIsMutable();
         this.list.add(byteString);
         ((AbstractList) this).modCount++;

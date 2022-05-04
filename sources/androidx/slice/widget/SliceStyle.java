@@ -5,14 +5,14 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.util.SparseArray;
+import androidx.core.R$styleable;
 import androidx.slice.SliceItem;
-import androidx.slice.view.R$styleable;
 import com.android.systemui.shared.R;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 import java.util.ArrayList;
 import java.util.List;
 /* loaded from: classes.dex */
-public class SliceStyle {
+public final class SliceStyle {
     public final Context mContext;
     public final int mDefaultRowStyleRes;
     public final boolean mExpandToAvailableHeight;
@@ -52,10 +52,97 @@ public class SliceStyle {
     public final int mVerticalHeaderTextPadding;
     public final int mVerticalTextPadding;
 
+    public final int getListItemsHeight(List<SliceContent> list, SliceViewPolicy sliceViewPolicy) {
+        if (list == null) {
+            return 0;
+        }
+        int i = 0;
+        for (int i2 = 0; i2 < list.size(); i2++) {
+            SliceContent sliceContent = list.get(i2);
+            if (i2 != 0 || !shouldSkipFirstListItem(list)) {
+                i = sliceContent.getHeight(this, sliceViewPolicy) + i;
+            }
+        }
+        return i;
+    }
+
+    public final DisplayedListItems getListItemsForNonScrollingList(ListContent listContent, int i, SliceViewPolicy sliceViewPolicy) {
+        int i2;
+        int i3;
+        ArrayList arrayList = new ArrayList();
+        ArrayList<SliceContent> arrayList2 = listContent.mRowItems;
+        if (arrayList2 == null || arrayList2.size() == 0) {
+            return new DisplayedListItems(arrayList, 0);
+        }
+        boolean shouldSkipFirstListItem = shouldSkipFirstListItem(listContent.mRowItems);
+        int size = listContent.mRowItems.size();
+        int i4 = 0;
+        int i5 = 0;
+        while (true) {
+            if (i4 >= size) {
+                i2 = 0;
+                break;
+            }
+            SliceContent sliceContent = listContent.mRowItems.get(i4);
+            if (i4 != 0 || !shouldSkipFirstListItem) {
+                int height = sliceContent.getHeight(this, sliceViewPolicy);
+                if (i > 0 && i5 + height > i) {
+                    i2 = size - i4;
+                    break;
+                }
+                i5 += height;
+                arrayList.add(sliceContent);
+            }
+            i4++;
+        }
+        if (shouldSkipFirstListItem) {
+            i3 = 1;
+        } else {
+            i3 = 2;
+        }
+        if (listContent.mSeeMoreContent != null && arrayList.size() >= i3 && i2 > 0) {
+            int height2 = listContent.mSeeMoreContent.getHeight(this, sliceViewPolicy) + i5;
+            while (height2 > i && arrayList.size() >= i3) {
+                int size2 = arrayList.size() - 1;
+                height2 -= ((SliceContent) arrayList.get(size2)).getHeight(this, sliceViewPolicy);
+                arrayList.remove(size2);
+                i2++;
+            }
+            if (arrayList.size() >= i3) {
+                arrayList.add(listContent.mSeeMoreContent);
+            }
+        }
+        if (arrayList.size() == 0) {
+            arrayList.add(listContent.mRowItems.get(0));
+        }
+        return new DisplayedListItems(arrayList, i2);
+    }
+
+    public final RowStyle getRowStyle(SliceItem sliceItem) {
+        int i = this.mDefaultRowStyleRes;
+        if (i == 0) {
+            return new RowStyle(this.mContext, this);
+        }
+        RowStyle rowStyle = this.mResourceToRowStyle.get(i);
+        if (rowStyle != null) {
+            return rowStyle;
+        }
+        RowStyle rowStyle2 = new RowStyle(this.mContext, i, this);
+        this.mResourceToRowStyle.put(i, rowStyle2);
+        return rowStyle2;
+    }
+
+    public final boolean shouldSkipFirstListItem(List<SliceContent> list) {
+        if (!this.mHideHeaderRow || list.size() <= 1 || !(list.get(0) instanceof RowContent) || !((RowContent) list.get(0)).mIsHeader) {
+            return false;
+        }
+        return true;
+    }
+
     /* JADX WARN: Finally extract failed */
-    public SliceStyle(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public SliceStyle(Context context, AttributeSet attributeSet, int i, int i2) {
         this.mTintColor = -1;
-        TypedArray obtainStyledAttributes = context.getTheme().obtainStyledAttributes(attrs, R$styleable.SliceView, defStyleAttr, defStyleRes);
+        TypedArray obtainStyledAttributes = context.getTheme().obtainStyledAttributes(attributeSet, R$styleable.SliceView, i, i2);
         try {
             int color = obtainStyledAttributes.getColor(20, -1);
             if (color == -1) {
@@ -104,84 +191,5 @@ public class SliceStyle {
             obtainStyledAttributes.recycle();
             throw th;
         }
-    }
-
-    public DisplayedListItems getListItemsForNonScrollingList(ListContent list, int availableHeight, SliceViewPolicy policy) {
-        int i;
-        ArrayList arrayList = new ArrayList();
-        ArrayList<SliceContent> arrayList2 = list.mRowItems;
-        if (arrayList2 == null || arrayList2.size() == 0) {
-            return new DisplayedListItems(arrayList, 0);
-        }
-        boolean shouldSkipFirstListItem = shouldSkipFirstListItem(list.mRowItems);
-        int size = list.mRowItems.size();
-        int i2 = 0;
-        int i3 = 0;
-        while (true) {
-            if (i2 >= size) {
-                i = 0;
-                break;
-            }
-            SliceContent sliceContent = list.mRowItems.get(i2);
-            if (i2 != 0 || !shouldSkipFirstListItem) {
-                int height = sliceContent.getHeight(this, policy);
-                if (availableHeight > 0 && i3 + height > availableHeight) {
-                    i = size - i2;
-                    break;
-                }
-                i3 += height;
-                arrayList.add(sliceContent);
-            }
-            i2++;
-        }
-        int i4 = shouldSkipFirstListItem ? 1 : 2;
-        if (list.mSeeMoreContent != null && arrayList.size() >= i4 && i > 0) {
-            int height2 = list.mSeeMoreContent.getHeight(this, policy) + i3;
-            while (height2 > availableHeight && arrayList.size() >= i4) {
-                int size2 = arrayList.size() - 1;
-                height2 -= ((SliceContent) arrayList.get(size2)).getHeight(this, policy);
-                arrayList.remove(size2);
-                i++;
-            }
-            if (arrayList.size() >= i4) {
-                arrayList.add(list.mSeeMoreContent);
-            }
-        }
-        if (arrayList.size() == 0) {
-            arrayList.add(list.mRowItems.get(0));
-        }
-        return new DisplayedListItems(arrayList, i);
-    }
-
-    public int getListItemsHeight(List<SliceContent> listItems, SliceViewPolicy policy) {
-        if (listItems == null) {
-            return 0;
-        }
-        int i = 0;
-        for (int i2 = 0; i2 < listItems.size(); i2++) {
-            SliceContent sliceContent = listItems.get(i2);
-            if (i2 != 0 || !shouldSkipFirstListItem(listItems)) {
-                i = sliceContent.getHeight(this, policy) + i;
-            }
-        }
-        return i;
-    }
-
-    public RowStyle getRowStyle(SliceItem sliceItem) {
-        int i = this.mDefaultRowStyleRes;
-        if (i == 0) {
-            return new RowStyle(this.mContext, this);
-        }
-        RowStyle rowStyle = this.mResourceToRowStyle.get(i);
-        if (rowStyle != null) {
-            return rowStyle;
-        }
-        RowStyle rowStyle2 = new RowStyle(this.mContext, i, this);
-        this.mResourceToRowStyle.put(i, rowStyle2);
-        return rowStyle2;
-    }
-
-    public final boolean shouldSkipFirstListItem(List<SliceContent> rowItems) {
-        return this.mHideHeaderRow && rowItems.size() > 1 && (rowItems.get(0) instanceof RowContent) && ((RowContent) rowItems.get(0)).mIsHeader;
     }
 }

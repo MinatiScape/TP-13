@@ -8,4 +8,13 @@ public abstract class Optional<T> implements Serializable {
     public abstract T get();
 
     public abstract T or(T defaultValue);
+
+    public static <T> Optional<T> of(T reference) {
+        reference.getClass();
+        return new Present(reference);
+    }
+
+    public static <T> Optional<T> absent() {
+        return Absent.INSTANCE;
+    }
 }

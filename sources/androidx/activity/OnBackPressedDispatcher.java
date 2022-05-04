@@ -1,6 +1,7 @@
 package androidx.activity;
 
 import android.annotation.SuppressLint;
+import androidx.activity.ComponentActivity;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -14,7 +15,7 @@ public final class OnBackPressedDispatcher {
 
     /* loaded from: classes.dex */
     public class LifecycleOnBackPressedCancellable implements LifecycleEventObserver, Cancellable {
-        public Cancellable mCurrentCancellable;
+        public OnBackPressedCancellable mCurrentCancellable;
         public final Lifecycle mLifecycle;
         public final OnBackPressedCallback mOnBackPressedCallback;
 
@@ -25,20 +26,18 @@ public final class OnBackPressedDispatcher {
         }
 
         @Override // androidx.activity.Cancellable
-        public void cancel() {
-            LifecycleRegistry lifecycleRegistry = (LifecycleRegistry) this.mLifecycle;
-            lifecycleRegistry.enforceMainThreadIfNeeded("removeObserver");
-            lifecycleRegistry.mObserverMap.remove(this);
+        public final void cancel() {
+            this.mLifecycle.removeObserver(this);
             this.mOnBackPressedCallback.mCancellables.remove(this);
-            Cancellable cancellable = this.mCurrentCancellable;
-            if (cancellable != null) {
-                cancellable.cancel();
+            OnBackPressedCancellable onBackPressedCancellable = this.mCurrentCancellable;
+            if (onBackPressedCancellable != null) {
+                onBackPressedCancellable.cancel();
                 this.mCurrentCancellable = null;
             }
         }
 
         @Override // androidx.lifecycle.LifecycleEventObserver
-        public void onStateChanged(LifecycleOwner lifecycleOwner, Lifecycle.Event event) {
+        public final void onStateChanged(LifecycleOwner lifecycleOwner, Lifecycle.Event event) {
             if (event == Lifecycle.Event.ON_START) {
                 OnBackPressedDispatcher onBackPressedDispatcher = OnBackPressedDispatcher.this;
                 OnBackPressedCallback onBackPressedCallback = this.mOnBackPressedCallback;
@@ -47,9 +46,9 @@ public final class OnBackPressedDispatcher {
                 onBackPressedCallback.mCancellables.add(onBackPressedCancellable);
                 this.mCurrentCancellable = onBackPressedCancellable;
             } else if (event == Lifecycle.Event.ON_STOP) {
-                Cancellable cancellable = this.mCurrentCancellable;
-                if (cancellable != null) {
-                    cancellable.cancel();
+                OnBackPressedCancellable onBackPressedCancellable2 = this.mCurrentCancellable;
+                if (onBackPressedCancellable2 != null) {
+                    onBackPressedCancellable2.cancel();
                 }
             } else if (event == Lifecycle.Event.ON_DESTROY) {
                 cancel();
@@ -66,25 +65,13 @@ public final class OnBackPressedDispatcher {
         }
 
         @Override // androidx.activity.Cancellable
-        public void cancel() {
+        public final void cancel() {
             OnBackPressedDispatcher.this.mOnBackPressedCallbacks.remove(this.mOnBackPressedCallback);
             this.mOnBackPressedCallback.mCancellables.remove(this);
         }
     }
 
-    public OnBackPressedDispatcher(Runnable runnable) {
-        this.mFallbackOnBackPressed = runnable;
-    }
-
-    @SuppressLint({"LambdaLast"})
-    public void addCallback(LifecycleOwner lifecycleOwner, OnBackPressedCallback onBackPressedCallback) {
-        Lifecycle lifecycle = lifecycleOwner.getLifecycle();
-        if (((LifecycleRegistry) lifecycle).mState != Lifecycle.State.DESTROYED) {
-            onBackPressedCallback.mCancellables.add(new LifecycleOnBackPressedCancellable(lifecycle, onBackPressedCallback));
-        }
-    }
-
-    public void onBackPressed() {
+    public final void onBackPressed() {
         Iterator<OnBackPressedCallback> descendingIterator = this.mOnBackPressedCallbacks.descendingIterator();
         while (descendingIterator.hasNext()) {
             OnBackPressedCallback next = descendingIterator.next();
@@ -96,6 +83,18 @@ public final class OnBackPressedDispatcher {
         Runnable runnable = this.mFallbackOnBackPressed;
         if (runnable != null) {
             runnable.run();
+        }
+    }
+
+    public OnBackPressedDispatcher(ComponentActivity.AnonymousClass1 r2) {
+        this.mFallbackOnBackPressed = r2;
+    }
+
+    @SuppressLint({"LambdaLast"})
+    public final void addCallback(LifecycleOwner lifecycleOwner, OnBackPressedCallback onBackPressedCallback) {
+        LifecycleRegistry lifecycle = lifecycleOwner.getLifecycle();
+        if (lifecycle.mState != Lifecycle.State.DESTROYED) {
+            onBackPressedCallback.mCancellables.add(new LifecycleOnBackPressedCancellable(lifecycle, onBackPressedCallback));
         }
     }
 }

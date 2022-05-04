@@ -1,7 +1,7 @@
 package com.google.common.base;
 
-import androidx.viewpager2.widget.FakeDrag$$ExternalSyntheticOutline0;
-import com.adobe.xmp.XMPPathFactory$$ExternalSyntheticOutline0;
+import com.adobe.xmp.impl.ParseRDF$$ExternalSyntheticOutline0;
+import com.adobe.xmp.impl.XMPNode$$ExternalSyntheticOutline0;
 /* loaded from: classes.dex */
 public enum StandardSystemProperty {
     /* JADX INFO: Fake field, exist only in values array */
@@ -61,18 +61,18 @@ public enum StandardSystemProperty {
     
     private final String key;
 
-    StandardSystemProperty(String key) {
-        this.key = key;
-    }
-
     @Override // java.lang.Enum
-    public String toString() {
+    public final String toString() {
         String str = this.key;
         String value = value();
-        return FakeDrag$$ExternalSyntheticOutline0.m(XMPPathFactory$$ExternalSyntheticOutline0.m(value, XMPPathFactory$$ExternalSyntheticOutline0.m(str, 1)), str, "=", value);
+        return XMPNode$$ExternalSyntheticOutline0.m(ParseRDF$$ExternalSyntheticOutline0.m(value, ParseRDF$$ExternalSyntheticOutline0.m(str, 1)), str, "=", value);
     }
 
-    public String value() {
+    public final String value() {
         return System.getProperty(this.key);
+    }
+
+    StandardSystemProperty(String key) {
+        this.key = key;
     }
 }

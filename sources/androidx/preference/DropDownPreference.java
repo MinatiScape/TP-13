@@ -7,12 +7,17 @@ import com.android.systemui.shared.R;
 /* loaded from: classes.dex */
 public class DropDownPreference extends ListPreference {
     public final ArrayAdapter mAdapter;
-    public final Context mContext;
 
-    /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+    @Override // androidx.preference.Preference
+    public final void notifyChanged() {
+        ArrayAdapter arrayAdapter = this.mAdapter;
+        if (arrayAdapter != null) {
+            arrayAdapter.notifyDataSetChanged();
+        }
+    }
+
     public DropDownPreference(Context context, AttributeSet attributeSet) {
-        super(context, attributeSet, R.attr.dropdownPreferenceStyle, 0);
-        this.mContext = context;
+        super(context, attributeSet, R.attr.dropdownPreferenceStyle);
         ArrayAdapter arrayAdapter = new ArrayAdapter(context, 17367049);
         this.mAdapter = arrayAdapter;
         arrayAdapter.clear();
@@ -21,14 +26,6 @@ public class DropDownPreference extends ListPreference {
             for (CharSequence charSequence : charSequenceArr) {
                 this.mAdapter.add(charSequence.toString());
             }
-        }
-    }
-
-    @Override // androidx.preference.Preference
-    public void notifyChanged() {
-        ArrayAdapter arrayAdapter = this.mAdapter;
-        if (arrayAdapter != null) {
-            arrayAdapter.notifyDataSetChanged();
         }
     }
 }

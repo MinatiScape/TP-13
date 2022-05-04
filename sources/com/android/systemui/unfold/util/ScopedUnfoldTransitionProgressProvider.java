@@ -1,102 +1,139 @@
 package com.android.systemui.unfold.util;
 
 import com.android.systemui.unfold.UnfoldTransitionProgressProvider;
-import com.android.wallpaper.widget.BottomActionBar$$ExternalSyntheticLambda4;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+import kotlin.jvm.internal.DefaultConstructorMarker;
+import kotlin.jvm.internal.Intrinsics;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+/* compiled from: ScopedUnfoldTransitionProgressProvider.kt */
 /* loaded from: classes.dex */
-public final class ScopedUnfoldTransitionProgressProvider implements UnfoldTransitionProgressProvider, UnfoldTransitionProgressProvider.TransitionProgressListener {
+public class ScopedUnfoldTransitionProgressProvider implements UnfoldTransitionProgressProvider, UnfoldTransitionProgressProvider.TransitionProgressListener {
+    @NotNull
+    public static final Companion Companion = new Companion(null);
     private static final float PROGRESS_UNSET = -1.0f;
-    private boolean mIsReadyToHandleTransition;
-    private boolean mIsTransitionRunning;
-    private float mLastTransitionProgress;
-    private final List<UnfoldTransitionProgressProvider.TransitionProgressListener> mListeners;
-    private UnfoldTransitionProgressProvider mSource;
+    private boolean isReadyToHandleTransition;
+    private boolean isTransitionRunning;
+    private float lastTransitionProgress;
+    @NotNull
+    private final List<UnfoldTransitionProgressProvider.TransitionProgressListener> listeners;
+    @Nullable
+    private UnfoldTransitionProgressProvider source;
 
     public ScopedUnfoldTransitionProgressProvider() {
-        this(null);
+        this(null, 1, null);
     }
 
-    /* JADX INFO: Access modifiers changed from: private */
-    public /* synthetic */ void lambda$setReadyToHandleTransition$0(UnfoldTransitionProgressProvider.TransitionProgressListener transitionProgressListener) {
-        transitionProgressListener.onTransitionProgress(this.mLastTransitionProgress);
-    }
-
-    @Override // com.android.systemui.unfold.UnfoldTransitionProgressProvider
-    public void destroy() {
-        this.mSource.removeCallback(this);
-    }
-
-    @Override // com.android.systemui.unfold.UnfoldTransitionProgressProvider.TransitionProgressListener
-    public void onTransitionFinished() {
-        if (this.mIsReadyToHandleTransition) {
-            this.mListeners.forEach(ScopedUnfoldTransitionProgressProvider$$ExternalSyntheticLambda1.INSTANCE);
-        }
-        this.mIsTransitionRunning = false;
-        this.mLastTransitionProgress = PROGRESS_UNSET;
-    }
-
-    @Override // com.android.systemui.unfold.UnfoldTransitionProgressProvider.TransitionProgressListener
-    public void onTransitionProgress(final float f) {
-        if (this.mIsReadyToHandleTransition) {
-            this.mListeners.forEach(new Consumer() { // from class: com.android.systemui.unfold.util.ScopedUnfoldTransitionProgressProvider$$ExternalSyntheticLambda0
-                @Override // java.util.function.Consumer
-                public final void accept(Object obj) {
-                    ((UnfoldTransitionProgressProvider.TransitionProgressListener) obj).onTransitionProgress(f);
-                }
-            });
-        }
-        this.mLastTransitionProgress = f;
+    public ScopedUnfoldTransitionProgressProvider(@Nullable UnfoldTransitionProgressProvider unfoldTransitionProgressProvider) {
+        this.listeners = new ArrayList();
+        this.lastTransitionProgress = PROGRESS_UNSET;
+        setSourceProvider(unfoldTransitionProgressProvider);
     }
 
     @Override // com.android.systemui.unfold.UnfoldTransitionProgressProvider.TransitionProgressListener
     public void onTransitionStarted() {
-        this.mIsTransitionRunning = true;
-        if (this.mIsReadyToHandleTransition) {
-            this.mListeners.forEach(ScopedUnfoldTransitionProgressProvider$$ExternalSyntheticLambda2.INSTANCE);
-        }
-    }
-
-    public void setReadyToHandleTransition(boolean z) {
-        if (this.mIsTransitionRunning) {
-            if (z) {
-                this.mListeners.forEach(ScopedUnfoldTransitionProgressProvider$$ExternalSyntheticLambda2.INSTANCE);
-                if (this.mLastTransitionProgress != PROGRESS_UNSET) {
-                    this.mListeners.forEach(new BottomActionBar$$ExternalSyntheticLambda4(this));
-                }
-            } else {
-                this.mIsTransitionRunning = false;
-                this.mListeners.forEach(ScopedUnfoldTransitionProgressProvider$$ExternalSyntheticLambda1.INSTANCE);
+        this.isTransitionRunning = true;
+        if (this.isReadyToHandleTransition) {
+            for (UnfoldTransitionProgressProvider.TransitionProgressListener transitionProgressListener : this.listeners) {
+                transitionProgressListener.onTransitionStarted();
             }
         }
-        this.mIsReadyToHandleTransition = z;
     }
 
-    public void setSourceProvider(UnfoldTransitionProgressProvider unfoldTransitionProgressProvider) {
-        UnfoldTransitionProgressProvider unfoldTransitionProgressProvider2 = this.mSource;
+    public void addCallback(@NotNull UnfoldTransitionProgressProvider.TransitionProgressListener listener) {
+        Intrinsics.checkNotNullParameter(listener, "listener");
+        this.listeners.add(listener);
+    }
+
+    @Override // com.android.systemui.unfold.UnfoldTransitionProgressProvider
+    public void destroy() {
+        UnfoldTransitionProgressProvider unfoldTransitionProgressProvider = this.source;
+        if (unfoldTransitionProgressProvider != null) {
+            unfoldTransitionProgressProvider.removeCallback(this);
+        }
+        UnfoldTransitionProgressProvider unfoldTransitionProgressProvider2 = this.source;
+        if (unfoldTransitionProgressProvider2 != null) {
+            unfoldTransitionProgressProvider2.destroy();
+        }
+    }
+
+    @Override // com.android.systemui.unfold.UnfoldTransitionProgressProvider.TransitionProgressListener
+    public void onTransitionFinished() {
+        if (this.isReadyToHandleTransition) {
+            for (UnfoldTransitionProgressProvider.TransitionProgressListener transitionProgressListener : this.listeners) {
+                transitionProgressListener.onTransitionFinished();
+            }
+        }
+        this.isTransitionRunning = false;
+        this.lastTransitionProgress = PROGRESS_UNSET;
+    }
+
+    @Override // com.android.systemui.unfold.UnfoldTransitionProgressProvider.TransitionProgressListener
+    public void onTransitionProgress(float f) {
+        if (this.isReadyToHandleTransition) {
+            for (UnfoldTransitionProgressProvider.TransitionProgressListener transitionProgressListener : this.listeners) {
+                transitionProgressListener.onTransitionProgress(f);
+            }
+        }
+        this.lastTransitionProgress = f;
+    }
+
+    public void removeCallback(@NotNull UnfoldTransitionProgressProvider.TransitionProgressListener listener) {
+        Intrinsics.checkNotNullParameter(listener, "listener");
+        this.listeners.remove(listener);
+    }
+
+    public final void setReadyToHandleTransition(boolean z) {
+        if (this.isTransitionRunning) {
+            boolean z2 = false;
+            if (z) {
+                for (UnfoldTransitionProgressProvider.TransitionProgressListener transitionProgressListener : this.listeners) {
+                    transitionProgressListener.onTransitionStarted();
+                }
+                if (this.lastTransitionProgress == PROGRESS_UNSET) {
+                    z2 = true;
+                }
+                if (!z2) {
+                    for (UnfoldTransitionProgressProvider.TransitionProgressListener transitionProgressListener2 : this.listeners) {
+                        transitionProgressListener2.onTransitionProgress(this.lastTransitionProgress);
+                    }
+                }
+            } else {
+                this.isTransitionRunning = false;
+                for (UnfoldTransitionProgressProvider.TransitionProgressListener transitionProgressListener3 : this.listeners) {
+                    transitionProgressListener3.onTransitionFinished();
+                }
+            }
+        }
+        this.isReadyToHandleTransition = z;
+    }
+
+    public final void setSourceProvider(@Nullable UnfoldTransitionProgressProvider unfoldTransitionProgressProvider) {
+        UnfoldTransitionProgressProvider unfoldTransitionProgressProvider2 = this.source;
         if (unfoldTransitionProgressProvider2 != null) {
             unfoldTransitionProgressProvider2.removeCallback(this);
         }
         if (unfoldTransitionProgressProvider != null) {
-            this.mSource = unfoldTransitionProgressProvider;
+            this.source = unfoldTransitionProgressProvider;
             unfoldTransitionProgressProvider.addCallback(this);
             return;
         }
-        this.mSource = null;
+        this.source = null;
     }
 
-    public ScopedUnfoldTransitionProgressProvider(UnfoldTransitionProgressProvider unfoldTransitionProgressProvider) {
-        this.mListeners = new ArrayList();
-        this.mLastTransitionProgress = PROGRESS_UNSET;
-        setSourceProvider(unfoldTransitionProgressProvider);
+    public /* synthetic */ ScopedUnfoldTransitionProgressProvider(UnfoldTransitionProgressProvider unfoldTransitionProgressProvider, int i, DefaultConstructorMarker defaultConstructorMarker) {
+        this((i & 1) != 0 ? null : unfoldTransitionProgressProvider);
     }
 
-    public void addCallback(UnfoldTransitionProgressProvider.TransitionProgressListener transitionProgressListener) {
-        this.mListeners.add(transitionProgressListener);
-    }
+    /* compiled from: ScopedUnfoldTransitionProgressProvider.kt */
+    /* loaded from: classes.dex */
+    public static final class Companion {
+        public /* synthetic */ Companion(DefaultConstructorMarker defaultConstructorMarker) {
+            this();
+        }
 
-    public void removeCallback(UnfoldTransitionProgressProvider.TransitionProgressListener transitionProgressListener) {
-        this.mListeners.remove(transitionProgressListener);
+        private Companion() {
+        }
     }
 }

@@ -1,11 +1,9 @@
 package androidx.appcompat.app;
 
 import android.content.Context;
-import android.location.Location;
 import android.location.LocationManager;
-import android.util.Log;
 /* loaded from: classes.dex */
-public class TwilightManager {
+public final class TwilightManager {
     public static TwilightManager sInstance;
     public final Context mContext;
     public final LocationManager mLocationManager;
@@ -24,17 +22,5 @@ public class TwilightManager {
 
     public static void setInstance(TwilightManager twilightManager) {
         sInstance = twilightManager;
-    }
-
-    public final Location getLastKnownLocationForProvider(String str) {
-        try {
-            if (this.mLocationManager.isProviderEnabled(str)) {
-                return this.mLocationManager.getLastKnownLocation(str);
-            }
-            return null;
-        } catch (Exception e) {
-            Log.d("TwilightManager", "Failed to get last known location", e);
-            return null;
-        }
     }
 }

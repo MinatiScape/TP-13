@@ -7,14 +7,10 @@ import android.app.FragmentManager;
 import android.os.Bundle;
 import androidx.lifecycle.Lifecycle;
 /* loaded from: classes.dex */
-public class ReportFragment extends Fragment {
+public final class ReportFragment extends Fragment {
 
     /* loaded from: classes.dex */
     public static class LifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
-        public static void registerIn(Activity activity) {
-            activity.registerActivityLifecycleCallbacks(new LifecycleCallbacks());
-        }
-
         @Override // android.app.Application.ActivityLifecycleCallbacks
         public void onActivityCreated(Activity activity, Bundle bundle) {
         }
@@ -25,6 +21,26 @@ public class ReportFragment extends Fragment {
 
         @Override // android.app.Application.ActivityLifecycleCallbacks
         public void onActivityPaused(Activity activity) {
+        }
+
+        @Override // android.app.Application.ActivityLifecycleCallbacks
+        public void onActivityResumed(Activity activity) {
+        }
+
+        @Override // android.app.Application.ActivityLifecycleCallbacks
+        public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
+        }
+
+        @Override // android.app.Application.ActivityLifecycleCallbacks
+        public void onActivityStarted(Activity activity) {
+        }
+
+        @Override // android.app.Application.ActivityLifecycleCallbacks
+        public void onActivityStopped(Activity activity) {
+        }
+
+        public static void registerIn(Activity activity) {
+            activity.registerActivityLifecycleCallbacks(new LifecycleCallbacks());
         }
 
         @Override // android.app.Application.ActivityLifecycleCallbacks
@@ -56,35 +72,15 @@ public class ReportFragment extends Fragment {
         public void onActivityPreStopped(Activity activity) {
             ReportFragment.dispatch(activity, Lifecycle.Event.ON_STOP);
         }
-
-        @Override // android.app.Application.ActivityLifecycleCallbacks
-        public void onActivityResumed(Activity activity) {
-        }
-
-        @Override // android.app.Application.ActivityLifecycleCallbacks
-        public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
-        }
-
-        @Override // android.app.Application.ActivityLifecycleCallbacks
-        public void onActivityStarted(Activity activity) {
-        }
-
-        @Override // android.app.Application.ActivityLifecycleCallbacks
-        public void onActivityStopped(Activity activity) {
-        }
     }
 
     public static void dispatch(Activity activity, Lifecycle.Event event) {
         if (activity instanceof LifecycleRegistryOwner) {
-            LifecycleRegistry lifecycle = ((LifecycleRegistryOwner) activity).getLifecycle();
-            lifecycle.enforceMainThreadIfNeeded("handleLifecycleEvent");
-            lifecycle.moveToState(event.getTargetState());
+            ((LifecycleRegistryOwner) activity).getLifecycle$1().handleLifecycleEvent(event);
         } else if (activity instanceof LifecycleOwner) {
-            Lifecycle lifecycle2 = ((LifecycleOwner) activity).getLifecycle();
-            if (lifecycle2 instanceof LifecycleRegistry) {
-                LifecycleRegistry lifecycleRegistry = (LifecycleRegistry) lifecycle2;
-                lifecycleRegistry.enforceMainThreadIfNeeded("handleLifecycleEvent");
-                lifecycleRegistry.moveToState(event.getTargetState());
+            LifecycleRegistry lifecycle = ((LifecycleOwner) activity).getLifecycle();
+            if (lifecycle instanceof LifecycleRegistry) {
+                lifecycle.handleLifecycleEvent(event);
             }
         }
     }
@@ -99,32 +95,32 @@ public class ReportFragment extends Fragment {
     }
 
     @Override // android.app.Fragment
-    public void onActivityCreated(Bundle bundle) {
+    public final void onActivityCreated(Bundle bundle) {
         super.onActivityCreated(bundle);
     }
 
     @Override // android.app.Fragment
-    public void onDestroy() {
+    public final void onDestroy() {
         super.onDestroy();
     }
 
     @Override // android.app.Fragment
-    public void onPause() {
+    public final void onPause() {
         super.onPause();
     }
 
     @Override // android.app.Fragment
-    public void onResume() {
+    public final void onResume() {
         super.onResume();
     }
 
     @Override // android.app.Fragment
-    public void onStart() {
+    public final void onStart() {
         super.onStart();
     }
 
     @Override // android.app.Fragment
-    public void onStop() {
+    public final void onStop() {
         super.onStop();
     }
 }

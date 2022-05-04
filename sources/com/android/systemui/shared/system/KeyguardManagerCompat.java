@@ -6,11 +6,11 @@ import android.content.Context;
 public class KeyguardManagerCompat {
     private final KeyguardManager mKeyguardManager;
 
-    public KeyguardManagerCompat(Context context) {
-        this.mKeyguardManager = (KeyguardManager) context.getSystemService("keyguard");
-    }
-
     public boolean isDeviceLocked(int i) {
         return this.mKeyguardManager.isDeviceLocked(i);
+    }
+
+    public KeyguardManagerCompat(Context context) {
+        this.mKeyguardManager = (KeyguardManager) context.getSystemService("keyguard");
     }
 }

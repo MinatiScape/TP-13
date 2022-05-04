@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import kotlin.jvm.KotlinReflectionNotSupportedError;
 import kotlin.reflect.KCallable;
 import kotlin.reflect.KDeclarationContainer;
@@ -21,27 +20,14 @@ public abstract class CallableReference implements KCallable, Serializable {
     private transient KCallable reflected;
     private final String signature;
 
-    /* loaded from: classes.dex */
-    public static class NoReceiver implements Serializable {
-        public static final NoReceiver INSTANCE = new NoReceiver();
-
-        private Object readResolve() throws ObjectStreamException {
-            return INSTANCE;
-        }
-    }
-
     public CallableReference() {
         this(NO_RECEIVER);
     }
 
-    @Override // kotlin.reflect.KCallable
-    public Object call(Object... objArr) {
-        return getReflected().call(objArr);
-    }
+    public abstract KCallable computeReflected();
 
-    @Override // kotlin.reflect.KCallable
-    public Object callBy(Map map) {
-        return getReflected().callBy(map);
+    public CallableReference(Object obj) {
+        this(obj, null, null, null, false);
     }
 
     public KCallable compute() {
@@ -54,35 +40,44 @@ public abstract class CallableReference implements KCallable, Serializable {
         return computeReflected;
     }
 
-    public abstract KCallable computeReflected();
+    public KDeclarationContainer getOwner() {
+        Class cls = this.owner;
+        if (cls == null) {
+            return null;
+        }
+        if (this.isTopLevel) {
+            Reflection.factory.getClass();
+            return new PackageReference(cls);
+        }
+        Reflection.factory.getClass();
+        return new ClassReference(cls);
+    }
+
+    public CallableReference(Object obj, Class cls, String str, String str2, boolean z) {
+        this.receiver = obj;
+        this.owner = cls;
+        this.name = str;
+        this.signature = str2;
+        this.isTopLevel = z;
+    }
+
+    @Override // kotlin.reflect.KCallable
+    public Object call(Object... objArr) {
+        return getReflected().call(objArr);
+    }
+
+    @Override // kotlin.reflect.KCallable
+    public Object callBy(Map map) {
+        return getReflected().callBy(map);
+    }
 
     @Override // kotlin.reflect.KAnnotatedElement
     public List<Annotation> getAnnotations() {
         return getReflected().getAnnotations();
     }
 
-    public Object getBoundReceiver() {
-        return this.receiver;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public KDeclarationContainer getOwner() {
-        Class cls = this.owner;
-        if (cls == null) {
-            return null;
-        }
-        if (!this.isTopLevel) {
-            return Reflection.getOrCreateKotlinClass(cls);
-        }
-        Objects.requireNonNull(Reflection.factory);
-        return new PackageReference(cls, "");
-    }
-
     @Override // kotlin.reflect.KCallable
-    public List<?> getParameters() {
+    public List<Object> getParameters() {
         return getReflected().getParameters();
     }
 
@@ -99,12 +94,8 @@ public abstract class CallableReference implements KCallable, Serializable {
         return getReflected().getReturnType();
     }
 
-    public String getSignature() {
-        return this.signature;
-    }
-
     @Override // kotlin.reflect.KCallable
-    public List<?> getTypeParameters() {
+    public List<Object> getTypeParameters() {
         return getReflected().getTypeParameters();
     }
 
@@ -133,15 +124,27 @@ public abstract class CallableReference implements KCallable, Serializable {
         return getReflected().isSuspend();
     }
 
-    public CallableReference(Object obj) {
-        this(obj, null, null, null, false);
+    /* loaded from: classes.dex */
+    public static class NoReceiver implements Serializable {
+        public static final NoReceiver INSTANCE = new NoReceiver();
+
+        private NoReceiver() {
+        }
+
+        private Object readResolve() throws ObjectStreamException {
+            return INSTANCE;
+        }
     }
 
-    public CallableReference(Object obj, Class cls, String str, String str2, boolean z) {
-        this.receiver = obj;
-        this.owner = cls;
-        this.name = str;
-        this.signature = str2;
-        this.isTopLevel = z;
+    public Object getBoundReceiver() {
+        return this.receiver;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public String getSignature() {
+        return this.signature;
     }
 }

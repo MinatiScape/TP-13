@@ -17,15 +17,13 @@ import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalS
 import android.util.ArraySet;
 import android.util.Log;
 import android.view.LayoutInflater;
-import com.android.customization.picker.WallpaperPreviewer$$ExternalSyntheticLambda1;
 import com.android.internal.annotations.VisibleForTesting;
 import com.android.systemui.plugins.Plugin;
 import com.android.systemui.plugins.PluginListener;
 import com.android.systemui.shared.plugins.PluginEnabler;
 import com.android.systemui.shared.plugins.PluginInstance;
 import com.android.systemui.shared.plugins.VersionInfo;
-import com.android.wallpaper.picker.ImagePreviewFragment$4$$ExternalSyntheticLambda0;
-import com.android.wallpaper.util.DiskBasedLogger$$ExternalSyntheticLambda1;
+import com.android.wallpaper.asset.Asset$$ExternalSyntheticLambda1;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -62,6 +60,10 @@ public class PluginActionManager<T extends Plugin> {
         private final PluginInstance.Factory mPluginInstanceFactory;
         private final List<String> mPrivilegedPlugins;
 
+        public <T extends Plugin> PluginActionManager<T> create(String str, PluginListener<T> pluginListener, Class<T> cls, boolean z, boolean z2) {
+            return new PluginActionManager<>(this.mContext, this.mPackageManager, str, pluginListener, cls, z, this.mMainExecutor, this.mBgExecutor, z2, this.mNotificationManager, this.mPluginEnabler, this.mPrivilegedPlugins, this.mPluginInstanceFactory);
+        }
+
         public Factory(Context context, PackageManager packageManager, Executor executor, Executor executor2, NotificationManager notificationManager, PluginEnabler pluginEnabler, List<String> list, PluginInstance.Factory factory) {
             this.mContext = context;
             this.mPackageManager = packageManager;
@@ -72,26 +74,12 @@ public class PluginActionManager<T extends Plugin> {
             this.mPrivilegedPlugins = list;
             this.mPluginInstanceFactory = factory;
         }
-
-        public <T extends Plugin> PluginActionManager<T> create(String str, PluginListener<T> pluginListener, Class<T> cls, boolean z, boolean z2) {
-            return new PluginActionManager<>(this.mContext, this.mPackageManager, str, pluginListener, cls, z, this.mMainExecutor, this.mBgExecutor, z2, this.mNotificationManager, this.mPluginEnabler, this.mPrivilegedPlugins, this.mPluginInstanceFactory);
-        }
     }
 
     /* loaded from: classes.dex */
     public static class PluginContextWrapper extends ContextWrapper {
         private final ClassLoader mClassLoader;
         private LayoutInflater mInflater;
-
-        public PluginContextWrapper(Context context, ClassLoader classLoader) {
-            super(context);
-            this.mClassLoader = classLoader;
-        }
-
-        @Override // android.content.ContextWrapper, android.content.Context
-        public ClassLoader getClassLoader() {
-            return this.mClassLoader;
-        }
 
         @Override // android.content.ContextWrapper, android.content.Context
         public Object getSystemService(String str) {
@@ -103,26 +91,44 @@ public class PluginActionManager<T extends Plugin> {
             }
             return this.mInflater;
         }
-    }
 
-    public static /* synthetic */ void $r8$lambda$8TM7K2rxqRKfAu55Vw3Zcf26ozs(PluginActionManager pluginActionManager, PluginInstance pluginInstance) {
-        pluginActionManager.lambda$handleQueryPlugins$5(pluginInstance);
-    }
-
-    public static /* synthetic */ void $r8$lambda$nTrqaXNoyZ9Ewe_oMzlt3sqKZco(PluginActionManager pluginActionManager, String str) {
-        pluginActionManager.lambda$reloadPackage$2(str);
-    }
-
-    private boolean disable(PluginInstance<T> pluginInstance, @PluginEnabler.DisableReason int i) {
-        ComponentName componentName = pluginInstance.getComponentName();
-        if (isPluginPrivileged(componentName)) {
-            return false;
+        public PluginContextWrapper(Context context, ClassLoader classLoader) {
+            super(context);
+            this.mClassLoader = classLoader;
         }
-        StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Disabling plugin ");
-        m.append(componentName.flattenToShortString());
-        Log.w(TAG, m.toString());
-        this.mPluginEnabler.setDisabled(componentName, i);
-        return true;
+
+        @Override // android.content.ContextWrapper, android.content.Context
+        public ClassLoader getClassLoader() {
+            return this.mClassLoader;
+        }
+    }
+
+    /* renamed from: $r8$lambda$tRQyi7k9O-R4crA50YERIw8utIE */
+    public static /* synthetic */ void m19$r8$lambda$tRQyi7k9OR4crA50YERIw8utIE(PluginActionManager pluginActionManager, String str) {
+        pluginActionManager.lambda$onPackageRemoved$1(str);
+    }
+
+    public String toString() {
+        return String.format("%s@%s (action=%s)", getClass().getSimpleName(), Integer.valueOf(hashCode()), this.mAction);
+    }
+
+    private PluginActionManager(Context context, PackageManager packageManager, String str, PluginListener<T> pluginListener, Class<T> cls, boolean z, Executor executor, Executor executor2, boolean z2, NotificationManager notificationManager, PluginEnabler pluginEnabler, List<String> list, PluginInstance.Factory factory) {
+        ArraySet<String> arraySet = new ArraySet<>();
+        this.mPrivilegedPlugins = arraySet;
+        this.mPluginInstances = new ArrayList<>();
+        this.mPluginClass = cls;
+        this.mMainExecutor = executor;
+        this.mBgExecutor = executor2;
+        this.mContext = context;
+        this.mPm = packageManager;
+        this.mAction = str;
+        this.mListener = pluginListener;
+        this.mAllowMultiple = z;
+        this.mNotificationManager = notificationManager;
+        this.mPluginEnabler = pluginEnabler;
+        this.mPluginInstanceFactory = factory;
+        arraySet.addAll(list);
+        this.mIsDebuggable = z2;
     }
 
     private void handleQueryPlugins(String str) {
@@ -137,7 +143,7 @@ public class PluginActionManager<T extends Plugin> {
                 PluginInstance<T> loadPluginComponent = loadPluginComponent(new ComponentName(serviceInfo.packageName, serviceInfo.name));
                 if (loadPluginComponent != null) {
                     this.mPluginInstances.add(loadPluginComponent);
-                    this.mMainExecutor.execute(new ImagePreviewFragment$4$$ExternalSyntheticLambda0(this, loadPluginComponent));
+                    this.mMainExecutor.execute(new PluginActionManager$$ExternalSyntheticLambda1(this, loadPluginComponent, 0));
                 }
             }
             return;
@@ -145,11 +151,6 @@ public class PluginActionManager<T extends Plugin> {
         StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Multiple plugins found for ");
         m.append(this.mAction);
         Log.w(TAG, m.toString());
-    }
-
-    public /* synthetic */ void lambda$reloadPackage$2(String str) {
-        lambda$onPackageRemoved$1(str);
-        queryPkg(str);
     }
 
     private PluginInstance<T> loadPluginComponent(ComponentName componentName) {
@@ -191,7 +192,13 @@ public class PluginActionManager<T extends Plugin> {
 
     public void queryAll() {
         for (int size = this.mPluginInstances.size() - 1; size >= 0; size--) {
-            this.mMainExecutor.execute(new WallpaperPreviewer$$ExternalSyntheticLambda1(this, this.mPluginInstances.get(size)));
+            final PluginInstance<T> pluginInstance = this.mPluginInstances.get(size);
+            this.mMainExecutor.execute(new Runnable() { // from class: com.android.systemui.shared.plugins.PluginActionManager$$ExternalSyntheticLambda3
+                @Override // java.lang.Runnable
+                public final void run() {
+                    PluginActionManager.this.lambda$queryAll$3(pluginInstance);
+                }
+            });
         }
         this.mPluginInstances.clear();
         handleQueryPlugins(null);
@@ -206,37 +213,17 @@ public class PluginActionManager<T extends Plugin> {
     /* renamed from: removePkg */
     public void lambda$onPackageRemoved$1(String str) {
         for (int size = this.mPluginInstances.size() - 1; size >= 0; size--) {
-            PluginInstance<T> pluginInstance = this.mPluginInstances.get(size);
+            final PluginInstance<T> pluginInstance = this.mPluginInstances.get(size);
             if (pluginInstance.getPackage().equals(str)) {
-                this.mMainExecutor.execute(new PluginActionManager$$ExternalSyntheticLambda0(this, pluginInstance, 1));
+                this.mMainExecutor.execute(new Runnable() { // from class: com.android.systemui.shared.plugins.PluginActionManager$$ExternalSyntheticLambda2
+                    @Override // java.lang.Runnable
+                    public final void run() {
+                        PluginActionManager.this.lambda$removePkg$4(pluginInstance);
+                    }
+                });
                 this.mPluginInstances.remove(size);
             }
         }
-    }
-
-    private void reportInvalidVersion(ComponentName componentName, String str, VersionInfo.InvalidVersionException invalidVersionException) {
-        Notification.Builder color = new Notification.Builder(this.mContext, PluginManager.NOTIFICATION_CHANNEL_ID).setStyle(new Notification.BigTextStyle()).setSmallIcon(Resources.getSystem().getIdentifier("stat_sys_warning", "drawable", "android")).setWhen(0L).setShowWhen(false).setVisibility(1).setColor(this.mContext.getColor(Resources.getSystem().getIdentifier("system_notification_accent_color", "color", "android")));
-        try {
-            str = this.mPm.getServiceInfo(componentName, 0).loadLabel(this.mPm).toString();
-        } catch (PackageManager.NameNotFoundException unused) {
-        }
-        if (!invalidVersionException.isTooNew()) {
-            Notification.Builder contentTitle = color.setContentTitle("Plugin \"" + str + "\" is too old");
-            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Contact plugin developer to get an updated version.\n");
-            m.append(invalidVersionException.getMessage());
-            contentTitle.setContentText(m.toString());
-        } else {
-            Notification.Builder contentTitle2 = color.setContentTitle("Plugin \"" + str + "\" is too new");
-            StringBuilder m2 = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Check to see if an OTA is available.\n");
-            m2.append(invalidVersionException.getMessage());
-            contentTitle2.setContentText(m2.toString());
-        }
-        Intent intent = new Intent(PluginManagerImpl.DISABLE_PLUGIN);
-        StringBuilder m3 = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("package://");
-        m3.append(componentName.flattenToString());
-        color.addAction(new Notification.Action.Builder((Icon) null, "Disable plugin", PendingIntent.getBroadcast(this.mContext, 0, intent.setData(Uri.parse(m3.toString())), 67108864)).build());
-        this.mNotificationManager.notify(6, color.build());
-        Log.w(TAG, "Plugin has invalid interface version " + invalidVersionException.getActualVersion() + ", expected " + invalidVersionException.getExpectedVersion());
     }
 
     public boolean checkAndDisable(String str) {
@@ -256,7 +243,10 @@ public class PluginActionManager<T extends Plugin> {
         while (it.hasNext()) {
             PluginInstance pluginInstance = (PluginInstance) it.next();
             if (pluginInstance.containsPluginClass(plugin.getClass())) {
-                return pluginInstance.getVersionInfo() != null && pluginInstance.getVersionInfo().hasClass(cls);
+                if (pluginInstance.getVersionInfo() == null || !pluginInstance.getVersionInfo().hasClass(cls)) {
+                    return false;
+                }
+                return true;
             }
         }
         return false;
@@ -265,7 +255,13 @@ public class PluginActionManager<T extends Plugin> {
     public void destroy() {
         Iterator it = new ArrayList(this.mPluginInstances).iterator();
         while (it.hasNext()) {
-            this.mMainExecutor.execute(new PluginActionManager$$ExternalSyntheticLambda0(this, (PluginInstance) it.next(), 0));
+            final PluginInstance pluginInstance = (PluginInstance) it.next();
+            this.mMainExecutor.execute(new Runnable() { // from class: com.android.systemui.shared.plugins.PluginActionManager$$ExternalSyntheticLambda4
+                @Override // java.lang.Runnable
+                public final void run() {
+                    PluginActionManager.this.lambda$destroy$0(pluginInstance);
+                }
+            });
         }
     }
 
@@ -295,37 +291,61 @@ public class PluginActionManager<T extends Plugin> {
     }
 
     public void loadAll() {
-        this.mBgExecutor.execute(new DiskBasedLogger$$ExternalSyntheticLambda1(this));
+        this.mBgExecutor.execute(new PluginActionManager$$ExternalSyntheticLambda0(this, 0));
     }
 
     public void onPackageRemoved(String str) {
-        this.mBgExecutor.execute(new WallpaperPreviewer$$ExternalSyntheticLambda1(this, str));
+        this.mBgExecutor.execute(new Asset$$ExternalSyntheticLambda1(this, str, 2));
     }
 
-    public void reloadPackage(String str) {
-        this.mBgExecutor.execute(new ImagePreviewFragment$4$$ExternalSyntheticLambda0(this, str));
+    public void reloadPackage(final String str) {
+        this.mBgExecutor.execute(new Runnable() { // from class: com.android.systemui.shared.plugins.PluginActionManager$$ExternalSyntheticLambda5
+            @Override // java.lang.Runnable
+            public final void run() {
+                PluginActionManager.this.lambda$reloadPackage$2(str);
+            }
+        });
     }
 
-    public String toString() {
-        return String.format("%s@%s (action=%s)", getClass().getSimpleName(), Integer.valueOf(hashCode()), this.mAction);
+    private boolean disable(PluginInstance<T> pluginInstance, @PluginEnabler.DisableReason int i) {
+        ComponentName componentName = pluginInstance.getComponentName();
+        if (isPluginPrivileged(componentName)) {
+            return false;
+        }
+        StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Disabling plugin ");
+        m.append(componentName.flattenToShortString());
+        Log.w(TAG, m.toString());
+        this.mPluginEnabler.setDisabled(componentName, i);
+        return true;
     }
 
-    private PluginActionManager(Context context, PackageManager packageManager, String str, PluginListener<T> pluginListener, Class<T> cls, boolean z, Executor executor, Executor executor2, boolean z2, NotificationManager notificationManager, PluginEnabler pluginEnabler, List<String> list, PluginInstance.Factory factory) {
-        ArraySet<String> arraySet = new ArraySet<>();
-        this.mPrivilegedPlugins = arraySet;
-        this.mPluginInstances = new ArrayList<>();
-        this.mPluginClass = cls;
-        this.mMainExecutor = executor;
-        this.mBgExecutor = executor2;
-        this.mContext = context;
-        this.mPm = packageManager;
-        this.mAction = str;
-        this.mListener = pluginListener;
-        this.mAllowMultiple = z;
-        this.mNotificationManager = notificationManager;
-        this.mPluginEnabler = pluginEnabler;
-        this.mPluginInstanceFactory = factory;
-        arraySet.addAll(list);
-        this.mIsDebuggable = z2;
+    public /* synthetic */ void lambda$reloadPackage$2(String str) {
+        lambda$onPackageRemoved$1(str);
+        queryPkg(str);
+    }
+
+    private void reportInvalidVersion(ComponentName componentName, String str, VersionInfo.InvalidVersionException invalidVersionException) {
+        Notification.Builder color = new Notification.Builder(this.mContext, PluginManager.NOTIFICATION_CHANNEL_ID).setStyle(new Notification.BigTextStyle()).setSmallIcon(Resources.getSystem().getIdentifier("stat_sys_warning", "drawable", "android")).setWhen(0L).setShowWhen(false).setVisibility(1).setColor(this.mContext.getColor(Resources.getSystem().getIdentifier("system_notification_accent_color", "color", "android")));
+        try {
+            str = this.mPm.getServiceInfo(componentName, 0).loadLabel(this.mPm).toString();
+        } catch (PackageManager.NameNotFoundException unused) {
+        }
+        if (!invalidVersionException.isTooNew()) {
+            Notification.Builder contentTitle = color.setContentTitle("Plugin \"" + str + "\" is too old");
+            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Contact plugin developer to get an updated version.\n");
+            m.append(invalidVersionException.getMessage());
+            contentTitle.setContentText(m.toString());
+        } else {
+            Notification.Builder contentTitle2 = color.setContentTitle("Plugin \"" + str + "\" is too new");
+            StringBuilder m2 = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Check to see if an OTA is available.\n");
+            m2.append(invalidVersionException.getMessage());
+            contentTitle2.setContentText(m2.toString());
+        }
+        Intent intent = new Intent(PluginManagerImpl.DISABLE_PLUGIN);
+        StringBuilder m3 = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("package://");
+        m3.append(componentName.flattenToString());
+        color.addAction(new Notification.Action.Builder((Icon) null, "Disable plugin", PendingIntent.getBroadcast(this.mContext, 0, intent.setData(Uri.parse(m3.toString())), 67108864)).build());
+        this.mNotificationManager.notify(6, color.build());
+        Log.w(TAG, "Plugin has invalid interface version " + invalidVersionException.getActualVersion() + ", expected " + invalidVersionException.getExpectedVersion());
     }
 }

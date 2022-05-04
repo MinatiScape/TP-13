@@ -6,23 +6,8 @@ import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.view.Display;
-import com.android.systemui.shared.system.WallpaperManagerCompat;
 /* loaded from: classes.dex */
 public final class WallpaperCropUtils {
-    public static void adjustCropRect(Context context, Rect rect, boolean z) {
-        float centerX = rect.centerX();
-        float centerY = rect.centerY();
-        float width = rect.width();
-        float height = rect.height();
-        float wallpaperZoomOutMaxScale = WallpaperManagerCompat.getWallpaperZoomOutMaxScale(context);
-        if (!z) {
-            wallpaperZoomOutMaxScale = 1.0f / wallpaperZoomOutMaxScale;
-        }
-        float f = (width / 2.0f) / wallpaperZoomOutMaxScale;
-        float f2 = (height / 2.0f) / wallpaperZoomOutMaxScale;
-        rect.set((int) (centerX - f), (int) (centerY - f2), (int) (centerX + f), (int) (centerY + f2));
-    }
-
     public static Rect calculateCropRect(Context context, float f, Point point, Point point2, Point point3, int i, int i2) {
         int round = Math.round(point.x * f);
         int round2 = Math.round(point.y * f);
@@ -43,26 +28,15 @@ public final class WallpaperCropUtils {
         return rect2;
     }
 
-    public static Point calculateCropSurfaceSize(Resources resources, int i, int i2, int i3, int i4) {
-        int i5;
-        if (resources.getConfiguration().smallestScreenWidthDp >= 720) {
-            float f = i;
-            i5 = (int) (f * (((f / i2) * (-0.30769226f)) + 1.6923077f));
-        } else {
-            i5 = Math.max((int) (i2 * 2.0f), i);
-        }
-        if (i3 >= i4) {
-            i = i2;
-        }
-        return new Point(i5, i);
-    }
-
     public static float calculateMinZoom(Point point, Point point2) {
         float f = point2.x;
         float f2 = point2.y;
         float f3 = point.x;
         float f4 = point.y;
-        return f / f2 > f3 / f4 ? f / f3 : f2 / f4;
+        if (f / f2 > f3 / f4) {
+            return f / f3;
+        }
+        return f2 / f4;
     }
 
     public static Rect calculateVisibleRect(Point point, Point point2) {
@@ -81,6 +55,40 @@ public final class WallpaperCropUtils {
         return new Rect((int) (f7 - f8), 0, (int) (f7 + f8), point.y);
     }
 
+    public static Point getDefaultCropSurfaceSize(Resources resources, Display display) {
+        Point point = new Point();
+        Point point2 = new Point();
+        display.getCurrentSizeRange(point, point2);
+        Math.max(point2.x, point2.y);
+        Math.max(point.x, point.y);
+        Point point3 = new Point();
+        display.getRealSize(point3);
+        return calculateCropSurfaceSize(resources, Math.max(point3.x, point3.y), Math.min(point3.x, point3.y), display.getWidth(), display.getHeight());
+    }
+
+    public static void adjustCropRect(Context context, Rect rect) {
+        float centerX = rect.centerX();
+        float centerY = rect.centerY();
+        float f = context.getResources().getFloat(Resources.getSystem().getIdentifier("config_wallpaperMaxScale", "dimen", "android"));
+        float width = (rect.width() / 2.0f) / f;
+        float height = (rect.height() / 2.0f) / f;
+        rect.set((int) (centerX - width), (int) (centerY - height), (int) (centerX + width), (int) (centerY + height));
+    }
+
+    public static Point calculateCropSurfaceSize(Resources resources, int i, int i2, int i3, int i4) {
+        int i5;
+        if (resources.getConfiguration().smallestScreenWidthDp >= 720) {
+            float f = i;
+            i5 = (int) ((((f / i2) * (-0.30769226f)) + 1.6923077f) * f);
+        } else {
+            i5 = Math.max((int) (i2 * 2.0f), i);
+        }
+        if (i3 >= i4) {
+            i = i2;
+        }
+        return new Point(i5, i);
+    }
+
     public static void fitToSize(Rect rect, int i, int i2) {
         if (!rect.isEmpty()) {
             float max = Math.max(i, i2) / Math.max(rect.width(), rect.height());
@@ -93,22 +101,10 @@ public final class WallpaperCropUtils {
         }
     }
 
-    public static Point getDefaultCropSurfaceSize(Resources resources, Display display) {
-        Point point = new Point();
-        Point point2 = new Point();
-        display.getCurrentSizeRange(point, point2);
-        Math.max(point2.x, point2.y);
-        Math.max(point.x, point.y);
-        Point point3 = new Point();
-        display.getRealSize(point3);
-        return calculateCropSurfaceSize(resources, Math.max(point3.x, point3.y), Math.min(point3.x, point3.y), display.getWidth(), display.getHeight());
-    }
-
     public static boolean isRtl(Context context) {
-        return context.getResources().getConfiguration().getLayoutDirection() == 1;
-    }
-
-    public static Rect calculateCropRect(Context context, Point point, Point point2, Point point3, Rect rect, float f) {
-        return calculateCropRect(context, f, point3, point2, point, (int) (rect.left * f), (int) (rect.top * f));
+        if (context.getResources().getConfiguration().getLayoutDirection() == 1) {
+            return true;
+        }
+        return false;
     }
 }

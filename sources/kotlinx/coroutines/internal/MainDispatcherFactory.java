@@ -4,6 +4,7 @@ import java.util.List;
 import kotlinx.coroutines.MainCoroutineDispatcher;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: MainDispatcherFactory.kt */
 /* loaded from: classes.dex */
 public interface MainDispatcherFactory {
     @NotNull

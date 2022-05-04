@@ -6,7 +6,6 @@ import com.google.protobuf.MessageLiteOrBuilder;
 import com.google.protobuf.Parser;
 import com.google.protobuf.ProtobufArrayList;
 import com.google.protobuf.RawMessageInfo;
-import java.util.List;
 /* loaded from: classes.dex */
 public final class ImaxWallpaperProto$GetCollectionsResponse extends GeneratedMessageLite<ImaxWallpaperProto$GetCollectionsResponse, Builder> implements MessageLiteOrBuilder {
     public static final int COLLECTIONS_FIELD_NUMBER = 1;
@@ -16,7 +15,7 @@ public final class ImaxWallpaperProto$GetCollectionsResponse extends GeneratedMe
 
     /* loaded from: classes.dex */
     public static final class Builder extends GeneratedMessageLite.Builder<ImaxWallpaperProto$GetCollectionsResponse, Builder> implements MessageLiteOrBuilder {
-        public Builder(ImaxWallpaperProto$1 imaxWallpaperProto$1) {
+        public Builder() {
             super(ImaxWallpaperProto$GetCollectionsResponse.DEFAULT_INSTANCE);
         }
     }
@@ -28,11 +27,11 @@ public final class ImaxWallpaperProto$GetCollectionsResponse extends GeneratedMe
     }
 
     public static Parser<ImaxWallpaperProto$GetCollectionsResponse> parser() {
-        return DEFAULT_INSTANCE.getParserForType();
+        return (Parser) DEFAULT_INSTANCE.dynamicMethod(GeneratedMessageLite.MethodToInvoke.GET_PARSER);
     }
 
     @Override // com.google.protobuf.GeneratedMessageLite
-    public final Object dynamicMethod(GeneratedMessageLite.MethodToInvoke methodToInvoke, Object obj, Object obj2) {
+    public final Object dynamicMethod(GeneratedMessageLite.MethodToInvoke methodToInvoke) {
         switch (methodToInvoke.ordinal()) {
             case 0:
                 return (byte) 1;
@@ -43,7 +42,7 @@ public final class ImaxWallpaperProto$GetCollectionsResponse extends GeneratedMe
             case 3:
                 return new ImaxWallpaperProto$GetCollectionsResponse();
             case 4:
-                return new Builder(null);
+                return new Builder();
             case 5:
                 return DEFAULT_INSTANCE;
             case 6:
@@ -63,7 +62,7 @@ public final class ImaxWallpaperProto$GetCollectionsResponse extends GeneratedMe
         }
     }
 
-    public List<ImaxWallpaperProto$Collection> getCollectionsList() {
+    public final Internal.ProtobufList getCollectionsList() {
         return this.collections_;
     }
 }

@@ -11,8 +11,16 @@ public class DialogTitle extends AppCompatTextView {
         super(context, attributeSet, i);
     }
 
+    public DialogTitle(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet);
+    }
+
+    public DialogTitle(Context context) {
+        super(context);
+    }
+
     @Override // androidx.appcompat.widget.AppCompatTextView, android.widget.TextView, android.view.View
-    public void onMeasure(int i, int i2) {
+    public final void onMeasure(int i, int i2) {
         int lineCount;
         super.onMeasure(i, i2);
         Layout layout = getLayout();
@@ -27,13 +35,5 @@ public class DialogTitle extends AppCompatTextView {
             obtainStyledAttributes.recycle();
             super.onMeasure(i, i2);
         }
-    }
-
-    public DialogTitle(Context context, AttributeSet attributeSet) {
-        super(context, attributeSet);
-    }
-
-    public DialogTitle(Context context) {
-        super(context);
     }
 }

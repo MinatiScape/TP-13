@@ -18,27 +18,6 @@ public final class ExpandedMenuView extends ListView implements MenuBuilder.Item
         this(context, attributeSet, 16842868);
     }
 
-    @Override // androidx.appcompat.view.menu.MenuView
-    public void initialize(MenuBuilder menuBuilder) {
-        this.mMenu = menuBuilder;
-    }
-
-    @Override // androidx.appcompat.view.menu.MenuBuilder.ItemInvoker
-    public boolean invokeItem(MenuItemImpl menuItemImpl) {
-        return this.mMenu.performItemAction(menuItemImpl, null, 0);
-    }
-
-    @Override // android.widget.ListView, android.widget.AbsListView, android.widget.AdapterView, android.view.ViewGroup, android.view.View
-    public void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        setChildrenDrawingCacheEnabled(false);
-    }
-
-    @Override // android.widget.AdapterView.OnItemClickListener
-    public void onItemClick(AdapterView adapterView, View view, int i, long j) {
-        invokeItem((MenuItemImpl) getAdapter().getItem(i));
-    }
-
     public ExpandedMenuView(Context context, AttributeSet attributeSet, int i) {
         super(context, attributeSet);
         Drawable drawable;
@@ -64,5 +43,26 @@ public final class ExpandedMenuView extends ListView implements MenuBuilder.Item
             setDivider(drawable);
         }
         obtainStyledAttributes.recycle();
+    }
+
+    @Override // androidx.appcompat.view.menu.MenuBuilder.ItemInvoker
+    public final boolean invokeItem(MenuItemImpl menuItemImpl) {
+        return this.mMenu.performItemAction(menuItemImpl, null, 0);
+    }
+
+    @Override // android.widget.ListView, android.widget.AbsListView, android.widget.AdapterView, android.view.ViewGroup, android.view.View
+    public final void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        setChildrenDrawingCacheEnabled(false);
+    }
+
+    @Override // android.widget.AdapterView.OnItemClickListener
+    public final void onItemClick(AdapterView adapterView, View view, int i, long j) {
+        invokeItem((MenuItemImpl) getAdapter().getItem(i));
+    }
+
+    @Override // androidx.appcompat.view.menu.MenuView
+    public final void initialize(MenuBuilder menuBuilder) {
+        this.mMenu = menuBuilder;
     }
 }

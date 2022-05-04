@@ -2,51 +2,27 @@ package com.android.wallpaper.model;
 
 import android.app.WallpaperInfo;
 import android.content.Context;
-import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
+import com.android.systemui.shared.plugins.PluginActionManager$$ExternalSyntheticLambda1;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 /* loaded from: classes.dex */
-public class ThirdPartyLiveWallpaperCategory extends WallpaperCategory {
+public final class ThirdPartyLiveWallpaperCategory extends WallpaperCategory {
+    public static final ExecutorService sExecutorService = Executors.newCachedThreadPool();
     public final Set<String> mExcludedPackages;
 
-    /* loaded from: classes.dex */
-    public class FetchLiveWallpapersTask extends AsyncTask<Void, Void, Void> {
-        public final List<WallpaperInfo> mCategoryWallpapers;
-        public final Context mContext;
-        public final Set<String> mExcludedPackages;
-        public final WallpaperReceiver mReceiver;
-
-        public FetchLiveWallpapersTask(Context context, List<WallpaperInfo> list, Set<String> set, WallpaperReceiver wallpaperReceiver) {
-            this.mContext = context;
-            this.mCategoryWallpapers = list;
-            this.mExcludedPackages = set;
-            this.mReceiver = wallpaperReceiver;
-        }
-
-        @Override // android.os.AsyncTask
-        public Void doInBackground(Void[] voidArr) {
-            List<WallpaperInfo> all = LiveWallpaperInfo.getAll(this.mContext, this.mExcludedPackages);
-            synchronized (ThirdPartyLiveWallpaperCategory.this.mWallpapersLock) {
-                this.mCategoryWallpapers.clear();
-                this.mCategoryWallpapers.addAll(all);
-            }
-            return null;
-        }
-
-        @Override // android.os.AsyncTask
-        public void onPostExecute(Void r2) {
-            this.mReceiver.onWallpapersReceived(new ArrayList(this.mCategoryWallpapers));
-        }
-    }
-
-    public ThirdPartyLiveWallpaperCategory(String str, String str2, List<WallpaperInfo> list, int i, Set<String> set) {
-        super(str, str2, list, i);
-        this.mExcludedPackages = set;
+    public ThirdPartyLiveWallpaperCategory(String str, String str2, ArrayList arrayList, HashSet hashSet) {
+        super(str, str2, arrayList, 300);
+        this.mExcludedPackages = hashSet;
     }
 
     @Override // com.android.wallpaper.model.WallpaperCategory, com.android.wallpaper.model.Category
-    public boolean containsThirdParty(String str) {
+    public final boolean containsThirdParty(String str) {
         synchronized (this.mWallpapersLock) {
             for (WallpaperInfo wallpaperInfo : this.mWallpapers) {
                 WallpaperInfo wallpaperComponent = wallpaperInfo.getWallpaperComponent();
@@ -59,9 +35,23 @@ public class ThirdPartyLiveWallpaperCategory extends WallpaperCategory {
     }
 
     @Override // com.android.wallpaper.model.WallpaperCategory
-    public void fetchWallpapers(Context context, WallpaperReceiver wallpaperReceiver, boolean z) {
+    public final void fetchWallpapers(final Context context, final WallpaperReceiver wallpaperReceiver, boolean z) {
         if (z) {
-            new FetchLiveWallpapersTask(context, this.mWallpapers, this.mExcludedPackages, wallpaperReceiver).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Void[0]);
+            sExecutorService.execute(new Runnable() { // from class: com.android.wallpaper.model.ThirdPartyLiveWallpaperCategory$$ExternalSyntheticLambda0
+                @Override // java.lang.Runnable
+                public final void run() {
+                    ThirdPartyLiveWallpaperCategory thirdPartyLiveWallpaperCategory = ThirdPartyLiveWallpaperCategory.this;
+                    Context context2 = context;
+                    WallpaperReceiver wallpaperReceiver2 = wallpaperReceiver;
+                    List<WallpaperInfo> list = thirdPartyLiveWallpaperCategory.mWallpapers;
+                    ArrayList all = LiveWallpaperInfo.getAll(context2, thirdPartyLiveWallpaperCategory.mExcludedPackages);
+                    synchronized (thirdPartyLiveWallpaperCategory.mWallpapersLock) {
+                        list.clear();
+                        list.addAll(all);
+                    }
+                    new Handler(Looper.getMainLooper()).post(new PluginActionManager$$ExternalSyntheticLambda1(wallpaperReceiver2, list, 1));
+                }
+            });
         } else {
             super.fetchWallpapers(context, wallpaperReceiver, z);
         }

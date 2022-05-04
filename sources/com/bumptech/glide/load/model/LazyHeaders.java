@@ -1,7 +1,7 @@
 package com.bumptech.glide.load.model;
 
+import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 import android.text.TextUtils;
-import com.adobe.xmp.XMPPathFactory$$ExternalSyntheticOutline0;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -15,15 +15,6 @@ public final class LazyHeaders implements Headers {
     public static final class Builder {
         public static final Map<String, List<LazyHeaderFactory>> DEFAULT_HEADERS;
         public Map<String, List<LazyHeaderFactory>> headers = DEFAULT_HEADERS;
-
-        static {
-            String sanitizedUserAgent = getSanitizedUserAgent();
-            HashMap hashMap = new HashMap(2);
-            if (!TextUtils.isEmpty(sanitizedUserAgent)) {
-                hashMap.put("User-Agent", Collections.singletonList(new StringHeaderFactory(sanitizedUserAgent)));
-            }
-            DEFAULT_HEADERS = Collections.unmodifiableMap(hashMap);
-        }
 
         public static String getSanitizedUserAgent() {
             String property = System.getProperty("http.agent");
@@ -42,55 +33,58 @@ public final class LazyHeaders implements Headers {
             }
             return sb.toString();
         }
+
+        static {
+            String sanitizedUserAgent = getSanitizedUserAgent();
+            HashMap hashMap = new HashMap(2);
+            if (!TextUtils.isEmpty(sanitizedUserAgent)) {
+                hashMap.put("User-Agent", Collections.singletonList(new StringHeaderFactory(sanitizedUserAgent)));
+            }
+            DEFAULT_HEADERS = Collections.unmodifiableMap(hashMap);
+        }
     }
 
     /* loaded from: classes.dex */
     public static final class StringHeaderFactory implements LazyHeaderFactory {
         public final String value;
 
-        public StringHeaderFactory(String value) {
-            this.value = value;
-        }
-
-        @Override // com.bumptech.glide.load.model.LazyHeaderFactory
-        public String buildHeader() {
-            return this.value;
-        }
-
-        public boolean equals(Object o) {
-            if (o instanceof StringHeaderFactory) {
-                return this.value.equals(((StringHeaderFactory) o).value);
+        public final boolean equals(Object obj) {
+            if (obj instanceof StringHeaderFactory) {
+                return this.value.equals(((StringHeaderFactory) obj).value);
             }
             return false;
         }
 
-        public int hashCode() {
+        public final int hashCode() {
             return this.value.hashCode();
         }
 
-        public String toString() {
-            String str = this.value;
-            StringBuilder sb = new StringBuilder(XMPPathFactory$$ExternalSyntheticOutline0.m(str, 29));
-            sb.append("StringHeaderFactory{value='");
-            sb.append(str);
-            sb.append('\'');
-            sb.append('}');
-            return sb.toString();
+        public final String toString() {
+            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("StringHeaderFactory{value='");
+            m.append(this.value);
+            m.append('\'');
+            m.append('}');
+            return m.toString();
+        }
+
+        public StringHeaderFactory(String str) {
+            this.value = str;
+        }
+
+        @Override // com.bumptech.glide.load.model.LazyHeaderFactory
+        public final String buildHeader() {
+            return this.value;
         }
     }
 
-    public LazyHeaders(Map<String, List<LazyHeaderFactory>> headers) {
-        this.headers = Collections.unmodifiableMap(headers);
-    }
-
-    public boolean equals(Object o) {
-        if (o instanceof LazyHeaders) {
-            return this.headers.equals(((LazyHeaders) o).headers);
+    public final boolean equals(Object obj) {
+        if (obj instanceof LazyHeaders) {
+            return this.headers.equals(((LazyHeaders) obj).headers);
         }
         return false;
     }
 
-    public final Map<String, String> generateHeaders() {
+    public final HashMap generateHeaders() {
         HashMap hashMap = new HashMap();
         for (Map.Entry<String, List<LazyHeaderFactory>> entry : this.headers.entrySet()) {
             List<LazyHeaderFactory> value = entry.getValue();
@@ -114,7 +108,7 @@ public final class LazyHeaders implements Headers {
     }
 
     @Override // com.bumptech.glide.load.model.Headers
-    public Map<String, String> getHeaders() {
+    public final Map<String, String> getHeaders() {
         if (this.combinedHeaders == null) {
             synchronized (this) {
                 if (this.combinedHeaders == null) {
@@ -125,16 +119,18 @@ public final class LazyHeaders implements Headers {
         return this.combinedHeaders;
     }
 
-    public int hashCode() {
+    public final int hashCode() {
         return this.headers.hashCode();
     }
 
-    public String toString() {
-        String valueOf = String.valueOf(this.headers);
-        StringBuilder sb = new StringBuilder(valueOf.length() + 21);
-        sb.append("LazyHeaders{headers=");
-        sb.append(valueOf);
-        sb.append('}');
-        return sb.toString();
+    public final String toString() {
+        StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("LazyHeaders{headers=");
+        m.append(this.headers);
+        m.append('}');
+        return m.toString();
+    }
+
+    public LazyHeaders(Map<String, List<LazyHeaderFactory>> map) {
+        this.headers = Collections.unmodifiableMap(map);
     }
 }

@@ -1,9 +1,7 @@
 package com.google.common.base;
 
 import com.google.common.base.CharMatcher;
-import java.io.IOException;
 import java.util.Iterator;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public final class Splitter {
     public final int limit;
@@ -13,7 +11,7 @@ public final class Splitter {
 
     /* renamed from: com.google.common.base.Splitter$5  reason: invalid class name */
     /* loaded from: classes.dex */
-    public class AnonymousClass5 implements Iterable<String> {
+    public final class AnonymousClass5 implements Iterable<String> {
         public final /* synthetic */ CharSequence val$sequence;
 
         public AnonymousClass5(final CharSequence val$sequence) {
@@ -21,55 +19,19 @@ public final class Splitter {
         }
 
         @Override // java.lang.Iterable
-        public Iterator<String> iterator() {
+        public final Iterator<String> iterator() {
             Splitter splitter = Splitter.this;
             return splitter.strategy.iterator(splitter, this.val$sequence);
         }
 
-        public String toString() {
-            Objects.requireNonNull(", ");
+        public final String toString() {
+            Joiner joiner = new Joiner(", ");
             StringBuilder sb = new StringBuilder();
             sb.append('[');
-            Iterator<String> it = iterator();
-            try {
-                Objects.requireNonNull(sb);
-                if (it.hasNext()) {
-                    String next = it.next();
-                    Objects.requireNonNull(next);
-                    sb.append((CharSequence) (next instanceof CharSequence ? next : next.toString()));
-                    while (it.hasNext()) {
-                        sb.append((CharSequence) ", ");
-                        String next2 = it.next();
-                        Objects.requireNonNull(next2);
-                        sb.append((CharSequence) (next2 instanceof CharSequence ? next2 : next2.toString()));
-                    }
-                }
-                sb.append(']');
-                return sb.toString();
-            } catch (IOException e) {
-                throw new AssertionError(e);
-            }
+            joiner.appendTo(sb, iterator());
+            sb.append(']');
+            return sb.toString();
         }
-    }
-
-    /* loaded from: classes.dex */
-    public static abstract class SplittingIterator extends AbstractIterator<String> {
-        public int limit;
-        public int offset = 0;
-        public final boolean omitEmptyStrings;
-        public final CharSequence toSplit;
-        public final CharMatcher trimmer;
-
-        public SplittingIterator(Splitter splitter, CharSequence toSplit) {
-            this.trimmer = splitter.trimmer;
-            this.omitEmptyStrings = splitter.omitEmptyStrings;
-            this.limit = splitter.limit;
-            this.toSplit = toSplit;
-        }
-
-        public abstract int separatorEnd(int separatorPosition);
-
-        public abstract int separatorStart(int start);
     }
 
     /* loaded from: classes.dex */
@@ -91,10 +53,10 @@ public final class Splitter {
         }
         return new Splitter(new Strategy() { // from class: com.google.common.base.Splitter.2
             @Override // com.google.common.base.Splitter.Strategy
-            public Iterator iterator(Splitter splitter, CharSequence toSplit) {
+            public final Iterator iterator(Splitter splitter, CharSequence toSplit) {
                 return new SplittingIterator(splitter, toSplit) { // from class: com.google.common.base.Splitter.2.1
                     @Override // com.google.common.base.Splitter.SplittingIterator
-                    public int separatorEnd(int separatorPosition) {
+                    public final int separatorEnd(int separatorPosition) {
                         return separator.length() + separatorPosition;
                     }
 
@@ -106,7 +68,7 @@ public final class Splitter {
                         Code decompiled incorrectly, please refer to instructions dump.
                         To view partially-correct add '--show-bad-code' argument
                     */
-                    public int separatorStart(int r6) {
+                    public final int separatorStart(int r6) {
                         /*
                             r5 = this;
                             com.google.common.base.Splitter$2 r0 = com.google.common.base.Splitter.AnonymousClass2.this
@@ -145,25 +107,40 @@ public final class Splitter {
         });
     }
 
-    public Iterable<String> split(final CharSequence sequence) {
-        Objects.requireNonNull(sequence);
-        return new AnonymousClass5(sequence);
+    /* loaded from: classes.dex */
+    public static abstract class SplittingIterator extends AbstractIterator<String> {
+        public int limit;
+        public int offset = 0;
+        public final boolean omitEmptyStrings;
+        public final CharSequence toSplit;
+        public final CharMatcher trimmer;
+
+        public abstract int separatorEnd(int separatorPosition);
+
+        public abstract int separatorStart(int start);
+
+        public SplittingIterator(Splitter splitter, CharSequence toSplit) {
+            this.trimmer = splitter.trimmer;
+            this.omitEmptyStrings = splitter.omitEmptyStrings;
+            this.limit = splitter.limit;
+            this.toSplit = toSplit;
+        }
     }
 
     public static Splitter on(char separator) {
         final CharMatcher.Is is = new CharMatcher.Is(separator);
         return new Splitter(new Strategy() { // from class: com.google.common.base.Splitter.1
             @Override // com.google.common.base.Splitter.Strategy
-            public Iterator iterator(Splitter splitter, final CharSequence toSplit) {
+            public final Iterator iterator(Splitter splitter, final CharSequence toSplit) {
                 return new SplittingIterator(splitter, toSplit) { // from class: com.google.common.base.Splitter.1.1
                     @Override // com.google.common.base.Splitter.SplittingIterator
-                    public int separatorEnd(int separatorPosition) {
+                    public final int separatorEnd(int separatorPosition) {
                         return separatorPosition + 1;
                     }
 
                     @Override // com.google.common.base.Splitter.SplittingIterator
-                    public int separatorStart(int start) {
-                        return CharMatcher.this.indexIn(this.toSplit, start);
+                    public final int separatorStart(int start) {
+                        return is.indexIn(this.toSplit, start);
                     }
                 };
             }
@@ -171,10 +148,6 @@ public final class Splitter {
     }
 
     public Splitter(Strategy strategy) {
-        CharMatcher.None none = CharMatcher.None.INSTANCE;
-        this.strategy = strategy;
-        this.omitEmptyStrings = false;
-        this.trimmer = none;
-        this.limit = Integer.MAX_VALUE;
+        this(strategy, false, CharMatcher.None.INSTANCE, Integer.MAX_VALUE);
     }
 }

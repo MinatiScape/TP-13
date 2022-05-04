@@ -6,6 +6,11 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 /* loaded from: classes.dex */
 public interface ImageHeaderParser {
+    int getOrientation(InputStream inputStream, ArrayPool arrayPool) throws IOException;
+
+    ImageType getType(InputStream inputStream) throws IOException;
+
+    ImageType getType(ByteBuffer byteBuffer) throws IOException;
 
     /* loaded from: classes.dex */
     public enum ImageType {
@@ -20,18 +25,12 @@ public interface ImageHeaderParser {
         
         private final boolean hasAlpha;
 
-        ImageType(boolean hasAlpha) {
-            this.hasAlpha = hasAlpha;
+        ImageType(boolean z) {
+            this.hasAlpha = z;
         }
 
         public boolean hasAlpha() {
             return this.hasAlpha;
         }
     }
-
-    int getOrientation(InputStream is, ArrayPool byteArrayPool) throws IOException;
-
-    ImageType getType(InputStream is) throws IOException;
-
-    ImageType getType(ByteBuffer byteBuffer) throws IOException;
 }

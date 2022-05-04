@@ -1,26 +1,28 @@
 package com.android.wallpaper.picker;
 
-import android.view.animation.Interpolator;
+import android.view.View;
+import com.android.systemui.shared.rotation.RotationButtonController;
+import com.android.wallpaper.model.LiveWallpaperInfo;
+/* compiled from: R8$$SyntheticClass */
 /* loaded from: classes.dex */
-public final /* synthetic */ class PreviewFragment$$ExternalSyntheticLambda2 implements Runnable {
+public final /* synthetic */ class PreviewFragment$$ExternalSyntheticLambda2 implements View.OnClickListener {
     public final /* synthetic */ int $r8$classId;
-    public final /* synthetic */ PreviewFragment f$0;
+    public final /* synthetic */ Object f$0;
 
-    public /* synthetic */ PreviewFragment$$ExternalSyntheticLambda2(PreviewFragment previewFragment, int i) {
+    public /* synthetic */ PreviewFragment$$ExternalSyntheticLambda2(Object obj, int i) {
         this.$r8$classId = i;
-        this.f$0 = previewFragment;
+        this.f$0 = obj;
     }
 
-    @Override // java.lang.Runnable
-    public final void run() {
+    @Override // android.view.View.OnClickListener
+    public final void onClick(View view) {
         switch (this.$r8$classId) {
             case 0:
-                this.f$0.mFullScreenAnimation.startAnimation(true);
+                PreviewFragment previewFragment = (PreviewFragment) this.f$0;
+                previewFragment.mWallpaperSetter.requestDestination(previewFragment.getActivity(), previewFragment.mFragmentManager, previewFragment, previewFragment.mWallpaper instanceof LiveWallpaperInfo);
                 return;
             default:
-                PreviewFragment previewFragment = this.f$0;
-                Interpolator interpolator = PreviewFragment.ALPHA_OUT;
-                previewFragment.finishActivity(true);
+                ((RotationButtonController) this.f$0).onRotateSuggestionClick(view);
                 return;
         }
     }

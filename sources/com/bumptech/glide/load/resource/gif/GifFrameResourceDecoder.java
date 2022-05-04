@@ -12,17 +12,17 @@ import java.io.IOException;
 public final class GifFrameResourceDecoder implements ResourceDecoder<GifDecoder, Bitmap> {
     public final BitmapPool bitmapPool;
 
+    @Override // com.bumptech.glide.load.ResourceDecoder
+    public final Resource<Bitmap> decode(GifDecoder gifDecoder, int i, int i2, Options options) throws IOException {
+        return BitmapResource.obtain(gifDecoder.getNextFrame(), this.bitmapPool);
+    }
+
+    @Override // com.bumptech.glide.load.ResourceDecoder
+    public final /* bridge */ /* synthetic */ boolean handles(GifDecoder gifDecoder, Options options) throws IOException {
+        return true;
+    }
+
     public GifFrameResourceDecoder(BitmapPool bitmapPool) {
         this.bitmapPool = bitmapPool;
-    }
-
-    @Override // com.bumptech.glide.load.ResourceDecoder
-    public Resource<Bitmap> decode(GifDecoder source, int width, int height, Options options) throws IOException {
-        return BitmapResource.obtain(source.getNextFrame(), this.bitmapPool);
-    }
-
-    @Override // com.bumptech.glide.load.ResourceDecoder
-    public /* bridge */ /* synthetic */ boolean handles(GifDecoder source, Options options) throws IOException {
-        return true;
     }
 }

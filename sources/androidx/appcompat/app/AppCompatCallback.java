@@ -1,11 +1,9 @@
 package androidx.appcompat.app;
-
-import androidx.appcompat.view.ActionMode;
 /* loaded from: classes.dex */
 public interface AppCompatCallback {
-    void onSupportActionModeFinished(ActionMode actionMode);
+    void onSupportActionModeFinished();
 
-    void onSupportActionModeStarted(ActionMode actionMode);
+    void onSupportActionModeStarted();
 
-    ActionMode onWindowStartingSupportActionMode(ActionMode.Callback callback);
+    void onWindowStartingSupportActionMode();
 }

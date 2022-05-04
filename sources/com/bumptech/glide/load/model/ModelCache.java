@@ -3,14 +3,23 @@ package com.bumptech.glide.load.model;
 import com.bumptech.glide.util.LruCache;
 import com.bumptech.glide.util.Util;
 import java.util.ArrayDeque;
-import java.util.Queue;
 /* loaded from: classes.dex */
-public class ModelCache<A, B> {
-    public final LruCache<ModelKey<A>, B> cache;
+public final class ModelCache<A, B> {
+    public final AnonymousClass1 cache = new LruCache<ModelKey<Object>, Object>() { // from class: com.bumptech.glide.load.model.ModelCache.1
+        @Override // com.bumptech.glide.util.LruCache
+        public final void onItemEvicted(ModelKey<Object> modelKey, Object obj) {
+            ModelKey<Object> modelKey2 = modelKey;
+            modelKey2.getClass();
+            ArrayDeque arrayDeque = ModelKey.KEY_QUEUE;
+            synchronized (arrayDeque) {
+                arrayDeque.offer(modelKey2);
+            }
+        }
+    };
 
     /* loaded from: classes.dex */
     public static final class ModelKey<A> {
-        public static final Queue<ModelKey<?>> KEY_QUEUE = new ArrayDeque(0);
+        public static final ArrayDeque KEY_QUEUE = new ArrayDeque(0);
         public int height;
         public A model;
         public int width;
@@ -19,50 +28,52 @@ public class ModelCache<A, B> {
             char[] cArr = Util.HEX_CHAR_ARRAY;
         }
 
-        private ModelKey() {
-        }
-
-        public static <A> ModelKey<A> get(A model, int width, int height) {
-            ModelKey<A> modelKey;
-            Queue<ModelKey<?>> queue = KEY_QUEUE;
-            synchronized (queue) {
-                modelKey = (ModelKey) ((ArrayDeque) queue).poll();
+        /* JADX WARN: Multi-variable type inference failed */
+        public static ModelKey get(Object obj) {
+            ModelKey modelKey;
+            ArrayDeque arrayDeque = KEY_QUEUE;
+            synchronized (arrayDeque) {
+                modelKey = (ModelKey) arrayDeque.poll();
             }
             if (modelKey == null) {
-                modelKey = new ModelKey<>();
+                modelKey = new ModelKey();
             }
-            modelKey.model = model;
-            modelKey.width = width;
-            modelKey.height = height;
+            modelKey.model = obj;
+            modelKey.width = 0;
+            modelKey.height = 0;
             return modelKey;
         }
 
-        public boolean equals(Object o) {
-            if (!(o instanceof ModelKey)) {
+        public final boolean equals(Object obj) {
+            if (!(obj instanceof ModelKey)) {
                 return false;
             }
-            ModelKey modelKey = (ModelKey) o;
-            return this.width == modelKey.width && this.height == modelKey.height && this.model.equals(modelKey.model);
+            ModelKey modelKey = (ModelKey) obj;
+            if (this.width == modelKey.width && this.height == modelKey.height && this.model.equals(modelKey.model)) {
+                return true;
+            }
+            return false;
         }
 
-        public int hashCode() {
+        public final int hashCode() {
             return this.model.hashCode() + (((this.height * 31) + this.width) * 31);
         }
 
-        public void release() {
-            Queue<ModelKey<?>> queue = KEY_QUEUE;
-            synchronized (queue) {
-                ((ArrayDeque) queue).offer(this);
-            }
+        private ModelKey() {
         }
     }
 
-    public ModelCache(long size) {
-        this.cache = new LruCache<ModelKey<A>, B>(size) { // from class: com.bumptech.glide.load.model.ModelCache.1
-            @Override // com.bumptech.glide.util.LruCache
-            public void onItemEvicted(Object key, Object item) {
-                ((ModelKey) key).release();
-            }
-        };
+    public final Object get(Object obj) {
+        ModelKey modelKey = ModelKey.get(obj);
+        Object obj2 = get(modelKey);
+        ArrayDeque arrayDeque = ModelKey.KEY_QUEUE;
+        synchronized (arrayDeque) {
+            arrayDeque.offer(modelKey);
+        }
+        return obj2;
+    }
+
+    public final void put(Object obj, Object obj2) {
+        put(ModelKey.get(obj), obj2);
     }
 }

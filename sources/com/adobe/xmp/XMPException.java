@@ -8,12 +8,12 @@ public class XMPException extends Exception {
         this.errorCode = errorCode;
     }
 
-    public int getErrorCode() {
-        return this.errorCode;
-    }
-
     public XMPException(String message, int errorCode, Throwable t) {
         super(message, t);
         this.errorCode = errorCode;
+    }
+
+    public final int getErrorCode() {
+        return this.errorCode;
     }
 }

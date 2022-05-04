@@ -2,6 +2,7 @@ package com.android.wallpaper.picker;
 
 import android.view.View;
 import android.view.WindowInsets;
+/* compiled from: R8$$SyntheticClass */
 /* loaded from: classes.dex */
 public final /* synthetic */ class CustomizationPickerFragment$$ExternalSyntheticLambda0 implements View.OnApplyWindowInsetsListener {
     public static final /* synthetic */ CustomizationPickerFragment$$ExternalSyntheticLambda0 INSTANCE = new CustomizationPickerFragment$$ExternalSyntheticLambda0();

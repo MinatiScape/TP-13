@@ -4,7 +4,7 @@ import android.graphics.Rect;
 import android.view.View;
 import androidx.recyclerview.widget.RecyclerView;
 /* loaded from: classes.dex */
-public class HorizontalSpacerItemDecoration extends RecyclerView.ItemDecoration {
+public final class HorizontalSpacerItemDecoration extends RecyclerView.ItemDecoration {
     public final int mOffset;
 
     public HorizontalSpacerItemDecoration(int i) {
@@ -12,7 +12,7 @@ public class HorizontalSpacerItemDecoration extends RecyclerView.ItemDecoration 
     }
 
     @Override // androidx.recyclerview.widget.RecyclerView.ItemDecoration
-    public void getItemOffsets(Rect rect, View view, RecyclerView recyclerView, RecyclerView.State state) {
+    public final void getItemOffsets(Rect rect, View view, RecyclerView recyclerView) {
         int childAdapterPosition = recyclerView.getChildAdapterPosition(view);
         int i = this.mOffset;
         if (childAdapterPosition == 0) {

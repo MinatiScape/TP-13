@@ -12,10 +12,6 @@ public abstract class BaseMenuWrapper {
     public SimpleArrayMap<SupportMenuItem, MenuItem> mMenuItems;
     public SimpleArrayMap<SupportSubMenu, SubMenu> mSubMenus;
 
-    public BaseMenuWrapper(Context context) {
-        this.mContext = context;
-    }
-
     public final MenuItem getMenuItemWrapper(MenuItem menuItem) {
         if (!(menuItem instanceof SupportMenuItem)) {
             return menuItem;
@@ -41,12 +37,16 @@ public abstract class BaseMenuWrapper {
         if (this.mSubMenus == null) {
             this.mSubMenus = new SimpleArrayMap<>();
         }
-        SubMenu subMenu2 = this.mSubMenus.get(supportSubMenu);
-        if (subMenu2 != null) {
-            return subMenu2;
+        SubMenu orDefault = this.mSubMenus.getOrDefault(supportSubMenu, null);
+        if (orDefault != null) {
+            return orDefault;
         }
         SubMenuWrapperICS subMenuWrapperICS = new SubMenuWrapperICS(this.mContext, supportSubMenu);
         this.mSubMenus.put(supportSubMenu, subMenuWrapperICS);
         return subMenuWrapperICS;
+    }
+
+    public BaseMenuWrapper(Context context) {
+        this.mContext = context;
     }
 }

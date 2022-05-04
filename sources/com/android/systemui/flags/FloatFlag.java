@@ -3,19 +3,19 @@ package com.android.systemui.flags;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
-import com.android.systemui.flags.Flag;
+import com.android.systemui.flags.ParcelableFlag;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 import kotlin.jvm.internal.DefaultConstructorMarker;
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: Flag.kt */
 /* loaded from: classes.dex */
-public final class FloatFlag implements Flag<Float> {
+public final class FloatFlag implements ParcelableFlag<Float> {
 
     /* renamed from: default  reason: not valid java name */
     private final float f2default;
     private final int id;
-    private final int resourceOverride;
     @NotNull
     public static final Companion Companion = new Companion(null);
     @NotNull
@@ -36,45 +36,27 @@ public final class FloatFlag implements Flag<Float> {
         }
     };
 
-    /* loaded from: classes.dex */
-    public static final class Companion {
-        private Companion() {
-        }
-
-        public /* synthetic */ Companion(DefaultConstructorMarker defaultConstructorMarker) {
-            this();
-        }
-    }
-
     public FloatFlag(int i) {
-        this(i, HingeAngleProviderKt.FULLY_CLOSED_DEGREES, 0, 6, null);
+        this(i, HingeAngleProviderKt.FULLY_CLOSED_DEGREES, 2, null);
     }
 
     public FloatFlag(int i, float f) {
-        this(i, f, 0, 4, null);
-    }
-
-    public FloatFlag(int i, float f, int i2) {
         this.id = i;
         this.f2default = f;
-        this.resourceOverride = i2;
     }
 
     public /* synthetic */ FloatFlag(Parcel parcel, DefaultConstructorMarker defaultConstructorMarker) {
         this(parcel);
     }
 
-    public static /* synthetic */ FloatFlag copy$default(FloatFlag floatFlag, int i, float f, int i2, int i3, Object obj) {
-        if ((i3 & 1) != 0) {
+    public static /* synthetic */ FloatFlag copy$default(FloatFlag floatFlag, int i, float f, int i2, Object obj) {
+        if ((i2 & 1) != 0) {
             i = floatFlag.getId();
         }
-        if ((i3 & 2) != 0) {
+        if ((i2 & 2) != 0) {
             f = floatFlag.getDefault().floatValue();
         }
-        if ((i3 & 4) != 0) {
-            i2 = floatFlag.getResourceOverride();
-        }
-        return floatFlag.copy(i, f, i2);
+        return floatFlag.copy(i, f);
     }
 
     public final int component1() {
@@ -85,18 +67,9 @@ public final class FloatFlag implements Flag<Float> {
         return getDefault().floatValue();
     }
 
-    public final int component3() {
-        return getResourceOverride();
-    }
-
     @NotNull
-    public final FloatFlag copy(int i, float f, int i2) {
-        return new FloatFlag(i, f, i2);
-    }
-
-    @Override // com.android.systemui.flags.Flag, android.os.Parcelable
-    public int describeContents() {
-        return Flag.DefaultImpls.describeContents(this);
+    public final FloatFlag copy(int i, float f) {
+        return new FloatFlag(i, f);
     }
 
     public boolean equals(@Nullable Object obj) {
@@ -107,27 +80,18 @@ public final class FloatFlag implements Flag<Float> {
             return false;
         }
         FloatFlag floatFlag = (FloatFlag) obj;
-        return getId() == floatFlag.getId() && Intrinsics.areEqual(getDefault(), floatFlag.getDefault()) && getResourceOverride() == floatFlag.getResourceOverride();
-    }
-
-    @Override // com.android.systemui.flags.Flag
-    public int getId() {
-        return this.id;
-    }
-
-    @Override // com.android.systemui.flags.Flag
-    public int getResourceOverride() {
-        return this.resourceOverride;
-    }
-
-    @Override // com.android.systemui.flags.Flag
-    public boolean hasResourceOverride() {
-        return Flag.DefaultImpls.hasResourceOverride(this);
+        return getId() == floatFlag.getId() && Intrinsics.areEqual(getDefault(), floatFlag.getDefault());
     }
 
     public int hashCode() {
-        int hashCode = getDefault().hashCode();
-        return Integer.hashCode(getResourceOverride()) + ((hashCode + (Integer.hashCode(getId()) * 31)) * 31);
+        return getDefault().hashCode() + (Integer.hashCode(getId()) * 31);
+    }
+
+    /* JADX WARN: Can't rename method to resolve collision */
+    @Override // com.android.systemui.flags.ParcelableFlag
+    @NotNull
+    public Float getDefault() {
+        return Float.valueOf(this.f2default);
     }
 
     @NotNull
@@ -136,8 +100,6 @@ public final class FloatFlag implements Flag<Float> {
         m.append(getId());
         m.append(", default=");
         m.append(getDefault().floatValue());
-        m.append(", resourceOverride=");
-        m.append(getResourceOverride());
         m.append(')');
         return m.toString();
     }
@@ -149,18 +111,32 @@ public final class FloatFlag implements Flag<Float> {
         parcel.writeFloat(getDefault().floatValue());
     }
 
-    /* JADX WARN: Can't rename method to resolve collision */
-    @Override // com.android.systemui.flags.Flag
-    @NotNull
-    public Float getDefault() {
-        return Float.valueOf(this.f2default);
+    @Override // com.android.systemui.flags.ParcelableFlag, android.os.Parcelable
+    public int describeContents() {
+        return ParcelableFlag.DefaultImpls.describeContents(this);
     }
 
-    public /* synthetic */ FloatFlag(int i, float f, int i2, int i3, DefaultConstructorMarker defaultConstructorMarker) {
-        this(i, (i3 & 2) != 0 ? HingeAngleProviderKt.FULLY_CLOSED_DEGREES : f, (i3 & 4) != 0 ? -1 : i2);
+    public /* synthetic */ FloatFlag(int i, float f, int i2, DefaultConstructorMarker defaultConstructorMarker) {
+        this(i, (i2 & 2) != 0 ? HingeAngleProviderKt.FULLY_CLOSED_DEGREES : f);
     }
 
     private FloatFlag(Parcel parcel) {
-        this(parcel.readInt(), parcel.readFloat(), 0, 4, null);
+        this(parcel.readInt(), parcel.readFloat());
+    }
+
+    /* compiled from: Flag.kt */
+    /* loaded from: classes.dex */
+    public static final class Companion {
+        public /* synthetic */ Companion(DefaultConstructorMarker defaultConstructorMarker) {
+            this();
+        }
+
+        private Companion() {
+        }
+    }
+
+    @Override // com.android.systemui.flags.Flag
+    public int getId() {
+        return this.id;
     }
 }

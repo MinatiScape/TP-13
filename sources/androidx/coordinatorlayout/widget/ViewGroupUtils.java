@@ -5,7 +5,7 @@ import android.graphics.RectF;
 import android.view.View;
 import android.view.ViewParent;
 /* loaded from: classes.dex */
-public class ViewGroupUtils {
+public final class ViewGroupUtils {
     public static final ThreadLocal<Matrix> sMatrix = new ThreadLocal<>();
     public static final ThreadLocal<RectF> sRectF = new ThreadLocal<>();
 

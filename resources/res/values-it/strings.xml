@@ -30,14 +30,13 @@
     <string name="abc_slice_more">Altro</string>
     <string name="abc_slice_more_content">+ %1$d</string>
     <string name="abc_slice_permission_allow">Consenti</string>
-    <string name="abc_slice_permission_checkbox">Consenti all\'app %1$s di mostrare porzioni di qualsiasi app</string>
-    <string name="abc_slice_permission_deny">Rifiuta</string>
+    <string name="abc_slice_permission_deny">Nega</string>
     <string name="abc_slice_permission_text_1">- Può leggere informazioni dell\'app %1$s</string>
     <string name="abc_slice_permission_text_2">- Può compiere azioni nell\'app %1$s</string>
-    <string name="abc_slice_permission_title">Vuoi consentire all\'app %1$s di mostrare porzioni dell\'app %2$s?</string>
+    <string name="abc_slice_permission_title">Vuoi consentire all\'app %1$s di mostrare sezioni dell\'app %2$s?</string>
     <string name="abc_slice_show_more">Mostra altro</string>
-    <string name="abc_slice_updated">Aggiornamento: %1$s</string>
-    <string name="abc_slices_permission_request">L\'app %1$s vuole mostrare porzioni dell\'app %2$s</string>
+    <string name="abc_slice_updated">Ultimo aggiornamento: %1$s</string>
+    <string name="abc_slices_permission_request">L\'app %1$s vuole mostrare sezioni dell\'app %2$s</string>
     <string name="abc_toolbar_collapse_description">Comprimi</string>
     <string name="accessibility_custom_color_title">Colore personalizzato</string>
     <string name="accessibility_custom_font_title">Carattere personalizzato</string>
@@ -72,6 +71,7 @@
     <string name="center_wallpaper_position">Al centro</string>
     <string name="character_counter_content_description">%1$d caratteri inserirti su %2$d</string>
     <string name="character_counter_overflowed_content_description">Sono presenti %2$d caratteri in più rispetto al limite di %1$d</string>
+    <string name="cinematic_effects_toogle">Sfondi 3D</string>
     <string name="clear_text_end_icon_content_description">Cancella testo</string>
     <string name="clock_preview_content_description">Anteprima dell\'orologio %1$s</string>
     <string name="clock_title">Orologio</string>
@@ -117,6 +117,8 @@
     <string name="delete_live_wallpaper">Elimina</string>
     <string name="delete_wallpaper_confirmation">Vuoi eliminare questo sfondo dal telefono?</string>
     <string name="edit_custom_theme_lbl">Tocca per modificare</string>
+    <string name="effect_error_dialog_body">Impossibile applicare gli effetti.\nProva con un\'altra foto.</string>
+    <string name="effect_error_dialog_title">Spiacenti.</string>
     <string name="error_icon_content_description">Errore</string>
     <string name="expand_button_title">Avanzate</string>
     <string name="explore">Esplora</string>
@@ -199,6 +201,7 @@
     <string name="mtrl_picker_toggle_to_day_selection">Tocca per passare alla selezione di un giorno</string>
     <string name="mtrl_picker_toggle_to_text_input_mode">Passa alla modalità di immissione Testo</string>
     <string name="mtrl_picker_toggle_to_year_selection">Tocca per passare alla selezione di un anno</string>
+    <string name="my_photos">Le mie foto</string>
     <string name="my_photos_category_title">Le mie foto</string>
     <string name="my_photos_generic_wallpaper_title">La mia foto</string>
     <string name="name_component_title">Assegna un nome al tuo stile</string>
@@ -244,6 +247,8 @@
     <string name="set_wallpaper_lock_screen_destination">Schermata di blocco</string>
     <string name="set_wallpaper_progress_message">Impostazione dello sfondo…</string>
     <string name="settings_button_label">Impostazioni</string>
+    <string name="settings_snackbar_description">Attiva l\'autorizzazione File e contenuti multimediali nelle impostazioni.</string>
+    <string name="settings_snackbar_enable">Attiva</string>
     <string name="shape_component_title">Scegli la forma</string>
     <string name="shape_preview_content_description">Anteprima forma</string>
     <string name="show_ui_preview_text">Mostra UI Anteprima</string>
@@ -261,6 +266,7 @@
     <string name="style_info_description">Anteprima di carattere, icone, forma dell\'app e colore</string>
     <string name="summary_collapsed_preference_list">%1$s, %2$s</string>
     <string name="tab_customize">Personalizza</string>
+    <string name="tab_effects">Effetti</string>
     <string name="tab_info">Informazioni</string>
     <string name="theme_description">Carattere: %1$s, icone: %2$s, forma: %3$s, colore: %4$s</string>
     <string name="theme_preview_card_content_description">Anteprima stile</string>
@@ -280,6 +286,8 @@
     <string name="wallpaper_destination_both">Schermate Home e di blocco</string>
     <string name="wallpaper_disabled_by_administrator_message">L\'impostazione di sfondi è stata disattivata dall\'amministratore del dispositivo</string>
     <string name="wallpaper_disabled_message">L\'impostazione di sfondi è stata disattivata su questo dispositivo</string>
+    <string name="wallpaper_effects_subtitle">Trasforma la tua foto in uno sfondo 3D che si muove in base al movimento del telefono</string>
+    <string name="wallpaper_effects_title">Sfondi 3D</string>
     <string name="wallpaper_picker_entry_title">Cambia sfondo</string>
     <string name="wallpaper_preview_card_content_description">Anteprima sfondo</string>
     <string name="wallpaper_set_successfully_message">Sfondo impostato</string>

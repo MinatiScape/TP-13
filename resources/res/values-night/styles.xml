@@ -20,6 +20,22 @@
         <item name="elevationOverlayColor">?attr/colorPrimary</item>
         <item name="elevationOverlayEnabled">true</item>
     </style>
+    <style name="Theme_Material3_DayNight" parent="@style/Theme_Material3_Dark">
+    </style>
+    <style name="Theme_Material3_DayNight_BottomSheetDialog" parent="@style/Theme_Material3_Dark_BottomSheetDialog">
+    </style>
+    <style name="Theme_Material3_DayNight_Dialog" parent="@style/Theme_Material3_Dark_Dialog">
+    </style>
+    <style name="Theme_Material3_DayNight_Dialog_Alert" parent="@style/Theme_Material3_Dark_Dialog_Alert">
+    </style>
+    <style name="Theme_Material3_DayNight_Dialog_MinWidth" parent="@style/Theme_Material3_Dark_Dialog_MinWidth">
+    </style>
+    <style name="Theme_Material3_DayNight_DialogWhenLarge" parent="@style/Theme_Material3_Dark_DialogWhenLarge">
+    </style>
+    <style name="Theme_Material3_DayNight_NoActionBar" parent="@style/Theme_Material3_Dark_NoActionBar">
+    </style>
+    <style name="Theme_Material3_DynamicColors_DayNight" parent="@style/Theme_Material3_DynamicColors_Dark">
+    </style>
     <style name="Theme_MaterialComponents_DayNight" parent="@style/Theme_MaterialComponents">
     </style>
     <style name="Theme_MaterialComponents_DayNight_BottomSheetDialog" parent="@style/Theme_MaterialComponents_BottomSheetDialog">
@@ -53,6 +69,8 @@
     <style name="Theme_MaterialComponents_DayNight_NoActionBar_Bridge" parent="@style/Theme_MaterialComponents_NoActionBar_Bridge">
     </style>
     <style name="ThemeOverlay_AppCompat_DayNight" parent="@style/ThemeOverlay_AppCompat_Dark">
+    </style>
+    <style name="ThemeOverlay_Material3_DynamicColors_DayNight" parent="@style/ThemeOverlay_Material3_DynamicColors_Dark">
     </style>
     <style name="Widget_MaterialComponents_ActionBar_PrimarySurface" parent="@style/Widget_MaterialComponents_ActionBar_Surface">
     </style>

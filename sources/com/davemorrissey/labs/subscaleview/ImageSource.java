@@ -10,19 +10,17 @@ public final class ImageSource {
     public final Bitmap bitmap;
     public boolean cached;
     public final Integer resource;
-    public int sHeight;
-    public int sWidth;
     public boolean tile;
     public final Uri uri;
 
-    public ImageSource(Bitmap bitmap, boolean z) {
+    public ImageSource(Bitmap bitmap) {
         this.bitmap = bitmap;
         this.uri = null;
         this.resource = null;
         this.tile = false;
-        this.sWidth = bitmap.getWidth();
-        this.sHeight = bitmap.getHeight();
-        this.cached = z;
+        bitmap.getWidth();
+        bitmap.getHeight();
+        this.cached = false;
     }
 
     public ImageSource(Uri uri) {

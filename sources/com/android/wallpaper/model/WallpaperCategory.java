@@ -1,13 +1,11 @@
 package com.android.wallpaper.model;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
+import androidx.fragment.app.FragmentActivity;
 import com.android.wallpaper.asset.Asset;
-import com.android.wallpaper.picker.individual.IndividualPickerActivity;
+import com.android.wallpaper.asset.ResourceAsset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public class WallpaperCategory extends Category {
     public int mFeaturedThumbnailIndex;
@@ -15,11 +13,8 @@ public class WallpaperCategory extends Category {
     public final List<WallpaperInfo> mWallpapers;
     public final Object mWallpapersLock;
 
-    public WallpaperCategory(String str, String str2, int i, List<WallpaperInfo> list, int i2) {
-        super(str, str2, i2);
-        this.mWallpapers = list;
-        this.mWallpapersLock = new Object();
-        this.mFeaturedThumbnailIndex = i;
+    public WallpaperCategory(String str, String str2, ArrayList arrayList, int i) {
+        this(str, str2, 0, arrayList, i);
     }
 
     @Override // com.android.wallpaper.model.Category
@@ -27,21 +22,24 @@ public class WallpaperCategory extends Category {
         return false;
     }
 
-    public void fetchWallpapers(Context context, WallpaperReceiver wallpaperReceiver, boolean z) {
-        wallpaperReceiver.onWallpapersReceived(new ArrayList(this.mWallpapers));
+    @Override // com.android.wallpaper.model.Category
+    public final void show(FragmentActivity fragmentActivity) {
     }
 
     @Override // com.android.wallpaper.model.Category
-    public WallpaperInfo getSingleWallpaper() {
-        List<WallpaperInfo> list = this.mWallpapers;
-        boolean z = true;
-        if (list == null || list.size() != 1) {
-            z = false;
-        }
-        if (z) {
-            return this.mWallpapers.get(0);
-        }
-        return null;
+    public boolean supportsThirdParty() {
+        return this instanceof ThirdPartyLiveWallpaperCategory;
+    }
+
+    public WallpaperCategory(String str, String str2, int i, ArrayList arrayList, int i2) {
+        super(str, str2, i2);
+        this.mWallpapers = arrayList;
+        this.mWallpapersLock = new Object();
+        this.mFeaturedThumbnailIndex = i;
+    }
+
+    public void fetchWallpapers(Context context, WallpaperReceiver wallpaperReceiver, boolean z) {
+        wallpaperReceiver.onWallpapersReceived(new ArrayList(this.mWallpapers));
     }
 
     @Override // com.android.wallpaper.model.Category
@@ -55,39 +53,26 @@ public class WallpaperCategory extends Category {
     }
 
     @Override // com.android.wallpaper.model.Category
-    public boolean isEnumerable() {
+    public final boolean isSingleWallpaperCategory() {
+        List<WallpaperInfo> list = this.mWallpapers;
+        if (list == null || list.size() != 1) {
+            return false;
+        }
         return true;
     }
 
     @Override // com.android.wallpaper.model.Category
-    public boolean isSingleWallpaperCategory() {
-        List<WallpaperInfo> list = this.mWallpapers;
-        return list != null && list.size() == 1;
+    public final WallpaperInfo getSingleWallpaper() {
+        if (isSingleWallpaperCategory()) {
+            return this.mWallpapers.get(0);
+        }
+        return null;
     }
 
-    @Override // com.android.wallpaper.model.Category
-    public void show(Activity activity, PickerIntentFactory pickerIntentFactory, int i) {
-        String str = this.mCollectionId;
-        Objects.requireNonNull((IndividualPickerActivity.IndividualPickerActivityIntentFactory) pickerIntentFactory);
-        activity.startActivityForResult(new Intent(activity, IndividualPickerActivity.class).putExtra("com.android.wallpaper.category_collection_id", str), i);
-    }
-
-    @Override // com.android.wallpaper.model.Category
-    public boolean supportsThirdParty() {
-        return this instanceof ThirdPartyLiveWallpaperCategory;
-    }
-
-    public WallpaperCategory(String str, String str2, List<WallpaperInfo> list, int i) {
+    public WallpaperCategory(String str, String str2, ResourceAsset resourceAsset, ArrayList arrayList, int i) {
         super(str, str2, i);
-        this.mWallpapers = list;
+        this.mWallpapers = arrayList;
         this.mWallpapersLock = new Object();
-        this.mFeaturedThumbnailIndex = 0;
-    }
-
-    public WallpaperCategory(String str, String str2, Asset asset, List<WallpaperInfo> list, int i) {
-        super(str, str2, i);
-        this.mWallpapers = list;
-        this.mWallpapersLock = new Object();
-        this.mThumbAsset = asset;
+        this.mThumbAsset = resourceAsset;
     }
 }

@@ -7,26 +7,30 @@ import androidx.recyclerview.widget.RecyclerView;
 /* loaded from: classes.dex */
 public abstract class SnapHelper extends RecyclerView.OnFlingListener {
     public RecyclerView mRecyclerView;
-    public final RecyclerView.OnScrollListener mScrollListener = new RecyclerView.OnScrollListener() { // from class: androidx.recyclerview.widget.SnapHelper.1
+    public final AnonymousClass1 mScrollListener = new RecyclerView.OnScrollListener() { // from class: androidx.recyclerview.widget.SnapHelper.1
         public boolean mScrolled = false;
 
         @Override // androidx.recyclerview.widget.RecyclerView.OnScrollListener
-        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-            if (newState == 0 && this.mScrolled) {
+        public final void onScrollStateChanged(RecyclerView recyclerView, int i) {
+            if (i == 0 && this.mScrolled) {
                 this.mScrolled = false;
                 SnapHelper.this.snapToTargetExistingView();
             }
         }
 
         @Override // androidx.recyclerview.widget.RecyclerView.OnScrollListener
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-            if (dx != 0 || dy != 0) {
+        public final void onScrolled(RecyclerView recyclerView, int i, int i2) {
+            if (i != 0 || i2 != 0) {
                 this.mScrolled = true;
             }
         }
     };
 
-    public void attachToRecyclerView(RecyclerView recyclerView) throws IllegalStateException {
+    public abstract int[] calculateDistanceToFinalSnap(RecyclerView.LayoutManager layoutManager, View view);
+
+    public abstract View findSnapView(RecyclerView.LayoutManager layoutManager);
+
+    public final void attachToRecyclerView(RecyclerView recyclerView) throws IllegalStateException {
         RecyclerView recyclerView2 = this.mRecyclerView;
         if (recyclerView2 != recyclerView) {
             if (recyclerView2 != null) {
@@ -48,18 +52,15 @@ public abstract class SnapHelper extends RecyclerView.OnFlingListener {
         }
     }
 
-    public abstract int[] calculateDistanceToFinalSnap(RecyclerView.LayoutManager layoutManager, View targetView);
-
-    public abstract View findSnapView(RecyclerView.LayoutManager layoutManager);
-
-    public void snapToTargetExistingView() {
+    public final void snapToTargetExistingView() {
         RecyclerView.LayoutManager layoutManager;
         View findSnapView;
         RecyclerView recyclerView = this.mRecyclerView;
         if (recyclerView != null && (layoutManager = recyclerView.getLayoutManager()) != null && (findSnapView = findSnapView(layoutManager)) != null) {
             int[] calculateDistanceToFinalSnap = calculateDistanceToFinalSnap(layoutManager, findSnapView);
-            if (calculateDistanceToFinalSnap[0] != 0 || calculateDistanceToFinalSnap[1] != 0) {
-                this.mRecyclerView.smoothScrollBy(calculateDistanceToFinalSnap[0], calculateDistanceToFinalSnap[1]);
+            int i = calculateDistanceToFinalSnap[0];
+            if (i != 0 || calculateDistanceToFinalSnap[1] != 0) {
+                this.mRecyclerView.smoothScrollBy(i, calculateDistanceToFinalSnap[1]);
             }
         }
     }

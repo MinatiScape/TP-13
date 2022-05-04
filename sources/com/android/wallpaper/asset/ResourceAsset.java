@@ -1,13 +1,12 @@
 package com.android.wallpaper.asset;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 import android.widget.ImageView;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.BaseRequestOptions;
@@ -16,7 +15,7 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 /* loaded from: classes.dex */
 public class ResourceAsset extends StreamableAsset {
-    public Key mKey;
+    public PackageResourceKey mKey;
     public final RequestOptions mRequestOptions;
     public final Resources mRes;
     public final int mResId;
@@ -26,13 +25,8 @@ public class ResourceAsset extends StreamableAsset {
         public String mPackageName;
         public int mResId;
 
-        public PackageResourceKey(Resources resources, int i) {
-            this.mPackageName = resources.getResourcePackageName(i);
-            this.mResId = i;
-        }
-
         @Override // com.bumptech.glide.load.Key
-        public boolean equals(Object obj) {
+        public final boolean equals(Object obj) {
             if (obj instanceof PackageResourceKey) {
                 return getCacheKey().equals(((PackageResourceKey) obj).getCacheKey());
             }
@@ -48,29 +42,27 @@ public class ResourceAsset extends StreamableAsset {
             return m.toString();
         }
 
+        public PackageResourceKey(Resources resources, int i) {
+            this.mPackageName = resources.getResourcePackageName(i);
+            this.mResId = i;
+        }
+
         @Override // com.bumptech.glide.load.Key
-        public int hashCode() {
+        public final int hashCode() {
             return getCacheKey().hashCode();
         }
 
-        public String toString() {
+        public final String toString() {
             return getCacheKey();
         }
 
         @Override // com.bumptech.glide.load.Key
-        public void updateDiskCacheKey(MessageDigest messageDigest) {
+        public final void updateDiskCacheKey(MessageDigest messageDigest) {
             messageDigest.update(getCacheKey().getBytes(Key.CHARSET));
         }
     }
 
-    public ResourceAsset(Resources resources, int i) {
-        RequestOptions centerCropTransform = RequestOptions.centerCropTransform();
-        this.mRes = resources;
-        this.mResId = i;
-        this.mRequestOptions = centerCropTransform;
-    }
-
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         if (obj instanceof ResourceAsset) {
             return getKey().equals(((ResourceAsset) obj).getKey());
         }
@@ -84,22 +76,24 @@ public class ResourceAsset extends StreamableAsset {
         return this.mKey;
     }
 
-    public int hashCode() {
+    @Override // com.android.wallpaper.asset.StreamableAsset
+    public final InputStream openInputStream() {
+        return this.mRes.openRawResource(this.mResId);
+    }
+
+    public ResourceAsset(Resources resources, int i) {
+        RequestOptions centerCropTransform = RequestOptions.centerCropTransform();
+        this.mRes = resources;
+        this.mResId = i;
+        this.mRequestOptions = centerCropTransform;
+    }
+
+    public final int hashCode() {
         return getKey().hashCode();
     }
 
     @Override // com.android.wallpaper.asset.Asset
-    public void loadDrawable(Context context, ImageView imageView, int i) {
-        RequestBuilder<Drawable> asDrawable = Glide.with(context).asDrawable();
-        asDrawable.model = this;
-        asDrawable.isModelSet = true;
-        RequestBuilder<Drawable> apply = asDrawable.apply((BaseRequestOptions<?>) this.mRequestOptions.placeholder(new ColorDrawable(i)));
-        apply.transition(DrawableTransitionOptions.withCrossFade());
-        apply.into(imageView);
-    }
-
-    @Override // com.android.wallpaper.asset.StreamableAsset
-    public InputStream openInputStream() {
-        return this.mRes.openRawResource(this.mResId);
+    public final void loadDrawable(Activity activity, ImageView imageView, int i) {
+        Glide.getRetriever(activity).get((Context) activity).asDrawable().loadGeneric(this).mo32apply((BaseRequestOptions<?>) this.mRequestOptions.placeholder(new ColorDrawable(i))).transition(DrawableTransitionOptions.withCrossFade()).into(imageView);
     }
 }

@@ -15,19 +15,21 @@ import android.widget.TextView;
 import com.android.systemui.shared.R;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.internal.TextWatcherAdapter;
+import com.google.android.material.internal.ViewUtils;
 import com.google.android.material.textfield.TextInputLayout;
 /* loaded from: classes.dex */
-public class ChipTextInputComboView extends FrameLayout implements Checkable {
+class ChipTextInputComboView extends FrameLayout implements Checkable {
     public final Chip chip;
     public final EditText editText;
+    public TextFormatter watcher;
 
     /* loaded from: classes.dex */
     public class TextFormatter extends TextWatcherAdapter {
-        public TextFormatter(AnonymousClass1 r2) {
+        public TextFormatter() {
         }
 
         @Override // com.google.android.material.internal.TextWatcherAdapter, android.text.TextWatcher
-        public void afterTextChanged(Editable editable) {
+        public final void afterTextChanged(Editable editable) {
             if (TextUtils.isEmpty(editable)) {
                 ChipTextInputComboView chipTextInputComboView = ChipTextInputComboView.this;
                 chipTextInputComboView.chip.setText(ChipTextInputComboView.access$100(chipTextInputComboView, "00"));
@@ -42,61 +44,56 @@ public class ChipTextInputComboView extends FrameLayout implements Checkable {
         this(context, null);
     }
 
-    public static String access$100(ChipTextInputComboView chipTextInputComboView, CharSequence charSequence) {
-        return String.format(chipTextInputComboView.getResources().getConfiguration().locale, "%02d", Integer.valueOf(Integer.parseInt(String.valueOf(charSequence))));
+    public ChipTextInputComboView(Context context, AttributeSet attributeSet) {
+        this(context, attributeSet, 0);
     }
 
     @Override // android.widget.Checkable
-    public boolean isChecked() {
+    public final boolean isChecked() {
         return this.chip.isChecked();
     }
 
-    @Override // android.view.View
-    public void onConfigurationChanged(Configuration configuration) {
-        super.onConfigurationChanged(configuration);
-        updateHintLocales();
-    }
-
     @Override // android.widget.Checkable
-    public void setChecked(boolean z) {
+    public final void setChecked(boolean z) {
+        int i;
         this.chip.setChecked(z);
-        int i = 0;
-        this.editText.setVisibility(z ? 0 : 4);
+        EditText editText = this.editText;
+        int i2 = 0;
+        if (z) {
+            i = 0;
+        } else {
+            i = 4;
+        }
+        editText.setVisibility(i);
         Chip chip = this.chip;
         if (z) {
-            i = 8;
+            i2 = 8;
         }
-        chip.setVisibility(i);
+        chip.setVisibility(i2);
         if (isChecked()) {
-            this.editText.requestFocus();
+            EditText editText2 = this.editText;
+            editText2.requestFocus();
+            editText2.post(new ViewUtils.AnonymousClass1(editText2));
             if (!TextUtils.isEmpty(this.editText.getText())) {
-                EditText editText = this.editText;
-                editText.setSelection(editText.getText().length());
+                EditText editText3 = this.editText;
+                editText3.setSelection(editText3.getText().length());
             }
         }
     }
 
     @Override // android.view.View
-    public void setOnClickListener(View.OnClickListener onClickListener) {
+    public final void setOnClickListener(View.OnClickListener onClickListener) {
         this.chip.setOnClickListener(onClickListener);
     }
 
     @Override // android.view.View
-    public void setTag(int i, Object obj) {
+    public final void setTag(int i, Object obj) {
         this.chip.setTag(i, obj);
     }
 
     @Override // android.widget.Checkable
-    public void toggle() {
+    public final void toggle() {
         this.chip.toggle();
-    }
-
-    public final void updateHintLocales() {
-        this.editText.setImeHintLocales(getContext().getResources().getConfiguration().getLocales());
-    }
-
-    public ChipTextInputComboView(Context context, AttributeSet attributeSet) {
-        this(context, attributeSet, 0);
     }
 
     public ChipTextInputComboView(Context context, AttributeSet attributeSet, int i) {
@@ -108,11 +105,23 @@ public class ChipTextInputComboView extends FrameLayout implements Checkable {
         EditText editText = textInputLayout.editText;
         this.editText = editText;
         editText.setVisibility(4);
-        editText.addTextChangedListener(new TextFormatter(null));
-        updateHintLocales();
+        TextFormatter textFormatter = new TextFormatter();
+        this.watcher = textFormatter;
+        editText.addTextChangedListener(textFormatter);
+        editText.setImeHintLocales(getContext().getResources().getConfiguration().getLocales());
         addView(chip);
         addView(textInputLayout);
         TextView textView = (TextView) findViewById(R.id.material_label);
         editText.setSaveEnabled(false);
+    }
+
+    public static String access$100(ChipTextInputComboView chipTextInputComboView, CharSequence charSequence) {
+        return String.format(chipTextInputComboView.getResources().getConfiguration().locale, "%02d", Integer.valueOf(Integer.parseInt(String.valueOf(charSequence))));
+    }
+
+    @Override // android.view.View
+    public final void onConfigurationChanged(Configuration configuration) {
+        super.onConfigurationChanged(configuration);
+        this.editText.setImeHintLocales(getContext().getResources().getConfiguration().getLocales());
     }
 }

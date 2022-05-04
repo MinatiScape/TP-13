@@ -12,7 +12,7 @@ public class ViewOffsetBehavior<V extends View> extends CoordinatorLayout.Behavi
     public ViewOffsetBehavior() {
     }
 
-    public int getTopAndBottomOffset() {
+    public final int getTopAndBottomOffset() {
         ViewOffsetHelper viewOffsetHelper = this.viewOffsetHelper;
         if (viewOffsetHelper != null) {
             return viewOffsetHelper.offsetTop;
@@ -20,8 +20,8 @@ public class ViewOffsetBehavior<V extends View> extends CoordinatorLayout.Behavi
         return 0;
     }
 
-    public void layoutChild(CoordinatorLayout coordinatorLayout, V v, int i) {
-        coordinatorLayout.onLayoutChild(v, i);
+    public ViewOffsetBehavior(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet);
     }
 
     @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
@@ -43,7 +43,7 @@ public class ViewOffsetBehavior<V extends View> extends CoordinatorLayout.Behavi
         return true;
     }
 
-    public ViewOffsetBehavior(Context context, AttributeSet attributeSet) {
-        super(context, attributeSet);
+    public void layoutChild(CoordinatorLayout coordinatorLayout, V v, int i) {
+        coordinatorLayout.onLayoutChild(v, i);
     }
 }

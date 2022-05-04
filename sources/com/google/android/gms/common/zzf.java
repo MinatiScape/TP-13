@@ -2,31 +2,18 @@ package com.google.android.gms.common;
 
 import android.os.RemoteException;
 import android.util.Log;
-import androidx.preference.R$string;
 import com.google.android.gms.common.internal.zzaa;
 import com.google.android.gms.common.internal.zzab;
 import com.google.android.gms.dynamic.IObjectWrapper;
 import com.google.android.gms.dynamic.zzn;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+/* compiled from: GoogleCertificates.java */
 /* loaded from: classes.dex */
 public abstract class zzf extends zzab {
     public int zza;
 
-    public zzf(byte[] bArr) {
-        R$string.zzb(bArr.length == 25);
-        this.zza = Arrays.hashCode(bArr);
-    }
-
-    public static byte[] zza(String str) {
-        try {
-            return str.getBytes("ISO-8859-1");
-        } catch (UnsupportedEncodingException e) {
-            throw new AssertionError(e);
-        }
-    }
-
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         IObjectWrapper zzb;
         if (obj != null && (obj instanceof zzaa)) {
             try {
@@ -42,15 +29,37 @@ public abstract class zzf extends zzab {
         return false;
     }
 
-    public int hashCode() {
-        return this.zza;
+    public abstract byte[] zza();
+
+    public static byte[] zza(String str) {
+        try {
+            return str.getBytes("ISO-8859-1");
+        } catch (UnsupportedEncodingException e) {
+            throw new AssertionError(e);
+        }
     }
 
-    public abstract byte[] zza();
+    public zzf(byte[] bArr) {
+        boolean z;
+        if (bArr.length == 25) {
+            z = true;
+        } else {
+            z = false;
+        }
+        if (z) {
+            this.zza = Arrays.hashCode(bArr);
+            return;
+        }
+        throw new IllegalArgumentException();
+    }
 
     @Override // com.google.android.gms.common.internal.zzaa
     public final IObjectWrapper zzb() {
-        return new zzn(zza());
+        return zzn.zza(zza());
+    }
+
+    public final int hashCode() {
+        return this.zza;
     }
 
     @Override // com.google.android.gms.common.internal.zzaa

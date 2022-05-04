@@ -3,11 +3,10 @@ package androidx.constraintlayout.solver;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 import java.util.Arrays;
 /* loaded from: classes.dex */
-public class SolverVariable {
-    public static int uniqueErrorId = 1;
+public final class SolverVariable {
     public float computedValue;
     public boolean inGoal;
-    public int mType;
+    public Type mType;
     public int id = -1;
     public int definitionId = -1;
     public int strength = 0;
@@ -17,8 +16,14 @@ public class SolverVariable {
     public int mClientEquationsCount = 0;
     public int usageInRowCount = 0;
 
-    public SolverVariable(int i) {
-        this.mType = i;
+    /* loaded from: classes.dex */
+    public enum Type {
+        UNRESTRICTED,
+        /* JADX INFO: Fake field, exist only in values array */
+        CONSTANT,
+        SLACK,
+        ERROR,
+        UNKNOWN
     }
 
     public final void addToRow(ArrayRow arrayRow) {
@@ -41,6 +46,10 @@ public class SolverVariable {
                 return;
             }
         }
+    }
+
+    public final String toString() {
+        return "null";
     }
 
     /* JADX WARN: Code restructure failed: missing block: B:10:0x001f, code lost:
@@ -95,8 +104,8 @@ public class SolverVariable {
         throw new UnsupportedOperationException("Method not decompiled: androidx.constraintlayout.solver.SolverVariable.removeFromRow(androidx.constraintlayout.solver.ArrayRow):void");
     }
 
-    public void reset() {
-        this.mType = 5;
+    public final void reset() {
+        this.mType = Type.UNKNOWN;
         this.strength = 0;
         this.id = -1;
         this.definitionId = -1;
@@ -107,15 +116,15 @@ public class SolverVariable {
         Arrays.fill(this.goalStrengthVector, (float) HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
     }
 
-    public String toString() {
-        return "null";
-    }
-
     public final void updateReferencesWithNewDefinition(ArrayRow arrayRow) {
         int i = this.mClientEquationsCount;
         for (int i2 = 0; i2 < i; i2++) {
-            this.mClientEquations[i2].updateFromRow(arrayRow, false);
+            this.mClientEquations[i2].updateFromRow(arrayRow);
         }
         this.mClientEquationsCount = 0;
+    }
+
+    public SolverVariable(Type type) {
+        this.mType = type;
     }
 }

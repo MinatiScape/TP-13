@@ -2,12 +2,9 @@ package com.google.android.gms.internal;
 
 import android.content.SharedPreferences;
 import android.util.Log;
+/* compiled from: PhenotypeFlag.java */
 /* loaded from: classes.dex */
 public final class zzfix extends zzfis<String> {
-    public zzfix(zzfiz zzfizVar, String str, String str2) {
-        super(zzfizVar, str, str2, null);
-    }
-
     @Override // com.google.android.gms.internal.zzfis
     public final String zza(SharedPreferences sharedPreferences) {
         try {
@@ -20,8 +17,11 @@ public final class zzfix extends zzfis<String> {
     }
 
     @Override // com.google.android.gms.internal.zzfis
-    /* renamed from: zza */
-    public final /* synthetic */ String mo18zza(String str) {
+    public final /* synthetic */ String zza(String str) {
         return str;
+    }
+
+    public zzfix(zzfiz zzfizVar, String str) {
+        super(zzfizVar, str);
     }
 }

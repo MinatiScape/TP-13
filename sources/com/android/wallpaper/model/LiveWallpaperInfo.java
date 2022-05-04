@@ -14,15 +14,15 @@ import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalS
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import androidx.cardview.R$style;
 import androidx.core.content.ContextCompat;
 import com.android.systemui.flags.FlagManager;
 import com.android.systemui.shared.R;
 import com.android.wallpaper.asset.Asset;
 import com.android.wallpaper.asset.LiveWallpaperThumbAsset;
-import com.android.wallpaper.compat.BuildCompat;
-import com.android.wallpaper.module.InjectorProvider;
 import com.android.wallpaper.util.ActivityUtils;
-import com.google.android.material.shape.CornerTreatment;
+import com.google.android.apps.wallpaper.model.GoogleLiveWallpaperInfo;
+import com.google.android.apps.wallpaper.model.MicropaperWallpaperInfo;
 import java.io.IOException;
 import java.text.Collator;
 import java.util.ArrayList;
@@ -30,19 +30,20 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
+import kotlin.jvm.internal.Intrinsics;
 import org.xmlpull.v1.XmlPullParserException;
+import wireless.android.learning.acmi.micropaper.frontend.MicropaperFrontend;
 /* loaded from: classes.dex */
 public class LiveWallpaperInfo extends WallpaperInfo {
     public static final Parcelable.Creator<LiveWallpaperInfo> CREATOR = new Parcelable.Creator<LiveWallpaperInfo>() { // from class: com.android.wallpaper.model.LiveWallpaperInfo.1
         @Override // android.os.Parcelable.Creator
-        public LiveWallpaperInfo createFromParcel(Parcel parcel) {
+        public final LiveWallpaperInfo createFromParcel(Parcel parcel) {
             return new LiveWallpaperInfo(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public LiveWallpaperInfo[] newArray(int i) {
+        public final LiveWallpaperInfo[] newArray(int i) {
             return new LiveWallpaperInfo[i];
         }
     };
@@ -52,18 +53,106 @@ public class LiveWallpaperInfo extends WallpaperInfo {
     public boolean mVisibleTitle;
 
     public LiveWallpaperInfo(WallpaperInfo wallpaperInfo) {
-        this.mInfo = wallpaperInfo;
-        this.mVisibleTitle = true;
-        this.mCollectionId = null;
+        this(wallpaperInfo, true, null);
     }
 
     public static LiveWallpaperInfo fromAttributeSet(Context context, String str, AttributeSet attributeSet) {
-        String attributeValue = attributeSet.getAttributeValue(null, FlagManager.FIELD_ID);
+        String attributeValue = attributeSet.getAttributeValue(null, FlagManager.EXTRA_ID);
         if (!TextUtils.isEmpty(attributeValue)) {
             return fromPackageAndServiceName(context, str, attributeValue, attributeSet.getAttributeValue(null, "package"), attributeSet.getAttributeValue(null, "service"));
         }
         Log.w("LiveWallpaperInfo", "Live wallpaper declaration without id in category " + str);
         return null;
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final String getActionUrl(Context context) {
+        try {
+            Uri loadContextUri = this.mInfo.loadContextUri(context.getPackageManager());
+            if (loadContextUri != null) {
+                return loadContextUri.toString();
+            }
+        } catch (Resources.NotFoundException unused) {
+        }
+        return null;
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final Asset getAsset(Context context) {
+        return null;
+    }
+
+    public LiveWallpaperInfo(WallpaperInfo wallpaperInfo, boolean z, String str) {
+        this.mInfo = wallpaperInfo;
+        this.mVisibleTitle = z;
+        this.mCollectionId = str;
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final List<String> getAttributions(Context context) {
+        String str;
+        ArrayList arrayList = new ArrayList();
+        PackageManager packageManager = context.getPackageManager();
+        CharSequence loadLabel = this.mInfo.loadLabel(packageManager);
+        if (loadLabel == null) {
+            str = null;
+        } else {
+            str = loadLabel.toString();
+        }
+        arrayList.add(str);
+        try {
+            CharSequence loadAuthor = this.mInfo.loadAuthor(packageManager);
+            if (loadAuthor != null) {
+                arrayList.add(loadAuthor.toString());
+            }
+        } catch (Resources.NotFoundException unused) {
+        }
+        try {
+            CharSequence loadDescription = this.mInfo.loadDescription(packageManager);
+            if (loadDescription != null) {
+                arrayList.add(loadDescription.toString());
+            }
+        } catch (Resources.NotFoundException unused2) {
+        }
+        return arrayList;
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final String getCollectionId(Context context) {
+        if (TextUtils.isEmpty(this.mCollectionId)) {
+            return context.getString(R.string.live_wallpaper_collection_id);
+        }
+        return this.mCollectionId;
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public Asset getThumbAsset(Context context) {
+        if (this.mThumbAsset == null) {
+            this.mThumbAsset = new LiveWallpaperThumbAsset(context, this.mInfo);
+        }
+        return this.mThumbAsset;
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final String getTitle(Activity activity) {
+        CharSequence loadLabel;
+        if (!this.mVisibleTitle || (loadLabel = this.mInfo.loadLabel(activity.getPackageManager())) == null) {
+            return null;
+        }
+        return loadLabel.toString();
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final String getWallpaperId() {
+        return this.mInfo.getServiceName();
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo, android.os.Parcelable
+    public final void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(this.mPlaceholderColor);
+        parcel.writeParcelable(this.mInfo, 0);
+        parcel.writeInt(this.mVisibleTitle ? 1 : 0);
+        parcel.writeString(this.mCollectionId);
     }
 
     public static LiveWallpaperInfo fromPackageAndServiceName(Context context, String str, String str2, String str3, String str4) {
@@ -98,32 +187,35 @@ public class LiveWallpaperInfo extends WallpaperInfo {
         }
     }
 
-    public static List<WallpaperInfo> getAll(Context context, Set<String> set) {
-        List<ResolveInfo> allOnDevice = getAllOnDevice(context);
+    public static ArrayList getAll(Context context, Set set) {
+        Object obj;
+        ArrayList allOnDevice = getAllOnDevice(context);
         ArrayList arrayList = new ArrayList();
-        CornerTreatment liveWallpaperInfoFactory = InjectorProvider.getInjector().getLiveWallpaperInfoFactory(context);
-        int i = 0;
-        while (true) {
-            ArrayList arrayList2 = (ArrayList) allOnDevice;
-            if (i >= arrayList2.size()) {
-                return arrayList;
-            }
-            ResolveInfo resolveInfo = (ResolveInfo) arrayList2.get(i);
+        Intrinsics liveWallpaperInfoFactory = R$style.getInjector().getLiveWallpaperInfoFactory();
+        for (int i = 0; i < allOnDevice.size(); i++) {
+            ResolveInfo resolveInfo = (ResolveInfo) allOnDevice.get(i);
             try {
                 WallpaperInfo wallpaperInfo = new WallpaperInfo(context, resolveInfo);
                 if (set == null || !set.contains(wallpaperInfo.getPackageName())) {
-                    arrayList.add(liveWallpaperInfoFactory.getLiveWallpaperInfo(wallpaperInfo));
+                    liveWallpaperInfoFactory.getClass();
+                    if (wallpaperInfo.getComponent().equals(MicropaperFrontend.MICROPAPER_SERVICE)) {
+                        obj = new MicropaperWallpaperInfo(wallpaperInfo);
+                    } else {
+                        obj = new GoogleLiveWallpaperInfo(wallpaperInfo);
+                    }
+                    arrayList.add(obj);
                 }
             } catch (IOException | XmlPullParserException e) {
                 StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Skipping wallpaper ");
                 m.append(resolveInfo.serviceInfo);
                 Log.w("LiveWallpaperInfo", m.toString(), e);
             }
-            i++;
         }
+        return arrayList;
     }
 
-    public static List<ResolveInfo> getAllOnDevice(Context context) {
+    public static ArrayList getAllOnDevice(Context context) {
+        boolean z;
         final PackageManager packageManager = context.getPackageManager();
         String packageName = context.getPackageName();
         List<ResolveInfo> queryIntentServices = packageManager.queryIntentServices(new Intent("android.service.wallpaper.WallpaperService"), 128);
@@ -135,6 +227,11 @@ public class LiveWallpaperInfo extends WallpaperInfo {
                 it.remove();
             } else {
                 if ((next.serviceInfo.applicationInfo.flags & 129) != 0) {
+                    z = true;
+                } else {
+                    z = false;
+                }
+                if (z) {
                     arrayList.add(next);
                     it.remove();
                 }
@@ -147,7 +244,7 @@ public class LiveWallpaperInfo extends WallpaperInfo {
             public final Collator mCollator = Collator.getInstance();
 
             @Override // java.util.Comparator
-            public int compare(ResolveInfo resolveInfo, ResolveInfo resolveInfo2) {
+            public final int compare(ResolveInfo resolveInfo, ResolveInfo resolveInfo2) {
                 return this.mCollator.compare(resolveInfo.loadLabel(packageManager), resolveInfo2.loadLabel(packageManager));
             }
         });
@@ -156,86 +253,15 @@ public class LiveWallpaperInfo extends WallpaperInfo {
     }
 
     @Override // com.android.wallpaper.model.WallpaperInfo
-    public String getActionUrl(Context context) {
-        if (BuildCompat.sSdk >= 25) {
-            try {
-                Uri loadContextUri = this.mInfo.loadContextUri(context.getPackageManager());
-                if (loadContextUri != null) {
-                    return loadContextUri.toString();
-                }
-            } catch (Resources.NotFoundException unused) {
-            }
-        }
-        return null;
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public Asset getAsset(Context context) {
-        return null;
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public List<String> getAttributions(Context context) {
-        ArrayList arrayList = new ArrayList();
-        PackageManager packageManager = context.getPackageManager();
-        CharSequence loadLabel = this.mInfo.loadLabel(packageManager);
-        arrayList.add(loadLabel == null ? null : loadLabel.toString());
-        try {
-            CharSequence loadAuthor = this.mInfo.loadAuthor(packageManager);
-            if (loadAuthor != null) {
-                arrayList.add(loadAuthor.toString());
-            }
-        } catch (Resources.NotFoundException unused) {
-        }
-        try {
-            CharSequence loadDescription = this.mInfo.loadDescription(packageManager);
-            if (loadDescription != null) {
-                arrayList.add(loadDescription.toString());
-            }
-        } catch (Resources.NotFoundException unused2) {
-        }
-        return arrayList;
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public String getCollectionId(Context context) {
-        if (TextUtils.isEmpty(this.mCollectionId)) {
-            return context.getString(R.string.live_wallpaper_collection_id);
-        }
-        return this.mCollectionId;
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public Asset getThumbAsset(Context context) {
-        if (this.mThumbAsset == null) {
-            this.mThumbAsset = new LiveWallpaperThumbAsset(context, this.mInfo);
-        }
-        return this.mThumbAsset;
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public String getTitle(Context context) {
-        CharSequence loadLabel;
-        if (!this.mVisibleTitle || (loadLabel = this.mInfo.loadLabel(context.getPackageManager())) == null) {
-            return null;
-        }
-        return loadLabel.toString();
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public WallpaperInfo getWallpaperComponent() {
-        return this.mInfo;
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public String getWallpaperId() {
-        return this.mInfo.getServiceName();
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperInfo
     public void showPreview(Activity activity, InlinePreviewIntentFactory inlinePreviewIntentFactory, int i) {
-        Objects.requireNonNull(inlinePreviewIntentFactory);
+        boolean z;
+        inlinePreviewIntentFactory.getClass();
         if (ContextCompat.checkSelfPermission(activity, "android.permission.BIND_WALLPAPER") == 0) {
+            z = true;
+        } else {
+            z = false;
+        }
+        if (z) {
             activity.startActivityForResult(inlinePreviewIntentFactory.newIntent(activity, this), i);
             return;
         }
@@ -244,24 +270,15 @@ public class LiveWallpaperInfo extends WallpaperInfo {
         ActivityUtils.startActivityForResultSafely(activity, intent, i);
     }
 
-    @Override // com.android.wallpaper.model.WallpaperInfo, android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeInt(this.mPlaceholderColor);
-        parcel.writeParcelable(this.mInfo, 0);
-        parcel.writeInt(this.mVisibleTitle ? 1 : 0);
-        parcel.writeString(this.mCollectionId);
-    }
-
-    public LiveWallpaperInfo(WallpaperInfo wallpaperInfo, boolean z, String str) {
-        this.mInfo = wallpaperInfo;
-        this.mVisibleTitle = z;
-        this.mCollectionId = str;
-    }
-
     public LiveWallpaperInfo(Parcel parcel) {
         super(parcel);
         this.mInfo = (WallpaperInfo) parcel.readParcelable(WallpaperInfo.class.getClassLoader());
         this.mVisibleTitle = parcel.readInt() != 1 ? false : true;
         this.mCollectionId = parcel.readString();
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final WallpaperInfo getWallpaperComponent() {
+        return this.mInfo;
     }
 }

@@ -7,41 +7,28 @@ import android.util.SparseArray;
 public class ParcelableSparseArray extends SparseArray<Parcelable> implements Parcelable {
     public static final Parcelable.Creator<ParcelableSparseArray> CREATOR = new Parcelable.ClassLoaderCreator<ParcelableSparseArray>() { // from class: com.google.android.material.internal.ParcelableSparseArray.1
         @Override // android.os.Parcelable.ClassLoaderCreator
-        public ParcelableSparseArray createFromParcel(Parcel parcel, ClassLoader classLoader) {
+        public final ParcelableSparseArray createFromParcel(Parcel parcel, ClassLoader classLoader) {
             return new ParcelableSparseArray(parcel, classLoader);
         }
 
         @Override // android.os.Parcelable.Creator
-        public Object[] newArray(int i) {
-            return new ParcelableSparseArray[i];
+        public final Object createFromParcel(Parcel parcel) {
+            return new ParcelableSparseArray(parcel, null);
         }
 
         @Override // android.os.Parcelable.Creator
-        public Object createFromParcel(Parcel parcel) {
-            return new ParcelableSparseArray(parcel, null);
+        public final Object[] newArray(int i) {
+            return new ParcelableSparseArray[i];
         }
     };
 
     public ParcelableSparseArray() {
+        throw null;
     }
 
     @Override // android.os.Parcelable
-    public int describeContents() {
+    public final int describeContents() {
         return 0;
-    }
-
-    @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
-        int size = size();
-        int[] iArr = new int[size];
-        Parcelable[] parcelableArr = new Parcelable[size];
-        for (int i2 = 0; i2 < size; i2++) {
-            iArr[i2] = keyAt(i2);
-            parcelableArr[i2] = valueAt(i2);
-        }
-        parcel.writeInt(size);
-        parcel.writeIntArray(iArr);
-        parcel.writeParcelableArray(parcelableArr, i);
     }
 
     public ParcelableSparseArray(Parcel parcel, ClassLoader classLoader) {
@@ -52,5 +39,19 @@ public class ParcelableSparseArray extends SparseArray<Parcelable> implements Pa
         for (int i = 0; i < readInt; i++) {
             put(iArr[i], readParcelableArray[i]);
         }
+    }
+
+    @Override // android.os.Parcelable
+    public final void writeToParcel(Parcel parcel, int i) {
+        int size = size();
+        int[] iArr = new int[size];
+        Parcelable[] parcelableArr = new Parcelable[size];
+        for (int i2 = 0; i2 < size; i2++) {
+            iArr[i2] = keyAt(i2);
+            parcelableArr[i2] = valueAt(i2);
+        }
+        parcel.writeInt(size);
+        parcel.writeIntArray(iArr);
+        parcel.writeParcelableArray(parcelableArr, i);
     }
 }

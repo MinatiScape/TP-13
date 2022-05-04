@@ -1,6 +1,7 @@
 package com.android.systemui.unfold.config;
 
 import org.jetbrains.annotations.NotNull;
+/* compiled from: ResourceUnfoldTransitionConfig.kt */
 /* loaded from: classes.dex */
 public final class ResourceUnfoldTransitionConfigKt {
     @NotNull

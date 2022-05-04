@@ -1,14 +1,11 @@
 package androidx.slice.core;
 
-import android.app.PendingIntent;
-import androidx.constraintlayout.solver.SolverVariable$Type$r8$EnumUnboxingUtility;
 import androidx.core.graphics.drawable.IconCompat;
-import androidx.slice.ArrayUtils;
 import androidx.slice.SliceItem;
 /* loaded from: classes.dex */
-public class SliceActionImpl implements SliceAction {
+public final class SliceActionImpl implements SliceAction {
     public SliceItem mActionItem;
-    public int mActionType;
+    public ActionType mActionType;
     public CharSequence mContentDescription;
     public IconCompat mIcon;
     public int mImageMode;
@@ -17,61 +14,87 @@ public class SliceActionImpl implements SliceAction {
     public SliceItem mSliceItem;
     public CharSequence mTitle;
 
-    public SliceActionImpl(PendingIntent action, IconCompat actionIcon, int imageMode, CharSequence actionTitle) {
-        this.mImageMode = 5;
-        this.mActionType = 1;
-        this.mPriority = -1;
-        this.mIcon = actionIcon;
-        this.mTitle = actionTitle;
-        this.mImageMode = imageMode;
+    /* loaded from: classes.dex */
+    public enum ActionType {
+        DEFAULT,
+        TOGGLE,
+        DATE_PICKER,
+        TIME_PICKER
     }
 
-    public static int parseImageMode(SliceItem iconItem) {
-        if (ArrayUtils.contains(iconItem.mHints, "show_label")) {
+    public SliceActionImpl(IconCompat iconCompat, int i, CharSequence charSequence) {
+        this.mActionType = ActionType.DEFAULT;
+        this.mPriority = -1;
+        this.mIcon = iconCompat;
+        this.mTitle = charSequence;
+        this.mImageMode = i;
+    }
+
+    public static int parseImageMode(SliceItem sliceItem) {
+        if (sliceItem.hasHint("show_label")) {
             return 6;
         }
-        if (!ArrayUtils.contains(iconItem.mHints, "no_tint")) {
+        if (!sliceItem.hasHint("no_tint")) {
             return 0;
         }
-        return ArrayUtils.contains(iconItem.mHints, "raw") ? ArrayUtils.contains(iconItem.mHints, "large") ? 4 : 3 : ArrayUtils.contains(iconItem.mHints, "large") ? 2 : 1;
+        if (sliceItem.hasHint("raw")) {
+            if (sliceItem.hasHint("large")) {
+                return 4;
+            }
+            return 3;
+        } else if (sliceItem.hasHint("large")) {
+            return 2;
+        } else {
+            return 1;
+        }
     }
 
-    @Override // androidx.slice.core.SliceAction
-    public int getPriority() {
-        return this.mPriority;
-    }
-
-    public String getSubtype() {
-        int $enumboxing$ordinal = SolverVariable$Type$r8$EnumUnboxingUtility.$enumboxing$ordinal(this.mActionType);
-        if ($enumboxing$ordinal == 1) {
+    public final String getSubtype() {
+        int ordinal = this.mActionType.ordinal();
+        if (ordinal == 1) {
             return "toggle";
         }
-        if ($enumboxing$ordinal == 2) {
+        if (ordinal == 2) {
             return "date_picker";
         }
-        if ($enumboxing$ordinal != 3) {
+        if (ordinal != 3) {
             return null;
         }
         return "time_picker";
     }
 
-    @Override // androidx.slice.core.SliceAction
-    public boolean isToggle() {
-        return this.mActionType == 2;
+    public final boolean isDefaultToggle() {
+        if (this.mActionType == ActionType.TOGGLE && this.mIcon == null) {
+            return true;
+        }
+        return false;
     }
 
-    /* JADX WARN: Removed duplicated region for block: B:35:0x009f  */
-    /* JADX WARN: Removed duplicated region for block: B:44:0x00c0  */
+    @Override // androidx.slice.core.SliceAction
+    public final boolean isToggle() {
+        if (this.mActionType == ActionType.TOGGLE) {
+            return true;
+        }
+        return false;
+    }
+
+    /* JADX WARN: Removed duplicated region for block: B:38:0x00aa  */
+    /* JADX WARN: Removed duplicated region for block: B:47:0x00cd  */
     @android.annotation.SuppressLint({"InlinedApi"})
     /*
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public SliceActionImpl(androidx.slice.SliceItem r8) {
+    public SliceActionImpl(androidx.slice.SliceItem r9) {
         /*
-            Method dump skipped, instructions count: 253
+            Method dump skipped, instructions count: 264
             To view this dump add '--comments-level debug' option
         */
         throw new UnsupportedOperationException("Method not decompiled: androidx.slice.core.SliceActionImpl.<init>(androidx.slice.SliceItem):void");
+    }
+
+    @Override // androidx.slice.core.SliceAction
+    public final int getPriority() {
+        return this.mPriority;
     }
 }

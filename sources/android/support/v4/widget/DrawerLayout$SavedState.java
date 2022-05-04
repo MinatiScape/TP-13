@@ -7,18 +7,18 @@ import android.support.v4.view.AbsSavedState;
 public class DrawerLayout$SavedState extends AbsSavedState {
     public static final Parcelable.Creator<DrawerLayout$SavedState> CREATOR = new Parcelable.ClassLoaderCreator<DrawerLayout$SavedState>() { // from class: android.support.v4.widget.DrawerLayout$SavedState.1
         @Override // android.os.Parcelable.ClassLoaderCreator
-        public DrawerLayout$SavedState createFromParcel(Parcel parcel, ClassLoader classLoader) {
+        public final DrawerLayout$SavedState createFromParcel(Parcel parcel, ClassLoader classLoader) {
             return new DrawerLayout$SavedState(parcel, classLoader);
         }
 
         @Override // android.os.Parcelable.Creator
-        public Object[] newArray(int i) {
-            return new DrawerLayout$SavedState[i];
+        public final Object createFromParcel(Parcel parcel) {
+            return new DrawerLayout$SavedState(parcel, null);
         }
 
         @Override // android.os.Parcelable.Creator
-        public Object createFromParcel(Parcel parcel) {
-            return new DrawerLayout$SavedState(parcel, null);
+        public final Object[] newArray(int i) {
+            return new DrawerLayout$SavedState[i];
         }
     };
     public int lockModeEnd;
@@ -26,6 +26,16 @@ public class DrawerLayout$SavedState extends AbsSavedState {
     public int lockModeRight;
     public int lockModeStart;
     public int openDrawerGravity;
+
+    @Override // android.support.v4.view.AbsSavedState, android.os.Parcelable
+    public final void writeToParcel(Parcel parcel, int i) {
+        parcel.writeParcelable(this.mSuperState, i);
+        parcel.writeInt(this.openDrawerGravity);
+        parcel.writeInt(this.lockModeLeft);
+        parcel.writeInt(this.lockModeRight);
+        parcel.writeInt(this.lockModeStart);
+        parcel.writeInt(this.lockModeEnd);
+    }
 
     public DrawerLayout$SavedState(Parcel parcel, ClassLoader classLoader) {
         super(parcel, classLoader);
@@ -35,15 +45,5 @@ public class DrawerLayout$SavedState extends AbsSavedState {
         this.lockModeRight = parcel.readInt();
         this.lockModeStart = parcel.readInt();
         this.lockModeEnd = parcel.readInt();
-    }
-
-    @Override // android.support.v4.view.AbsSavedState, android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeParcelable(this.mSuperState, i);
-        parcel.writeInt(this.openDrawerGravity);
-        parcel.writeInt(this.lockModeLeft);
-        parcel.writeInt(this.lockModeRight);
-        parcel.writeInt(this.lockModeStart);
-        parcel.writeInt(this.lockModeEnd);
     }
 }

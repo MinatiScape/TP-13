@@ -4,21 +4,24 @@ import android.util.Property;
 import android.view.ViewGroup;
 import com.android.systemui.shared.R;
 /* loaded from: classes.dex */
-public class ChildrenAlphaProperty extends Property<ViewGroup, Float> {
-    public static final Property<ViewGroup, Float> CHILDREN_ALPHA = new ChildrenAlphaProperty("childrenAlpha");
+public final class ChildrenAlphaProperty extends Property<ViewGroup, Float> {
+    public static final ChildrenAlphaProperty CHILDREN_ALPHA = new ChildrenAlphaProperty();
 
-    public ChildrenAlphaProperty(String str) {
-        super(Float.class, str);
+    public ChildrenAlphaProperty() {
+        super(Float.class, "childrenAlpha");
     }
 
     @Override // android.util.Property
-    public Float get(ViewGroup viewGroup) {
+    public final Float get(ViewGroup viewGroup) {
         Float f = (Float) viewGroup.getTag(R.id.mtrl_internal_children_alpha_tag);
-        return f != null ? f : Float.valueOf(1.0f);
+        if (f != null) {
+            return f;
+        }
+        return Float.valueOf(1.0f);
     }
 
     @Override // android.util.Property
-    public void set(ViewGroup viewGroup, Float f) {
+    public final void set(ViewGroup viewGroup, Float f) {
         ViewGroup viewGroup2 = viewGroup;
         float floatValue = f.floatValue();
         viewGroup2.setTag(R.id.mtrl_internal_children_alpha_tag, Float.valueOf(floatValue));

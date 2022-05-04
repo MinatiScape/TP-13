@@ -12,26 +12,32 @@ import androidx.core.content.res.ResourcesCompat;
 public final class DrawableDecoderCompat {
     public static volatile boolean shouldCallAppCompatResources = true;
 
-    public static Drawable getDrawable(Context ourContext, Context targetContext, int id, Resources.Theme theme) {
+    public static Drawable getDrawable(Context context, Context context2, int i, Resources.Theme theme) {
+        Context context3;
         try {
             if (shouldCallAppCompatResources) {
-                return AppCompatResources.getDrawable(theme != null ? new ContextThemeWrapper(targetContext, theme) : targetContext, id);
+                if (theme != null) {
+                    context3 = new ContextThemeWrapper(context2, theme);
+                } else {
+                    context3 = context2;
+                }
+                return AppCompatResources.getDrawable(context3, i);
             }
         } catch (Resources.NotFoundException unused) {
         } catch (IllegalStateException e) {
-            if (!ourContext.getPackageName().equals(targetContext.getPackageName())) {
+            if (!context.getPackageName().equals(context2.getPackageName())) {
                 Object obj = ContextCompat.sLock;
-                return targetContext.getDrawable(id);
+                return context2.getDrawable(i);
             }
             throw e;
         } catch (NoClassDefFoundError unused2) {
             shouldCallAppCompatResources = false;
         }
         if (theme == null) {
-            theme = targetContext.getTheme();
+            theme = context2.getTheme();
         }
-        Resources resources = targetContext.getResources();
+        Resources resources = context2.getResources();
         ThreadLocal<TypedValue> threadLocal = ResourcesCompat.sTempTypedValue;
-        return resources.getDrawable(id, theme);
+        return resources.getDrawable(i, theme);
     }
 }

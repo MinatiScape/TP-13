@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="settingslib_accent_primary_variant">@android:color/background_device_default_light</color>
+    <color name="settingslib_colorSurface">@color/settingslib_surface_dark</color>
     <color name="settingslib_colorSurfaceHeader">@android:color/Red_700</color>
     <color name="settingslib_colorSurfaceVariant">@android:color/Red_700</color>
     <color name="settingslib_dialog_accent">@android:color/background_cache_hint_selector_material_light</color>
-    <color name="settingslib_dialog_background">@android:color/Red_800</color>
+    <color name="settingslib_dialog_background">@color/settingslib_surface_dark</color>
     <color name="settingslib_dialog_colorError">#f28b82</color>
+    <color name="settingslib_ripple_color">@color/settingslib_material_grey_900</color>
+    <color name="settingslib_surface_dark">@android:color/Red_800</color>
+    <color name="settingslib_text_color_preference_category_title">@android:color/background_cache_hint_selector_material_light</color>
     <color name="settingslib_text_color_primary_device_default">@android:color/GM2_grey_800</color>
+    <color name="settingslib_text_color_secondary_device_default">@android:color/accent_device_default_dark_60_percent_opacity</color>
     <color name="settingslib_thumb_disabled_color">@android:color/Red_700</color>
     <color name="settingslib_thumb_off_color">@android:color/Pink_800</color>
     <color name="settingslib_track_off_color">@android:color/Red_700</color>

@@ -1,10 +1,12 @@
 package com.google.android.apps.wallpaper.module;
 
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
+import java.util.ArrayList;
 import java.util.List;
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: RecentWallpaperUtils.kt */
 /* loaded from: classes.dex */
 public final class RecentWallpaperEntry {
     @Nullable
@@ -20,23 +22,7 @@ public final class RecentWallpaperEntry {
     @Nullable
     public final Integer placeHolderColor;
 
-    public RecentWallpaperEntry(@NotNull String str, @Nullable String str2, @Nullable List<String> list, @Nullable String str3, @Nullable String str4, @Nullable Integer num) {
-        this.id = str;
-        this.collectionId = str2;
-        this.attributions = list;
-        this.actionUrl = str3;
-        this.component = str4;
-        this.placeHolderColor = num;
-    }
-
-    public boolean equals(@Nullable Object obj) {
-        if (obj instanceof RecentWallpaperEntry) {
-            return Intrinsics.areEqual(this.id, ((RecentWallpaperEntry) obj).id);
-        }
-        return super.equals(obj);
-    }
-
-    public int hashCode() {
+    public final int hashCode() {
         int hashCode = this.id.hashCode() * 31;
         String str = this.collectionId;
         int i = 0;
@@ -54,8 +40,15 @@ public final class RecentWallpaperEntry {
         return hashCode5 + i;
     }
 
+    public final boolean equals(@Nullable Object obj) {
+        if (obj instanceof RecentWallpaperEntry) {
+            return Intrinsics.areEqual(this.id, ((RecentWallpaperEntry) obj).id);
+        }
+        return super.equals(obj);
+    }
+
     @NotNull
-    public String toString() {
+    public final String toString() {
         StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("RecentWallpaperEntry(id=");
         m.append(this.id);
         m.append(", collectionId=");
@@ -70,5 +63,14 @@ public final class RecentWallpaperEntry {
         m.append(this.placeHolderColor);
         m.append(')');
         return m.toString();
+    }
+
+    public RecentWallpaperEntry(@NotNull String str, @Nullable String str2, @Nullable ArrayList arrayList, @Nullable String str3, @Nullable String str4, @Nullable Integer num) {
+        this.id = str;
+        this.collectionId = str2;
+        this.attributions = arrayList;
+        this.actionUrl = str3;
+        this.component = str4;
+        this.placeHolderColor = num;
     }
 }

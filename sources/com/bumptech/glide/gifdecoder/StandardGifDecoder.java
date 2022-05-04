@@ -1,9 +1,7 @@
 package com.bumptech.glide.gifdecoder;
 
 import android.graphics.Bitmap;
-import android.support.v4.app.FragmentTabHost$SavedState$$ExternalSyntheticOutline0;
 import android.util.Log;
-import androidx.recyclerview.R$attr$$ExternalSyntheticOutline0;
 import com.bumptech.glide.gifdecoder.GifDecoder;
 import com.bumptech.glide.load.engine.bitmap_recycle.ArrayPool;
 import com.bumptech.glide.load.resource.gif.GifBitmapProvider;
@@ -11,7 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Iterator;
 /* loaded from: classes.dex */
-public class StandardGifDecoder implements GifDecoder {
+public final class StandardGifDecoder implements GifDecoder {
     public int[] act;
     public final GifDecoder.BitmapProvider bitmapProvider;
     public byte[] block;
@@ -33,63 +31,8 @@ public class StandardGifDecoder implements GifDecoder {
     public final int[] pct = new int[256];
     public Bitmap.Config bitmapConfig = Bitmap.Config.ARGB_8888;
 
-    public StandardGifDecoder(GifDecoder.BitmapProvider provider, GifHeader gifHeader, ByteBuffer rawData, int sampleSize) {
-        int[] iArr;
-        this.bitmapProvider = provider;
-        this.header = new GifHeader();
-        synchronized (this) {
-            if (sampleSize > 0) {
-                int highestOneBit = Integer.highestOneBit(sampleSize);
-                this.status = 0;
-                this.header = gifHeader;
-                this.framePointer = -1;
-                ByteBuffer asReadOnlyBuffer = rawData.asReadOnlyBuffer();
-                this.rawData = asReadOnlyBuffer;
-                asReadOnlyBuffer.position(0);
-                this.rawData.order(ByteOrder.LITTLE_ENDIAN);
-                this.savePrevious = false;
-                Iterator<GifFrame> it = gifHeader.frames.iterator();
-                while (true) {
-                    if (it.hasNext()) {
-                        if (it.next().dispose == 3) {
-                            this.savePrevious = true;
-                            break;
-                        }
-                    } else {
-                        break;
-                    }
-                }
-                this.sampleSize = highestOneBit;
-                int i = gifHeader.width;
-                this.downsampledWidth = i / highestOneBit;
-                int i2 = gifHeader.height;
-                this.downsampledHeight = i2 / highestOneBit;
-                this.mainPixels = ((GifBitmapProvider) this.bitmapProvider).obtainByteArray(i * i2);
-                GifDecoder.BitmapProvider bitmapProvider = this.bitmapProvider;
-                int i3 = this.downsampledWidth * this.downsampledHeight;
-                ArrayPool arrayPool = ((GifBitmapProvider) bitmapProvider).arrayPool;
-                if (arrayPool == null) {
-                    iArr = new int[i3];
-                } else {
-                    iArr = (int[]) arrayPool.get(i3, int[].class);
-                }
-                this.mainScratch = iArr;
-            } else {
-                StringBuilder sb = new StringBuilder(41);
-                sb.append("Sample size must be >=0, not: ");
-                sb.append(sampleSize);
-                throw new IllegalArgumentException(sb.toString());
-            }
-        }
-    }
-
     @Override // com.bumptech.glide.gifdecoder.GifDecoder
-    public void advance() {
-        this.framePointer = (this.framePointer + 1) % this.header.frameCount;
-    }
-
-    @Override // com.bumptech.glide.gifdecoder.GifDecoder
-    public void clear() {
+    public final void clear() {
         ArrayPool arrayPool;
         ArrayPool arrayPool2;
         ArrayPool arrayPool3;
@@ -116,35 +59,94 @@ public class StandardGifDecoder implements GifDecoder {
     }
 
     @Override // com.bumptech.glide.gifdecoder.GifDecoder
-    public int getByteSize() {
+    public final synchronized Bitmap getNextFrame() {
+        GifFrame gifFrame;
+        byte[] bArr;
+        if (this.header.frameCount <= 0 || this.framePointer < 0) {
+            if (Log.isLoggable("StandardGifDecoder", 3)) {
+                Log.d("StandardGifDecoder", "Unable to decode frame, frameCount=" + this.header.frameCount + ", framePointer=" + this.framePointer);
+            }
+            this.status = 1;
+        }
+        int i = this.status;
+        if (!(i == 1 || i == 2)) {
+            this.status = 0;
+            if (this.block == null) {
+                ArrayPool arrayPool = ((GifBitmapProvider) this.bitmapProvider).arrayPool;
+                if (arrayPool == null) {
+                    bArr = new byte[255];
+                } else {
+                    bArr = (byte[]) arrayPool.get(255, byte[].class);
+                }
+                this.block = bArr;
+            }
+            GifFrame gifFrame2 = (GifFrame) this.header.frames.get(this.framePointer);
+            int i2 = this.framePointer - 1;
+            if (i2 >= 0) {
+                gifFrame = (GifFrame) this.header.frames.get(i2);
+            } else {
+                gifFrame = null;
+            }
+            int[] iArr = gifFrame2.lct;
+            if (iArr == null) {
+                iArr = this.header.gct;
+            }
+            this.act = iArr;
+            if (iArr == null) {
+                if (Log.isLoggable("StandardGifDecoder", 3)) {
+                    Log.d("StandardGifDecoder", "No valid color table found for frame #" + this.framePointer);
+                }
+                this.status = 1;
+                return null;
+            }
+            if (gifFrame2.transparency) {
+                System.arraycopy(iArr, 0, this.pct, 0, iArr.length);
+                int[] iArr2 = this.pct;
+                this.act = iArr2;
+                iArr2[gifFrame2.transIndex] = 0;
+                if (gifFrame2.dispose == 2 && this.framePointer == 0) {
+                    this.isFirstFrameTransparent = Boolean.TRUE;
+                }
+            }
+            return setPixels(gifFrame2, gifFrame);
+        }
+        if (Log.isLoggable("StandardGifDecoder", 3)) {
+            Log.d("StandardGifDecoder", "Unable to decode frame, status=" + this.status);
+        }
+        return null;
+    }
+
+    @Override // com.bumptech.glide.gifdecoder.GifDecoder
+    public final void advance() {
+        this.framePointer = (this.framePointer + 1) % this.header.frameCount;
+    }
+
+    @Override // com.bumptech.glide.gifdecoder.GifDecoder
+    public final int getByteSize() {
         return (this.mainScratch.length * 4) + this.rawData.limit() + this.mainPixels.length;
     }
 
     @Override // com.bumptech.glide.gifdecoder.GifDecoder
-    public int getCurrentFrameIndex() {
-        return this.framePointer;
-    }
-
-    @Override // com.bumptech.glide.gifdecoder.GifDecoder
-    public ByteBuffer getData() {
-        return this.rawData;
-    }
-
-    @Override // com.bumptech.glide.gifdecoder.GifDecoder
-    public int getFrameCount() {
+    public final int getFrameCount() {
         return this.header.frameCount;
     }
 
     public final Bitmap getNextBitmap() {
+        Bitmap.Config config;
         Boolean bool = this.isFirstFrameTransparent;
-        Bitmap.Config config = (bool == null || bool.booleanValue()) ? Bitmap.Config.ARGB_8888 : this.bitmapConfig;
-        Bitmap dirty = ((GifBitmapProvider) this.bitmapProvider).bitmapPool.getDirty(this.downsampledWidth, this.downsampledHeight, config);
+        if (bool == null || bool.booleanValue()) {
+            config = Bitmap.Config.ARGB_8888;
+        } else {
+            config = this.bitmapConfig;
+        }
+        GifDecoder.BitmapProvider bitmapProvider = this.bitmapProvider;
+        Bitmap dirty = ((GifBitmapProvider) bitmapProvider).bitmapPool.getDirty(this.downsampledWidth, this.downsampledHeight, config);
         dirty.setHasAlpha(true);
         return dirty;
     }
 
     @Override // com.bumptech.glide.gifdecoder.GifDecoder
-    public int getNextDelay() {
+    public final int getNextDelay() {
         int i;
         GifHeader gifHeader = this.header;
         int i2 = gifHeader.frameCount;
@@ -154,92 +156,96 @@ public class StandardGifDecoder implements GifDecoder {
         if (i < 0 || i >= i2) {
             return -1;
         }
-        return gifHeader.frames.get(i).delay;
+        return ((GifFrame) gifHeader.frames.get(i)).delay;
     }
 
-    @Override // com.bumptech.glide.gifdecoder.GifDecoder
-    public synchronized Bitmap getNextFrame() {
-        if (this.header.frameCount <= 0 || this.framePointer < 0) {
-            if (Log.isLoggable("StandardGifDecoder", 3)) {
-                int i = this.header.frameCount;
-                int i2 = this.framePointer;
-                StringBuilder sb = new StringBuilder(72);
-                sb.append("Unable to decode frame, frameCount=");
-                sb.append(i);
-                sb.append(", framePointer=");
-                sb.append(i2);
-                Log.d("StandardGifDecoder", sb.toString());
-            }
-            this.status = 1;
-        }
-        int i3 = this.status;
-        if (!(i3 == 1 || i3 == 2)) {
-            this.status = 0;
-            if (this.block == null) {
-                this.block = ((GifBitmapProvider) this.bitmapProvider).obtainByteArray(255);
-            }
-            GifFrame gifFrame = this.header.frames.get(this.framePointer);
-            int i4 = this.framePointer - 1;
-            GifFrame gifFrame2 = i4 >= 0 ? this.header.frames.get(i4) : null;
-            int[] iArr = gifFrame.lct;
-            if (iArr == null) {
-                iArr = this.header.gct;
-            }
-            this.act = iArr;
-            if (iArr == null) {
-                if (Log.isLoggable("StandardGifDecoder", 3)) {
-                    int i5 = this.framePointer;
-                    StringBuilder sb2 = new StringBuilder(49);
-                    sb2.append("No valid color table found for frame #");
-                    sb2.append(i5);
-                    Log.d("StandardGifDecoder", sb2.toString());
-                }
-                this.status = 1;
-                return null;
-            }
-            if (gifFrame.transparency) {
-                System.arraycopy(iArr, 0, this.pct, 0, iArr.length);
-                int[] iArr2 = this.pct;
-                this.act = iArr2;
-                iArr2[gifFrame.transIndex] = 0;
-            }
-            return setPixels(gifFrame, gifFrame2);
-        }
-        if (Log.isLoggable("StandardGifDecoder", 3)) {
-            int i6 = this.status;
-            StringBuilder sb3 = new StringBuilder(42);
-            sb3.append("Unable to decode frame, status=");
-            sb3.append(i6);
-            Log.d("StandardGifDecoder", sb3.toString());
-        }
-        return null;
-    }
-
-    public void setDefaultBitmapConfig(Bitmap.Config config) {
+    public final void setDefaultBitmapConfig(Bitmap.Config config) {
         if (config == Bitmap.Config.ARGB_8888 || config == Bitmap.Config.RGB_565) {
             this.bitmapConfig = config;
             return;
         }
-        String valueOf = String.valueOf(config);
-        String valueOf2 = String.valueOf(Bitmap.Config.ARGB_8888);
-        String valueOf3 = String.valueOf(Bitmap.Config.RGB_565);
-        throw new IllegalArgumentException(FragmentTabHost$SavedState$$ExternalSyntheticOutline0.m(R$attr$$ExternalSyntheticOutline0.m(valueOf3.length() + valueOf2.length() + valueOf.length() + 41, "Unsupported format: ", valueOf, ", must be one of ", valueOf2), " or ", valueOf3));
+        throw new IllegalArgumentException("Unsupported format: " + config + ", must be one of " + Bitmap.Config.ARGB_8888 + " or " + Bitmap.Config.RGB_565);
     }
 
     /* JADX WARN: Code restructure failed: missing block: B:25:0x0045, code lost:
-        if (r3.bgIndex == r36.transIndex) goto L29;
+        if (r3.bgIndex == r36.transIndex) goto L26;
      */
     /* JADX WARN: Multi-variable type inference failed */
-    /* JADX WARN: Removed duplicated region for block: B:32:0x0067  */
+    /* JADX WARN: Removed duplicated region for block: B:29:0x005e  */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
     public final android.graphics.Bitmap setPixels(com.bumptech.glide.gifdecoder.GifFrame r36, com.bumptech.glide.gifdecoder.GifFrame r37) {
         /*
-            Method dump skipped, instructions count: 1078
+            Method dump skipped, instructions count: 1090
             To view this dump add '--comments-level debug' option
         */
         throw new UnsupportedOperationException("Method not decompiled: com.bumptech.glide.gifdecoder.StandardGifDecoder.setPixels(com.bumptech.glide.gifdecoder.GifFrame, com.bumptech.glide.gifdecoder.GifFrame):android.graphics.Bitmap");
+    }
+
+    public StandardGifDecoder(GifBitmapProvider gifBitmapProvider, GifHeader gifHeader, ByteBuffer byteBuffer, int i) {
+        byte[] bArr;
+        int[] iArr;
+        this.bitmapProvider = gifBitmapProvider;
+        this.header = new GifHeader();
+        synchronized (this) {
+            if (i > 0) {
+                int highestOneBit = Integer.highestOneBit(i);
+                this.status = 0;
+                this.header = gifHeader;
+                this.framePointer = -1;
+                ByteBuffer asReadOnlyBuffer = byteBuffer.asReadOnlyBuffer();
+                this.rawData = asReadOnlyBuffer;
+                asReadOnlyBuffer.position(0);
+                this.rawData.order(ByteOrder.LITTLE_ENDIAN);
+                this.savePrevious = false;
+                Iterator it = gifHeader.frames.iterator();
+                while (true) {
+                    if (it.hasNext()) {
+                        if (((GifFrame) it.next()).dispose == 3) {
+                            this.savePrevious = true;
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                this.sampleSize = highestOneBit;
+                int i2 = gifHeader.width;
+                this.downsampledWidth = i2 / highestOneBit;
+                int i3 = gifHeader.height;
+                this.downsampledHeight = i3 / highestOneBit;
+                int i4 = i2 * i3;
+                ArrayPool arrayPool = ((GifBitmapProvider) this.bitmapProvider).arrayPool;
+                if (arrayPool == null) {
+                    bArr = new byte[i4];
+                } else {
+                    bArr = (byte[]) arrayPool.get(i4, byte[].class);
+                }
+                this.mainPixels = bArr;
+                GifDecoder.BitmapProvider bitmapProvider = this.bitmapProvider;
+                int i5 = this.downsampledWidth * this.downsampledHeight;
+                ArrayPool arrayPool2 = ((GifBitmapProvider) bitmapProvider).arrayPool;
+                if (arrayPool2 == null) {
+                    iArr = new int[i5];
+                } else {
+                    iArr = (int[]) arrayPool2.get(i5, int[].class);
+                }
+                this.mainScratch = iArr;
+            } else {
+                throw new IllegalArgumentException("Sample size must be >=0, not: " + i);
+            }
+        }
+    }
+
+    @Override // com.bumptech.glide.gifdecoder.GifDecoder
+    public final int getCurrentFrameIndex() {
+        return this.framePointer;
+    }
+
+    @Override // com.bumptech.glide.gifdecoder.GifDecoder
+    public final ByteBuffer getData() {
+        return this.rawData;
     }
 }

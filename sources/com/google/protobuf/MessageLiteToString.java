@@ -1,5 +1,6 @@
 package com.google.protobuf;
 
+import androidx.collection.ContainerHelpers;
 import com.android.systemui.flags.FlagManager;
 import com.google.protobuf.ByteString;
 import java.util.List;
@@ -37,11 +38,11 @@ public final class MessageLiteToString {
             if (obj instanceof String) {
                 sb.append(": \"");
                 ByteString byteString = ByteString.EMPTY;
-                sb.append(TextFormatEscaper.escapeBytes(new ByteString.LiteralByteString(((String) obj).getBytes(Internal.UTF_8))));
+                sb.append(ContainerHelpers.escapeBytes(new ByteString.LiteralByteString(((String) obj).getBytes(Internal.UTF_8))));
                 sb.append('\"');
             } else if (obj instanceof ByteString) {
                 sb.append(": \"");
-                sb.append(TextFormatEscaper.escapeBytes((ByteString) obj));
+                sb.append(ContainerHelpers.escapeBytes((ByteString) obj));
                 sb.append('\"');
             } else if (obj instanceof GeneratedMessageLite) {
                 sb.append(" {");
@@ -57,7 +58,7 @@ public final class MessageLiteToString {
                 Map.Entry entry2 = (Map.Entry) obj;
                 int i4 = i + 2;
                 printField(sb, i4, "key", entry2.getKey());
-                printField(sb, i4, FlagManager.FIELD_VALUE, entry2.getValue());
+                printField(sb, i4, FlagManager.EXTRA_VALUE, entry2.getValue());
                 sb.append("\n");
                 while (i2 < i) {
                     sb.append(' ');

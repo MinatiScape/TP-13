@@ -8,9 +8,8 @@ import android.view.SurfaceControl;
 import android.view.View;
 import android.view.ViewRootImpl;
 import android.view.ViewTreeObserver;
-import com.android.wallpaper.picker.ImagePreviewFragment$4$$ExternalSyntheticLambda0;
-import com.android.wallpaper.util.PreviewUtils$$ExternalSyntheticLambda0;
 import java.io.PrintWriter;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 @TargetApi(29)
 /* loaded from: classes.dex */
@@ -19,35 +18,25 @@ public class RegionSamplingHelper implements View.OnAttachStateChangeListener, V
     private static final float NAVIGATION_LUMINANCE_THRESHOLD = 0.5f;
     private final Executor mBackgroundExecutor;
     private final SamplingCallback mCallback;
+    private final SysuiCompositionSamplingListener mCompositionSamplingListener;
     private float mCurrentMedianLuma;
     private boolean mFirstSamplingAfterStart;
+    private final Handler mHandler;
     private boolean mIsDestroyed;
     private float mLastMedianLuma;
+    private final Rect mRegisteredSamplingBounds;
+    private SurfaceControl mRegisteredStopLayer;
+    private Runnable mRemoveDrawRunnable;
     private final View mSampledView;
+    private boolean mSamplingEnabled;
     private final CompositionSamplingListener mSamplingListener;
+    private boolean mSamplingListenerRegistered;
+    private final Rect mSamplingRequestBounds;
+    private ViewTreeObserver.OnDrawListener mUpdateOnDraw;
     private boolean mWaitingOnDraw;
     private boolean mWindowHasBlurs;
     private boolean mWindowVisible;
-    private final Handler mHandler = new Handler();
-    private final Rect mSamplingRequestBounds = new Rect();
-    private final Rect mRegisteredSamplingBounds = new Rect();
-    private boolean mSamplingEnabled = false;
-    private boolean mSamplingListenerRegistered = false;
-    private SurfaceControl mRegisteredStopLayer = null;
-    private SurfaceControl mWrappedStopLayer = null;
-    private ViewTreeObserver.OnDrawListener mUpdateOnDraw = new ViewTreeObserver.OnDrawListener() { // from class: com.android.systemui.shared.navigationbar.RegionSamplingHelper.1
-        @Override // android.view.ViewTreeObserver.OnDrawListener
-        public void onDraw() {
-            RegionSamplingHelper.this.mHandler.post(RegionSamplingHelper.this.mRemoveDrawRunnable);
-            RegionSamplingHelper.this.onDraw();
-        }
-    };
-    private Runnable mRemoveDrawRunnable = new Runnable() { // from class: com.android.systemui.shared.navigationbar.RegionSamplingHelper.2
-        @Override // java.lang.Runnable
-        public void run() {
-            RegionSamplingHelper.this.mSampledView.getViewTreeObserver().removeOnDrawListener(RegionSamplingHelper.this.mUpdateOnDraw);
-        }
-    };
+    private SurfaceControl mWrappedStopLayer;
 
     /* loaded from: classes.dex */
     public interface SamplingCallback {
@@ -61,8 +50,42 @@ public class RegionSamplingHelper implements View.OnAttachStateChangeListener, V
     }
 
     public RegionSamplingHelper(View view, SamplingCallback samplingCallback, Executor executor) {
-        this.mBackgroundExecutor = executor;
-        this.mSamplingListener = new CompositionSamplingListener(view.getContext().getMainExecutor()) { // from class: com.android.systemui.shared.navigationbar.RegionSamplingHelper.3
+        this(view, samplingCallback, view.getContext().getMainExecutor(), executor, new SysuiCompositionSamplingListener());
+    }
+
+    public void dump(PrintWriter printWriter) {
+        dump("", printWriter);
+    }
+
+    public void stop() {
+        this.mSamplingEnabled = false;
+        updateSamplingListener();
+    }
+
+    public RegionSamplingHelper(View view, SamplingCallback samplingCallback, Executor executor, Executor executor2, SysuiCompositionSamplingListener sysuiCompositionSamplingListener) {
+        this.mHandler = new Handler();
+        this.mSamplingRequestBounds = new Rect();
+        this.mRegisteredSamplingBounds = new Rect();
+        this.mSamplingEnabled = false;
+        this.mSamplingListenerRegistered = false;
+        this.mRegisteredStopLayer = null;
+        this.mWrappedStopLayer = null;
+        this.mUpdateOnDraw = new ViewTreeObserver.OnDrawListener() { // from class: com.android.systemui.shared.navigationbar.RegionSamplingHelper.1
+            @Override // android.view.ViewTreeObserver.OnDrawListener
+            public void onDraw() {
+                RegionSamplingHelper.this.mHandler.post(RegionSamplingHelper.this.mRemoveDrawRunnable);
+                RegionSamplingHelper.this.onDraw();
+            }
+        };
+        this.mRemoveDrawRunnable = new Runnable() { // from class: com.android.systemui.shared.navigationbar.RegionSamplingHelper.2
+            @Override // java.lang.Runnable
+            public void run() {
+                RegionSamplingHelper.this.mSampledView.getViewTreeObserver().removeOnDrawListener(RegionSamplingHelper.this.mUpdateOnDraw);
+            }
+        };
+        this.mBackgroundExecutor = executor2;
+        this.mCompositionSamplingListener = sysuiCompositionSamplingListener;
+        this.mSamplingListener = new CompositionSamplingListener(executor) { // from class: com.android.systemui.shared.navigationbar.RegionSamplingHelper.3
             public void onSampleCollected(float f) {
                 if (RegionSamplingHelper.this.mSamplingEnabled) {
                     RegionSamplingHelper.this.updateMediaLuma(f);
@@ -77,7 +100,7 @@ public class RegionSamplingHelper implements View.OnAttachStateChangeListener, V
 
     /* JADX INFO: Access modifiers changed from: private */
     public /* synthetic */ void lambda$unregisterSamplingListener$1(SurfaceControl surfaceControl) {
-        CompositionSamplingListener.unregister(this.mSamplingListener);
+        this.mCompositionSamplingListener.unregister(this.mSamplingListener);
         if (surfaceControl != null && surfaceControl.isValid()) {
             surfaceControl.release();
         }
@@ -86,7 +109,7 @@ public class RegionSamplingHelper implements View.OnAttachStateChangeListener, V
     /* JADX INFO: Access modifiers changed from: private */
     public /* synthetic */ void lambda$updateSamplingListener$0(SurfaceControl surfaceControl) {
         if (surfaceControl == null || surfaceControl.isValid()) {
-            CompositionSamplingListener.register(this.mSamplingListener, 0, surfaceControl, this.mSamplingRequestBounds);
+            this.mCompositionSamplingListener.register(this.mSamplingListener, 0, surfaceControl, this.mSamplingRequestBounds);
         }
     }
 
@@ -101,48 +124,69 @@ public class RegionSamplingHelper implements View.OnAttachStateChangeListener, V
     private void unregisterSamplingListener() {
         if (this.mSamplingListenerRegistered) {
             this.mSamplingListenerRegistered = false;
-            SurfaceControl surfaceControl = this.mWrappedStopLayer;
+            final SurfaceControl surfaceControl = this.mWrappedStopLayer;
             this.mRegisteredStopLayer = null;
+            this.mWrappedStopLayer = null;
             this.mRegisteredSamplingBounds.setEmpty();
-            this.mBackgroundExecutor.execute(new ImagePreviewFragment$4$$ExternalSyntheticLambda0(this, surfaceControl));
+            this.mBackgroundExecutor.execute(new Runnable() { // from class: com.android.systemui.shared.navigationbar.RegionSamplingHelper$$ExternalSyntheticLambda2
+                @Override // java.lang.Runnable
+                public final void run() {
+                    RegionSamplingHelper.this.lambda$unregisterSamplingListener$1(surfaceControl);
+                }
+            });
         }
     }
 
     /* JADX INFO: Access modifiers changed from: private */
     public void updateMediaLuma(float f) {
+        boolean z;
         this.mCurrentMedianLuma = f;
         if (Math.abs(f - this.mLastMedianLuma) > NAVIGATION_LUMINANCE_CHANGE_THRESHOLD) {
-            this.mCallback.onRegionDarknessChanged(f < NAVIGATION_LUMINANCE_THRESHOLD);
+            SamplingCallback samplingCallback = this.mCallback;
+            if (f < NAVIGATION_LUMINANCE_THRESHOLD) {
+                z = true;
+            } else {
+                z = false;
+            }
+            samplingCallback.onRegionDarknessChanged(z);
             this.mLastMedianLuma = f;
         }
     }
 
     private void updateSamplingListener() {
-        if (this.mSamplingEnabled && !this.mSamplingRequestBounds.isEmpty() && this.mWindowVisible && !this.mWindowHasBlurs && (this.mSampledView.isAttachedToWindow() || this.mFirstSamplingAfterStart)) {
+        boolean z;
+        SurfaceControl surfaceControl;
+        if (!this.mSamplingEnabled || this.mSamplingRequestBounds.isEmpty() || !this.mWindowVisible || this.mWindowHasBlurs || (!this.mSampledView.isAttachedToWindow() && !this.mFirstSamplingAfterStart)) {
+            z = false;
+        } else {
+            z = true;
+        }
+        if (z) {
             ViewRootImpl viewRootImpl = this.mSampledView.getViewRootImpl();
-            SurfaceControl surfaceControl = null;
-            SurfaceControl surfaceControl2 = viewRootImpl != null ? viewRootImpl.getSurfaceControl() : null;
-            if (surfaceControl2 == null || !surfaceControl2.isValid()) {
-                if (!this.mWaitingOnDraw) {
-                    this.mWaitingOnDraw = true;
-                    if (this.mHandler.hasCallbacks(this.mRemoveDrawRunnable)) {
-                        this.mHandler.removeCallbacks(this.mRemoveDrawRunnable);
-                    } else {
-                        this.mSampledView.getViewTreeObserver().addOnDrawListener(this.mUpdateOnDraw);
-                    }
+            SurfaceControl surfaceControl2 = null;
+            if (viewRootImpl != null) {
+                surfaceControl = viewRootImpl.getSurfaceControl();
+            } else {
+                surfaceControl = null;
+            }
+            if (surfaceControl != null && surfaceControl.isValid()) {
+                surfaceControl2 = surfaceControl;
+            } else if (!this.mWaitingOnDraw) {
+                this.mWaitingOnDraw = true;
+                if (this.mHandler.hasCallbacks(this.mRemoveDrawRunnable)) {
+                    this.mHandler.removeCallbacks(this.mRemoveDrawRunnable);
+                } else {
+                    this.mSampledView.getViewTreeObserver().addOnDrawListener(this.mUpdateOnDraw);
                 }
-                surfaceControl2 = null;
             }
             if (!this.mSamplingRequestBounds.equals(this.mRegisteredSamplingBounds) || this.mRegisteredStopLayer != surfaceControl2) {
                 unregisterSamplingListener();
                 this.mSamplingListenerRegistered = true;
-                if (surfaceControl2 != null) {
-                    surfaceControl = new SurfaceControl(surfaceControl2, "regionSampling");
-                }
-                this.mBackgroundExecutor.execute(new PreviewUtils$$ExternalSyntheticLambda0(this, surfaceControl));
+                SurfaceControl wrap = wrap(surfaceControl2);
+                this.mBackgroundExecutor.execute(new RegionSamplingHelper$$ExternalSyntheticLambda0(this, wrap, 0));
                 this.mRegisteredSamplingBounds.set(this.mSamplingRequestBounds);
                 this.mRegisteredStopLayer = surfaceControl2;
-                this.mWrappedStopLayer = surfaceControl;
+                this.mWrappedStopLayer = wrap;
             }
             this.mFirstSamplingAfterStart = false;
             return;
@@ -150,40 +194,26 @@ public class RegionSamplingHelper implements View.OnAttachStateChangeListener, V
         unregisterSamplingListener();
     }
 
-    public void dump(PrintWriter printWriter) {
-        printWriter.println("RegionSamplingHelper:");
-        printWriter.println("  sampleView isAttached: " + this.mSampledView.isAttachedToWindow());
+    public void dump(String str, PrintWriter printWriter) {
+        printWriter.println(str + "RegionSamplingHelper:");
+        printWriter.println(str + "\tsampleView isAttached: " + this.mSampledView.isAttachedToWindow());
         StringBuilder sb = new StringBuilder();
-        sb.append("  sampleView isScValid: ");
+        sb.append(str);
+        sb.append("\tsampleView isScValid: ");
         sb.append(this.mSampledView.isAttachedToWindow() ? Boolean.valueOf(this.mSampledView.getViewRootImpl().getSurfaceControl().isValid()) : "notAttached");
         printWriter.println(sb.toString());
-        printWriter.println("  mSamplingEnabled: " + this.mSamplingEnabled);
-        printWriter.println("  mSamplingListenerRegistered: " + this.mSamplingListenerRegistered);
-        printWriter.println("  mSamplingRequestBounds: " + this.mSamplingRequestBounds);
-        printWriter.println("  mRegisteredSamplingBounds: " + this.mRegisteredSamplingBounds);
-        printWriter.println("  mLastMedianLuma: " + this.mLastMedianLuma);
-        printWriter.println("  mCurrentMedianLuma: " + this.mCurrentMedianLuma);
-        printWriter.println("  mWindowVisible: " + this.mWindowVisible);
-        printWriter.println("  mWindowHasBlurs: " + this.mWindowHasBlurs);
-        printWriter.println("  mWaitingOnDraw: " + this.mWaitingOnDraw);
-        printWriter.println("  mRegisteredStopLayer: " + this.mRegisteredStopLayer);
-        printWriter.println("  mWrappedStopLayer: " + this.mWrappedStopLayer);
-        printWriter.println("  mIsDestroyed: " + this.mIsDestroyed);
-    }
-
-    @Override // android.view.View.OnLayoutChangeListener
-    public void onLayoutChange(View view, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8) {
-        updateSamplingRect();
-    }
-
-    @Override // android.view.View.OnAttachStateChangeListener
-    public void onViewAttachedToWindow(View view) {
-        updateSamplingListener();
-    }
-
-    @Override // android.view.View.OnAttachStateChangeListener
-    public void onViewDetachedFromWindow(View view) {
-        stopAndDestroy();
+        printWriter.println(str + "\tmSamplingEnabled: " + this.mSamplingEnabled);
+        printWriter.println(str + "\tmSamplingListenerRegistered: " + this.mSamplingListenerRegistered);
+        printWriter.println(str + "\tmSamplingRequestBounds: " + this.mSamplingRequestBounds);
+        printWriter.println(str + "\tmRegisteredSamplingBounds: " + this.mRegisteredSamplingBounds);
+        printWriter.println(str + "\tmLastMedianLuma: " + this.mLastMedianLuma);
+        printWriter.println(str + "\tmCurrentMedianLuma: " + this.mCurrentMedianLuma);
+        printWriter.println(str + "\tmWindowVisible: " + this.mWindowVisible);
+        printWriter.println(str + "\tmWindowHasBlurs: " + this.mWindowHasBlurs);
+        printWriter.println(str + "\tmWaitingOnDraw: " + this.mWaitingOnDraw);
+        printWriter.println(str + "\tmRegisteredStopLayer: " + this.mRegisteredStopLayer);
+        printWriter.println(str + "\tmWrappedStopLayer: " + this.mWrappedStopLayer);
+        printWriter.println(str + "\tmIsDestroyed: " + this.mIsDestroyed);
     }
 
     public void setWindowHasBlurs(boolean z) {
@@ -208,22 +238,58 @@ public class RegionSamplingHelper implements View.OnAttachStateChangeListener, V
         }
     }
 
-    public void stop() {
-        this.mSamplingEnabled = false;
-        updateSamplingListener();
-    }
-
-    public void stopAndDestroy() {
-        stop();
-        this.mSamplingListener.destroy();
-        this.mIsDestroyed = true;
-    }
-
     public void updateSamplingRect() {
         Rect sampledRegion = this.mCallback.getSampledRegion(this.mSampledView);
         if (!this.mSamplingRequestBounds.equals(sampledRegion)) {
             this.mSamplingRequestBounds.set(sampledRegion);
             updateSamplingListener();
         }
+    }
+
+    public SurfaceControl wrap(SurfaceControl surfaceControl) {
+        if (surfaceControl == null) {
+            return null;
+        }
+        return new SurfaceControl(surfaceControl, "regionSampling");
+    }
+
+    public void stopAndDestroy() {
+        stop();
+        Executor executor = this.mBackgroundExecutor;
+        final CompositionSamplingListener compositionSamplingListener = this.mSamplingListener;
+        Objects.requireNonNull(compositionSamplingListener);
+        executor.execute(new Runnable() { // from class: com.android.systemui.shared.navigationbar.RegionSamplingHelper$$ExternalSyntheticLambda1
+            @Override // java.lang.Runnable
+            public final void run() {
+                compositionSamplingListener.destroy();
+            }
+        });
+        this.mIsDestroyed = true;
+    }
+
+    @Override // android.view.View.OnLayoutChangeListener
+    public void onLayoutChange(View view, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8) {
+        updateSamplingRect();
+    }
+
+    /* loaded from: classes.dex */
+    public static class SysuiCompositionSamplingListener {
+        public void register(CompositionSamplingListener compositionSamplingListener, int i, SurfaceControl surfaceControl, Rect rect) {
+            CompositionSamplingListener.register(compositionSamplingListener, i, surfaceControl, rect);
+        }
+
+        public void unregister(CompositionSamplingListener compositionSamplingListener) {
+            CompositionSamplingListener.unregister(compositionSamplingListener);
+        }
+    }
+
+    @Override // android.view.View.OnAttachStateChangeListener
+    public void onViewAttachedToWindow(View view) {
+        updateSamplingListener();
+    }
+
+    @Override // android.view.View.OnAttachStateChangeListener
+    public void onViewDetachedFromWindow(View view) {
+        stopAndDestroy();
     }
 }

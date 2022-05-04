@@ -11,6 +11,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.util.zzi;
 import com.google.android.gms.internal.zzbmj;
 import com.google.android.gms.internal.zzbmk;
+/* compiled from: ConnectionErrorMessages.java */
 /* loaded from: classes.dex */
 public final class zzf {
     public static final SimpleArrayMap<String, String> zza = new SimpleArrayMap<>();
@@ -76,7 +77,10 @@ public final class zzf {
             return zza2.zza.getPackageManager().getApplicationLabel(zza2.zza.getPackageManager().getApplicationInfo(packageName, 0)).toString();
         } catch (PackageManager.NameNotFoundException | NullPointerException unused) {
             String str = context.getApplicationInfo().name;
-            return TextUtils.isEmpty(str) ? packageName : str;
+            if (TextUtils.isEmpty(str)) {
+                return packageName;
+            }
+            return str;
         }
     }
 
@@ -147,14 +151,12 @@ public final class zzf {
             }
             int identifier = resources.getIdentifier(str, "string", "com.google.android.gms");
             if (identifier == 0) {
-                String valueOf = String.valueOf(str);
-                Log.w("GoogleApiAvailability", valueOf.length() != 0 ? "Missing resource: ".concat(valueOf) : new String("Missing resource: "));
+                Log.w("GoogleApiAvailability", str.length() != 0 ? "Missing resource: ".concat(str) : new String("Missing resource: "));
                 return null;
             }
             String string = resources.getString(identifier);
             if (TextUtils.isEmpty(string)) {
-                String valueOf2 = String.valueOf(str);
-                Log.w("GoogleApiAvailability", valueOf2.length() != 0 ? "Got empty resource: ".concat(valueOf2) : new String("Got empty resource: "));
+                Log.w("GoogleApiAvailability", str.length() != 0 ? "Got empty resource: ".concat(str) : new String("Got empty resource: "));
                 return null;
             }
             zza.put(str, string);

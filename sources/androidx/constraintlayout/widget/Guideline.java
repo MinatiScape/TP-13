@@ -12,16 +12,16 @@ public class Guideline extends View {
     }
 
     @Override // android.view.View
-    public void draw(Canvas canvas) {
+    public final void draw(Canvas canvas) {
     }
 
     @Override // android.view.View
-    public void onMeasure(int i, int i2) {
+    public final void onMeasure(int i, int i2) {
         setMeasuredDimension(0, 0);
     }
 
     @Override // android.view.View
-    public void setVisibility(int i) {
+    public final void setVisibility(int i) {
     }
 
     public Guideline(Context context, AttributeSet attributeSet) {

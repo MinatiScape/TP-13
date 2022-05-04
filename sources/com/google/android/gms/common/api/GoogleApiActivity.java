@@ -12,12 +12,29 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.internal.zzbn;
 /* loaded from: classes.dex */
-public class GoogleApiActivity extends Activity implements DialogInterface.OnCancelListener {
+public final class GoogleApiActivity extends Activity implements DialogInterface.OnCancelListener {
     public static final /* synthetic */ int $r8$clinit = 0;
-    public int zza = 0;
+    public int zza;
+
+    public GoogleApiActivity() {
+        throw null;
+    }
+
+    @Override // android.content.DialogInterface.OnCancelListener
+    public final void onCancel(DialogInterface dialogInterface) {
+        this.zza = 0;
+        setResult(0);
+        finish();
+    }
 
     @Override // android.app.Activity
-    public void onActivityResult(int i, int i2, Intent intent) {
+    public final void onSaveInstanceState(Bundle bundle) {
+        bundle.putInt("resolution", this.zza);
+        super.onSaveInstanceState(bundle);
+    }
+
+    @Override // android.app.Activity
+    public final void onActivityResult(int i, int i2, Intent intent) {
         super.onActivityResult(i, i2, intent);
         if (i == 1) {
             boolean booleanExtra = getIntent().getBooleanExtra("notify_manager", true);
@@ -44,15 +61,8 @@ public class GoogleApiActivity extends Activity implements DialogInterface.OnCan
         finish();
     }
 
-    @Override // android.content.DialogInterface.OnCancelListener
-    public void onCancel(DialogInterface dialogInterface) {
-        this.zza = 0;
-        setResult(0);
-        finish();
-    }
-
     @Override // android.app.Activity
-    public void onCreate(Bundle bundle) {
+    public final void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         if (bundle != null) {
             this.zza = bundle.getInt("resolution");
@@ -78,16 +88,9 @@ public class GoogleApiActivity extends Activity implements DialogInterface.OnCan
                     finish();
                 }
             } else {
-                Object obj = GoogleApiAvailability.zza;
-                GoogleApiAvailability.zzb.showErrorDialogFragment(this, num.intValue(), 2, this);
+                GoogleApiAvailability.zzb.showErrorDialogFragment(this, num.intValue(), this);
                 this.zza = 1;
             }
         }
-    }
-
-    @Override // android.app.Activity
-    public void onSaveInstanceState(Bundle bundle) {
-        bundle.putInt("resolution", this.zza);
-        super.onSaveInstanceState(bundle);
     }
 }

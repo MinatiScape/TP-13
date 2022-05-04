@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
+/* compiled from: PhysicsBasedUnfoldTransitionProgressProvider.kt */
 /* loaded from: classes.dex */
 public final class PhysicsBasedUnfoldTransitionProgressProvider implements UnfoldTransitionProgressProvider, FoldStateProvider.FoldUpdatesListener, DynamicAnimation.OnAnimationEndListener {
     @NotNull
@@ -26,6 +27,7 @@ public final class PhysicsBasedUnfoldTransitionProgressProvider implements Unfol
     private final SpringAnimation springAnimation;
     private float transitionProgress;
 
+    /* compiled from: PhysicsBasedUnfoldTransitionProgressProvider.kt */
     /* loaded from: classes.dex */
     public static final class AnimationProgressProperty extends FloatPropertyCompat<PhysicsBasedUnfoldTransitionProgressProvider> {
         @NotNull
@@ -88,7 +90,16 @@ public final class PhysicsBasedUnfoldTransitionProgressProvider implements Unfol
             throw new AndroidRuntimeException("Animations may only be canceled from the same thread as the animation handler");
         }
         this.isAnimatedCancelRunning = true;
-        this.springAnimation.animateToFinalPosition(f);
+        SpringAnimation springAnimation2 = this.springAnimation;
+        if (springAnimation2.mRunning) {
+            springAnimation2.mPendingPosition = f;
+            return;
+        }
+        if (springAnimation2.mSpring == null) {
+            springAnimation2.mSpring = new SpringForce(f);
+        }
+        springAnimation2.mSpring.mFinalPosition = f;
+        springAnimation2.start();
     }
 
     private final void onStartTransition() {
@@ -129,6 +140,11 @@ public final class PhysicsBasedUnfoldTransitionProgressProvider implements Unfol
         this.springAnimation.start();
     }
 
+    public void addCallback(@NotNull UnfoldTransitionProgressProvider.TransitionProgressListener listener) {
+        Intrinsics.checkNotNullParameter(listener, "listener");
+        this.listeners.add(listener);
+    }
+
     @Override // com.android.systemui.unfold.UnfoldTransitionProgressProvider
     public void destroy() {
         this.foldStateProvider.stop();
@@ -144,21 +160,18 @@ public final class PhysicsBasedUnfoldTransitionProgressProvider implements Unfol
 
     @Override // com.android.systemui.unfold.updates.FoldStateProvider.FoldUpdatesListener
     public void onFoldUpdate(int i) {
-        if (i != 2) {
-            if (i != 3) {
-                if (i == 4) {
-                    startTransition(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
-                    if (this.foldStateProvider.isFullyOpened()) {
-                        cancelTransition(1.0f, true);
-                    }
-                } else if (i != 6) {
-                    if (i == 7) {
-                        cancelTransition(HingeAngleProviderKt.FULLY_CLOSED_DEGREES, false);
-                    }
+        if (i != 1) {
+            if (i == 2) {
+                startTransition(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
+                if (this.foldStateProvider.isFullyOpened()) {
+                    cancelTransition(1.0f, true);
                 }
-            }
-            if (this.isTransitionRunning) {
-                cancelTransition(1.0f, true);
+            } else if (i == 3 || i == 4) {
+                if (this.isTransitionRunning) {
+                    cancelTransition(1.0f, true);
+                }
+            } else if (i == 5) {
+                cancelTransition(HingeAngleProviderKt.FULLY_CLOSED_DEGREES, false);
             }
         } else if (!this.isTransitionRunning) {
             startTransition(1.0f);
@@ -169,13 +182,18 @@ public final class PhysicsBasedUnfoldTransitionProgressProvider implements Unfol
     @Override // com.android.systemui.unfold.updates.FoldStateProvider.FoldUpdatesListener
     public void onHingeAngleUpdate(float f) {
         if (this.isTransitionRunning && !this.isAnimatedCancelRunning) {
-            this.springAnimation.animateToFinalPosition(MathUtils.saturate(f / 165.0f));
+            float saturate = MathUtils.saturate(f / 165.0f);
+            SpringAnimation springAnimation = this.springAnimation;
+            if (springAnimation.mRunning) {
+                springAnimation.mPendingPosition = saturate;
+                return;
+            }
+            if (springAnimation.mSpring == null) {
+                springAnimation.mSpring = new SpringForce(saturate);
+            }
+            springAnimation.mSpring.mFinalPosition = saturate;
+            springAnimation.start();
         }
-    }
-
-    public void addCallback(@NotNull UnfoldTransitionProgressProvider.TransitionProgressListener listener) {
-        Intrinsics.checkNotNullParameter(listener, "listener");
-        this.listeners.add(listener);
     }
 
     public void removeCallback(@NotNull UnfoldTransitionProgressProvider.TransitionProgressListener listener) {

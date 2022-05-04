@@ -1,6 +1,7 @@
 package com.google.android.gms.clearcut;
 
 import java.util.Comparator;
+/* compiled from: Counters.java */
 /* loaded from: classes.dex */
 public final class zzp implements Comparator<byte[]> {
     @Override // java.util.Comparator
@@ -18,8 +19,10 @@ public final class zzp implements Comparator<byte[]> {
         }
         int min = Math.min(bArr3.length, bArr4.length);
         for (int i = 0; i < min; i++) {
-            if (bArr3[i] != bArr4[i]) {
-                return bArr3[i] - bArr4[i];
+            byte b = bArr3[i];
+            byte b2 = bArr4[i];
+            if (b != b2) {
+                return b - b2;
             }
         }
         return bArr3.length - bArr4.length;

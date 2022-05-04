@@ -1,4 +1,5 @@
 package kotlin.reflect;
+/* compiled from: KVisibility.kt */
 /* loaded from: classes.dex */
 public enum KVisibility {
     /* JADX INFO: Fake field, exist only in values array */

@@ -7,7 +7,7 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 /* loaded from: classes.dex */
-public class XMPDateTimeImpl implements XMPDateTime {
+public final class XMPDateTimeImpl implements XMPDateTime {
     public int day;
     public int hour;
     public int minute;
@@ -27,18 +27,8 @@ public class XMPDateTimeImpl implements XMPDateTime {
         this.timeZone = TimeZone.getTimeZone("UTC");
     }
 
-    @Override // java.lang.Comparable
-    public int compareTo(Object dt) {
-        XMPDateTime xMPDateTime = (XMPDateTime) dt;
-        long timeInMillis = getCalendar().getTimeInMillis() - xMPDateTime.getCalendar().getTimeInMillis();
-        if (timeInMillis != 0) {
-            return (int) (timeInMillis % 2);
-        }
-        return (int) ((this.nanoSeconds - xMPDateTime.getNanoSecond()) % 2);
-    }
-
     @Override // com.adobe.xmp.XMPDateTime
-    public Calendar getCalendar() {
+    public final GregorianCalendar getCalendar() {
         GregorianCalendar gregorianCalendar = (GregorianCalendar) Calendar.getInstance(Locale.US);
         gregorianCalendar.setGregorianChange(new Date(Long.MIN_VALUE));
         gregorianCalendar.setTimeZone(this.timeZone);
@@ -52,91 +42,33 @@ public class XMPDateTimeImpl implements XMPDateTime {
         return gregorianCalendar;
     }
 
-    @Override // com.adobe.xmp.XMPDateTime
-    public int getDay() {
-        return this.day;
-    }
-
-    @Override // com.adobe.xmp.XMPDateTime
-    public int getHour() {
-        return this.hour;
-    }
-
-    @Override // com.adobe.xmp.XMPDateTime
-    public int getMinute() {
-        return this.minute;
-    }
-
-    @Override // com.adobe.xmp.XMPDateTime
-    public int getMonth() {
-        return this.month;
-    }
-
-    @Override // com.adobe.xmp.XMPDateTime
-    public int getNanoSecond() {
-        return this.nanoSeconds;
-    }
-
-    @Override // com.adobe.xmp.XMPDateTime
-    public int getSecond() {
-        return this.second;
-    }
-
-    @Override // com.adobe.xmp.XMPDateTime
-    public TimeZone getTimeZone() {
-        return this.timeZone;
-    }
-
-    @Override // com.adobe.xmp.XMPDateTime
-    public int getYear() {
-        return this.year;
-    }
-
-    public void setDay(int day) {
-        if (day < 1) {
-            this.day = 1;
-        } else if (day > 31) {
-            this.day = 31;
-        } else {
-            this.day = day;
+    @Override // java.lang.Comparable
+    public final int compareTo(Object dt) {
+        XMPDateTime xMPDateTime = (XMPDateTime) dt;
+        long timeInMillis = getCalendar().getTimeInMillis() - xMPDateTime.getCalendar().getTimeInMillis();
+        if (timeInMillis != 0) {
+            return (int) (timeInMillis % 2);
         }
+        return (int) ((this.nanoSeconds - xMPDateTime.getNanoSecond()) % 2);
     }
 
-    public void setHour(int hour) {
+    public final void setHour(int hour) {
         this.hour = Math.min(Math.abs(hour), 23);
     }
 
-    public void setMinute(int minute) {
+    public final void setMinute(int minute) {
         this.minute = Math.min(Math.abs(minute), 59);
     }
 
-    public void setMonth(int month) {
-        if (month < 1) {
-            this.month = 1;
-        } else if (month > 12) {
-            this.month = 12;
-        } else {
-            this.month = month;
-        }
-    }
-
-    public void setNanoSecond(int nanoSecond) {
-        this.nanoSeconds = nanoSecond;
-    }
-
-    public void setSecond(int second) {
+    public final void setSecond(int second) {
         this.second = Math.min(Math.abs(second), 59);
     }
 
-    public void setTimeZone(TimeZone timeZone) {
-        this.timeZone = timeZone;
-    }
-
-    public void setYear(int year) {
+    public final void setYear(int year) {
         this.year = Math.min(Math.abs(year), 9999);
     }
 
-    public String toString() {
+    public final String toString() {
         return ISO8601Converter.render(this);
     }
 
@@ -162,5 +94,45 @@ public class XMPDateTimeImpl implements XMPDateTime {
         this.second = gregorianCalendar.get(13);
         this.nanoSeconds = gregorianCalendar.get(14) * 1000000;
         this.timeZone = gregorianCalendar.getTimeZone();
+    }
+
+    @Override // com.adobe.xmp.XMPDateTime
+    public final int getDay() {
+        return this.day;
+    }
+
+    @Override // com.adobe.xmp.XMPDateTime
+    public final int getHour() {
+        return this.hour;
+    }
+
+    @Override // com.adobe.xmp.XMPDateTime
+    public final int getMinute() {
+        return this.minute;
+    }
+
+    @Override // com.adobe.xmp.XMPDateTime
+    public final int getMonth() {
+        return this.month;
+    }
+
+    @Override // com.adobe.xmp.XMPDateTime
+    public final int getNanoSecond() {
+        return this.nanoSeconds;
+    }
+
+    @Override // com.adobe.xmp.XMPDateTime
+    public final int getSecond() {
+        return this.second;
+    }
+
+    @Override // com.adobe.xmp.XMPDateTime
+    public final TimeZone getTimeZone() {
+        return this.timeZone;
+    }
+
+    @Override // com.adobe.xmp.XMPDateTime
+    public final int getYear() {
+        return this.year;
     }
 }

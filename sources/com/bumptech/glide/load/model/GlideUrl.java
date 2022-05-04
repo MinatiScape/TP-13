@@ -2,13 +2,13 @@ package com.bumptech.glide.load.model;
 
 import android.net.Uri;
 import android.text.TextUtils;
+import androidx.collection.ContainerHelpers;
 import com.bumptech.glide.load.Key;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
-import java.util.Objects;
 /* loaded from: classes.dex */
-public class GlideUrl implements Key {
+public final class GlideUrl implements Key {
     public volatile byte[] cacheKeyBytes;
     public int hashCode;
     public final Headers headers;
@@ -18,35 +18,38 @@ public class GlideUrl implements Key {
     public final URL url;
 
     public GlideUrl(URL url) {
-        Headers headers = Headers.DEFAULT;
-        Objects.requireNonNull(url, "Argument must not be null");
+        LazyHeaders lazyHeaders = Headers.DEFAULT;
+        ContainerHelpers.checkNotNull(url);
         this.url = url;
         this.stringUrl = null;
-        Objects.requireNonNull(headers, "Argument must not be null");
-        this.headers = headers;
+        ContainerHelpers.checkNotNull(lazyHeaders);
+        this.headers = lazyHeaders;
     }
 
     @Override // com.bumptech.glide.load.Key
-    public boolean equals(Object o) {
-        if (!(o instanceof GlideUrl)) {
+    public final boolean equals(Object obj) {
+        if (!(obj instanceof GlideUrl)) {
             return false;
         }
-        GlideUrl glideUrl = (GlideUrl) o;
-        return getCacheKey().equals(glideUrl.getCacheKey()) && this.headers.equals(glideUrl.headers);
+        GlideUrl glideUrl = (GlideUrl) obj;
+        if (!getCacheKey().equals(glideUrl.getCacheKey()) || !this.headers.equals(glideUrl.headers)) {
+            return false;
+        }
+        return true;
     }
 
-    public String getCacheKey() {
+    public final String getCacheKey() {
         String str = this.stringUrl;
         if (str != null) {
             return str;
         }
         URL url = this.url;
-        Objects.requireNonNull(url, "Argument must not be null");
+        ContainerHelpers.checkNotNull(url);
         return url.toString();
     }
 
     @Override // com.bumptech.glide.load.Key
-    public int hashCode() {
+    public final int hashCode() {
         if (this.hashCode == 0) {
             int hashCode = getCacheKey().hashCode();
             this.hashCode = hashCode;
@@ -55,17 +58,13 @@ public class GlideUrl implements Key {
         return this.hashCode;
     }
 
-    public String toString() {
-        return getCacheKey();
-    }
-
-    public URL toURL() throws MalformedURLException {
+    public final URL toURL() throws MalformedURLException {
         if (this.safeUrl == null) {
             if (TextUtils.isEmpty(this.safeStringUrl)) {
                 String str = this.stringUrl;
                 if (TextUtils.isEmpty(str)) {
                     URL url = this.url;
-                    Objects.requireNonNull(url, "Argument must not be null");
+                    ContainerHelpers.checkNotNull(url);
                     str = url.toString();
                 }
                 this.safeStringUrl = Uri.encode(str, "@#&=*+-_.,:!?()/~'%;$");
@@ -76,20 +75,24 @@ public class GlideUrl implements Key {
     }
 
     @Override // com.bumptech.glide.load.Key
-    public void updateDiskCacheKey(MessageDigest messageDigest) {
+    public final void updateDiskCacheKey(MessageDigest messageDigest) {
         if (this.cacheKeyBytes == null) {
             this.cacheKeyBytes = getCacheKey().getBytes(Key.CHARSET);
         }
         messageDigest.update(this.cacheKeyBytes);
     }
 
-    public GlideUrl(String url) {
-        Headers headers = Headers.DEFAULT;
+    public final String toString() {
+        return getCacheKey();
+    }
+
+    public GlideUrl(String str) {
+        LazyHeaders lazyHeaders = Headers.DEFAULT;
         this.url = null;
-        if (!TextUtils.isEmpty(url)) {
-            this.stringUrl = url;
-            Objects.requireNonNull(headers, "Argument must not be null");
-            this.headers = headers;
+        if (!TextUtils.isEmpty(str)) {
+            this.stringUrl = str;
+            ContainerHelpers.checkNotNull(lazyHeaders);
+            this.headers = lazyHeaders;
             return;
         }
         throw new IllegalArgumentException("Must not be null or empty");

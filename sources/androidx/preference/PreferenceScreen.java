@@ -7,6 +7,6 @@ import com.android.systemui.shared.R;
 /* loaded from: classes.dex */
 public final class PreferenceScreen extends PreferenceGroup {
     public PreferenceScreen(Context context, AttributeSet attributeSet) {
-        super(context, attributeSet, TypedArrayUtils.getAttr(context, R.attr.preferenceScreenStyle, 16842891), 0);
+        super(context, attributeSet, TypedArrayUtils.getAttr(context, R.attr.preferenceScreenStyle, 16842891));
     }
 }

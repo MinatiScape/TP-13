@@ -9,13 +9,28 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import androidx.core.graphics.PathParser;
 /* loaded from: classes.dex */
-public class GridTileDrawable extends Drawable {
+public final class GridTileDrawable extends Drawable {
     public final int mCols;
     public final int mRows;
     public final Path mShapePath;
     public final Path mTransformedPath;
     public final Paint mPaint = new Paint(1);
     public final Matrix mScaleMatrix = new Matrix();
+
+    @Override // android.graphics.drawable.Drawable
+    public final int getOpacity() {
+        return -3;
+    }
+
+    @Override // android.graphics.drawable.Drawable
+    public final void setAlpha(int i) {
+        this.mPaint.setAlpha(i);
+    }
+
+    @Override // android.graphics.drawable.Drawable
+    public final void setColorFilter(ColorFilter colorFilter) {
+        this.mPaint.setColorFilter(colorFilter);
+    }
 
     public GridTileDrawable(int i, int i2, String str) {
         this.mCols = i;
@@ -26,7 +41,7 @@ public class GridTileDrawable extends Drawable {
     }
 
     @Override // android.graphics.drawable.Drawable
-    public void draw(Canvas canvas) {
+    public final void draw(Canvas canvas) {
         double width = getBounds().width();
         for (int i = 0; i < this.mRows; i++) {
             for (int i2 = 0; i2 < this.mCols; i2++) {
@@ -39,25 +54,10 @@ public class GridTileDrawable extends Drawable {
     }
 
     @Override // android.graphics.drawable.Drawable
-    public int getOpacity() {
-        return -3;
-    }
-
-    @Override // android.graphics.drawable.Drawable
-    public void onBoundsChange(Rect rect) {
+    public final void onBoundsChange(Rect rect) {
         super.onBoundsChange(rect);
         float width = ((rect.width() / Math.max(this.mRows, this.mCols)) - 12.0f) / 100.0f;
         this.mScaleMatrix.setScale(width, width);
         this.mShapePath.transform(this.mScaleMatrix, this.mTransformedPath);
-    }
-
-    @Override // android.graphics.drawable.Drawable
-    public void setAlpha(int i) {
-        this.mPaint.setAlpha(i);
-    }
-
-    @Override // android.graphics.drawable.Drawable
-    public void setColorFilter(ColorFilter colorFilter) {
-        this.mPaint.setColorFilter(colorFilter);
     }
 }

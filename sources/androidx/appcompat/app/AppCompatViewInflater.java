@@ -6,13 +6,13 @@ import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalS
 import android.util.AttributeSet;
 import android.view.InflateException;
 import android.view.View;
+import android.widget.TextView;
 import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatCheckBox;
 import androidx.appcompat.widget.AppCompatRadioButton;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.collection.SimpleArrayMap;
-import com.android.systemui.shared.R;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,13 +31,8 @@ public class AppCompatViewInflater {
         public Context mResolvedContext;
         public Method mResolvedMethod;
 
-        public DeclaredOnClickListener(View view, String str) {
-            this.mHostView = view;
-            this.mMethodName = str;
-        }
-
         @Override // android.view.View.OnClickListener
-        public void onClick(View view) {
+        public final void onClick(View view) {
             String str;
             Method method;
             if (this.mResolvedMethod == null) {
@@ -50,7 +45,11 @@ public class AppCompatViewInflater {
                         }
                     } catch (NoSuchMethodException unused) {
                     }
-                    context = context instanceof ContextWrapper ? ((ContextWrapper) context).getBaseContext() : null;
+                    if (context instanceof ContextWrapper) {
+                        context = ((ContextWrapper) context).getBaseContext();
+                    } else {
+                        context = null;
+                    }
                 }
                 int id = this.mHostView.getId();
                 if (id == -1) {
@@ -76,6 +75,11 @@ public class AppCompatViewInflater {
                 throw new IllegalStateException("Could not execute method for android:onClick", e2);
             }
         }
+
+        public DeclaredOnClickListener(View view, String str) {
+            this.mHostView = view;
+            this.mMethodName = str;
+        }
     }
 
     public AppCompatAutoCompleteTextView createAutoCompleteTextView(Context context, AttributeSet attributeSet) {
@@ -91,7 +95,7 @@ public class AppCompatViewInflater {
     }
 
     public AppCompatRadioButton createRadioButton(Context context, AttributeSet attributeSet) {
-        return new AppCompatRadioButton(context, attributeSet, R.attr.radioButtonStyle);
+        return new AppCompatRadioButton(context, attributeSet);
     }
 
     public AppCompatTextView createTextView(Context context, AttributeSet attributeSet) {
@@ -119,8 +123,8 @@ public class AppCompatViewInflater {
         return orDefault.newInstance(this.mConstructorArgs);
     }
 
-    public final void verifyNotNull(View view, String str) {
-        if (view == null) {
+    public final void verifyNotNull(TextView textView, String str) {
+        if (textView == null) {
             throw new IllegalStateException(getClass().getName() + " asked to inflate view for <" + str + ">, but returned null");
         }
     }

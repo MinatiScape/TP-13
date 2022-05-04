@@ -4,45 +4,16 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Parcel;
 import android.os.Parcelable;
-import androidx.fragment.R$id$$ExternalSyntheticOutline0;
-import com.adobe.xmp.XMPPathFactory$$ExternalSyntheticOutline0;
-import com.bumptech.glide.gifdecoder.GifHeaderParser$$ExternalSyntheticOutline0;
+import androidx.cardview.R$style$$ExternalSyntheticOutline0;
+import com.adobe.xmp.impl.ParseRDF$$ExternalSyntheticOutline0;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+/* compiled from: SafeParcelReader.java */
 /* loaded from: classes.dex */
 public final class zzbkw {
     public static int zza(Parcel parcel, int i) {
         return (i & (-65536)) != -65536 ? (i >> 16) & 65535 : parcel.readInt();
-    }
-
-    public static String[] zzaa(Parcel parcel, int i) {
-        int zza = zza(parcel, i);
-        int dataPosition = parcel.dataPosition();
-        if (zza == 0) {
-            return null;
-        }
-        String[] createStringArray = parcel.createStringArray();
-        parcel.setDataPosition(dataPosition + zza);
-        return createStringArray;
-    }
-
-    public static Parcel zzad(Parcel parcel, int i) {
-        int zza = zza(parcel, i);
-        int dataPosition = parcel.dataPosition();
-        if (zza == 0) {
-            return null;
-        }
-        Parcel obtain = Parcel.obtain();
-        obtain.appendFrom(parcel, dataPosition, zza);
-        parcel.setDataPosition(dataPosition + zza);
-        return obtain;
-    }
-
-    public static void zzae(Parcel parcel, int i) {
-        if (parcel.dataPosition() != i) {
-            throw new zzbkx(R$id$$ExternalSyntheticOutline0.m(37, "Overread allowed size end=", i), parcel);
-        }
     }
 
     public static void zzb(Parcel parcel, int i) {
@@ -59,30 +30,64 @@ public final class zzbkw {
         return parcel.readInt();
     }
 
+    public static void zza(Parcel parcel, int i, int i2) {
+        int zza = zza(parcel, i);
+        if (zza != i2) {
+            String hexString = Integer.toHexString(zza);
+            StringBuilder sb = new StringBuilder(ParseRDF$$ExternalSyntheticOutline0.m(hexString, 46));
+            sb.append("Expected size ");
+            sb.append(i2);
+            sb.append(" got ");
+            sb.append(zza);
+            sb.append(" (0x");
+            sb.append(hexString);
+            sb.append(")");
+            throw new zzbkx(sb.toString(), parcel);
+        }
+    }
+
     public static long zzi(Parcel parcel, int i) {
         zza(parcel, i, 8);
         return parcel.readLong();
     }
 
-    public static BigInteger zzk(Parcel parcel, int i) {
+    public static String[] zzaa(Parcel parcel, int i) {
         int zza = zza(parcel, i);
         int dataPosition = parcel.dataPosition();
         if (zza == 0) {
             return null;
         }
-        byte[] createByteArray = parcel.createByteArray();
+        String[] createStringArray = parcel.createStringArray();
         parcel.setDataPosition(dataPosition + zza);
-        return new BigInteger(createByteArray);
+        return createStringArray;
     }
 
-    public static float zzl(Parcel parcel, int i) {
-        zza(parcel, i, 4);
-        return parcel.readFloat();
+    public static void zzae(Parcel parcel, int i) {
+        if (parcel.dataPosition() != i) {
+            throw new zzbkx(R$style$$ExternalSyntheticOutline0.m(37, "Overread allowed size end=", i), parcel);
+        }
     }
 
-    public static double zzn(Parcel parcel, int i) {
-        zza(parcel, i, 8);
-        return parcel.readDouble();
+    public static <T> T[] zzb(Parcel parcel, int i, Parcelable.Creator<T> creator) {
+        int zza = zza(parcel, i);
+        int dataPosition = parcel.dataPosition();
+        if (zza == 0) {
+            return null;
+        }
+        T[] tArr = (T[]) parcel.createTypedArray(creator);
+        parcel.setDataPosition(dataPosition + zza);
+        return tArr;
+    }
+
+    public static <T> ArrayList<T> zzc(Parcel parcel, int i, Parcelable.Creator<T> creator) {
+        int zza = zza(parcel, i);
+        int dataPosition = parcel.dataPosition();
+        if (zza == 0) {
+            return null;
+        }
+        ArrayList<T> createTypedArrayList = parcel.createTypedArrayList(creator);
+        parcel.setDataPosition(dataPosition + zza);
+        return createTypedArrayList;
     }
 
     public static BigDecimal zzp(Parcel parcel, int i) {
@@ -165,40 +170,6 @@ public final class zzbkw {
         int[] createIntArray = parcel.createIntArray();
         parcel.setDataPosition(dataPosition + zza);
         return createIntArray;
-    }
-
-    public static void zza(Parcel parcel, int i, int i2) {
-        int zza = zza(parcel, i);
-        if (zza != i2) {
-            String hexString = Integer.toHexString(zza);
-            StringBuilder m = GifHeaderParser$$ExternalSyntheticOutline0.m(XMPPathFactory$$ExternalSyntheticOutline0.m(hexString, 46), "Expected size ", i2, " got ", zza);
-            m.append(" (0x");
-            m.append(hexString);
-            m.append(")");
-            throw new zzbkx(m.toString(), parcel);
-        }
-    }
-
-    public static <T> T[] zzb(Parcel parcel, int i, Parcelable.Creator<T> creator) {
-        int zza = zza(parcel, i);
-        int dataPosition = parcel.dataPosition();
-        if (zza == 0) {
-            return null;
-        }
-        T[] tArr = (T[]) parcel.createTypedArray(creator);
-        parcel.setDataPosition(dataPosition + zza);
-        return tArr;
-    }
-
-    public static <T> ArrayList<T> zzc(Parcel parcel, int i, Parcelable.Creator<T> creator) {
-        int zza = zza(parcel, i);
-        int dataPosition = parcel.dataPosition();
-        if (zza == 0) {
-            return null;
-        }
-        ArrayList<T> createTypedArrayList = parcel.createTypedArrayList(creator);
-        parcel.setDataPosition(dataPosition + zza);
-        return createTypedArrayList;
     }
 
     public static int zza(Parcel parcel) {

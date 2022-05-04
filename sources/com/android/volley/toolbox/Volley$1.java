@@ -4,7 +4,7 @@ import android.content.Context;
 import com.android.volley.toolbox.DiskBasedCache;
 import java.io.File;
 /* loaded from: classes.dex */
-public class Volley$1 implements DiskBasedCache.FileSupplier {
+public final class Volley$1 implements DiskBasedCache.FileSupplier {
     public File cacheDir = null;
     public final /* synthetic */ Context val$appContext;
 
@@ -12,7 +12,7 @@ public class Volley$1 implements DiskBasedCache.FileSupplier {
         this.val$appContext = context;
     }
 
-    public File get() {
+    public final File get() {
         if (this.cacheDir == null) {
             this.cacheDir = new File(this.val$appContext.getCacheDir(), "volley");
         }

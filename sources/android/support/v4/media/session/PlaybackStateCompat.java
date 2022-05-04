@@ -5,24 +5,24 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 import android.text.TextUtils;
-import java.util.List;
+import java.util.ArrayList;
 /* loaded from: classes.dex */
 public final class PlaybackStateCompat implements Parcelable {
     public static final Parcelable.Creator<PlaybackStateCompat> CREATOR = new Parcelable.Creator<PlaybackStateCompat>() { // from class: android.support.v4.media.session.PlaybackStateCompat.1
         @Override // android.os.Parcelable.Creator
-        public PlaybackStateCompat createFromParcel(Parcel parcel) {
+        public final PlaybackStateCompat createFromParcel(Parcel parcel) {
             return new PlaybackStateCompat(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public PlaybackStateCompat[] newArray(int i) {
+        public final PlaybackStateCompat[] newArray(int i) {
             return new PlaybackStateCompat[i];
         }
     };
     public final long mActions;
     public final long mActiveItemId;
     public final long mBufferedPosition;
-    public List<CustomAction> mCustomActions;
+    public ArrayList mCustomActions;
     public final int mErrorCode;
     public final CharSequence mErrorMessage;
     public final Bundle mExtras;
@@ -35,12 +35,12 @@ public final class PlaybackStateCompat implements Parcelable {
     public static final class CustomAction implements Parcelable {
         public static final Parcelable.Creator<CustomAction> CREATOR = new Parcelable.Creator<CustomAction>() { // from class: android.support.v4.media.session.PlaybackStateCompat.CustomAction.1
             @Override // android.os.Parcelable.Creator
-            public CustomAction createFromParcel(Parcel parcel) {
+            public final CustomAction createFromParcel(Parcel parcel) {
                 return new CustomAction(parcel);
             }
 
             @Override // android.os.Parcelable.Creator
-            public CustomAction[] newArray(int i) {
+            public final CustomAction[] newArray(int i) {
                 return new CustomAction[i];
             }
         };
@@ -49,19 +49,12 @@ public final class PlaybackStateCompat implements Parcelable {
         public final int mIcon;
         public final CharSequence mName;
 
-        public CustomAction(Parcel parcel) {
-            this.mAction = parcel.readString();
-            this.mName = (CharSequence) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel);
-            this.mIcon = parcel.readInt();
-            this.mExtras = parcel.readBundle();
-        }
-
         @Override // android.os.Parcelable
-        public int describeContents() {
+        public final int describeContents() {
             return 0;
         }
 
-        public String toString() {
+        public final String toString() {
             StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Action:mName='");
             m.append((Object) this.mName);
             m.append(", mIcon=");
@@ -72,12 +65,43 @@ public final class PlaybackStateCompat implements Parcelable {
         }
 
         @Override // android.os.Parcelable
-        public void writeToParcel(Parcel parcel, int i) {
+        public final void writeToParcel(Parcel parcel, int i) {
             parcel.writeString(this.mAction);
             TextUtils.writeToParcel(this.mName, parcel, i);
             parcel.writeInt(this.mIcon);
             parcel.writeBundle(this.mExtras);
         }
+
+        public CustomAction(Parcel parcel) {
+            this.mAction = parcel.readString();
+            this.mName = (CharSequence) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel);
+            this.mIcon = parcel.readInt();
+            this.mExtras = parcel.readBundle();
+        }
+    }
+
+    @Override // android.os.Parcelable
+    public final int describeContents() {
+        return 0;
+    }
+
+    public final String toString() {
+        return "PlaybackState {state=" + this.mState + ", position=" + this.mPosition + ", buffered position=" + this.mBufferedPosition + ", speed=" + this.mSpeed + ", updated=" + this.mUpdateTime + ", actions=" + this.mActions + ", error code=" + this.mErrorCode + ", error message=" + this.mErrorMessage + ", custom actions=" + this.mCustomActions + ", active item id=" + this.mActiveItemId + "}";
+    }
+
+    @Override // android.os.Parcelable
+    public final void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(this.mState);
+        parcel.writeLong(this.mPosition);
+        parcel.writeFloat(this.mSpeed);
+        parcel.writeLong(this.mUpdateTime);
+        parcel.writeLong(this.mBufferedPosition);
+        parcel.writeLong(this.mActions);
+        TextUtils.writeToParcel(this.mErrorMessage, parcel, i);
+        parcel.writeTypedList(this.mCustomActions);
+        parcel.writeLong(this.mActiveItemId);
+        parcel.writeBundle(this.mExtras);
+        parcel.writeInt(this.mErrorCode);
     }
 
     public PlaybackStateCompat(Parcel parcel) {
@@ -92,29 +116,5 @@ public final class PlaybackStateCompat implements Parcelable {
         this.mActiveItemId = parcel.readLong();
         this.mExtras = parcel.readBundle();
         this.mErrorCode = parcel.readInt();
-    }
-
-    @Override // android.os.Parcelable
-    public int describeContents() {
-        return 0;
-    }
-
-    public String toString() {
-        return "PlaybackState {state=" + this.mState + ", position=" + this.mPosition + ", buffered position=" + this.mBufferedPosition + ", speed=" + this.mSpeed + ", updated=" + this.mUpdateTime + ", actions=" + this.mActions + ", error code=" + this.mErrorCode + ", error message=" + this.mErrorMessage + ", custom actions=" + this.mCustomActions + ", active item id=" + this.mActiveItemId + "}";
-    }
-
-    @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeInt(this.mState);
-        parcel.writeLong(this.mPosition);
-        parcel.writeFloat(this.mSpeed);
-        parcel.writeLong(this.mUpdateTime);
-        parcel.writeLong(this.mBufferedPosition);
-        parcel.writeLong(this.mActions);
-        TextUtils.writeToParcel(this.mErrorMessage, parcel, i);
-        parcel.writeTypedList(this.mCustomActions);
-        parcel.writeLong(this.mActiveItemId);
-        parcel.writeBundle(this.mExtras);
-        parcel.writeInt(this.mErrorCode);
     }
 }

@@ -3,14 +3,15 @@ package com.google.android.gms.phenotype;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.android.gms.internal.zzbkw;
+/* compiled from: RegistrationInfoCreator.java */
 /* loaded from: classes.dex */
 public final class zzaw implements Parcelable.Creator<RegistrationInfo> {
     @Override // android.os.Parcelable.Creator
     public final /* synthetic */ RegistrationInfo createFromParcel(Parcel parcel) {
         int zza = zzbkw.zza(parcel);
         int i = 0;
-        String str = null;
         boolean z = false;
+        String str = null;
         String[] strArr = null;
         byte[] bArr = null;
         int[] iArr = null;

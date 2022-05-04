@@ -1,18 +1,16 @@
 package com.google.common.collect;
 
-import com.bumptech.glide.Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline1;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 /* loaded from: classes.dex */
@@ -31,56 +29,12 @@ public final class ImmutableSortedMap<K, V> extends ImmutableSortedMapFauxveride
 
         public Builder(Comparator<? super K> comparator) {
             super(4);
-            Objects.requireNonNull(comparator);
+            comparator.getClass();
             this.comparator = comparator;
         }
 
         @Override // com.google.common.collect.ImmutableMap.Builder
-        public ImmutableMap build() {
-            int i = this.size;
-            if (i == 0) {
-                return ImmutableSortedMap.emptyMap(this.comparator);
-            }
-            if (i != 1) {
-                Object[] copyOf = Arrays.copyOf(this.keys, i);
-                Arrays.sort(copyOf, this.comparator);
-                int i2 = this.size;
-                Object[] objArr = new Object[i2];
-                for (int i3 = 0; i3 < this.size; i3++) {
-                    if (i3 > 0) {
-                        int i4 = i3 - 1;
-                        if (this.comparator.compare(copyOf[i4], copyOf[i3]) == 0) {
-                            String valueOf = String.valueOf(copyOf[i4]);
-                            String valueOf2 = String.valueOf(copyOf[i3]);
-                            throw new IllegalArgumentException(Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline1.m(valueOf2.length() + valueOf.length() + 57, "keys required to be distinct but compared as equal: ", valueOf, " and ", valueOf2));
-                        }
-                    }
-                    objArr[Arrays.binarySearch(copyOf, this.keys[i3], this.comparator)] = this.values[i3];
-                }
-                return new ImmutableSortedMap(new RegularImmutableSortedSet(ImmutableList.asImmutableList(copyOf), this.comparator), ImmutableList.asImmutableList(objArr, i2));
-            }
-            Comparator<? super K> comparator = this.comparator;
-            Object obj = this.keys[0];
-            Object obj2 = this.values[0];
-            ImmutableList of = ImmutableList.of(obj);
-            Objects.requireNonNull(comparator);
-            return new ImmutableSortedMap(new RegularImmutableSortedSet(of, comparator), ImmutableList.of(obj2));
-        }
-
-        @Override // com.google.common.collect.ImmutableMap.Builder
-        public ImmutableMap.Builder put(Map.Entry entry) {
-            put(entry.getKey(), entry.getValue());
-            return this;
-        }
-
-        @Override // com.google.common.collect.ImmutableMap.Builder
-        public ImmutableMap.Builder putAll(Iterable entries) {
-            super.putAll(entries);
-            return this;
-        }
-
-        @Override // com.google.common.collect.ImmutableMap.Builder
-        public ImmutableMap.Builder put(Object key, Object value) {
+        public final ImmutableMap.Builder put(Object key, Object value) {
             int i = this.size + 1;
             Object[] objArr = this.keys;
             if (i > objArr.length) {
@@ -96,6 +50,58 @@ public final class ImmutableSortedMap<K, V> extends ImmutableSortedMapFauxveride
             this.size = i2 + 1;
             return this;
         }
+
+        @Override // com.google.common.collect.ImmutableMap.Builder
+        public final ImmutableMap.Builder putAll(Iterable entries) {
+            throw null;
+        }
+
+        @Override // com.google.common.collect.ImmutableMap.Builder
+        public final ImmutableMap build() {
+            int i = this.size;
+            if (i == 0) {
+                return ImmutableSortedMap.emptyMap(this.comparator);
+            }
+            if (i != 1) {
+                Object[] copyOf = Arrays.copyOf(this.keys, i);
+                Arrays.sort(copyOf, this.comparator);
+                int i2 = this.size;
+                Object[] objArr = new Object[i2];
+                for (int i3 = 0; i3 < this.size; i3++) {
+                    if (i3 > 0) {
+                        int i4 = i3 - 1;
+                        if (this.comparator.compare(copyOf[i4], copyOf[i3]) == 0) {
+                            String valueOf = String.valueOf(copyOf[i4]);
+                            String valueOf2 = String.valueOf(copyOf[i3]);
+                            StringBuilder sb = new StringBuilder(valueOf2.length() + valueOf.length() + 57);
+                            sb.append("keys required to be distinct but compared as equal: ");
+                            sb.append(valueOf);
+                            sb.append(" and ");
+                            sb.append(valueOf2);
+                            throw new IllegalArgumentException(sb.toString());
+                        }
+                    }
+                    objArr[Arrays.binarySearch(copyOf, this.keys[i3], this.comparator)] = this.values[i3];
+                }
+                return new ImmutableSortedMap(new RegularImmutableSortedSet(ImmutableList.asImmutableList(copyOf, copyOf.length), this.comparator), ImmutableList.asImmutableList(objArr, i2), null);
+            }
+            Comparator<? super K> comparator = this.comparator;
+            Object obj = this.keys[0];
+            Object obj2 = this.values[0];
+            Object[] objArr2 = {obj};
+            ObjectArrays.checkElementsNotNull(objArr2, 1);
+            ImmutableList asImmutableList = ImmutableList.asImmutableList(objArr2, 1);
+            comparator.getClass();
+            RegularImmutableSortedSet regularImmutableSortedSet = new RegularImmutableSortedSet(asImmutableList, comparator);
+            Object[] objArr3 = {obj2};
+            ObjectArrays.checkElementsNotNull(objArr3, 1);
+            return new ImmutableSortedMap(regularImmutableSortedSet, ImmutableList.asImmutableList(objArr3, 1), null);
+        }
+
+        @Override // com.google.common.collect.ImmutableMap.Builder
+        public final void put(Map.Entry entry) {
+            super.put(entry);
+        }
     }
 
     /* loaded from: classes.dex */
@@ -103,144 +109,163 @@ public final class ImmutableSortedMap<K, V> extends ImmutableSortedMapFauxveride
         private static final long serialVersionUID = 0;
         private final Comparator<Object> comparator;
 
-        public SerializedForm(ImmutableSortedMap<?, ?> sortedMap) {
-            super(sortedMap);
-            this.comparator = sortedMap.keySet.comparator;
-        }
-
         @Override // com.google.common.collect.ImmutableMap.SerializedForm
         public Object readResolve() {
             return createMap(new Builder(this.comparator));
         }
+
+        public SerializedForm(ImmutableSortedMap<?, ?> sortedMap) {
+            super(sortedMap);
+            this.comparator = sortedMap.keySet.comparator;
+        }
+    }
+
+    public ImmutableSortedMap() {
+        throw null;
+    }
+
+    public ImmutableSortedMap(RegularImmutableSortedSet<K> keySet, ImmutableList<V> valueList, ImmutableSortedMap<K, V> descendingMap) {
+        this.keySet = keySet;
+        this.valueList = valueList;
+        this.descendingMap = descendingMap;
+    }
+
+    @Override // java.util.NavigableMap
+    public final Map.Entry<K, V> ceilingEntry(K key) {
+        return tailMap((ImmutableSortedMap<K, V>) key, true).firstEntry();
+    }
+
+    @Override // java.util.NavigableMap
+    public final K ceilingKey(K key) {
+        return (K) Maps.keyOrNull(tailMap((ImmutableSortedMap<K, V>) key, true).firstEntry());
+    }
+
+    @Override // com.google.common.collect.ImmutableMap, java.util.Map
+    /* renamed from: entrySet */
+    public final ImmutableSet<Map.Entry<K, V>> mo60entrySet() {
+        return super.entrySet();
+    }
+
+    @Override // java.util.NavigableMap
+    public final Map.Entry<K, V> floorEntry(K key) {
+        return headMap((ImmutableSortedMap<K, V>) key, true).lastEntry();
+    }
+
+    @Override // java.util.NavigableMap
+    public final K floorKey(K key) {
+        return (K) Maps.keyOrNull(headMap((ImmutableSortedMap<K, V>) key, true).lastEntry());
+    }
+
+    @Override // java.util.NavigableMap
+    public final Map.Entry<K, V> higherEntry(K key) {
+        return tailMap((ImmutableSortedMap<K, V>) key, false).firstEntry();
+    }
+
+    @Override // java.util.NavigableMap
+    public final K higherKey(K key) {
+        return (K) Maps.keyOrNull(tailMap((ImmutableSortedMap<K, V>) key, false).firstEntry());
+    }
+
+    @Override // com.google.common.collect.ImmutableMap, java.util.Map
+    /* renamed from: keySet */
+    public final ImmutableSet mo61keySet() {
+        return this.keySet;
+    }
+
+    @Override // java.util.NavigableMap
+    public final Map.Entry<K, V> lowerEntry(K key) {
+        return headMap((ImmutableSortedMap<K, V>) key, false).lastEntry();
+    }
+
+    @Override // java.util.NavigableMap
+    public final K lowerKey(K key) {
+        return (K) Maps.keyOrNull(headMap((ImmutableSortedMap<K, V>) key, false).lastEntry());
+    }
+
+    @Override // com.google.common.collect.ImmutableMap, java.util.Map
+    /* renamed from: values */
+    public final ImmutableCollection<V> mo62values() {
+        return this.valueList;
     }
 
     static {
         RegularImmutableSortedSet emptySet = ImmutableSortedSet.emptySet(NaturalOrdering.INSTANCE);
-        AbstractIndexedListIterator<Object> abstractIndexedListIterator = ImmutableList.EMPTY_ITR;
-        NATURAL_EMPTY_MAP = new ImmutableSortedMap<>(emptySet, RegularImmutableList.EMPTY);
-    }
-
-    public ImmutableSortedMap(RegularImmutableSortedSet<K> keySet, ImmutableList<V> valueList) {
-        this.keySet = keySet;
-        this.valueList = valueList;
-        this.descendingMap = null;
+        ImmutableList.Itr itr = ImmutableList.EMPTY_ITR;
+        NATURAL_EMPTY_MAP = new ImmutableSortedMap<>(emptySet, RegularImmutableList.EMPTY, null);
     }
 
     public static <K, V> ImmutableSortedMap<K, V> emptyMap(Comparator<? super K> comparator) {
         if (NaturalOrdering.INSTANCE.equals(comparator)) {
             return (ImmutableSortedMap<K, V>) NATURAL_EMPTY_MAP;
         }
-        return new ImmutableSortedMap<>(ImmutableSortedSet.emptySet(comparator), RegularImmutableList.EMPTY);
-    }
-
-    @Override // java.util.NavigableMap
-    public Map.Entry<K, V> ceilingEntry(K key) {
-        return tailMap((ImmutableSortedMap<K, V>) key, true).firstEntry();
-    }
-
-    @Override // java.util.NavigableMap
-    public K ceilingKey(K key) {
-        return (K) Maps.keyOrNull(tailMap((ImmutableSortedMap<K, V>) key, true).firstEntry());
+        return new ImmutableSortedMap<>(ImmutableSortedSet.emptySet(comparator), RegularImmutableList.EMPTY, null);
     }
 
     @Override // java.util.SortedMap
-    public Comparator<? super K> comparator() {
+    public final Comparator<? super K> comparator() {
         return this.keySet.comparator;
     }
 
     @Override // com.google.common.collect.ImmutableMap
-    public ImmutableSet<Map.Entry<K, V>> createEntrySet() {
-        if (!isEmpty()) {
-            return new ImmutableMapEntrySet<K, V>() { // from class: com.google.common.collect.ImmutableSortedMap.1EntrySet
-                @Override // com.google.common.collect.ImmutableSet
-                public ImmutableList<Map.Entry<K, V>> createAsList() {
-                    return new ImmutableList<Map.Entry<K, V>>() { // from class: com.google.common.collect.ImmutableSortedMap.1EntrySet.1
-                        @Override // java.util.List
-                        public Object get(int index) {
-                            return new AbstractMap.SimpleImmutableEntry(ImmutableSortedMap.this.keySet.elements.get(index), ImmutableSortedMap.this.valueList.get(index));
-                        }
+    public final ImmutableSet<K> createKeySet() {
+        throw new AssertionError("should never be called");
+    }
 
-                        @Override // com.google.common.collect.ImmutableCollection
-                        public boolean isPartialView() {
-                            return true;
-                        }
+    @Override // com.google.common.collect.ImmutableMap
+    public final ImmutableCollection<V> createValues() {
+        throw new AssertionError("should never be called");
+    }
 
-                        @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
-                        public int size() {
-                            return ImmutableSortedMap.this.size();
-                        }
-                    };
-                }
-
-                @Override // com.google.common.collect.ImmutableMapEntrySet, com.google.common.collect.ImmutableSet, com.google.common.collect.ImmutableCollection, java.util.AbstractCollection, java.util.Collection, java.lang.Iterable
-                public UnmodifiableIterator<Map.Entry<K, V>> iterator() {
-                    return asList().iterator();
-                }
-
-                @Override // com.google.common.collect.ImmutableMapEntrySet
-                public ImmutableMap<K, V> map() {
-                    return ImmutableSortedMap.this;
-                }
-            };
+    @Override // java.util.NavigableMap
+    public final NavigableSet descendingKeySet() {
+        RegularImmutableSortedSet<K> regularImmutableSortedSet = this.keySet;
+        ImmutableSortedSet<K> immutableSortedSet = regularImmutableSortedSet.descendingSet;
+        if (immutableSortedSet != null) {
+            return immutableSortedSet;
         }
-        int i = ImmutableSet.$r8$clinit;
-        return RegularImmutableSet.EMPTY;
-    }
-
-    @Override // com.google.common.collect.ImmutableMap
-    public ImmutableSet<K> createKeySet() {
-        throw new AssertionError("should never be called");
-    }
-
-    @Override // com.google.common.collect.ImmutableMap
-    public ImmutableCollection<V> createValues() {
-        throw new AssertionError("should never be called");
+        ImmutableSortedSet immutableSortedSet2 = (ImmutableSortedSet<K>) regularImmutableSortedSet.createDescendingSet();
+        regularImmutableSortedSet.descendingSet = immutableSortedSet2;
+        immutableSortedSet2.descendingSet = regularImmutableSortedSet;
+        return immutableSortedSet2;
     }
 
     @Override // java.util.NavigableMap
-    public NavigableSet descendingKeySet() {
-        return this.keySet.descendingSet();
-    }
-
-    @Override // java.util.NavigableMap
-    public NavigableMap descendingMap() {
+    public final NavigableMap descendingMap() {
+        Ordering ordering;
         ImmutableSortedMap<K, V> immutableSortedMap = this.descendingMap;
         if (immutableSortedMap == null) {
             if (isEmpty()) {
-                return emptyMap(Ordering.from(this.keySet.comparator).reverse());
+                Comparator<? super K> comparator = this.keySet.comparator;
+                if (comparator instanceof Ordering) {
+                    ordering = (Ordering) comparator;
+                } else {
+                    ordering = new ComparatorOrdering(comparator);
+                }
+                return emptyMap(ordering.reverse());
             }
-            immutableSortedMap = new ImmutableSortedMap<>((RegularImmutableSortedSet) this.keySet.descendingSet(), this.valueList.reverse(), this);
+            RegularImmutableSortedSet<K> regularImmutableSortedSet = this.keySet;
+            ImmutableSortedSet immutableSortedSet = (ImmutableSortedSet<K>) regularImmutableSortedSet.descendingSet;
+            ImmutableSortedSet immutableSortedSet2 = immutableSortedSet;
+            if (immutableSortedSet == null) {
+                ImmutableSortedSet immutableSortedSet3 = (ImmutableSortedSet<K>) regularImmutableSortedSet.createDescendingSet();
+                regularImmutableSortedSet.descendingSet = immutableSortedSet3;
+                immutableSortedSet3.descendingSet = regularImmutableSortedSet;
+                immutableSortedSet2 = immutableSortedSet3;
+            }
+            immutableSortedMap = new ImmutableSortedMap<>((RegularImmutableSortedSet) immutableSortedSet2, this.valueList.reverse(), this);
         }
         return immutableSortedMap;
     }
 
     @Override // com.google.common.collect.ImmutableMap, java.util.Map
-    /* renamed from: entrySet */
-    public ImmutableSet<Map.Entry<K, V>> mo22entrySet() {
+    /* renamed from: entrySet  reason: collision with other method in class */
+    public final Set mo60entrySet() {
         return super.entrySet();
     }
 
-    @Override // java.util.NavigableMap
-    public Map.Entry<K, V> firstEntry() {
-        if (isEmpty()) {
-            return null;
-        }
-        return super.entrySet().asList().get(0);
-    }
-
     @Override // java.util.SortedMap
-    public K firstKey() {
+    public final K firstKey() {
         return this.keySet.first();
-    }
-
-    @Override // java.util.NavigableMap
-    public Map.Entry<K, V> floorEntry(K key) {
-        return headMap((ImmutableSortedMap<K, V>) key, true).lastEntry();
-    }
-
-    @Override // java.util.NavigableMap
-    public K floorKey(K key) {
-        return (K) Maps.keyOrNull(headMap((ImmutableSortedMap<K, V>) key, true).lastEntry());
     }
 
     /* JADX WARN: Code restructure failed: missing block: B:5:0x0011, code lost:
@@ -251,11 +276,11 @@ public final class ImmutableSortedMap<K, V> extends ImmutableSortedMapFauxveride
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public V get(java.lang.Object r4) {
+    public final V get(java.lang.Object r4) {
         /*
             r3 = this;
             com.google.common.collect.RegularImmutableSortedSet<K> r0 = r3.keySet
-            java.util.Objects.requireNonNull(r0)
+            r0.getClass()
             r1 = -1
             if (r4 != 0) goto L9
             goto L14
@@ -287,56 +312,32 @@ public final class ImmutableSortedMap<K, V> extends ImmutableSortedMapFauxveride
         if (fromIndex == toIndex) {
             return emptyMap(this.keySet.comparator);
         }
-        return new ImmutableSortedMap<>(this.keySet.getSubSet(fromIndex, toIndex), this.valueList.subList(fromIndex, toIndex));
+        return new ImmutableSortedMap<>(this.keySet.getSubSet(fromIndex, toIndex), this.valueList.subList(fromIndex, toIndex), null);
     }
 
-    @Override // java.util.NavigableMap
-    public Map.Entry<K, V> higherEntry(K key) {
-        return tailMap((ImmutableSortedMap<K, V>) key, false).firstEntry();
-    }
-
-    @Override // java.util.NavigableMap
-    public K higherKey(K key) {
-        return (K) Maps.keyOrNull(tailMap((ImmutableSortedMap<K, V>) key, false).firstEntry());
+    /* JADX WARN: Multi-variable type inference failed */
+    @Override // java.util.NavigableMap, java.util.SortedMap
+    public final SortedMap headMap(Object toKey) {
+        return headMap((ImmutableSortedMap<K, V>) toKey, false);
     }
 
     @Override // com.google.common.collect.ImmutableMap
-    public boolean isPartialView() {
-        return this.keySet.isPartialView() || this.valueList.isPartialView();
+    public final boolean isPartialView() {
+        if (this.keySet.isPartialView() || this.valueList.isPartialView()) {
+            return true;
+        }
+        return false;
     }
 
     @Override // com.google.common.collect.ImmutableMap, java.util.Map
-    /* renamed from: keySet */
-    public ImmutableSet mo23keySet() {
+    /* renamed from: keySet  reason: collision with other method in class */
+    public final Set mo61keySet() {
         return this.keySet;
-    }
-
-    @Override // java.util.NavigableMap
-    public Map.Entry<K, V> lastEntry() {
-        if (isEmpty()) {
-            return null;
-        }
-        return super.entrySet().asList().get(size() - 1);
     }
 
     @Override // java.util.SortedMap
-    public K lastKey() {
+    public final K lastKey() {
         return this.keySet.last();
-    }
-
-    @Override // java.util.NavigableMap
-    public Map.Entry<K, V> lowerEntry(K key) {
-        return headMap((ImmutableSortedMap<K, V>) key, false).lastEntry();
-    }
-
-    @Override // java.util.NavigableMap
-    public K lowerKey(K key) {
-        return (K) Maps.keyOrNull(headMap((ImmutableSortedMap<K, V>) key, false).lastEntry());
-    }
-
-    @Override // java.util.NavigableMap
-    public NavigableSet navigableKeySet() {
-        return this.keySet;
     }
 
     @Override // java.util.NavigableMap
@@ -352,19 +353,25 @@ public final class ImmutableSortedMap<K, V> extends ImmutableSortedMapFauxveride
     }
 
     @Override // java.util.Map
-    public int size() {
+    public final int size() {
         return this.valueList.size();
     }
 
     /* JADX WARN: Multi-variable type inference failed */
     @Override // java.util.NavigableMap, java.util.SortedMap
-    public SortedMap tailMap(Object fromKey) {
+    public final SortedMap subMap(Object fromKey, Object toKey) {
+        return subMap((boolean) fromKey, true, (boolean) toKey, false);
+    }
+
+    /* JADX WARN: Multi-variable type inference failed */
+    @Override // java.util.NavigableMap, java.util.SortedMap
+    public final SortedMap tailMap(Object fromKey) {
         return tailMap((ImmutableSortedMap<K, V>) fromKey, true);
     }
 
     @Override // com.google.common.collect.ImmutableMap, java.util.Map
-    /* renamed from: values */
-    public ImmutableCollection<V> mo25values() {
+    /* renamed from: values  reason: collision with other method in class */
+    public final Collection mo62values() {
         return this.valueList;
     }
 
@@ -373,78 +380,88 @@ public final class ImmutableSortedMap<K, V> extends ImmutableSortedMapFauxveride
         return new SerializedForm(this);
     }
 
-    @Override // com.google.common.collect.ImmutableMap, java.util.Map
-    /* renamed from: entrySet  reason: collision with other method in class */
-    public Set mo22entrySet() {
-        return super.entrySet();
-    }
+    @Override // com.google.common.collect.ImmutableMap
+    public final ImmutableSet<Map.Entry<K, V>> createEntrySet() {
+        if (!isEmpty()) {
+            return new ImmutableMapEntrySet<K, V>() { // from class: com.google.common.collect.ImmutableSortedMap.1EntrySet
+                @Override // com.google.common.collect.ImmutableSet
+                public final ImmutableList<Map.Entry<K, V>> createAsList() {
+                    return new ImmutableList<Map.Entry<K, V>>() { // from class: com.google.common.collect.ImmutableSortedMap.1EntrySet.1
+                        @Override // com.google.common.collect.ImmutableCollection
+                        public final boolean isPartialView() {
+                            return true;
+                        }
 
-    /* JADX WARN: Multi-variable type inference failed */
-    @Override // java.util.NavigableMap, java.util.SortedMap
-    public SortedMap headMap(Object toKey) {
-        return headMap((ImmutableSortedMap<K, V>) toKey, false);
-    }
+                        @Override // java.util.List
+                        public final Object get(int index) {
+                            return new AbstractMap.SimpleImmutableEntry(ImmutableSortedMap.this.keySet.elements.get(index), ImmutableSortedMap.this.valueList.get(index));
+                        }
 
-    @Override // com.google.common.collect.ImmutableMap, java.util.Map
-    /* renamed from: keySet  reason: collision with other method in class */
-    public Set mo23keySet() {
-        return this.keySet;
-    }
+                        @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
+                        public final int size() {
+                            return ImmutableSortedMap.this.size();
+                        }
+                    };
+                }
 
-    /* JADX WARN: Multi-variable type inference failed */
-    @Override // java.util.NavigableMap, java.util.SortedMap
-    public SortedMap subMap(Object fromKey, Object toKey) {
-        return subMap((boolean) fromKey, true, (boolean) toKey, false);
-    }
+                @Override // com.google.common.collect.ImmutableMapEntrySet, com.google.common.collect.ImmutableSet, com.google.common.collect.ImmutableCollection, java.util.AbstractCollection, java.util.Collection, java.lang.Iterable
+                /* renamed from: iterator */
+                public final UnmodifiableIterator<Map.Entry<K, V>> mo59iterator() {
+                    return asList().listIterator(0);
+                }
 
-    @Override // java.util.NavigableMap
-    public ImmutableSortedMap<K, V> tailMap(K fromKey, boolean inclusive) {
-        RegularImmutableSortedSet<K> regularImmutableSortedSet = this.keySet;
-        Objects.requireNonNull(fromKey);
-        return getSubMap(regularImmutableSortedSet.tailIndex(fromKey, inclusive), size());
-    }
-
-    @Override // com.google.common.collect.ImmutableMap, java.util.Map
-    /* renamed from: values  reason: collision with other method in class */
-    public Collection mo25values() {
-        return this.valueList;
-    }
-
-    @Override // java.util.NavigableMap
-    public ImmutableSortedMap<K, V> headMap(K toKey, boolean inclusive) {
-        RegularImmutableSortedSet<K> regularImmutableSortedSet = this.keySet;
-        Objects.requireNonNull(toKey);
-        int binarySearch = Collections.binarySearch(regularImmutableSortedSet.elements, toKey, regularImmutableSortedSet.comparator);
-        if (binarySearch < 0) {
-            binarySearch = ~binarySearch;
-        } else if (inclusive) {
-            binarySearch++;
+                @Override // com.google.common.collect.ImmutableMapEntrySet
+                public final ImmutableSortedMap map() {
+                    return ImmutableSortedMap.this;
+                }
+            };
         }
-        return getSubMap(0, binarySearch);
+        int i = ImmutableSet.$r8$clinit;
+        return RegularImmutableSet.EMPTY;
     }
 
     @Override // java.util.NavigableMap
-    public ImmutableSortedMap<K, V> subMap(K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
-        Objects.requireNonNull(fromKey);
-        Objects.requireNonNull(toKey);
+    public final Map.Entry<K, V> firstEntry() {
+        if (isEmpty()) {
+            return null;
+        }
+        return super.entrySet().asList().get(0);
+    }
+
+    @Override // java.util.NavigableMap
+    public final ImmutableSortedMap<K, V> headMap(K toKey, boolean inclusive) {
+        RegularImmutableSortedSet<K> regularImmutableSortedSet = this.keySet;
+        toKey.getClass();
+        return getSubMap(0, regularImmutableSortedSet.headIndex(toKey, inclusive));
+    }
+
+    @Override // java.util.NavigableMap
+    public final Map.Entry<K, V> lastEntry() {
+        if (isEmpty()) {
+            return null;
+        }
+        return super.entrySet().asList().get(size() - 1);
+    }
+
+    @Override // java.util.NavigableMap
+    public final ImmutableSortedMap<K, V> subMap(K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
+        fromKey.getClass();
+        toKey.getClass();
         if (this.keySet.comparator.compare(fromKey, toKey) <= 0) {
-            ImmutableSortedMap<K, V> headMap = headMap((ImmutableSortedMap<K, V>) toKey, toInclusive);
-            return headMap.getSubMap(headMap.keySet.tailIndex(fromKey, fromInclusive), headMap.size());
+            return headMap((ImmutableSortedMap<K, V>) toKey, toInclusive).tailMap((ImmutableSortedMap<K, V>) fromKey, fromInclusive);
         }
         throw new IllegalArgumentException(Strings.lenientFormat("expected fromKey <= toKey but %s > %s", fromKey, toKey));
     }
 
-    public ImmutableSortedMap(RegularImmutableSortedSet<K> keySet, ImmutableList<V> valueList, ImmutableSortedMap<K, V> descendingMap) {
-        this.keySet = keySet;
-        this.valueList = valueList;
-        this.descendingMap = descendingMap;
+    @Override // java.util.NavigableMap
+    public final ImmutableSortedMap<K, V> tailMap(K fromKey, boolean inclusive) {
+        RegularImmutableSortedSet<K> regularImmutableSortedSet = this.keySet;
+        fromKey.getClass();
+        return getSubMap(regularImmutableSortedSet.tailIndex(fromKey, inclusive), size());
     }
 
     @Override // java.util.NavigableMap
-    /* renamed from: tailMap  reason: collision with other method in class */
-    public NavigableMap mo24tailMap(Object fromKey, boolean inclusive) {
-        RegularImmutableSortedSet<K> regularImmutableSortedSet = this.keySet;
-        Objects.requireNonNull(fromKey);
-        return getSubMap(regularImmutableSortedSet.tailIndex(fromKey, inclusive), size());
+    public final NavigableSet navigableKeySet() {
+        return this.keySet;
     }
 }

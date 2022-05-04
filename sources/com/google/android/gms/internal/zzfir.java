@@ -1,6 +1,7 @@
 package com.google.android.gms.internal;
 
 import android.database.ContentObserver;
+/* compiled from: ConfigurationContentLoader.java */
 /* loaded from: classes.dex */
 public final class zzfir extends ContentObserver {
     public final /* synthetic */ zzfiq zza;

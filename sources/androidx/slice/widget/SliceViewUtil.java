@@ -10,12 +10,24 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.text.format.DateUtils;
-import android.widget.ProgressBar;
-import com.android.systemui.shared.R;
 import com.android.systemui.shared.system.QuickStepContract;
 import java.util.Calendar;
 /* loaded from: classes.dex */
-public class SliceViewUtil {
+public final class SliceViewUtil {
+    public static int getColorAttr(Context context, int i) {
+        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(new int[]{i});
+        int color = obtainStyledAttributes.getColor(0, 0);
+        obtainStyledAttributes.recycle();
+        return color;
+    }
+
+    public static Drawable getDrawable(Context context, int i) {
+        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(new int[]{i});
+        Drawable drawable = obtainStyledAttributes.getDrawable(0);
+        obtainStyledAttributes.recycle();
+        return drawable;
+    }
+
     public static Bitmap getCircularBitmap(Bitmap bitmap) {
         Bitmap createBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(createBitmap);
@@ -29,33 +41,10 @@ public class SliceViewUtil {
         return createBitmap;
     }
 
-    public static int getColorAttr(Context context, int attr) {
-        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(new int[]{attr});
-        int color = obtainStyledAttributes.getColor(0, 0);
-        obtainStyledAttributes.recycle();
-        return color;
-    }
-
-    public static Drawable getDrawable(Context context, int attr) {
-        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(new int[]{attr});
-        Drawable drawable = obtainStyledAttributes.getDrawable(0);
-        obtainStyledAttributes.recycle();
-        return drawable;
-    }
-
-    public static CharSequence getTimestampString(Context context, long time) {
-        if (time < System.currentTimeMillis() || DateUtils.isToday(time)) {
-            return DateUtils.getRelativeTimeSpanString(time, Calendar.getInstance().getTimeInMillis(), 60000L, QuickStepContract.SYSUI_STATE_IME_SHOWING);
+    public static CharSequence getTimestampString(Context context, long j) {
+        if (j < System.currentTimeMillis() || DateUtils.isToday(j)) {
+            return DateUtils.getRelativeTimeSpanString(j, Calendar.getInstance().getTimeInMillis(), 60000L, QuickStepContract.SYSUI_STATE_IME_SHOWING);
         }
-        return DateUtils.formatDateTime(context, time, 8);
-    }
-
-    public static void tintIndeterminateProgressBar(Context context, ProgressBar bar) {
-        int colorAttr = getColorAttr(context, R.attr.colorControlHighlight);
-        Drawable indeterminateDrawable = bar.getIndeterminateDrawable();
-        if (indeterminateDrawable != null && colorAttr != 0) {
-            indeterminateDrawable.setColorFilter(colorAttr, PorterDuff.Mode.MULTIPLY);
-            bar.setProgressDrawable(indeterminateDrawable);
-        }
+        return DateUtils.formatDateTime(context, j, 8);
     }
 }

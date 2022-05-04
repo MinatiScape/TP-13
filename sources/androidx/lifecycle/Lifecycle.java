@@ -5,6 +5,38 @@ import java.util.concurrent.atomic.AtomicReference;
 public abstract class Lifecycle {
     public AtomicReference<Object> mInternalScopeRef = new AtomicReference<>();
 
+    /* loaded from: classes.dex */
+    public enum Event {
+        ON_CREATE,
+        ON_START,
+        ON_RESUME,
+        ON_PAUSE,
+        ON_STOP,
+        ON_DESTROY,
+        ON_ANY;
+
+        public final State getTargetState() {
+            switch (AnonymousClass1.$SwitchMap$androidx$lifecycle$Lifecycle$Event[ordinal()]) {
+                case 1:
+                case 2:
+                    return State.CREATED;
+                case 3:
+                case 4:
+                    return State.STARTED;
+                case 5:
+                    return State.RESUMED;
+                case 6:
+                    return State.DESTROYED;
+                default:
+                    throw new IllegalArgumentException(this + " has no target state");
+            }
+        }
+    }
+
+    public abstract void addObserver(LifecycleObserver lifecycleObserver);
+
+    public abstract void removeObserver(LifecycleObserver lifecycleObserver);
+
     /* renamed from: androidx.lifecycle.Lifecycle$1  reason: invalid class name */
     /* loaded from: classes.dex */
     public static /* synthetic */ class AnonymousClass1 {
@@ -68,57 +100,18 @@ public abstract class Lifecycle {
     }
 
     /* loaded from: classes.dex */
-    public enum Event {
-        ON_CREATE,
-        ON_START,
-        ON_RESUME,
-        ON_PAUSE,
-        ON_STOP,
-        ON_DESTROY,
-        ON_ANY;
-
-        public static Event upFrom(State state) {
-            int ordinal = state.ordinal();
-            if (ordinal == 1) {
-                return ON_CREATE;
-            }
-            if (ordinal == 2) {
-                return ON_START;
-            }
-            if (ordinal != 3) {
-                return null;
-            }
-            return ON_RESUME;
-        }
-
-        public State getTargetState() {
-            switch (AnonymousClass1.$SwitchMap$androidx$lifecycle$Lifecycle$Event[ordinal()]) {
-                case 1:
-                case 2:
-                    return State.CREATED;
-                case 3:
-                case 4:
-                    return State.STARTED;
-                case 5:
-                    return State.RESUMED;
-                case 6:
-                    return State.DESTROYED;
-                default:
-                    throw new IllegalArgumentException(this + " has no target state");
-            }
-        }
-    }
-
-    /* loaded from: classes.dex */
     public enum State {
         DESTROYED,
         INITIALIZED,
         CREATED,
         STARTED,
-        RESUMED
+        RESUMED;
+
+        public final boolean isAtLeast(State state) {
+            if (compareTo(state) >= 0) {
+                return true;
+            }
+            return false;
+        }
     }
-
-    public abstract void addObserver(LifecycleObserver lifecycleObserver);
-
-    public abstract void removeObserver(LifecycleObserver lifecycleObserver);
 }

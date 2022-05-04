@@ -1,6 +1,5 @@
 package kotlin.coroutines.jvm.internal;
 
-import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -12,13 +11,16 @@ import kotlin.coroutines.jvm.internal.ModuleNameRetriever;
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: ContinuationImpl.kt */
 /* loaded from: classes.dex */
 public abstract class BaseContinuationImpl implements Continuation<Object>, CoroutineStackFrame, Serializable {
     @Nullable
     private final Continuation<Object> completion;
 
-    public BaseContinuationImpl(@Nullable Continuation<Object> continuation) {
-        this.completion = continuation;
+    @Nullable
+    public abstract Object invokeSuspend(@NotNull Object obj);
+
+    public void releaseIntercepted() {
     }
 
     @NotNull
@@ -29,29 +31,54 @@ public abstract class BaseContinuationImpl implements Continuation<Object>, Coro
 
     @Override // kotlin.coroutines.jvm.internal.CoroutineStackFrame
     @Nullable
-    public CoroutineStackFrame getCallerFrame() {
+    public final CoroutineStackFrame getCallerFrame() {
         Continuation<Object> continuation = this.completion;
-        if (!(continuation instanceof CoroutineStackFrame)) {
-            continuation = null;
+        if (continuation instanceof CoroutineStackFrame) {
+            return (CoroutineStackFrame) continuation;
         }
-        return (CoroutineStackFrame) continuation;
+        return null;
     }
 
-    @Nullable
-    public final Continuation<Object> getCompletion() {
-        return this.completion;
+    /* JADX WARN: Multi-variable type inference failed */
+    /* JADX WARN: Type inference failed for: r0v0, types: [kotlin.coroutines.Continuation, java.lang.Object, kotlin.coroutines.Continuation<java.lang.Object>] */
+    @Override // kotlin.coroutines.Continuation
+    public final void resumeWith(@NotNull Object obj) {
+        while (true) {
+            BaseContinuationImpl baseContinuationImpl = this;
+            ?? r0 = baseContinuationImpl.completion;
+            Intrinsics.checkNotNull(r0);
+            try {
+                obj = baseContinuationImpl.invokeSuspend(obj);
+                if (obj == CoroutineSingletons.COROUTINE_SUSPENDED) {
+                    return;
+                }
+            } catch (Throwable th) {
+                obj = ResultKt.createFailure(th);
+            }
+            baseContinuationImpl.releaseIntercepted();
+            if (r0 instanceof BaseContinuationImpl) {
+                this = r0;
+            } else {
+                r0.resumeWith(obj);
+                return;
+            }
+        }
+    }
+
+    public BaseContinuationImpl(@Nullable Continuation<Object> continuation) {
+        this.completion = continuation;
     }
 
     @Override // kotlin.coroutines.jvm.internal.CoroutineStackFrame
     @Nullable
-    public StackTraceElement getStackTraceElement() {
+    public final StackTraceElement getStackTraceElement() {
         int i;
         String str;
-        Method method;
-        Object invoke;
-        Method method2;
-        Object invoke2;
-        Intrinsics.checkNotNullParameter(this, "$this$getStackTraceElementImpl");
+        Object obj;
+        Object obj2;
+        Object obj3;
+        Integer num;
+        int i2;
         DebugMetadata debugMetadata = (DebugMetadata) getClass().getAnnotation(DebugMetadata.class);
         String str2 = null;
         if (debugMetadata == null) {
@@ -59,24 +86,28 @@ public abstract class BaseContinuationImpl implements Continuation<Object>, Coro
         }
         int v = debugMetadata.v();
         if (v <= 1) {
-            int i2 = -1;
+            int i3 = -1;
             try {
-                Field field = getClass().getDeclaredField("label");
-                Intrinsics.checkNotNullExpressionValue(field, "field");
-                field.setAccessible(true);
-                Object obj = field.get(this);
-                if (!(obj instanceof Integer)) {
-                    obj = null;
+                Field declaredField = getClass().getDeclaredField("label");
+                declaredField.setAccessible(true);
+                Object obj4 = declaredField.get(this);
+                if (obj4 instanceof Integer) {
+                    num = (Integer) obj4;
+                } else {
+                    num = null;
                 }
-                Integer num = (Integer) obj;
-                i = (num != null ? num.intValue() : 0) - 1;
+                if (num == null) {
+                    i2 = 0;
+                } else {
+                    i2 = num.intValue();
+                }
+                i = i2 - 1;
             } catch (Exception unused) {
                 i = -1;
             }
             if (i >= 0) {
-                i2 = debugMetadata.l()[i];
+                i3 = debugMetadata.l()[i];
             }
-            Intrinsics.checkNotNullParameter(this, "continuation");
             ModuleNameRetriever.Cache cache = ModuleNameRetriever.cache;
             if (cache == null) {
                 try {
@@ -88,62 +119,54 @@ public abstract class BaseContinuationImpl implements Continuation<Object>, Coro
                     ModuleNameRetriever.cache = cache;
                 }
             }
-            if (!(cache == ModuleNameRetriever.notOnJava9 || (method = cache.getModuleMethod) == null || (invoke = method.invoke(getClass(), new Object[0])) == null || (method2 = cache.getDescriptorMethod) == null || (invoke2 = method2.invoke(invoke, new Object[0])) == null)) {
-                Method method3 = cache.nameMethod;
-                Object invoke3 = method3 != null ? method3.invoke(invoke2, new Object[0]) : null;
-                if (invoke3 instanceof String) {
-                    str2 = invoke3;
+            if (cache != ModuleNameRetriever.notOnJava9) {
+                Method method = cache.getModuleMethod;
+                if (method == null) {
+                    obj = null;
+                } else {
+                    obj = method.invoke(getClass(), new Object[0]);
                 }
-                str2 = str2;
+                if (obj != null) {
+                    Method method2 = cache.getDescriptorMethod;
+                    if (method2 == null) {
+                        obj2 = null;
+                    } else {
+                        obj2 = method2.invoke(obj, new Object[0]);
+                    }
+                    if (obj2 != null) {
+                        Method method3 = cache.nameMethod;
+                        if (method3 == null) {
+                            obj3 = null;
+                        } else {
+                            obj3 = method3.invoke(obj2, new Object[0]);
+                        }
+                        if (obj3 instanceof String) {
+                            str2 = obj3;
+                        }
+                    }
+                }
             }
             if (str2 == null) {
                 str = debugMetadata.c();
             } else {
-                str = str2 + '/' + debugMetadata.c();
+                str = ((Object) str2) + '/' + debugMetadata.c();
             }
-            return new StackTraceElement(str, debugMetadata.m(), debugMetadata.f(), i2);
+            return new StackTraceElement(str, debugMetadata.m(), debugMetadata.f(), i3);
         }
         throw new IllegalStateException(("Debug metadata version mismatch. Expected: 1, got " + v + ". Please update the Kotlin standard library.").toString());
     }
 
-    @Nullable
-    public abstract Object invokeSuspend(@NotNull Object obj);
-
-    public void releaseIntercepted() {
-    }
-
-    @Override // kotlin.coroutines.Continuation
-    public final void resumeWith(@NotNull Object obj) {
-        while (true) {
-            Intrinsics.checkNotNullParameter(frame, "frame");
-            Continuation<Object> continuation = frame.completion;
-            Intrinsics.checkNotNull(continuation);
-            try {
-                obj = frame.invokeSuspend(obj);
-                if (obj == CoroutineSingletons.COROUTINE_SUSPENDED) {
-                    return;
-                }
-            } catch (Throwable th) {
-                obj = ResultKt.createFailure(th);
-            }
-            frame.releaseIntercepted();
-            if (continuation instanceof BaseContinuationImpl) {
-                frame = (BaseContinuationImpl) continuation;
-            } else {
-                continuation.resumeWith(obj);
-                return;
-            }
-        }
-    }
-
     @NotNull
     public String toString() {
-        StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Continuation at ");
         Object stackTraceElement = getStackTraceElement();
         if (stackTraceElement == null) {
             stackTraceElement = getClass().getName();
         }
-        m.append(stackTraceElement);
-        return m.toString();
+        return Intrinsics.stringPlus("Continuation at ", stackTraceElement);
+    }
+
+    @Nullable
+    public final Continuation<Object> getCompletion() {
+        return this.completion;
     }
 }

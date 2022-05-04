@@ -4,14 +4,27 @@ import java.io.Serializable;
 import kotlin.jvm.functions.Function0;
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+/* JADX INFO: Access modifiers changed from: package-private */
+/* compiled from: LazyJVM.kt */
 /* loaded from: classes.dex */
 public final class SynchronizedLazyImpl<T> implements Lazy<T>, Serializable {
+    @Nullable
+    private volatile Object _value;
+    @Nullable
     private Function0<? extends T> initializer;
-    private volatile Object _value = UNINITIALIZED_VALUE.INSTANCE;
-    private final Object lock = this;
+    @NotNull
+    private final Object lock;
 
-    public SynchronizedLazyImpl(Function0 function0, Object obj, int i) {
-        this.initializer = function0;
+    public SynchronizedLazyImpl() {
+        throw null;
+    }
+
+    public SynchronizedLazyImpl(Function0 initializer) {
+        Intrinsics.checkNotNullParameter(initializer, "initializer");
+        this.initializer = initializer;
+        this._value = UNINITIALIZED_VALUE.INSTANCE;
+        this.lock = this;
     }
 
     private final Object writeReplace() {
@@ -19,7 +32,7 @@ public final class SynchronizedLazyImpl<T> implements Lazy<T>, Serializable {
     }
 
     @Override // kotlin.Lazy
-    public T getValue() {
+    public final T getValue() {
         T t;
         T t2 = (T) this._value;
         UNINITIALIZED_VALUE uninitialized_value = UNINITIALIZED_VALUE.INSTANCE;
@@ -40,7 +53,16 @@ public final class SynchronizedLazyImpl<T> implements Lazy<T>, Serializable {
     }
 
     @NotNull
-    public String toString() {
-        return this._value != UNINITIALIZED_VALUE.INSTANCE ? String.valueOf(getValue()) : "Lazy value not initialized yet.";
+    public final String toString() {
+        boolean z;
+        if (this._value != UNINITIALIZED_VALUE.INSTANCE) {
+            z = true;
+        } else {
+            z = false;
+        }
+        if (z) {
+            return String.valueOf(getValue());
+        }
+        return "Lazy value not initialized yet.";
     }
 }

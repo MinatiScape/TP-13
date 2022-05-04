@@ -3,6 +3,6 @@
     <Space android:layout_width="wrap_content" android:layout_height="24dp"/>
     <ImageView android:layout_gravity="center" android:layout_width="@dimen/set_wallpaper_dialog_icon_size" android:layout_height="@dimen/set_wallpaper_dialog_icon_size" android:src="@drawable/ic_baseline_wallpaper_24" android:tint="?android:attr/colorAccent"/>
     <Space android:layout_width="wrap_content" android:layout_height="16dp"/>
-    <TextView android:textSize="24sp" android:textColor="?android:attr/textColorPrimary" android:gravity="center" android:id="@+id/dialog_set_wallpaper_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="32dp" android:fontFamily="@android:string/config_screenshotErrorReceiverComponent"/>
+    <TextView android:textSize="24sp" android:textColor="?android:attr/textColorPrimary" android:gravity="center" android:id="@+id/dialog_set_wallpaper_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="32dp" android:fontFamily="@android:string/config_wimaxServiceClassname"/>
     <Space android:layout_width="wrap_content" android:layout_height="8dp"/>
 </LinearLayout>

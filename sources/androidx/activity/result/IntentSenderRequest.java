@@ -10,12 +10,12 @@ import android.os.Parcelable;
 public final class IntentSenderRequest implements Parcelable {
     public static final Parcelable.Creator<IntentSenderRequest> CREATOR = new Parcelable.Creator<IntentSenderRequest>() { // from class: androidx.activity.result.IntentSenderRequest.1
         @Override // android.os.Parcelable.Creator
-        public IntentSenderRequest createFromParcel(Parcel parcel) {
+        public final IntentSenderRequest createFromParcel(Parcel parcel) {
             return new IntentSenderRequest(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public IntentSenderRequest[] newArray(int i) {
+        public final IntentSenderRequest[] newArray(int i) {
             return new IntentSenderRequest[i];
         }
     };
@@ -32,12 +32,12 @@ public final class IntentSenderRequest implements Parcelable {
     }
 
     @Override // android.os.Parcelable
-    public int describeContents() {
+    public final int describeContents() {
         return 0;
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
+    public final void writeToParcel(Parcel parcel, int i) {
         parcel.writeParcelable(this.mIntentSender, i);
         parcel.writeParcelable(this.mFillInIntent, i);
         parcel.writeInt(this.mFlagsMask);

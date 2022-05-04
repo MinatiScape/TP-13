@@ -1,55 +1,54 @@
 package com.bumptech.glide.manager;
 
 import com.bumptech.glide.util.Util;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.WeakHashMap;
 /* loaded from: classes.dex */
-public class ActivityFragmentLifecycle implements Lifecycle {
+public final class ActivityFragmentLifecycle implements Lifecycle {
     public boolean isDestroyed;
     public boolean isStarted;
     public final Set<LifecycleListener> lifecycleListeners = Collections.newSetFromMap(new WeakHashMap());
 
-    @Override // com.bumptech.glide.manager.Lifecycle
-    public void addListener(LifecycleListener listener) {
-        this.lifecycleListeners.add(listener);
-        if (this.isDestroyed) {
-            listener.onDestroy();
-        } else if (this.isStarted) {
-            listener.onStart();
-        } else {
-            listener.onStop();
-        }
-    }
-
-    public void onDestroy() {
+    public final void onDestroy() {
         this.isDestroyed = true;
-        Iterator it = ((ArrayList) Util.getSnapshot(this.lifecycleListeners)).iterator();
+        Iterator it = Util.getSnapshot(this.lifecycleListeners).iterator();
         while (it.hasNext()) {
             ((LifecycleListener) it.next()).onDestroy();
         }
     }
 
-    public void onStart() {
+    public final void onStart() {
         this.isStarted = true;
-        Iterator it = ((ArrayList) Util.getSnapshot(this.lifecycleListeners)).iterator();
+        Iterator it = Util.getSnapshot(this.lifecycleListeners).iterator();
         while (it.hasNext()) {
             ((LifecycleListener) it.next()).onStart();
         }
     }
 
-    public void onStop() {
+    public final void onStop() {
         this.isStarted = false;
-        Iterator it = ((ArrayList) Util.getSnapshot(this.lifecycleListeners)).iterator();
+        Iterator it = Util.getSnapshot(this.lifecycleListeners).iterator();
         while (it.hasNext()) {
             ((LifecycleListener) it.next()).onStop();
         }
     }
 
     @Override // com.bumptech.glide.manager.Lifecycle
-    public void removeListener(LifecycleListener listener) {
-        this.lifecycleListeners.remove(listener);
+    public final void addListener(LifecycleListener lifecycleListener) {
+        this.lifecycleListeners.add(lifecycleListener);
+        if (this.isDestroyed) {
+            lifecycleListener.onDestroy();
+        } else if (this.isStarted) {
+            lifecycleListener.onStart();
+        } else {
+            lifecycleListener.onStop();
+        }
+    }
+
+    @Override // com.bumptech.glide.manager.Lifecycle
+    public final void removeListener(LifecycleListener lifecycleListener) {
+        this.lifecycleListeners.remove(lifecycleListener);
     }
 }

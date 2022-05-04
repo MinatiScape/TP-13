@@ -3,32 +3,41 @@ package kotlinx.coroutines.internal;
 import java.util.Iterator;
 import java.util.List;
 import kotlin.jvm.internal.Intrinsics;
+import kotlin.sequences.ConstrainedOnceSequence;
 import kotlin.sequences.SequencesKt;
-import kotlin.sequences.SequencesKt___SequencesJvmKt;
+import kotlin.sequences.SequencesKt__SequencesKt$asSequence$$inlined$Sequence$1;
 import kotlinx.coroutines.MainCoroutineDispatcher;
 import org.jetbrains.annotations.NotNull;
+/* compiled from: MainDispatchers.kt */
 /* loaded from: classes.dex */
 public final class MainDispatcherLoader {
-    public static final boolean FAST_SERVICE_LOADER_ENABLED;
     @NotNull
     public static final MainCoroutineDispatcher dispatcher;
 
+    /* JADX WARN: Multi-variable type inference failed */
+    /* JADX WARN: Type inference failed for: r0v14, types: [kotlin.sequences.ConstrainedOnceSequence] */
     static {
-        MainCoroutineDispatcher mainCoroutineDispatcher;
+        boolean z;
+        MissingMainCoroutineDispatcher missingMainCoroutineDispatcher;
         List<? extends MainDispatcherFactory> list;
         Object obj;
         String systemProp = SystemPropsKt.systemProp("kotlinx.coroutines.fast.service.loader");
-        boolean parseBoolean = systemProp != null ? Boolean.parseBoolean(systemProp) : true;
-        FAST_SERVICE_LOADER_ENABLED = parseBoolean;
+        if (systemProp == null) {
+            z = true;
+        } else {
+            z = Boolean.parseBoolean(systemProp);
+        }
         try {
-            if (parseBoolean) {
-                ClassLoader classLoader = MainDispatcherFactory.class.getClassLoader();
-                Intrinsics.checkExpressionValueIsNotNull(classLoader, "clz.classLoader");
-                list = FastServiceLoader.loadProviders$kotlinx_coroutines_core(MainDispatcherFactory.class, classLoader);
+            if (z) {
+                list = SystemPropsKt.loadMainDispatcherFactory$external__kotlinx_coroutines__android_common__kotlinx_coroutines();
             } else {
                 Iterator m = MainDispatcherLoader$$ExternalSyntheticServiceLoad0.m();
-                Intrinsics.checkExpressionValueIsNotNull(m, "ServiceLoader.load(\n    …             ).iterator()");
-                list = SequencesKt.toList(SequencesKt___SequencesJvmKt.asSequence(m));
+                Intrinsics.checkNotNullExpressionValue(m, "load(\n                  …             ).iterator()");
+                SequencesKt__SequencesKt$asSequence$$inlined$Sequence$1 sequencesKt__SequencesKt$asSequence$$inlined$Sequence$1 = new SequencesKt__SequencesKt$asSequence$$inlined$Sequence$1(m);
+                if (!(sequencesKt__SequencesKt$asSequence$$inlined$Sequence$1 instanceof ConstrainedOnceSequence)) {
+                    sequencesKt__SequencesKt$asSequence$$inlined$Sequence$1 = new ConstrainedOnceSequence(sequencesKt__SequencesKt$asSequence$$inlined$Sequence$1);
+                }
+                list = SequencesKt.toList(sequencesKt__SequencesKt$asSequence$$inlined$Sequence$1);
             }
             Iterator it = list.iterator();
             if (!it.hasNext()) {
@@ -48,12 +57,17 @@ public final class MainDispatcherLoader {
                 }
             }
             MainDispatcherFactory mainDispatcherFactory = (MainDispatcherFactory) obj;
-            if (mainDispatcherFactory == null || (mainCoroutineDispatcher = mainDispatcherFactory.createDispatcher(list)) == null) {
-                mainCoroutineDispatcher = new MissingMainCoroutineDispatcher(null, null, 2);
+            if (mainDispatcherFactory == null) {
+                missingMainCoroutineDispatcher = null;
+            } else {
+                missingMainCoroutineDispatcher = mainDispatcherFactory.createDispatcher(list);
+            }
+            if (missingMainCoroutineDispatcher == null) {
+                missingMainCoroutineDispatcher = new MissingMainCoroutineDispatcher(null, null);
             }
         } catch (Throwable th) {
-            mainCoroutineDispatcher = new MissingMainCoroutineDispatcher(th, null, 2);
+            missingMainCoroutineDispatcher = new MissingMainCoroutineDispatcher(th, null);
         }
-        dispatcher = mainCoroutineDispatcher;
+        dispatcher = missingMainCoroutineDispatcher;
     }
 }

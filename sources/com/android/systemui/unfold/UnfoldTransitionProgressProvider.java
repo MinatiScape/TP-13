@@ -3,12 +3,15 @@ package com.android.systemui.unfold;
 import com.android.systemui.statusbar.policy.CallbackController;
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
+/* compiled from: UnfoldTransitionProgressProvider.kt */
 /* loaded from: classes.dex */
 public interface UnfoldTransitionProgressProvider extends CallbackController<TransitionProgressListener> {
 
+    /* compiled from: UnfoldTransitionProgressProvider.kt */
     /* loaded from: classes.dex */
     public interface TransitionProgressListener {
 
+        /* compiled from: UnfoldTransitionProgressProvider.kt */
         /* loaded from: classes.dex */
         public static final class DefaultImpls {
             public static void onTransitionFinished(@NotNull TransitionProgressListener transitionProgressListener) {

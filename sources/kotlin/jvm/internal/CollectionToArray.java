@@ -4,17 +4,19 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: CollectionToArray.kt */
 /* loaded from: classes.dex */
 public final class CollectionToArray {
+    @NotNull
     public static final Object[] EMPTY = new Object[0];
 
     @NotNull
     public static final Object[] toArray(@NotNull Collection<?> collection, @Nullable Object[] objArr) {
         Object[] objArr2;
-        Objects.requireNonNull(objArr);
+        Intrinsics.checkNotNullParameter(collection, "collection");
+        objArr.getClass();
         int size = collection.size();
         int i = 0;
         if (size != 0) {
@@ -24,8 +26,11 @@ public final class CollectionToArray {
                     objArr2 = objArr;
                 } else {
                     Object newInstance = Array.newInstance(objArr.getClass().getComponentType(), size);
-                    Objects.requireNonNull(newInstance, "null cannot be cast to non-null type kotlin.Array<kotlin.Any?>");
-                    objArr2 = (Object[]) newInstance;
+                    if (newInstance != null) {
+                        objArr2 = (Object[]) newInstance;
+                    } else {
+                        throw new NullPointerException("null cannot be cast to non-null type kotlin.Array<kotlin.Any?>");
+                    }
                 }
                 while (true) {
                     int i2 = i + 1;
@@ -43,14 +48,14 @@ public final class CollectionToArray {
                             }
                         }
                         objArr2 = Arrays.copyOf(objArr2, i3);
-                        Intrinsics.checkNotNullExpressionValue(objArr2, "Arrays.copyOf(result, newSize)");
+                        Intrinsics.checkNotNullExpressionValue(objArr2, "copyOf(result, newSize)");
                     } else if (!it.hasNext()) {
                         if (objArr2 == objArr) {
                             objArr[i2] = null;
                             return objArr;
                         }
                         Object[] copyOf = Arrays.copyOf(objArr2, i2);
-                        Intrinsics.checkNotNullExpressionValue(copyOf, "Arrays.copyOf(result, size)");
+                        Intrinsics.checkNotNullExpressionValue(copyOf, "copyOf(result, size)");
                         return copyOf;
                     }
                     i = i2;
@@ -71,6 +76,7 @@ public final class CollectionToArray {
 
     @NotNull
     public static final Object[] toArray(@NotNull Collection<?> collection) {
+        Intrinsics.checkNotNullParameter(collection, "collection");
         int size = collection.size();
         if (size != 0) {
             Iterator<?> it = collection.iterator();
@@ -93,10 +99,10 @@ public final class CollectionToArray {
                             }
                         }
                         objArr = Arrays.copyOf(objArr, i3);
-                        Intrinsics.checkNotNullExpressionValue(objArr, "Arrays.copyOf(result, newSize)");
+                        Intrinsics.checkNotNullExpressionValue(objArr, "copyOf(result, newSize)");
                     } else if (!it.hasNext()) {
                         Object[] copyOf = Arrays.copyOf(objArr, i2);
-                        Intrinsics.checkNotNullExpressionValue(copyOf, "Arrays.copyOf(result, size)");
+                        Intrinsics.checkNotNullExpressionValue(copyOf, "copyOf(result, size)");
                         return copyOf;
                     }
                     i = i2;

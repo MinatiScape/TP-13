@@ -1,4 +1,4 @@
 package androidx.core.app;
 /* loaded from: classes.dex */
-public class NotificationCompat$Action {
+public final class NotificationCompat$Action {
 }

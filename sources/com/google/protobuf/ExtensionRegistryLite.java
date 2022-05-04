@@ -2,10 +2,9 @@ package com.google.protobuf;
 
 import com.google.protobuf.GeneratedMessageLite;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 /* loaded from: classes.dex */
-public class ExtensionRegistryLite {
+public final class ExtensionRegistryLite {
     public static final ExtensionRegistryLite EMPTY_REGISTRY_LITE;
     public static volatile ExtensionRegistryLite emptyRegistry;
     public final Map<ObjectIntPair, GeneratedMessageLite.GeneratedExtension<?, ?>> extensionsByNumber;
@@ -15,22 +14,29 @@ public class ExtensionRegistryLite {
         public final int number;
         public final Object object;
 
-        public ObjectIntPair(Object obj, int i) {
-            this.object = obj;
-            this.number = i;
-        }
-
-        public boolean equals(Object obj) {
+        public final boolean equals(Object obj) {
             if (!(obj instanceof ObjectIntPair)) {
                 return false;
             }
             ObjectIntPair objectIntPair = (ObjectIntPair) obj;
-            return this.object == objectIntPair.object && this.number == objectIntPair.number;
+            if (this.object == objectIntPair.object && this.number == objectIntPair.number) {
+                return true;
+            }
+            return false;
         }
 
-        public int hashCode() {
+        public final int hashCode() {
             return (System.identityHashCode(this.object) * 65535) + this.number;
         }
+
+        public ObjectIntPair(Object obj, int i) {
+            this.object = obj;
+            this.number = i;
+        }
+    }
+
+    public ExtensionRegistryLite() {
+        throw null;
     }
 
     static {
@@ -38,11 +44,7 @@ public class ExtensionRegistryLite {
             Class.forName("com.google.protobuf.Extension");
         } catch (ClassNotFoundException unused) {
         }
-        EMPTY_REGISTRY_LITE = new ExtensionRegistryLite(true);
-    }
-
-    public ExtensionRegistryLite() {
-        this.extensionsByNumber = new HashMap();
+        EMPTY_REGISTRY_LITE = new ExtensionRegistryLite(0);
     }
 
     public static ExtensionRegistryLite getEmptyRegistry() {
@@ -67,7 +69,7 @@ public class ExtensionRegistryLite {
         return extensionRegistryLite;
     }
 
-    public ExtensionRegistryLite(boolean z) {
+    public ExtensionRegistryLite(int i) {
         this.extensionsByNumber = Collections.emptyMap();
     }
 }

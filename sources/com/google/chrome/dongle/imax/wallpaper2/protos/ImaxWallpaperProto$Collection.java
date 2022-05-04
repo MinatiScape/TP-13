@@ -20,7 +20,7 @@ public final class ImaxWallpaperProto$Collection extends GeneratedMessageLite<Im
 
     /* loaded from: classes.dex */
     public static final class Builder extends GeneratedMessageLite.Builder<ImaxWallpaperProto$Collection, Builder> implements MessageLiteOrBuilder {
-        public Builder(ImaxWallpaperProto$1 imaxWallpaperProto$1) {
+        public Builder() {
             super(ImaxWallpaperProto$Collection.DEFAULT_INSTANCE);
         }
     }
@@ -31,8 +31,12 @@ public final class ImaxWallpaperProto$Collection extends GeneratedMessageLite<Im
         GeneratedMessageLite.registerDefaultInstance(ImaxWallpaperProto$Collection.class, imaxWallpaperProto$Collection);
     }
 
+    public final ImaxWallpaperProto$Image getPreview() {
+        return this.preview_.get(0);
+    }
+
     @Override // com.google.protobuf.GeneratedMessageLite
-    public final Object dynamicMethod(GeneratedMessageLite.MethodToInvoke methodToInvoke, Object obj, Object obj2) {
+    public final Object dynamicMethod(GeneratedMessageLite.MethodToInvoke methodToInvoke) {
         switch (methodToInvoke.ordinal()) {
             case 0:
                 return (byte) 1;
@@ -43,7 +47,7 @@ public final class ImaxWallpaperProto$Collection extends GeneratedMessageLite<Im
             case 3:
                 return new ImaxWallpaperProto$Collection();
             case 4:
-                return new Builder(null);
+                return new Builder();
             case 5:
                 return DEFAULT_INSTANCE;
             case 6:
@@ -63,15 +67,11 @@ public final class ImaxWallpaperProto$Collection extends GeneratedMessageLite<Im
         }
     }
 
-    public String getCollectionId() {
+    public final String getCollectionId() {
         return this.collectionId_;
     }
 
-    public String getCollectionName() {
+    public final String getCollectionName() {
         return this.collectionName_;
-    }
-
-    public ImaxWallpaperProto$Image getPreview(int i) {
-        return this.preview_.get(i);
     }
 }

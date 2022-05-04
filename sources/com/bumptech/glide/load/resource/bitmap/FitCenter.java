@@ -5,26 +5,26 @@ import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import java.security.MessageDigest;
 /* loaded from: classes.dex */
-public class FitCenter extends BitmapTransformation {
+public final class FitCenter extends BitmapTransformation {
     public static final byte[] ID_BYTES = "com.bumptech.glide.load.resource.bitmap.FitCenter".getBytes(Key.CHARSET);
 
     @Override // com.bumptech.glide.load.Key
-    public boolean equals(Object o) {
-        return o instanceof FitCenter;
-    }
-
-    @Override // com.bumptech.glide.load.Key
-    public int hashCode() {
+    public final int hashCode() {
         return 1572326941;
     }
 
+    @Override // com.bumptech.glide.load.Key
+    public final void updateDiskCacheKey(MessageDigest messageDigest) {
+        messageDigest.update(ID_BYTES);
+    }
+
     @Override // com.bumptech.glide.load.resource.bitmap.BitmapTransformation
-    public Bitmap transform(BitmapPool pool, Bitmap toTransform, int outWidth, int outHeight) {
-        return TransformationUtils.fitCenter(pool, toTransform, outWidth, outHeight);
+    public final Bitmap transform(BitmapPool bitmapPool, Bitmap bitmap, int i, int i2) {
+        return TransformationUtils.fitCenter(bitmapPool, bitmap, i, i2);
     }
 
     @Override // com.bumptech.glide.load.Key
-    public void updateDiskCacheKey(MessageDigest messageDigest) {
-        messageDigest.update(ID_BYTES);
+    public final boolean equals(Object obj) {
+        return obj instanceof FitCenter;
     }
 }

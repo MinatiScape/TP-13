@@ -1,84 +1,99 @@
 package com.google.common.base;
 
-import androidx.constraintlayout.solver.SolverVariable$Type$r8$EnumUnboxingUtility;
 import com.google.common.base.Splitter;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 /* loaded from: classes.dex */
 public abstract class AbstractIterator<T> implements Iterator<T> {
-    public T next;
-    public int state = 2;
+    public String next;
+    public State state = State.NOT_READY;
+
+    /* loaded from: classes.dex */
+    public enum State {
+        READY,
+        NOT_READY,
+        DONE,
+        FAILED
+    }
 
     @Override // java.util.Iterator
     public final boolean hasNext() {
-        T t;
+        boolean z;
+        String str;
         int separatorStart;
-        int i = this.state;
-        if (i != 4) {
-            int $enumboxing$ordinal = SolverVariable$Type$r8$EnumUnboxingUtility.$enumboxing$ordinal(i);
-            if ($enumboxing$ordinal == 0) {
+        State state = this.state;
+        State state2 = State.FAILED;
+        if (state != state2) {
+            z = true;
+        } else {
+            z = false;
+        }
+        if (z) {
+            int ordinal = state.ordinal();
+            if (ordinal == 0) {
                 return true;
             }
-            if ($enumboxing$ordinal != 2) {
-                this.state = 4;
+            if (ordinal != 2) {
+                State state3 = State.DONE;
+                this.state = state2;
                 Splitter.SplittingIterator splittingIterator = (Splitter.SplittingIterator) this;
-                int i2 = splittingIterator.offset;
+                int i = splittingIterator.offset;
                 while (true) {
-                    int i3 = splittingIterator.offset;
-                    if (i3 == -1) {
-                        splittingIterator.state = 3;
-                        t = null;
+                    int i2 = splittingIterator.offset;
+                    if (i2 == -1) {
+                        splittingIterator.state = state3;
+                        str = null;
                         break;
                     }
-                    separatorStart = splittingIterator.separatorStart(i3);
+                    separatorStart = splittingIterator.separatorStart(i2);
                     if (separatorStart == -1) {
                         separatorStart = splittingIterator.toSplit.length();
                         splittingIterator.offset = -1;
                     } else {
                         splittingIterator.offset = splittingIterator.separatorEnd(separatorStart);
                     }
-                    int i4 = splittingIterator.offset;
-                    if (i4 == i2) {
-                        int i5 = i4 + 1;
-                        splittingIterator.offset = i5;
-                        if (i5 > splittingIterator.toSplit.length()) {
+                    int i3 = splittingIterator.offset;
+                    if (i3 == i) {
+                        int i4 = i3 + 1;
+                        splittingIterator.offset = i4;
+                        if (i4 > splittingIterator.toSplit.length()) {
                             splittingIterator.offset = -1;
                         }
                     } else {
-                        while (i2 < separatorStart && splittingIterator.trimmer.matches(splittingIterator.toSplit.charAt(i2))) {
-                            i2++;
+                        while (i < separatorStart && splittingIterator.trimmer.matches(splittingIterator.toSplit.charAt(i))) {
+                            i++;
                         }
-                        while (separatorStart > i2) {
-                            int i6 = separatorStart - 1;
-                            if (!splittingIterator.trimmer.matches(splittingIterator.toSplit.charAt(i6))) {
+                        while (separatorStart > i) {
+                            int i5 = separatorStart - 1;
+                            if (!splittingIterator.trimmer.matches(splittingIterator.toSplit.charAt(i5))) {
                                 break;
                             }
-                            separatorStart = i6;
+                            separatorStart = i5;
                         }
-                        if (!splittingIterator.omitEmptyStrings || i2 != separatorStart) {
+                        if (!splittingIterator.omitEmptyStrings || i != separatorStart) {
                             break;
                         }
-                        i2 = splittingIterator.offset;
+                        i = splittingIterator.offset;
                     }
                 }
-                int i7 = splittingIterator.limit;
-                if (i7 == 1) {
+                int i6 = splittingIterator.limit;
+                if (i6 == 1) {
                     separatorStart = splittingIterator.toSplit.length();
                     splittingIterator.offset = -1;
-                    while (separatorStart > i2) {
-                        int i8 = separatorStart - 1;
-                        if (!splittingIterator.trimmer.matches(splittingIterator.toSplit.charAt(i8))) {
+                    while (separatorStart > i) {
+                        int i7 = separatorStart - 1;
+                        if (!splittingIterator.trimmer.matches(splittingIterator.toSplit.charAt(i7))) {
                             break;
                         }
-                        separatorStart = i8;
+                        separatorStart = i7;
                     }
                 } else {
-                    splittingIterator.limit = i7 - 1;
+                    splittingIterator.limit = i6 - 1;
                 }
-                t = (T) splittingIterator.toSplit.subSequence(i2, separatorStart).toString();
-                this.next = t;
-                if (this.state != 3) {
-                    this.state = 1;
+                str = splittingIterator.toSplit.subSequence(i, separatorStart).toString();
+                this.next = str;
+                if (this.state != state3) {
+                    this.state = State.READY;
                     return true;
                 }
             }
@@ -88,18 +103,18 @@ public abstract class AbstractIterator<T> implements Iterator<T> {
     }
 
     @Override // java.util.Iterator
+    public final void remove() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override // java.util.Iterator
     public final T next() {
         if (hasNext()) {
-            this.state = 2;
-            T t = this.next;
+            this.state = State.NOT_READY;
+            T t = (T) this.next;
             this.next = null;
             return t;
         }
         throw new NoSuchElementException();
-    }
-
-    @Override // java.util.Iterator
-    public final void remove() {
-        throw new UnsupportedOperationException();
     }
 }

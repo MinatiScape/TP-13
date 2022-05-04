@@ -10,16 +10,16 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
-import android.os.AsyncTask;
-import android.view.View;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.ImageView;
+import androidx.cardview.R$style;
+import androidx.fragment.app.FragmentActivity;
 import com.android.wallpaper.module.BitmapCropper;
 import com.android.wallpaper.module.DefaultBitmapCropper;
-import com.android.wallpaper.module.InjectorProvider;
+import com.android.wallpaper.picker.WallpaperPreviewBitmapTransformation;
 import com.android.wallpaper.util.ScreenSizeCalculator;
 import com.android.wallpaper.util.WallpaperCropUtils;
-import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public abstract class Asset {
 
@@ -29,62 +29,8 @@ public abstract class Asset {
     }
 
     /* loaded from: classes.dex */
-    public static class CenterCropBitmapTask extends AsyncTask<Void, Void, Bitmap> {
-        public Bitmap mBitmap;
-        public BitmapReceiver mBitmapReceiver;
-        public int mImageViewHeight;
-        public int mImageViewWidth;
-
-        public CenterCropBitmapTask(Bitmap bitmap, View view, BitmapReceiver bitmapReceiver) {
-            this.mBitmap = bitmap;
-            this.mBitmapReceiver = bitmapReceiver;
-            Point viewDimensions = Asset.getViewDimensions(view);
-            this.mImageViewWidth = viewDimensions.x;
-            this.mImageViewHeight = viewDimensions.y;
-        }
-
-        @Override // android.os.AsyncTask
-        public Bitmap doInBackground(Void[] voidArr) {
-            int i = this.mImageViewWidth;
-            int i2 = this.mImageViewHeight;
-            float width = this.mBitmap.getWidth();
-            float height = this.mBitmap.getHeight();
-            float min = Math.min(width / i, height / i2);
-            Bitmap createScaledBitmap = Bitmap.createScaledBitmap(this.mBitmap, Math.round(width / min), Math.round(height / min), true);
-            int max = Math.max(0, (createScaledBitmap.getWidth() - i) / 2);
-            int max2 = Math.max(0, (createScaledBitmap.getHeight() - i2) / 2);
-            return Bitmap.createBitmap(createScaledBitmap, max, max2, createScaledBitmap.getWidth() - (max * 2), createScaledBitmap.getHeight() - (max2 * 2));
-        }
-
-        @Override // android.os.AsyncTask
-        public void onPostExecute(Bitmap bitmap) {
-            this.mBitmapReceiver.onBitmapDecoded(bitmap);
-        }
-    }
-
-    /* loaded from: classes.dex */
     public interface DimensionsReceiver {
         void onDimensionsDecoded(Point point);
-    }
-
-    /* loaded from: classes.dex */
-    public interface DrawableLoadedListener {
-        void onDrawableLoaded();
-    }
-
-    public static Drawable getPlaceholderDrawable(Context context, ImageView imageView, int i) {
-        Point viewDimensions = getViewDimensions(imageView);
-        Bitmap createBitmap = Bitmap.createBitmap(viewDimensions.x, viewDimensions.y, Bitmap.Config.ARGB_8888);
-        createBitmap.eraseColor(i);
-        return new BitmapDrawable(context.getResources(), createBitmap);
-    }
-
-    public static Point getViewDimensions(View view) {
-        return new Point(view.getWidth() > 0 ? view.getWidth() : Math.abs(view.getLayoutParams().width), view.getHeight() > 0 ? view.getHeight() : Math.abs(view.getLayoutParams().height));
-    }
-
-    public void adjustCropRect(Context context, Point point, Rect rect) {
-        WallpaperCropUtils.adjustCropRect(context, rect, true);
     }
 
     public abstract void decodeBitmap(int i, int i2, BitmapReceiver bitmapReceiver);
@@ -97,10 +43,22 @@ public abstract class Asset {
         return null;
     }
 
-    public void loadDrawable(final Context context, final ImageView imageView, int i) {
+    public void loadLowResDrawable(FragmentActivity fragmentActivity, ImageView imageView, int i, WallpaperPreviewBitmapTransformation wallpaperPreviewBitmapTransformation) {
+    }
+
+    public static void decodeBitmapCompleted(BitmapReceiver bitmapReceiver, Bitmap bitmap) {
+        new Handler(Looper.getMainLooper()).post(new Asset$$ExternalSyntheticLambda1(bitmapReceiver, bitmap, 0));
+    }
+
+    public void loadDrawable(final Activity activity, final ImageView imageView, int i) {
+        final boolean z;
         int i2;
         int i3;
-        final boolean z = imageView.getDrawable() == null;
+        if (imageView.getDrawable() == null) {
+            z = true;
+        } else {
+            z = false;
+        }
         final ColorDrawable colorDrawable = new ColorDrawable(i);
         if (z) {
             imageView.setImageDrawable(colorDrawable);
@@ -115,14 +73,14 @@ public abstract class Asset {
         } else {
             i3 = Math.abs(imageView.getLayoutParams().height);
         }
-        decodeBitmap(i2, i3, new BitmapReceiver(this) { // from class: com.android.wallpaper.asset.Asset.1
+        decodeBitmap(i2, i3, new BitmapReceiver() { // from class: com.android.wallpaper.asset.Asset.1
             @Override // com.android.wallpaper.asset.Asset.BitmapReceiver
-            public void onBitmapDecoded(Bitmap bitmap) {
+            public final void onBitmapDecoded(Bitmap bitmap) {
                 if (!z) {
                     imageView.setImageBitmap(bitmap);
                     return;
                 }
-                Resources resources = context.getResources();
+                Resources resources = activity.getResources();
                 TransitionDrawable transitionDrawable = new TransitionDrawable(new Drawable[]{colorDrawable, new BitmapDrawable(resources, bitmap)});
                 transitionDrawable.setCrossFadeEnabled(true);
                 imageView.setImageDrawable(transitionDrawable);
@@ -131,98 +89,59 @@ public abstract class Asset {
         });
     }
 
-    public void loadDrawableWithTransition(final Context context, final ImageView imageView, final int i, final DrawableLoadedListener drawableLoadedListener, int i2) {
-        Point viewDimensions = getViewDimensions(imageView);
-        if (imageView.getDrawable() == null) {
-            imageView.setImageDrawable(getPlaceholderDrawable(context, imageView, i2));
-        }
-        decodeBitmap(viewDimensions.x, viewDimensions.y, new BitmapReceiver(this) { // from class: com.android.wallpaper.asset.Asset.2
-            @Override // com.android.wallpaper.asset.Asset.BitmapReceiver
-            public void onBitmapDecoded(Bitmap bitmap) {
-                final Resources resources = context.getResources();
-                new CenterCropBitmapTask(bitmap, imageView, new BitmapReceiver() { // from class: com.android.wallpaper.asset.Asset.2.1
-                    @Override // com.android.wallpaper.asset.Asset.BitmapReceiver
-                    public void onBitmapDecoded(Bitmap bitmap2) {
-                        Drawable[] drawableArr = new Drawable[2];
-                        Drawable drawable = imageView.getDrawable();
-                        if (drawable instanceof TransitionDrawable) {
-                            TransitionDrawable transitionDrawable = (TransitionDrawable) drawable;
-                            drawableArr[0] = transitionDrawable.findDrawableByLayerId(transitionDrawable.getId(1));
-                        } else {
-                            drawableArr[0] = drawable;
-                        }
-                        drawableArr[1] = new BitmapDrawable(resources, bitmap2);
-                        TransitionDrawable transitionDrawable2 = new TransitionDrawable(drawableArr);
-                        transitionDrawable2.setCrossFadeEnabled(true);
-                        imageView.setImageDrawable(transitionDrawable2);
-                        transitionDrawable2.startTransition(i);
-                        DrawableLoadedListener drawableLoadedListener2 = drawableLoadedListener;
-                        if (drawableLoadedListener2 != null) {
-                            drawableLoadedListener2.onDrawableLoaded();
-                        }
-                    }
-                }).execute(new Void[0]);
-            }
-        });
-    }
-
-    public void loadLowResDrawable(Activity activity, ImageView imageView, int i, BitmapTransformation bitmapTransformation) {
-    }
-
     public void loadPreviewImage(final Activity activity, final ImageView imageView, final int i) {
-        final boolean z = imageView.getDrawable() == null;
+        boolean z;
+        if (imageView.getDrawable() == null) {
+            z = true;
+        } else {
+            z = false;
+        }
+        final boolean z2 = z;
         final ColorDrawable colorDrawable = new ColorDrawable(i);
-        if (z) {
+        if (z2) {
             imageView.setImageDrawable(colorDrawable);
         }
         decodeRawDimensions(activity, new DimensionsReceiver() { // from class: com.android.wallpaper.asset.Asset$$ExternalSyntheticLambda0
             @Override // com.android.wallpaper.asset.Asset.DimensionsReceiver
             public final void onDimensionsDecoded(Point point) {
                 Asset asset = Asset.this;
-                Activity activity2 = activity;
-                ImageView imageView2 = imageView;
+                final Activity activity2 = activity;
+                final ImageView imageView2 = imageView;
                 int i2 = i;
-                boolean z2 = z;
-                Drawable drawable = colorDrawable;
-                Objects.requireNonNull(asset);
+                final boolean z3 = z2;
+                final Drawable drawable = colorDrawable;
                 if (point == null) {
                     asset.loadDrawable(activity2, imageView2, i2);
                     return;
                 }
+                asset.getClass();
                 Rect calculateVisibleRect = WallpaperCropUtils.calculateVisibleRect(point, ScreenSizeCalculator.getInstance().getScreenSize(activity2.getWindowManager().getDefaultDisplay()));
-                asset.adjustCropRect(activity2, point, calculateVisibleRect);
-                ((DefaultBitmapCropper) InjectorProvider.getInjector().getBitmapCropper()).cropAndScaleBitmap(asset, 1.0f, calculateVisibleRect, WallpaperCropUtils.isRtl(activity2), new BitmapCropper.Callback(asset, imageView2, z2, activity2, drawable) { // from class: com.android.wallpaper.asset.Asset.3
-                    public final /* synthetic */ Activity val$activity;
-                    public final /* synthetic */ ImageView val$imageView;
-                    public final /* synthetic */ boolean val$needsTransition;
-                    public final /* synthetic */ Drawable val$placeholderDrawable;
-
-                    {
-                        this.val$imageView = imageView2;
-                        this.val$needsTransition = z2;
-                        this.val$activity = activity2;
-                        this.val$placeholderDrawable = drawable;
+                asset.adjustCropRect(activity2, calculateVisibleRect);
+                BitmapCropper bitmapCropper = R$style.getInjector().getBitmapCropper();
+                ((DefaultBitmapCropper) bitmapCropper).cropAndScaleBitmap(asset, 1.0f, calculateVisibleRect, WallpaperCropUtils.isRtl(activity2), new BitmapCropper.Callback() { // from class: com.android.wallpaper.asset.Asset.3
+                    @Override // com.android.wallpaper.module.BitmapCropper.Callback
+                    public final void onError(OutOfMemoryError outOfMemoryError) {
                     }
 
                     @Override // com.android.wallpaper.module.BitmapCropper.Callback
-                    public void onBitmapCropped(Bitmap bitmap) {
-                        this.val$imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                        if (!this.val$needsTransition) {
-                            this.val$imageView.setImageBitmap(bitmap);
+                    public final void onBitmapCropped(Bitmap bitmap) {
+                        imageView2.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                        if (!z3) {
+                            imageView2.setImageBitmap(bitmap);
                             return;
                         }
-                        Resources resources = this.val$activity.getResources();
-                        TransitionDrawable transitionDrawable = new TransitionDrawable(new Drawable[]{this.val$placeholderDrawable, new BitmapDrawable(resources, bitmap)});
+                        Resources resources = activity2.getResources();
+                        TransitionDrawable transitionDrawable = new TransitionDrawable(new Drawable[]{drawable, new BitmapDrawable(resources, bitmap)});
                         transitionDrawable.setCrossFadeEnabled(true);
-                        this.val$imageView.setImageDrawable(transitionDrawable);
+                        imageView2.setImageDrawable(transitionDrawable);
                         transitionDrawable.startTransition(resources.getInteger(17694720));
-                    }
-
-                    @Override // com.android.wallpaper.module.BitmapCropper.Callback
-                    public void onError(Throwable th) {
                     }
                 });
             }
         });
+    }
+
+    public void adjustCropRect(Activity activity, Rect rect) {
+        WallpaperCropUtils.adjustCropRect(activity, rect);
     }
 }

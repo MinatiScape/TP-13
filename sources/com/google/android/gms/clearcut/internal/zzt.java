@@ -1,4 +1,5 @@
 package com.google.android.gms.clearcut.internal;
+/* compiled from: LogSamplerImpl.java */
 /* loaded from: classes.dex */
 public final class zzt {
     public final String zza;

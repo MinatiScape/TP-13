@@ -2,19 +2,16 @@ package com.google.android.gms.phenotype;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import androidx.slice.view.R$layout;
+import androidx.core.R$id;
 import com.google.android.gms.internal.zzbkv;
+import java.util.ArrayList;
 import java.util.List;
 /* loaded from: classes.dex */
 public class FlagOverrides extends zzbkv {
     public static final Parcelable.Creator<FlagOverrides> CREATOR = new zzm();
     public final List<FlagOverride> overrides;
 
-    public FlagOverrides(List<FlagOverride> list) {
-        this.overrides = list;
-    }
-
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
@@ -24,7 +21,7 @@ public class FlagOverrides extends zzbkv {
         return this.overrides.equals(((FlagOverrides) obj).overrides);
     }
 
-    public String toString() {
+    public final String toString() {
         StringBuilder sb = new StringBuilder("FlagOverrides(");
         boolean z = true;
         for (FlagOverride flagOverride : this.overrides) {
@@ -39,9 +36,13 @@ public class FlagOverrides extends zzbkv {
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
-        int zzb = R$layout.zzb(parcel, 20293);
-        R$layout.zzc(parcel, 2, this.overrides, false);
-        R$layout.zzc(parcel, zzb);
+    public final void writeToParcel(Parcel parcel, int i) {
+        int zzb = R$id.zzb(parcel, 20293);
+        R$id.zzc(parcel, 2, this.overrides);
+        R$id.zzc(parcel, zzb);
+    }
+
+    public FlagOverrides(ArrayList arrayList) {
+        this.overrides = arrayList;
     }
 }

@@ -6,7 +6,6 @@ import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.media.ExifInterface$$ExternalSyntheticOutline0;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -17,39 +16,39 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.view.accessibility.AccessibilityNodeInfo;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.math.MathUtils;
+import androidx.core.view.AccessibilityDelegateCompat;
 import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.ViewPropertyAnimatorCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import androidx.core.view.accessibility.AccessibilityViewCommand;
 import androidx.customview.view.AbsSavedState;
 import androidx.customview.widget.ViewDragHelper;
+import androidx.recyclerview.widget.RecyclerView;
 import com.android.systemui.shared.R;
 import com.android.systemui.shared.system.QuickStepContract;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 import com.google.android.material.R$styleable;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.elevation.ElevationOverlayProvider;
 import com.google.android.material.internal.ViewUtils;
 import com.google.android.material.resources.MaterialResources;
 import com.google.android.material.shape.MaterialShapeDrawable;
 import com.google.android.material.shape.ShapeAppearanceModel;
+import com.google.common.math.IntMath;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.WeakHashMap;
 /* loaded from: classes.dex */
 public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behavior<V> {
     public int activePointerId;
+    public ColorStateList backgroundTint;
     public final ArrayList<BottomSheetCallback> callbacks;
     public int childHeight;
     public int collapsedOffset;
-    public final ViewDragHelper.Callback dragCallback;
+    public final AnonymousClass4 dragCallback;
     public boolean draggable;
     public float elevation;
     public int expandHalfwayActionId;
@@ -62,14 +61,18 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
     public float halfExpandedRatio;
     public boolean hideable;
     public boolean ignoreEvents;
-    public Map<View, Integer> importantForAccessibilityMap;
+    public HashMap importantForAccessibilityMap;
     public int initialY;
     public int insetBottom;
     public int insetTop;
     public ValueAnimator interpolatorAnimator;
     public boolean isShapeExpanded;
     public int lastNestedScrollDy;
+    public boolean marginLeftSystemWindowInsets;
+    public boolean marginRightSystemWindowInsets;
+    public boolean marginTopSystemWindowInsets;
     public MaterialShapeDrawable materialShapeDrawable;
+    public int maxHeight;
     public int maxWidth;
     public float maximumVelocity;
     public boolean nestedScrolled;
@@ -87,7 +90,6 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
     public int saveFlags;
     public BottomSheetBehavior<V>.SettleRunnable settleRunnable;
     public ShapeAppearanceModel shapeAppearanceModelDefault;
-    public boolean shapeThemingEnabled;
     public boolean skipCollapsed;
     public int state;
     public boolean touchingScrollingChild;
@@ -95,29 +97,13 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
     public ViewDragHelper viewDragHelper;
     public WeakReference<V> viewRef;
 
-    /* renamed from: com.google.android.material.bottomsheet.BottomSheetBehavior$4  reason: invalid class name */
+    /* renamed from: com.google.android.material.bottomsheet.BottomSheetBehavior$3  reason: invalid class name */
     /* loaded from: classes.dex */
-    public class AnonymousClass4 implements ViewUtils.OnApplyWindowInsetsListener {
+    public final class AnonymousClass3 implements ViewUtils.OnApplyWindowInsetsListener {
         public final /* synthetic */ boolean val$shouldHandleGestureInsets;
 
-        public AnonymousClass4(boolean z) {
+        public AnonymousClass3(boolean z) {
             this.val$shouldHandleGestureInsets = z;
-        }
-    }
-
-    /* renamed from: com.google.android.material.bottomsheet.BottomSheetBehavior$6  reason: invalid class name */
-    /* loaded from: classes.dex */
-    public class AnonymousClass6 implements AccessibilityViewCommand {
-        public final /* synthetic */ int val$state;
-
-        public AnonymousClass6(int i) {
-            this.val$state = i;
-        }
-
-        @Override // androidx.core.view.accessibility.AccessibilityViewCommand
-        public boolean perform(View view, AccessibilityViewCommand.CommandArguments commandArguments) {
-            BottomSheetBehavior.this.setState(this.val$state);
-            return true;
         }
     }
 
@@ -129,34 +115,89 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
     }
 
     /* loaded from: classes.dex */
+    public static class SavedState extends AbsSavedState {
+        public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.ClassLoaderCreator<SavedState>() { // from class: com.google.android.material.bottomsheet.BottomSheetBehavior.SavedState.1
+            @Override // android.os.Parcelable.ClassLoaderCreator
+            public final SavedState createFromParcel(Parcel parcel, ClassLoader classLoader) {
+                return new SavedState(parcel, classLoader);
+            }
+
+            @Override // android.os.Parcelable.Creator
+            public final Object createFromParcel(Parcel parcel) {
+                return new SavedState(parcel, (ClassLoader) null);
+            }
+
+            @Override // android.os.Parcelable.Creator
+            public final Object[] newArray(int i) {
+                return new SavedState[i];
+            }
+        };
+        public boolean fitToContents;
+        public boolean hideable;
+        public int peekHeight;
+        public boolean skipCollapsed;
+        public final int state;
+
+        public SavedState(Parcel parcel, ClassLoader classLoader) {
+            super(parcel, classLoader);
+            this.state = parcel.readInt();
+            this.peekHeight = parcel.readInt();
+            boolean z = false;
+            this.fitToContents = parcel.readInt() == 1;
+            this.hideable = parcel.readInt() == 1;
+            this.skipCollapsed = parcel.readInt() == 1 ? true : z;
+        }
+
+        @Override // androidx.customview.view.AbsSavedState, android.os.Parcelable
+        public final void writeToParcel(Parcel parcel, int i) {
+            parcel.writeParcelable(this.mSuperState, i);
+            parcel.writeInt(this.state);
+            parcel.writeInt(this.peekHeight);
+            parcel.writeInt(this.fitToContents ? 1 : 0);
+            parcel.writeInt(this.hideable ? 1 : 0);
+            parcel.writeInt(this.skipCollapsed ? 1 : 0);
+        }
+
+        public SavedState(android.view.AbsSavedState absSavedState, BottomSheetBehavior bottomSheetBehavior) {
+            super(absSavedState);
+            this.state = bottomSheetBehavior.state;
+            this.peekHeight = bottomSheetBehavior.peekHeight;
+            this.fitToContents = bottomSheetBehavior.fitToContents;
+            this.hideable = bottomSheetBehavior.hideable;
+            this.skipCollapsed = bottomSheetBehavior.skipCollapsed;
+        }
+    }
+
+    /* loaded from: classes.dex */
     public class SettleRunnable implements Runnable {
         public boolean isPosted;
         public int targetState;
-        public final View view;
+        public final WeakReference<View> viewRef;
 
         public SettleRunnable(View view, int i) {
-            this.view = view;
+            this.viewRef = new WeakReference<>(view);
             this.targetState = i;
         }
 
         @Override // java.lang.Runnable
-        public void run() {
-            ViewDragHelper viewDragHelper = BottomSheetBehavior.this.viewDragHelper;
-            if (viewDragHelper == null || !viewDragHelper.continueSettling(true)) {
+        public final void run() {
+            ViewDragHelper viewDragHelper;
+            if (this.viewRef.get() == null || (viewDragHelper = BottomSheetBehavior.this.viewDragHelper) == null || !viewDragHelper.continueSettling()) {
                 BottomSheetBehavior.this.setStateInternal(this.targetState);
             } else {
-                View view = this.view;
                 WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-                view.postOnAnimation(this);
+                ViewCompat.Api16Impl.postOnAnimation(this.viewRef.get(), this);
             }
             this.isPosted = false;
         }
     }
 
+    /* JADX WARN: Type inference failed for: r0v4, types: [com.google.android.material.bottomsheet.BottomSheetBehavior$4] */
     public BottomSheetBehavior() {
         this.saveFlags = 0;
         this.fitToContents = true;
         this.maxWidth = -1;
+        this.maxHeight = -1;
         this.settleRunnable = null;
         this.halfExpandedRatio = 0.5f;
         this.elevation = -1.0f;
@@ -164,30 +205,9 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
         this.state = 4;
         this.callbacks = new ArrayList<>();
         this.expandHalfwayActionId = -1;
-        this.dragCallback = new ViewDragHelper.Callback() { // from class: com.google.android.material.bottomsheet.BottomSheetBehavior.5
+        this.dragCallback = new ViewDragHelper.Callback() { // from class: com.google.android.material.bottomsheet.BottomSheetBehavior.4
             @Override // androidx.customview.widget.ViewDragHelper.Callback
-            public int clampViewPositionHorizontal(View view, int i, int i2) {
-                return view.getLeft();
-            }
-
-            @Override // androidx.customview.widget.ViewDragHelper.Callback
-            public int clampViewPositionVertical(View view, int i, int i2) {
-                int expandedOffset = BottomSheetBehavior.this.getExpandedOffset();
-                BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.this;
-                return MathUtils.clamp(i, expandedOffset, bottomSheetBehavior.hideable ? bottomSheetBehavior.parentHeight : bottomSheetBehavior.collapsedOffset);
-            }
-
-            @Override // androidx.customview.widget.ViewDragHelper.Callback
-            public int getViewVerticalDragRange(View view) {
-                BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.this;
-                if (bottomSheetBehavior.hideable) {
-                    return bottomSheetBehavior.parentHeight;
-                }
-                return bottomSheetBehavior.collapsedOffset;
-            }
-
-            @Override // androidx.customview.widget.ViewDragHelper.Callback
-            public void onViewDragStateChanged(int i) {
+            public final void onViewDragStateChanged(int i) {
                 if (i == 1) {
                     BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.this;
                     if (bottomSheetBehavior.draggable) {
@@ -197,49 +217,55 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
             }
 
             @Override // androidx.customview.widget.ViewDragHelper.Callback
-            public void onViewPositionChanged(View view, int i, int i2, int i3, int i4) {
-                BottomSheetBehavior.this.dispatchOnSlide(i2);
-            }
-
-            @Override // androidx.customview.widget.ViewDragHelper.Callback
-            public void onViewReleased(View view, float f, float f2) {
+            public final void onViewReleased(View view, float f, float f2) {
                 int i;
-                int i2 = 4;
-                i2 = 6;
-                i2 = 3;
+                int i2;
+                boolean z;
+                int i3 = 4;
                 if (f2 < HingeAngleProviderKt.FULLY_CLOSED_DEGREES) {
                     BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.this;
                     if (bottomSheetBehavior.fitToContents) {
                         i = bottomSheetBehavior.fitToContentsOffset;
                     } else {
                         int top = view.getTop();
+                        System.currentTimeMillis();
+                        BottomSheetBehavior.this.getClass();
                         BottomSheetBehavior bottomSheetBehavior2 = BottomSheetBehavior.this;
-                        int i3 = bottomSheetBehavior2.halfExpandedOffset;
-                        if (top > i3) {
-                            i = i3;
-                        } else {
+                        i2 = bottomSheetBehavior2.halfExpandedOffset;
+                        if (top <= i2) {
                             i = bottomSheetBehavior2.getExpandedOffset();
                         }
+                        i3 = 6;
+                        i = i2;
                     }
+                    i3 = 3;
                 } else {
                     BottomSheetBehavior bottomSheetBehavior3 = BottomSheetBehavior.this;
                     if (bottomSheetBehavior3.hideable && bottomSheetBehavior3.shouldHide(view, f2)) {
                         if (Math.abs(f) >= Math.abs(f2) || f2 <= 500.0f) {
                             int top2 = view.getTop();
                             BottomSheetBehavior bottomSheetBehavior4 = BottomSheetBehavior.this;
-                            if (!(top2 > (bottomSheetBehavior4.getExpandedOffset() + bottomSheetBehavior4.parentHeight) / 2)) {
+                            if (top2 > (bottomSheetBehavior4.getExpandedOffset() + bottomSheetBehavior4.parentHeight) / 2) {
+                                z = true;
+                            } else {
+                                z = false;
+                            }
+                            if (!z) {
                                 BottomSheetBehavior bottomSheetBehavior5 = BottomSheetBehavior.this;
                                 if (bottomSheetBehavior5.fitToContents) {
                                     i = bottomSheetBehavior5.fitToContentsOffset;
                                 } else if (Math.abs(view.getTop() - BottomSheetBehavior.this.getExpandedOffset()) < Math.abs(view.getTop() - BottomSheetBehavior.this.halfExpandedOffset)) {
                                     i = BottomSheetBehavior.this.getExpandedOffset();
                                 } else {
-                                    i = BottomSheetBehavior.this.halfExpandedOffset;
+                                    i2 = BottomSheetBehavior.this.halfExpandedOffset;
+                                    i3 = 6;
+                                    i = i2;
                                 }
+                                i3 = 3;
                             }
                         }
                         i = BottomSheetBehavior.this.parentHeight;
-                        i2 = 5;
+                        i3 = 5;
                     } else if (f2 == HingeAngleProviderKt.FULLY_CLOSED_DEGREES || Math.abs(f) > Math.abs(f2)) {
                         int top3 = view.getTop();
                         BottomSheetBehavior bottomSheetBehavior6 = BottomSheetBehavior.this;
@@ -248,16 +274,22 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
                             if (top3 < i4) {
                                 if (top3 < Math.abs(top3 - bottomSheetBehavior6.collapsedOffset)) {
                                     i = BottomSheetBehavior.this.getExpandedOffset();
+                                    i3 = 3;
                                 } else {
-                                    i = BottomSheetBehavior.this.halfExpandedOffset;
+                                    BottomSheetBehavior.this.getClass();
+                                    i2 = BottomSheetBehavior.this.halfExpandedOffset;
                                 }
                             } else if (Math.abs(top3 - i4) < Math.abs(top3 - BottomSheetBehavior.this.collapsedOffset)) {
-                                i = BottomSheetBehavior.this.halfExpandedOffset;
+                                BottomSheetBehavior.this.getClass();
+                                i2 = BottomSheetBehavior.this.halfExpandedOffset;
                             } else {
                                 i = BottomSheetBehavior.this.collapsedOffset;
                             }
+                            i3 = 6;
+                            i = i2;
                         } else if (Math.abs(top3 - bottomSheetBehavior6.fitToContentsOffset) < Math.abs(top3 - BottomSheetBehavior.this.collapsedOffset)) {
                             i = BottomSheetBehavior.this.fitToContentsOffset;
+                            i3 = 3;
                         } else {
                             i = BottomSheetBehavior.this.collapsedOffset;
                         }
@@ -268,18 +300,51 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
                         } else {
                             int top4 = view.getTop();
                             if (Math.abs(top4 - BottomSheetBehavior.this.halfExpandedOffset) < Math.abs(top4 - BottomSheetBehavior.this.collapsedOffset)) {
-                                i = BottomSheetBehavior.this.halfExpandedOffset;
+                                BottomSheetBehavior.this.getClass();
+                                i2 = BottomSheetBehavior.this.halfExpandedOffset;
+                                i3 = 6;
+                                i = i2;
                             } else {
                                 i = BottomSheetBehavior.this.collapsedOffset;
                             }
                         }
                     }
                 }
-                BottomSheetBehavior.this.startSettlingAnimation(view, i2, i, true);
+                BottomSheetBehavior bottomSheetBehavior8 = BottomSheetBehavior.this;
+                bottomSheetBehavior8.getClass();
+                bottomSheetBehavior8.startSettlingAnimation(view, i3, i, true);
             }
 
             @Override // androidx.customview.widget.ViewDragHelper.Callback
-            public boolean tryCaptureView(View view, int i) {
+            public final int clampViewPositionVertical(View view, int i) {
+                int i2;
+                int expandedOffset = BottomSheetBehavior.this.getExpandedOffset();
+                BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.this;
+                if (bottomSheetBehavior.hideable) {
+                    i2 = bottomSheetBehavior.parentHeight;
+                } else {
+                    i2 = bottomSheetBehavior.collapsedOffset;
+                }
+                return MathUtils.clamp(i, expandedOffset, i2);
+            }
+
+            @Override // androidx.customview.widget.ViewDragHelper.Callback
+            public final int getViewVerticalDragRange() {
+                BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.this;
+                if (bottomSheetBehavior.hideable) {
+                    return bottomSheetBehavior.parentHeight;
+                }
+                return bottomSheetBehavior.collapsedOffset;
+            }
+
+            @Override // androidx.customview.widget.ViewDragHelper.Callback
+            public final void onViewPositionChanged(View view, int i, int i2) {
+                BottomSheetBehavior.this.dispatchOnSlide(i2);
+            }
+
+            @Override // androidx.customview.widget.ViewDragHelper.Callback
+            public final boolean tryCaptureView(View view, int i) {
+                View view2;
                 BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.this;
                 int i2 = bottomSheetBehavior.state;
                 if (i2 == 1 || bottomSheetBehavior.touchingScrollingChild) {
@@ -287,35 +352,189 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
                 }
                 if (i2 == 3 && bottomSheetBehavior.activePointerId == i) {
                     WeakReference<View> weakReference = bottomSheetBehavior.nestedScrollingChildRef;
-                    View view2 = weakReference != null ? weakReference.get() : null;
+                    if (weakReference != null) {
+                        view2 = weakReference.get();
+                    } else {
+                        view2 = null;
+                    }
                     if (view2 != null && view2.canScrollVertically(-1)) {
                         return false;
                     }
                 }
+                System.currentTimeMillis();
                 WeakReference<V> weakReference2 = BottomSheetBehavior.this.viewRef;
-                return weakReference2 != null && weakReference2.get() == view;
+                if (weakReference2 == null || weakReference2.get() != view) {
+                    return false;
+                }
+                return true;
+            }
+
+            @Override // androidx.customview.widget.ViewDragHelper.Callback
+            public final int clampViewPositionHorizontal(View view, int i) {
+                return view.getLeft();
             }
         };
     }
 
-    public static <V extends View> BottomSheetBehavior<V> from(V v) {
-        ViewGroup.LayoutParams layoutParams = v.getLayoutParams();
-        if (layoutParams instanceof CoordinatorLayout.LayoutParams) {
-            CoordinatorLayout.Behavior behavior = ((CoordinatorLayout.LayoutParams) layoutParams).mBehavior;
-            if (behavior instanceof BottomSheetBehavior) {
-                return (BottomSheetBehavior) behavior;
-            }
-            throw new IllegalArgumentException("The view is not associated with BottomSheetBehavior");
+    private void reset$1() {
+        this.activePointerId = -1;
+        VelocityTracker velocityTracker = this.velocityTracker;
+        if (velocityTracker != null) {
+            velocityTracker.recycle();
+            this.velocityTracker = null;
         }
-        throw new IllegalArgumentException("The view is not a child of CoordinatorLayout");
     }
 
-    public final void calculateCollapsedOffset() {
-        int calculatePeekHeight = calculatePeekHeight();
-        if (this.fitToContents) {
-            this.collapsedOffset = Math.max(this.parentHeight - calculatePeekHeight, this.fitToContentsOffset);
+    public void disableShapeAnimations() {
+        this.interpolatorAnimator = null;
+    }
+
+    @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
+    public final void onAttachedToLayoutParams(CoordinatorLayout.LayoutParams layoutParams) {
+        this.viewRef = null;
+        this.viewDragHelper = null;
+    }
+
+    @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
+    public final void onDetachedFromLayoutParams() {
+        this.viewRef = null;
+        this.viewDragHelper = null;
+    }
+
+    @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
+    public final void onNestedPreScroll(CoordinatorLayout coordinatorLayout, V v, View view, int i, int i2, int[] iArr, int i3) {
+        View view2;
+        if (i3 != 1) {
+            WeakReference<View> weakReference = this.nestedScrollingChildRef;
+            if (weakReference != null) {
+                view2 = weakReference.get();
+            } else {
+                view2 = null;
+            }
+            if (view == view2) {
+                int top = v.getTop();
+                int i4 = top - i2;
+                if (i2 > 0) {
+                    if (i4 < getExpandedOffset()) {
+                        int expandedOffset = top - getExpandedOffset();
+                        iArr[1] = expandedOffset;
+                        int i5 = -expandedOffset;
+                        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
+                        v.offsetTopAndBottom(i5);
+                        setStateInternal(3);
+                    } else if (this.draggable) {
+                        iArr[1] = i2;
+                        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap2 = ViewCompat.sViewPropertyAnimatorMap;
+                        v.offsetTopAndBottom(-i2);
+                        setStateInternal(1);
+                    } else {
+                        return;
+                    }
+                } else if (i2 < 0 && !view.canScrollVertically(-1)) {
+                    int i6 = this.collapsedOffset;
+                    if (i4 > i6 && !this.hideable) {
+                        int i7 = top - i6;
+                        iArr[1] = i7;
+                        int i8 = -i7;
+                        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap3 = ViewCompat.sViewPropertyAnimatorMap;
+                        v.offsetTopAndBottom(i8);
+                        setStateInternal(4);
+                    } else if (this.draggable) {
+                        iArr[1] = i2;
+                        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap4 = ViewCompat.sViewPropertyAnimatorMap;
+                        v.offsetTopAndBottom(-i2);
+                        setStateInternal(1);
+                    } else {
+                        return;
+                    }
+                }
+                dispatchOnSlide(v.getTop());
+                this.lastNestedScrollDy = i2;
+                this.nestedScrolled = true;
+            }
+        }
+    }
+
+    @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
+    public final void onNestedScroll(CoordinatorLayout coordinatorLayout, View view, int i, int i2, int i3, int[] iArr) {
+    }
+
+    @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
+    public final boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, View view, View view2, int i, int i2) {
+        this.lastNestedScrollDy = 0;
+        this.nestedScrolled = false;
+        return (i & 2) != 0;
+    }
+
+    public final void setPeekHeight(int i) {
+        boolean z = true;
+        if (i == -1) {
+            if (!this.peekHeightAuto) {
+                this.peekHeightAuto = true;
+            }
+            z = false;
         } else {
-            this.collapsedOffset = this.parentHeight - calculatePeekHeight;
+            if (this.peekHeightAuto || this.peekHeight != i) {
+                this.peekHeightAuto = false;
+                this.peekHeight = Math.max(0, i);
+            }
+            z = false;
+        }
+        if (z) {
+            updatePeekHeight();
+        }
+    }
+
+    public final void settleToState(View view, int i) {
+        int i2;
+        int i3;
+        if (i == 4) {
+            i2 = this.collapsedOffset;
+        } else if (i == 6) {
+            int i4 = this.halfExpandedOffset;
+            if (!this.fitToContents || i4 > (i3 = this.fitToContentsOffset)) {
+                i2 = i4;
+            } else {
+                i = 3;
+                i2 = i3;
+            }
+        } else if (i == 3) {
+            i2 = getExpandedOffset();
+        } else if (!this.hideable || i != 5) {
+            Log.w("BottomSheetBehavior", "The bottom sheet may be in an invalid state. Ensure `hideable` is true when using `STATE_HIDDEN`.");
+            return;
+        } else {
+            i2 = this.parentHeight;
+        }
+        startSettlingAnimation(view, i, i2, false);
+    }
+
+    public final void updateDrawableForTargetState(int i) {
+        boolean z;
+        ValueAnimator valueAnimator;
+        float f;
+        if (i != 2) {
+            if (i == 3) {
+                z = true;
+            } else {
+                z = false;
+            }
+            if (this.isShapeExpanded != z) {
+                this.isShapeExpanded = z;
+                if (this.materialShapeDrawable != null && (valueAnimator = this.interpolatorAnimator) != null) {
+                    if (valueAnimator.isRunning()) {
+                        this.interpolatorAnimator.reverse();
+                        return;
+                    }
+                    if (z) {
+                        f = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
+                    } else {
+                        f = 1.0f;
+                    }
+                    this.interpolatorAnimator.setFloatValues(1.0f - f, f);
+                    this.interpolatorAnimator.start();
+                }
+            }
         }
     }
 
@@ -335,28 +554,7 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
         return i + i2;
     }
 
-    public final void createMaterialShapeDrawable(Context context, AttributeSet attributeSet, boolean z, ColorStateList colorStateList) {
-        if (this.shapeThemingEnabled) {
-            this.shapeAppearanceModelDefault = ShapeAppearanceModel.builder(context, attributeSet, (int) R.attr.bottomSheetStyle, (int) R.style.Widget_Design_BottomSheet_Modal).build();
-            MaterialShapeDrawable materialShapeDrawable = new MaterialShapeDrawable(this.shapeAppearanceModelDefault);
-            this.materialShapeDrawable = materialShapeDrawable;
-            materialShapeDrawable.drawableState.elevationOverlayProvider = new ElevationOverlayProvider(context);
-            materialShapeDrawable.updateZ();
-            if (!z || colorStateList == null) {
-                TypedValue typedValue = new TypedValue();
-                context.getTheme().resolveAttribute(16842801, typedValue, true);
-                this.materialShapeDrawable.setTint(typedValue.data);
-                return;
-            }
-            this.materialShapeDrawable.setFillColor(colorStateList);
-        }
-    }
-
-    public void disableShapeAnimations() {
-        this.interpolatorAnimator = null;
-    }
-
-    public void dispatchOnSlide(int i) {
+    public final void dispatchOnSlide(int i) {
         float f;
         float f2;
         V v = this.viewRef.get();
@@ -380,7 +578,7 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
 
     public View findScrollingChild(View view) {
         WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-        if (view.isNestedScrollingEnabled()) {
+        if (ViewCompat.Api21Impl.isNestedScrollingEnabled(view)) {
             return view;
         }
         if (!(view instanceof ViewGroup)) {
@@ -397,179 +595,209 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
         return null;
     }
 
-    public int getExpandedOffset() {
+    public final int getExpandedOffset() {
+        int i;
         if (this.fitToContents) {
             return this.fitToContentsOffset;
         }
-        return Math.max(this.expandedOffset, this.paddingTopSystemWindowInsets ? 0 : this.insetTop);
-    }
-
-    public int getPeekHeightMin() {
-        return this.peekHeightMin;
-    }
-
-    @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
-    public void onAttachedToLayoutParams(CoordinatorLayout.LayoutParams layoutParams) {
-        this.viewRef = null;
-        this.viewDragHelper = null;
+        int i2 = this.expandedOffset;
+        if (this.paddingTopSystemWindowInsets) {
+            i = 0;
+        } else {
+            i = this.insetTop;
+        }
+        return Math.max(i2, i);
     }
 
     @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
-    public void onDetachedFromLayoutParams() {
-        this.viewRef = null;
-        this.viewDragHelper = null;
-    }
-
-    @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
-    public boolean onInterceptTouchEvent(CoordinatorLayout coordinatorLayout, V v, MotionEvent motionEvent) {
-        ViewDragHelper viewDragHelper;
-        if (!v.isShown() || !this.draggable) {
-            this.ignoreEvents = true;
-            return false;
-        }
-        int actionMasked = motionEvent.getActionMasked();
-        View view = null;
-        if (actionMasked == 0) {
-            this.activePointerId = -1;
-            VelocityTracker velocityTracker = this.velocityTracker;
-            if (velocityTracker != null) {
-                velocityTracker.recycle();
-                this.velocityTracker = null;
-            }
-        }
-        if (this.velocityTracker == null) {
-            this.velocityTracker = VelocityTracker.obtain();
-        }
-        this.velocityTracker.addMovement(motionEvent);
-        if (actionMasked == 0) {
-            int x = (int) motionEvent.getX();
-            this.initialY = (int) motionEvent.getY();
-            if (this.state != 2) {
-                WeakReference<View> weakReference = this.nestedScrollingChildRef;
-                View view2 = weakReference != null ? weakReference.get() : null;
-                if (view2 != null && coordinatorLayout.isPointInChildBounds(view2, x, this.initialY)) {
-                    this.activePointerId = motionEvent.getPointerId(motionEvent.getActionIndex());
-                    this.touchingScrollingChild = true;
-                }
-            }
-            this.ignoreEvents = this.activePointerId == -1 && !coordinatorLayout.isPointInChildBounds(v, x, this.initialY);
-        } else if (actionMasked == 1 || actionMasked == 3) {
-            this.touchingScrollingChild = false;
-            this.activePointerId = -1;
-            if (this.ignoreEvents) {
-                this.ignoreEvents = false;
-                return false;
-            }
-        }
-        if (!this.ignoreEvents && (viewDragHelper = this.viewDragHelper) != null && viewDragHelper.shouldInterceptTouchEvent(motionEvent)) {
-            return true;
-        }
-        WeakReference<View> weakReference2 = this.nestedScrollingChildRef;
-        if (weakReference2 != null) {
-            view = weakReference2.get();
-        }
-        return actionMasked == 2 && view != null && !this.ignoreEvents && this.state != 1 && !coordinatorLayout.isPointInChildBounds(view, (int) motionEvent.getX(), (int) motionEvent.getY()) && this.viewDragHelper != null && Math.abs(((float) this.initialY) - motionEvent.getY()) > ((float) this.viewDragHelper.mTouchSlop);
-    }
-
-    @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
-    public boolean onLayoutChild(CoordinatorLayout coordinatorLayout, final V v, int i) {
-        MaterialShapeDrawable materialShapeDrawable;
+    public final boolean onLayoutChild(CoordinatorLayout coordinatorLayout, V v, int i) {
+        boolean z;
+        boolean z2;
+        float f;
         WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-        if (coordinatorLayout.getFitsSystemWindows() && !v.getFitsSystemWindows()) {
+        if (ViewCompat.Api16Impl.getFitsSystemWindows(coordinatorLayout) && !ViewCompat.Api16Impl.getFitsSystemWindows(v)) {
             v.setFitsSystemWindows(true);
         }
         if (this.viewRef == null) {
             this.peekHeightMin = coordinatorLayout.getResources().getDimensionPixelSize(R.dimen.design_bottom_sheet_peek_height_min);
-            boolean z = !this.gestureInsetBottomIgnored && !this.peekHeightAuto;
-            if (this.paddingBottomSystemWindowInsets || this.paddingLeftSystemWindowInsets || this.paddingRightSystemWindowInsets || z) {
-                final AnonymousClass4 r5 = new AnonymousClass4(z);
-                final ViewUtils.RelativePadding relativePadding = new ViewUtils.RelativePadding(v.getPaddingStart(), v.getPaddingTop(), v.getPaddingEnd(), v.getPaddingBottom());
+            if (this.gestureInsetBottomIgnored || this.peekHeightAuto) {
+                z = false;
+            } else {
+                z = true;
+            }
+            if (this.paddingBottomSystemWindowInsets || this.paddingLeftSystemWindowInsets || this.paddingRightSystemWindowInsets || this.marginLeftSystemWindowInsets || this.marginRightSystemWindowInsets || this.marginTopSystemWindowInsets || z) {
+                final AnonymousClass3 r5 = new AnonymousClass3(z);
+                final ViewUtils.RelativePadding relativePadding = new ViewUtils.RelativePadding(ViewCompat.Api17Impl.getPaddingStart(v), v.getPaddingTop(), ViewCompat.Api17Impl.getPaddingEnd(v), v.getPaddingBottom());
                 ViewCompat.Api21Impl.setOnApplyWindowInsetsListener(v, new OnApplyWindowInsetsListener() { // from class: com.google.android.material.internal.ViewUtils.3
+                    /* JADX WARN: Removed duplicated region for block: B:33:0x0093  */
+                    /* JADX WARN: Removed duplicated region for block: B:36:0x00a1  */
                     @Override // androidx.core.view.OnApplyWindowInsetsListener
-                    public WindowInsetsCompat onApplyWindowInsets(View view, WindowInsetsCompat windowInsetsCompat) {
-                        OnApplyWindowInsetsListener onApplyWindowInsetsListener = OnApplyWindowInsetsListener.this;
-                        RelativePadding relativePadding2 = relativePadding;
-                        int i2 = relativePadding2.start;
-                        int i3 = relativePadding2.end;
-                        int i4 = relativePadding2.bottom;
-                        BottomSheetBehavior.AnonymousClass4 r0 = (BottomSheetBehavior.AnonymousClass4) onApplyWindowInsetsListener;
-                        BottomSheetBehavior.this.insetTop = windowInsetsCompat.getSystemWindowInsetTop();
-                        boolean isLayoutRtl = ViewUtils.isLayoutRtl(view);
-                        int paddingBottom = view.getPaddingBottom();
-                        int paddingLeft = view.getPaddingLeft();
-                        int paddingRight = view.getPaddingRight();
-                        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.this;
-                        if (bottomSheetBehavior.paddingBottomSystemWindowInsets) {
-                            bottomSheetBehavior.insetBottom = windowInsetsCompat.getSystemWindowInsetBottom();
-                            paddingBottom = BottomSheetBehavior.this.insetBottom + i4;
-                        }
-                        if (BottomSheetBehavior.this.paddingLeftSystemWindowInsets) {
-                            paddingLeft = windowInsetsCompat.getSystemWindowInsetLeft() + (isLayoutRtl ? i3 : i2);
-                        }
-                        if (BottomSheetBehavior.this.paddingRightSystemWindowInsets) {
-                            if (!isLayoutRtl) {
-                                i2 = i3;
-                            }
-                            paddingRight = windowInsetsCompat.getSystemWindowInsetRight() + i2;
-                        }
-                        view.setPadding(paddingLeft, view.getPaddingTop(), paddingRight, paddingBottom);
-                        if (r0.val$shouldHandleGestureInsets) {
-                            BottomSheetBehavior.this.gestureInsetBottom = windowInsetsCompat.mImpl.getMandatorySystemGestureInsets().bottom;
-                        }
-                        BottomSheetBehavior bottomSheetBehavior2 = BottomSheetBehavior.this;
-                        if (bottomSheetBehavior2.paddingBottomSystemWindowInsets || r0.val$shouldHandleGestureInsets) {
-                            bottomSheetBehavior2.updatePeekHeight(false);
-                        }
-                        return windowInsetsCompat;
+                    /*
+                        Code decompiled incorrectly, please refer to instructions dump.
+                        To view partially-correct add '--show-bad-code' argument
+                    */
+                    public final androidx.core.view.WindowInsetsCompat onApplyWindowInsets(android.view.View r12, androidx.core.view.WindowInsetsCompat r13) {
+                        /*
+                            r11 = this;
+                            com.google.android.material.internal.ViewUtils$OnApplyWindowInsetsListener r0 = r1
+                            com.google.android.material.internal.ViewUtils$RelativePadding r11 = r2
+                            int r1 = r11.start
+                            int r2 = r11.end
+                            int r11 = r11.bottom
+                            com.google.android.material.bottomsheet.BottomSheetBehavior$3 r0 = (com.google.android.material.bottomsheet.BottomSheetBehavior.AnonymousClass3) r0
+                            r0.getClass()
+                            androidx.core.view.WindowInsetsCompat$Impl r3 = r13.mImpl
+                            r4 = 7
+                            androidx.core.graphics.Insets r3 = r3.getInsets(r4)
+                            r4 = 32
+                            androidx.core.view.WindowInsetsCompat$Impl r5 = r13.mImpl
+                            androidx.core.graphics.Insets r4 = r5.getInsets(r4)
+                            com.google.android.material.bottomsheet.BottomSheetBehavior r5 = com.google.android.material.bottomsheet.BottomSheetBehavior.this
+                            int r6 = r3.top
+                            r5.insetTop = r6
+                            boolean r5 = com.google.android.material.internal.ViewUtils.isLayoutRtl(r12)
+                            int r6 = r12.getPaddingBottom()
+                            int r7 = r12.getPaddingLeft()
+                            int r8 = r12.getPaddingRight()
+                            com.google.android.material.bottomsheet.BottomSheetBehavior r9 = com.google.android.material.bottomsheet.BottomSheetBehavior.this
+                            boolean r10 = r9.paddingBottomSystemWindowInsets
+                            if (r10 == 0) goto L45
+                            int r6 = r13.getSystemWindowInsetBottom()
+                            r9.insetBottom = r6
+                            com.google.android.material.bottomsheet.BottomSheetBehavior r6 = com.google.android.material.bottomsheet.BottomSheetBehavior.this
+                            int r6 = r6.insetBottom
+                            int r6 = r6 + r11
+                        L45:
+                            com.google.android.material.bottomsheet.BottomSheetBehavior r11 = com.google.android.material.bottomsheet.BottomSheetBehavior.this
+                            boolean r9 = r11.paddingLeftSystemWindowInsets
+                            if (r9 == 0) goto L53
+                            if (r5 == 0) goto L4f
+                            r7 = r2
+                            goto L50
+                        L4f:
+                            r7 = r1
+                        L50:
+                            int r9 = r3.left
+                            int r7 = r7 + r9
+                        L53:
+                            boolean r11 = r11.paddingRightSystemWindowInsets
+                            if (r11 == 0) goto L5f
+                            if (r5 == 0) goto L5a
+                            goto L5b
+                        L5a:
+                            r1 = r2
+                        L5b:
+                            int r11 = r3.right
+                            int r8 = r1 + r11
+                        L5f:
+                            android.view.ViewGroup$LayoutParams r11 = r12.getLayoutParams()
+                            android.view.ViewGroup$MarginLayoutParams r11 = (android.view.ViewGroup.MarginLayoutParams) r11
+                            com.google.android.material.bottomsheet.BottomSheetBehavior r1 = com.google.android.material.bottomsheet.BottomSheetBehavior.this
+                            boolean r2 = r1.marginLeftSystemWindowInsets
+                            r5 = 0
+                            r9 = 1
+                            if (r2 == 0) goto L76
+                            int r2 = r11.leftMargin
+                            int r10 = r3.left
+                            if (r2 == r10) goto L76
+                            r11.leftMargin = r10
+                            r5 = r9
+                        L76:
+                            boolean r2 = r1.marginRightSystemWindowInsets
+                            if (r2 == 0) goto L83
+                            int r2 = r11.rightMargin
+                            int r10 = r3.right
+                            if (r2 == r10) goto L83
+                            r11.rightMargin = r10
+                            r5 = r9
+                        L83:
+                            boolean r1 = r1.marginTopSystemWindowInsets
+                            if (r1 == 0) goto L90
+                            int r1 = r11.topMargin
+                            int r2 = r3.top
+                            if (r1 == r2) goto L90
+                            r11.topMargin = r2
+                            goto L91
+                        L90:
+                            r9 = r5
+                        L91:
+                            if (r9 == 0) goto L96
+                            r12.setLayoutParams(r11)
+                        L96:
+                            int r11 = r12.getPaddingTop()
+                            r12.setPadding(r7, r11, r8, r6)
+                            boolean r11 = r0.val$shouldHandleGestureInsets
+                            if (r11 == 0) goto La7
+                            com.google.android.material.bottomsheet.BottomSheetBehavior r12 = com.google.android.material.bottomsheet.BottomSheetBehavior.this
+                            int r1 = r4.bottom
+                            r12.gestureInsetBottom = r1
+                        La7:
+                            com.google.android.material.bottomsheet.BottomSheetBehavior r12 = com.google.android.material.bottomsheet.BottomSheetBehavior.this
+                            boolean r0 = r12.paddingBottomSystemWindowInsets
+                            if (r0 != 0) goto Laf
+                            if (r11 == 0) goto Lb2
+                        Laf:
+                            r12.updatePeekHeight()
+                        Lb2:
+                            return r13
+                        */
+                        throw new UnsupportedOperationException("Method not decompiled: com.google.android.material.internal.ViewUtils.AnonymousClass3.onApplyWindowInsets(android.view.View, androidx.core.view.WindowInsetsCompat):androidx.core.view.WindowInsetsCompat");
                     }
                 });
-                if (v.isAttachedToWindow()) {
-                    v.requestApplyInsets();
+                if (ViewCompat.Api19Impl.isAttachedToWindow(v)) {
+                    ViewCompat.Api20Impl.requestApplyInsets(v);
                 } else {
                     v.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() { // from class: com.google.android.material.internal.ViewUtils.4
                         @Override // android.view.View.OnAttachStateChangeListener
-                        public void onViewAttachedToWindow(View view) {
-                            view.removeOnAttachStateChangeListener(this);
-                            WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap2 = ViewCompat.sViewPropertyAnimatorMap;
-                            view.requestApplyInsets();
+                        public final void onViewDetachedFromWindow(View view) {
                         }
 
                         @Override // android.view.View.OnAttachStateChangeListener
-                        public void onViewDetachedFromWindow(View view) {
+                        public final void onViewAttachedToWindow(View view) {
+                            view.removeOnAttachStateChangeListener(this);
+                            WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap2 = ViewCompat.sViewPropertyAnimatorMap;
+                            ViewCompat.Api20Impl.requestApplyInsets(view);
                         }
                     });
                 }
             }
             this.viewRef = new WeakReference<>(v);
-            if (this.shapeThemingEnabled && (materialShapeDrawable = this.materialShapeDrawable) != null) {
-                v.setBackground(materialShapeDrawable);
-            }
-            MaterialShapeDrawable materialShapeDrawable2 = this.materialShapeDrawable;
-            if (materialShapeDrawable2 != null) {
-                float f = this.elevation;
-                if (f == -1.0f) {
-                    f = v.getElevation();
+            MaterialShapeDrawable materialShapeDrawable = this.materialShapeDrawable;
+            if (materialShapeDrawable != null) {
+                ViewCompat.Api16Impl.setBackground(v, materialShapeDrawable);
+                MaterialShapeDrawable materialShapeDrawable2 = this.materialShapeDrawable;
+                float f2 = this.elevation;
+                if (f2 == -1.0f) {
+                    f2 = ViewCompat.Api21Impl.getElevation(v);
                 }
-                materialShapeDrawable2.setElevation(f);
-                boolean z2 = this.state == 3;
+                materialShapeDrawable2.setElevation(f2);
+                if (this.state == 3) {
+                    z2 = true;
+                } else {
+                    z2 = false;
+                }
                 this.isShapeExpanded = z2;
-                this.materialShapeDrawable.setInterpolation(z2 ? HingeAngleProviderKt.FULLY_CLOSED_DEGREES : 1.0f);
+                MaterialShapeDrawable materialShapeDrawable3 = this.materialShapeDrawable;
+                if (z2) {
+                    f = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
+                } else {
+                    f = 1.0f;
+                }
+                MaterialShapeDrawable.MaterialShapeDrawableState materialShapeDrawableState = materialShapeDrawable3.drawableState;
+                if (materialShapeDrawableState.interpolation != f) {
+                    materialShapeDrawableState.interpolation = f;
+                    materialShapeDrawable3.pathDirty = true;
+                    materialShapeDrawable3.invalidateSelf();
+                }
+            } else {
+                ColorStateList colorStateList = this.backgroundTint;
+                if (colorStateList != null) {
+                    ViewCompat.Api21Impl.setBackgroundTintList(v, colorStateList);
+                }
             }
-            updateAccessibilityActions();
-            if (v.getImportantForAccessibility() == 0) {
-                v.setImportantForAccessibility(1);
-            }
-            int measuredWidth = v.getMeasuredWidth();
-            int i2 = this.maxWidth;
-            if (measuredWidth > i2 && i2 != -1) {
-                final ViewGroup.LayoutParams layoutParams = v.getLayoutParams();
-                layoutParams.width = this.maxWidth;
-                v.post(new Runnable(this) { // from class: com.google.android.material.bottomsheet.BottomSheetBehavior.1
-                    @Override // java.lang.Runnable
-                    public void run() {
-                        v.setLayoutParams(layoutParams);
-                    }
-                });
+            updateAccessibilityActions$1();
+            if (ViewCompat.Api16Impl.getImportantForAccessibility(v) == 0) {
+                ViewCompat.Api16Impl.setImportantForAccessibility(v, 1);
             }
         }
         if (this.viewDragHelper == null) {
@@ -581,91 +809,49 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
         this.parentHeight = coordinatorLayout.getHeight();
         int height = v.getHeight();
         this.childHeight = height;
-        int i3 = this.parentHeight;
-        int i4 = i3 - height;
-        int i5 = this.insetTop;
-        if (i4 < i5) {
+        int i2 = this.parentHeight;
+        int i3 = i2 - height;
+        int i4 = this.insetTop;
+        if (i3 < i4) {
             if (this.paddingTopSystemWindowInsets) {
-                this.childHeight = i3;
+                this.childHeight = i2;
             } else {
-                this.childHeight = i3 - i5;
+                this.childHeight = i2 - i4;
             }
         }
-        this.fitToContentsOffset = Math.max(0, i3 - this.childHeight);
+        this.fitToContentsOffset = Math.max(0, i2 - this.childHeight);
         this.halfExpandedOffset = (int) ((1.0f - this.halfExpandedRatio) * this.parentHeight);
         calculateCollapsedOffset();
-        int i6 = this.state;
-        if (i6 == 3) {
+        int i5 = this.state;
+        if (i5 == 3) {
             v.offsetTopAndBottom(getExpandedOffset());
-        } else if (i6 == 6) {
+        } else if (i5 == 6) {
             v.offsetTopAndBottom(this.halfExpandedOffset);
-        } else if (this.hideable && i6 == 5) {
+        } else if (this.hideable && i5 == 5) {
             v.offsetTopAndBottom(this.parentHeight);
-        } else if (i6 == 4) {
+        } else if (i5 == 4) {
             v.offsetTopAndBottom(this.collapsedOffset);
-        } else if (i6 == 1 || i6 == 2) {
+        } else if (i5 == 1 || i5 == 2) {
             v.offsetTopAndBottom(top - v.getTop());
         }
         this.nestedScrollingChildRef = new WeakReference<>(findScrollingChild(v));
+        for (int i6 = 0; i6 < this.callbacks.size(); i6++) {
+            this.callbacks.get(i6).getClass();
+        }
         return true;
     }
 
     @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
-    public boolean onNestedPreFling(CoordinatorLayout coordinatorLayout, V v, View view, float f, float f2) {
+    public final boolean onNestedPreFling(View view) {
         WeakReference<View> weakReference = this.nestedScrollingChildRef;
-        return (weakReference == null || view != weakReference.get() || this.state == 3) ? false : true;
-    }
-
-    @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
-    public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, V v, View view, int i, int i2, int[] iArr, int i3) {
-        if (i3 != 1) {
-            WeakReference<View> weakReference = this.nestedScrollingChildRef;
-            if (view == (weakReference != null ? weakReference.get() : null)) {
-                int top = v.getTop();
-                int i4 = top - i2;
-                if (i2 > 0) {
-                    if (i4 < getExpandedOffset()) {
-                        iArr[1] = top - getExpandedOffset();
-                        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-                        v.offsetTopAndBottom(-iArr[1]);
-                        setStateInternal(3);
-                    } else if (this.draggable) {
-                        iArr[1] = i2;
-                        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap2 = ViewCompat.sViewPropertyAnimatorMap;
-                        v.offsetTopAndBottom(-i2);
-                        setStateInternal(1);
-                    } else {
-                        return;
-                    }
-                } else if (i2 < 0 && !view.canScrollVertically(-1)) {
-                    int i5 = this.collapsedOffset;
-                    if (i4 > i5 && !this.hideable) {
-                        iArr[1] = top - i5;
-                        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap3 = ViewCompat.sViewPropertyAnimatorMap;
-                        v.offsetTopAndBottom(-iArr[1]);
-                        setStateInternal(4);
-                    } else if (this.draggable) {
-                        iArr[1] = i2;
-                        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap4 = ViewCompat.sViewPropertyAnimatorMap;
-                        v.offsetTopAndBottom(-i2);
-                        setStateInternal(1);
-                    } else {
-                        return;
-                    }
-                }
-                dispatchOnSlide(v.getTop());
-                this.lastNestedScrollDy = i2;
-                this.nestedScrolled = true;
-            }
+        if (weakReference == null || view != weakReference.get() || this.state == 3) {
+            return false;
         }
+        return true;
     }
 
     @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
-    public void onNestedScroll(CoordinatorLayout coordinatorLayout, V v, View view, int i, int i2, int i3, int i4, int i5, int[] iArr) {
-    }
-
-    @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
-    public void onRestoreInstanceState(CoordinatorLayout coordinatorLayout, V v, Parcelable parcelable) {
+    public final void onRestoreInstanceState(View view, Parcelable parcelable) {
         SavedState savedState = (SavedState) parcelable;
         int i = this.saveFlags;
         if (i != 0) {
@@ -691,161 +877,11 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
     }
 
     @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
-    public Parcelable onSaveInstanceState(CoordinatorLayout coordinatorLayout, V v) {
-        return new SavedState((Parcelable) View.BaseSavedState.EMPTY_STATE, (BottomSheetBehavior<?>) this);
+    public final Parcelable onSaveInstanceState(View view) {
+        return new SavedState(View.BaseSavedState.EMPTY_STATE, this);
     }
 
-    @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
-    public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, V v, View view, View view2, int i, int i2) {
-        this.lastNestedScrollDy = 0;
-        this.nestedScrolled = false;
-        return (i & 2) != 0;
-    }
-
-    @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
-    public void onStopNestedScroll(CoordinatorLayout coordinatorLayout, V v, View view, int i) {
-        int i2;
-        float f;
-        int i3 = 3;
-        if (v.getTop() == getExpandedOffset()) {
-            setStateInternal(3);
-            return;
-        }
-        WeakReference<View> weakReference = this.nestedScrollingChildRef;
-        if (weakReference != null && view == weakReference.get() && this.nestedScrolled) {
-            i3 = 4;
-            i3 = 6;
-            if (this.lastNestedScrollDy > 0) {
-                if (this.fitToContents) {
-                    i2 = this.fitToContentsOffset;
-                } else {
-                    int top = v.getTop();
-                    int i4 = this.halfExpandedOffset;
-                    if (top > i4) {
-                        i2 = i4;
-                    } else {
-                        i2 = getExpandedOffset();
-                    }
-                }
-                startSettlingAnimation(v, i3, i2, false);
-                this.nestedScrolled = false;
-            }
-            if (this.hideable) {
-                VelocityTracker velocityTracker = this.velocityTracker;
-                if (velocityTracker == null) {
-                    f = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
-                } else {
-                    velocityTracker.computeCurrentVelocity(1000, this.maximumVelocity);
-                    f = this.velocityTracker.getYVelocity(this.activePointerId);
-                }
-                if (shouldHide(v, f)) {
-                    i2 = this.parentHeight;
-                    i3 = 5;
-                    startSettlingAnimation(v, i3, i2, false);
-                    this.nestedScrolled = false;
-                }
-            }
-            if (this.lastNestedScrollDy == 0) {
-                int top2 = v.getTop();
-                if (!this.fitToContents) {
-                    int i5 = this.halfExpandedOffset;
-                    if (top2 < i5) {
-                        if (top2 < Math.abs(top2 - this.collapsedOffset)) {
-                            i2 = getExpandedOffset();
-                        } else {
-                            i2 = this.halfExpandedOffset;
-                        }
-                    } else if (Math.abs(top2 - i5) < Math.abs(top2 - this.collapsedOffset)) {
-                        i2 = this.halfExpandedOffset;
-                    } else {
-                        i2 = this.collapsedOffset;
-                    }
-                } else if (Math.abs(top2 - this.fitToContentsOffset) < Math.abs(top2 - this.collapsedOffset)) {
-                    i2 = this.fitToContentsOffset;
-                } else {
-                    i2 = this.collapsedOffset;
-                }
-            } else if (this.fitToContents) {
-                i2 = this.collapsedOffset;
-            } else {
-                int top3 = v.getTop();
-                if (Math.abs(top3 - this.halfExpandedOffset) < Math.abs(top3 - this.collapsedOffset)) {
-                    i2 = this.halfExpandedOffset;
-                } else {
-                    i2 = this.collapsedOffset;
-                }
-            }
-            startSettlingAnimation(v, i3, i2, false);
-            this.nestedScrolled = false;
-        }
-    }
-
-    @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
-    public boolean onTouchEvent(CoordinatorLayout coordinatorLayout, V v, MotionEvent motionEvent) {
-        if (!v.isShown()) {
-            return false;
-        }
-        int actionMasked = motionEvent.getActionMasked();
-        if (this.state == 1 && actionMasked == 0) {
-            return true;
-        }
-        ViewDragHelper viewDragHelper = this.viewDragHelper;
-        if (viewDragHelper != null) {
-            viewDragHelper.processTouchEvent(motionEvent);
-        }
-        if (actionMasked == 0) {
-            this.activePointerId = -1;
-            VelocityTracker velocityTracker = this.velocityTracker;
-            if (velocityTracker != null) {
-                velocityTracker.recycle();
-                this.velocityTracker = null;
-            }
-        }
-        if (this.velocityTracker == null) {
-            this.velocityTracker = VelocityTracker.obtain();
-        }
-        this.velocityTracker.addMovement(motionEvent);
-        if (this.viewDragHelper != null && actionMasked == 2 && !this.ignoreEvents) {
-            float abs = Math.abs(this.initialY - motionEvent.getY());
-            ViewDragHelper viewDragHelper2 = this.viewDragHelper;
-            if (abs > viewDragHelper2.mTouchSlop) {
-                viewDragHelper2.captureChildView(v, motionEvent.getPointerId(motionEvent.getActionIndex()));
-            }
-        }
-        return !this.ignoreEvents;
-    }
-
-    public final void replaceAccessibilityActionForState(V v, AccessibilityNodeInfoCompat.AccessibilityActionCompat accessibilityActionCompat, int i) {
-        ViewCompat.replaceAccessibilityAction(v, accessibilityActionCompat, null, new AnonymousClass6(i));
-    }
-
-    @Deprecated
-    public void setBottomSheetCallback(BottomSheetCallback bottomSheetCallback) {
-        Log.w("BottomSheetBehavior", "BottomSheetBehavior now supports multiple callbacks. `setBottomSheetCallback()` removes all existing callbacks, including ones set internally by library authors, which may result in unintended behavior. This may change in the future. Please use `addBottomSheetCallback()` and `removeBottomSheetCallback()` instead to set your own callbacks.");
-        this.callbacks.clear();
-        this.callbacks.add(bottomSheetCallback);
-    }
-
-    public void setPeekHeight(int i) {
-        boolean z = true;
-        if (i == -1) {
-            if (!this.peekHeightAuto) {
-                this.peekHeightAuto = true;
-            }
-            z = false;
-        } else {
-            if (this.peekHeightAuto || this.peekHeight != i) {
-                this.peekHeightAuto = false;
-                this.peekHeight = Math.max(0, i);
-            }
-            z = false;
-        }
-        if (z) {
-            updatePeekHeight(false);
-        }
-    }
-
-    public void setState(int i) {
+    public final void setState(int i) {
         if (i != this.state) {
             if (this.viewRef != null) {
                 settleToStatePendingLayout(i);
@@ -855,7 +891,7 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
         }
     }
 
-    public void setStateInternal(int i) {
+    public final void setStateInternal(int i) {
         V v;
         if (this.state != i) {
             this.state = i;
@@ -870,32 +906,9 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
                 for (int i2 = 0; i2 < this.callbacks.size(); i2++) {
                     this.callbacks.get(i2).onStateChanged(v, i);
                 }
-                updateAccessibilityActions();
+                updateAccessibilityActions$1();
             }
         }
-    }
-
-    public void settleToState(View view, int i) {
-        int i2;
-        int i3;
-        if (i == 4) {
-            i2 = this.collapsedOffset;
-        } else if (i == 6) {
-            int i4 = this.halfExpandedOffset;
-            if (!this.fitToContents || i4 > (i3 = this.fitToContentsOffset)) {
-                i2 = i4;
-            } else {
-                i = 3;
-                i2 = i3;
-            }
-        } else if (i == 3) {
-            i2 = getExpandedOffset();
-        } else if (!this.hideable || i != 5) {
-            throw new IllegalArgumentException(ExifInterface$$ExternalSyntheticOutline0.m("Illegal state argument: ", i));
-        } else {
-            i2 = this.parentHeight;
-        }
-        startSettlingAnimation(view, i, i2, false);
     }
 
     public final void settleToStatePendingLayout(final int i) {
@@ -904,10 +917,10 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
             ViewParent parent = v.getParent();
             if (parent != null && parent.isLayoutRequested()) {
                 WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-                if (v.isAttachedToWindow()) {
-                    v.post(new Runnable() { // from class: com.google.android.material.bottomsheet.BottomSheetBehavior.2
+                if (ViewCompat.Api19Impl.isAttachedToWindow(v)) {
+                    v.post(new Runnable() { // from class: com.google.android.material.bottomsheet.BottomSheetBehavior.1
                         @Override // java.lang.Runnable
-                        public void run() {
+                        public final void run() {
                             BottomSheetBehavior.this.settleToState(v, i);
                         }
                     });
@@ -918,14 +931,17 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
         }
     }
 
-    public boolean shouldHide(View view, float f) {
+    public final boolean shouldHide(View view, float f) {
         if (this.skipCollapsed) {
             return true;
         }
         if (view.getTop() < this.collapsedOffset) {
             return false;
         }
-        return Math.abs(((f * 0.1f) + ((float) view.getTop())) - ((float) this.collapsedOffset)) / ((float) calculatePeekHeight()) > 0.5f;
+        if (Math.abs(((f * 0.1f) + view.getTop()) - this.collapsedOffset) / calculatePeekHeight() > 0.5f) {
+            return true;
+        }
+        return false;
     }
 
     /* JADX WARN: Code restructure failed: missing block: B:14:0x002d, code lost:
@@ -941,7 +957,7 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public void startSettlingAnimation(android.view.View r5, int r6, int r7, boolean r8) {
+    public final void startSettlingAnimation(android.view.View r5, int r6, int r7, boolean r8) {
         /*
             r4 = this;
             androidx.customview.widget.ViewDragHelper r0 = r4.viewDragHelper
@@ -986,7 +1002,7 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
             if (r8 != 0) goto L56
             r7.targetState = r6
             java.util.WeakHashMap<android.view.View, androidx.core.view.ViewPropertyAnimatorCompat> r6 = androidx.core.view.ViewCompat.sViewPropertyAnimatorMap
-            r5.postOnAnimation(r7)
+            androidx.core.view.ViewCompat.Api16Impl.postOnAnimation(r5, r7)
             com.google.android.material.bottomsheet.BottomSheetBehavior<V>$SettleRunnable r4 = r4.settleRunnable
             r4.isPosted = r1
             goto L5c
@@ -1001,9 +1017,11 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
         throw new UnsupportedOperationException("Method not decompiled: com.google.android.material.bottomsheet.BottomSheetBehavior.startSettlingAnimation(android.view.View, int, int, boolean):void");
     }
 
-    public final void updateAccessibilityActions() {
+    public final void updateAccessibilityActions$1() {
         V v;
         int i;
+        boolean z;
+        AccessibilityDelegateCompat accessibilityDelegateCompat;
         WeakReference<V> weakReference = this.viewRef;
         if (weakReference != null && (v = weakReference.get()) != null) {
             ViewCompat.removeActionWithId(QuickStepContract.SYSUI_STATE_MAGNIFICATION_OVERLAP, v);
@@ -1017,11 +1035,17 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
                 ViewCompat.removeActionWithId(i2, v);
                 ViewCompat.notifyViewAccessibilityStateChangedIfNeeded(v, 0);
             }
-            int i3 = 6;
+            final int i3 = 6;
             if (!this.fitToContents && this.state != 6) {
                 String string = v.getResources().getString(R.string.bottomsheet_action_expand_halfway);
-                AnonymousClass6 r10 = new AnonymousClass6(6);
-                List<AccessibilityNodeInfoCompat.AccessibilityActionCompat> actionList = ViewCompat.getActionList(v);
+                AccessibilityViewCommand accessibilityViewCommand = new AccessibilityViewCommand() { // from class: com.google.android.material.bottomsheet.BottomSheetBehavior.5
+                    @Override // androidx.core.view.accessibility.AccessibilityViewCommand
+                    public final boolean perform(View view) {
+                        BottomSheetBehavior.this.setState(r2);
+                        return true;
+                    }
+                };
+                ArrayList actionList = ViewCompat.getActionList(v);
                 int i4 = 0;
                 while (true) {
                     if (i4 >= actionList.size()) {
@@ -1033,64 +1057,95 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
                                 break;
                             }
                             int i7 = iArr[i5];
-                            boolean z = true;
+                            boolean z2 = true;
                             for (int i8 = 0; i8 < actionList.size(); i8++) {
-                                z &= actionList.get(i8).getId() != i7;
+                                if (((AccessibilityNodeInfoCompat.AccessibilityActionCompat) actionList.get(i8)).getId() != i7) {
+                                    z = true;
+                                } else {
+                                    z = false;
+                                }
+                                z2 &= z;
                             }
-                            if (z) {
+                            if (z2) {
                                 i6 = i7;
                             }
                             i5++;
                         }
                         i = i6;
-                    } else if (TextUtils.equals(string, actionList.get(i4).getLabel())) {
-                        i = actionList.get(i4).getId();
+                    } else if (TextUtils.equals(string, ((AccessibilityNodeInfo.AccessibilityAction) ((AccessibilityNodeInfoCompat.AccessibilityActionCompat) actionList.get(i4)).mAction).getLabel())) {
+                        i = ((AccessibilityNodeInfoCompat.AccessibilityActionCompat) actionList.get(i4)).getId();
                         break;
                     } else {
                         i4++;
                     }
                 }
                 if (i != -1) {
-                    ViewCompat.addAccessibilityAction(v, new AccessibilityNodeInfoCompat.AccessibilityActionCompat(null, i, string, r10, null));
+                    AccessibilityNodeInfoCompat.AccessibilityActionCompat accessibilityActionCompat = new AccessibilityNodeInfoCompat.AccessibilityActionCompat(null, i, string, accessibilityViewCommand, null);
+                    View.AccessibilityDelegate accessibilityDelegate = ViewCompat.Api29Impl.getAccessibilityDelegate(v);
+                    if (accessibilityDelegate == null) {
+                        accessibilityDelegateCompat = null;
+                    } else if (accessibilityDelegate instanceof AccessibilityDelegateCompat.AccessibilityDelegateAdapter) {
+                        accessibilityDelegateCompat = ((AccessibilityDelegateCompat.AccessibilityDelegateAdapter) accessibilityDelegate).mCompat;
+                    } else {
+                        accessibilityDelegateCompat = new AccessibilityDelegateCompat(accessibilityDelegate);
+                    }
+                    if (accessibilityDelegateCompat == null) {
+                        accessibilityDelegateCompat = new AccessibilityDelegateCompat();
+                    }
+                    ViewCompat.setAccessibilityDelegate(v, accessibilityDelegateCompat);
+                    ViewCompat.removeActionWithId(accessibilityActionCompat.getId(), v);
+                    ViewCompat.getActionList(v).add(accessibilityActionCompat);
+                    ViewCompat.notifyViewAccessibilityStateChangedIfNeeded(v, 0);
                 }
                 this.expandHalfwayActionId = i;
             }
             if (this.hideable && this.state != 5) {
-                replaceAccessibilityActionForState(v, AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_DISMISS, 5);
+                ViewCompat.replaceAccessibilityAction(v, AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_DISMISS, new AccessibilityViewCommand() { // from class: com.google.android.material.bottomsheet.BottomSheetBehavior.5
+                    @Override // androidx.core.view.accessibility.AccessibilityViewCommand
+                    public final boolean perform(View view) {
+                        BottomSheetBehavior.this.setState(r2);
+                        return true;
+                    }
+                });
             }
             int i9 = this.state;
             if (i9 == 3) {
                 if (this.fitToContents) {
                     i3 = 4;
                 }
-                replaceAccessibilityActionForState(v, AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_COLLAPSE, i3);
+                ViewCompat.replaceAccessibilityAction(v, AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_COLLAPSE, new AccessibilityViewCommand() { // from class: com.google.android.material.bottomsheet.BottomSheetBehavior.5
+                    @Override // androidx.core.view.accessibility.AccessibilityViewCommand
+                    public final boolean perform(View view) {
+                        BottomSheetBehavior.this.setState(i3);
+                        return true;
+                    }
+                });
             } else if (i9 == 4) {
                 if (this.fitToContents) {
                     i3 = 3;
                 }
-                replaceAccessibilityActionForState(v, AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_EXPAND, i3);
-            } else if (i9 == 6) {
-                replaceAccessibilityActionForState(v, AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_COLLAPSE, 4);
-                replaceAccessibilityActionForState(v, AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_EXPAND, 3);
-            }
-        }
-    }
-
-    public final void updateDrawableForTargetState(int i) {
-        ValueAnimator valueAnimator;
-        if (i != 2) {
-            boolean z = i == 3;
-            if (this.isShapeExpanded != z) {
-                this.isShapeExpanded = z;
-                if (this.materialShapeDrawable != null && (valueAnimator = this.interpolatorAnimator) != null) {
-                    if (valueAnimator.isRunning()) {
-                        this.interpolatorAnimator.reverse();
-                        return;
+                ViewCompat.replaceAccessibilityAction(v, AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_EXPAND, new AccessibilityViewCommand() { // from class: com.google.android.material.bottomsheet.BottomSheetBehavior.5
+                    @Override // androidx.core.view.accessibility.AccessibilityViewCommand
+                    public final boolean perform(View view) {
+                        BottomSheetBehavior.this.setState(i3);
+                        return true;
                     }
-                    float f = z ? HingeAngleProviderKt.FULLY_CLOSED_DEGREES : 1.0f;
-                    this.interpolatorAnimator.setFloatValues(1.0f - f, f);
-                    this.interpolatorAnimator.start();
-                }
+                });
+            } else if (i9 == 6) {
+                ViewCompat.replaceAccessibilityAction(v, AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_COLLAPSE, new AccessibilityViewCommand() { // from class: com.google.android.material.bottomsheet.BottomSheetBehavior.5
+                    @Override // androidx.core.view.accessibility.AccessibilityViewCommand
+                    public final boolean perform(View view) {
+                        BottomSheetBehavior.this.setState(i3);
+                        return true;
+                    }
+                });
+                ViewCompat.replaceAccessibilityAction(v, AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_EXPAND, new AccessibilityViewCommand() { // from class: com.google.android.material.bottomsheet.BottomSheetBehavior.5
+                    @Override // androidx.core.view.accessibility.AccessibilityViewCommand
+                    public final boolean perform(View view) {
+                        BottomSheetBehavior.this.setState(i3);
+                        return true;
+                    }
+                });
             }
         }
     }
@@ -1122,80 +1177,241 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
         }
     }
 
-    public final void updatePeekHeight(boolean z) {
+    public final void updatePeekHeight() {
         V v;
         if (this.viewRef != null) {
             calculateCollapsedOffset();
             if (this.state == 4 && (v = this.viewRef.get()) != null) {
-                if (z) {
-                    settleToStatePendingLayout(this.state);
+                v.requestLayout();
+            }
+        }
+    }
+
+    public static int getChildMeasureSpec(int i, int i2, int i3, int i4) {
+        int childMeasureSpec = ViewGroup.getChildMeasureSpec(i, i2, i4);
+        if (i3 == -1) {
+            return childMeasureSpec;
+        }
+        int mode = View.MeasureSpec.getMode(childMeasureSpec);
+        int size = View.MeasureSpec.getSize(childMeasureSpec);
+        if (mode == 1073741824) {
+            return View.MeasureSpec.makeMeasureSpec(Math.min(size, i3), IntMath.MAX_SIGNED_POWER_OF_TWO);
+        }
+        if (size != 0) {
+            i3 = Math.min(size, i3);
+        }
+        return View.MeasureSpec.makeMeasureSpec(i3, RecyclerView.UNDEFINED_DURATION);
+    }
+
+    public final void calculateCollapsedOffset() {
+        int calculatePeekHeight = calculatePeekHeight();
+        if (this.fitToContents) {
+            this.collapsedOffset = Math.max(this.parentHeight - calculatePeekHeight, this.fitToContentsOffset);
+        } else {
+            this.collapsedOffset = this.parentHeight - calculatePeekHeight;
+        }
+    }
+
+    @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
+    public final boolean onInterceptTouchEvent(CoordinatorLayout coordinatorLayout, V v, MotionEvent motionEvent) {
+        ViewDragHelper viewDragHelper;
+        boolean z;
+        View view;
+        if (!v.isShown() || !this.draggable) {
+            this.ignoreEvents = true;
+            return false;
+        }
+        int actionMasked = motionEvent.getActionMasked();
+        if (actionMasked == 0) {
+            reset$1();
+        }
+        if (this.velocityTracker == null) {
+            this.velocityTracker = VelocityTracker.obtain();
+        }
+        this.velocityTracker.addMovement(motionEvent);
+        View view2 = null;
+        if (actionMasked == 0) {
+            int x = (int) motionEvent.getX();
+            this.initialY = (int) motionEvent.getY();
+            if (this.state != 2) {
+                WeakReference<View> weakReference = this.nestedScrollingChildRef;
+                if (weakReference != null) {
+                    view = weakReference.get();
                 } else {
-                    v.requestLayout();
+                    view = null;
+                }
+                if (view != null && coordinatorLayout.isPointInChildBounds(view, x, this.initialY)) {
+                    this.activePointerId = motionEvent.getPointerId(motionEvent.getActionIndex());
+                    this.touchingScrollingChild = true;
                 }
             }
+            if (this.activePointerId != -1 || coordinatorLayout.isPointInChildBounds(v, x, this.initialY)) {
+                z = false;
+            } else {
+                z = true;
+            }
+            this.ignoreEvents = z;
+        } else if (actionMasked == 1 || actionMasked == 3) {
+            this.touchingScrollingChild = false;
+            this.activePointerId = -1;
+            if (this.ignoreEvents) {
+                this.ignoreEvents = false;
+                return false;
+            }
+        }
+        if (!this.ignoreEvents && (viewDragHelper = this.viewDragHelper) != null && viewDragHelper.shouldInterceptTouchEvent(motionEvent)) {
+            return true;
+        }
+        WeakReference<View> weakReference2 = this.nestedScrollingChildRef;
+        if (weakReference2 != null) {
+            view2 = weakReference2.get();
+        }
+        if (actionMasked != 2 || view2 == null || this.ignoreEvents || this.state == 1 || coordinatorLayout.isPointInChildBounds(view2, (int) motionEvent.getX(), (int) motionEvent.getY()) || this.viewDragHelper == null || Math.abs(this.initialY - motionEvent.getY()) <= this.viewDragHelper.mTouchSlop) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
+    public final boolean onMeasureChild(CoordinatorLayout coordinatorLayout, View view, int i, int i2, int i3) {
+        ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+        view.measure(getChildMeasureSpec(i, coordinatorLayout.getPaddingRight() + coordinatorLayout.getPaddingLeft() + marginLayoutParams.leftMargin + marginLayoutParams.rightMargin + i2, this.maxWidth, marginLayoutParams.width), getChildMeasureSpec(i3, coordinatorLayout.getPaddingBottom() + coordinatorLayout.getPaddingTop() + marginLayoutParams.topMargin + marginLayoutParams.bottomMargin + 0, this.maxHeight, marginLayoutParams.height));
+        return true;
+    }
+
+    @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
+    public final void onStopNestedScroll(CoordinatorLayout coordinatorLayout, V v, View view, int i) {
+        int i2;
+        float f;
+        int i3 = 3;
+        if (v.getTop() == getExpandedOffset()) {
+            setStateInternal(3);
+            return;
+        }
+        WeakReference<View> weakReference = this.nestedScrollingChildRef;
+        if (weakReference != null && view == weakReference.get() && this.nestedScrolled) {
+            if (this.lastNestedScrollDy > 0) {
+                if (this.fitToContents) {
+                    i2 = this.fitToContentsOffset;
+                } else {
+                    int top = v.getTop();
+                    int i4 = this.halfExpandedOffset;
+                    if (top > i4) {
+                        i2 = i4;
+                        i3 = 6;
+                    } else {
+                        i2 = getExpandedOffset();
+                    }
+                }
+                startSettlingAnimation(v, i3, i2, false);
+                this.nestedScrolled = false;
+            }
+            if (this.hideable) {
+                VelocityTracker velocityTracker = this.velocityTracker;
+                if (velocityTracker == null) {
+                    f = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
+                } else {
+                    velocityTracker.computeCurrentVelocity(1000, this.maximumVelocity);
+                    f = this.velocityTracker.getYVelocity(this.activePointerId);
+                }
+                if (shouldHide(v, f)) {
+                    i2 = this.parentHeight;
+                    i3 = 5;
+                    startSettlingAnimation(v, i3, i2, false);
+                    this.nestedScrolled = false;
+                }
+            }
+            if (this.lastNestedScrollDy == 0) {
+                int top2 = v.getTop();
+                if (!this.fitToContents) {
+                    int i5 = this.halfExpandedOffset;
+                    if (top2 < i5) {
+                        if (top2 < Math.abs(top2 - this.collapsedOffset)) {
+                            i2 = getExpandedOffset();
+                        } else {
+                            i2 = this.halfExpandedOffset;
+                        }
+                    } else if (Math.abs(top2 - i5) < Math.abs(top2 - this.collapsedOffset)) {
+                        i2 = this.halfExpandedOffset;
+                    } else {
+                        i2 = this.collapsedOffset;
+                        i3 = 4;
+                    }
+                    i3 = 6;
+                } else if (Math.abs(top2 - this.fitToContentsOffset) < Math.abs(top2 - this.collapsedOffset)) {
+                    i2 = this.fitToContentsOffset;
+                } else {
+                    i2 = this.collapsedOffset;
+                    i3 = 4;
+                }
+            } else {
+                if (this.fitToContents) {
+                    i2 = this.collapsedOffset;
+                } else {
+                    int top3 = v.getTop();
+                    if (Math.abs(top3 - this.halfExpandedOffset) < Math.abs(top3 - this.collapsedOffset)) {
+                        i2 = this.halfExpandedOffset;
+                        i3 = 6;
+                    } else {
+                        i2 = this.collapsedOffset;
+                    }
+                }
+                i3 = 4;
+            }
+            startSettlingAnimation(v, i3, i2, false);
+            this.nestedScrolled = false;
         }
     }
 
-    /* loaded from: classes.dex */
-    public static class SavedState extends AbsSavedState {
-        public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.ClassLoaderCreator<SavedState>() { // from class: com.google.android.material.bottomsheet.BottomSheetBehavior.SavedState.1
-            @Override // android.os.Parcelable.ClassLoaderCreator
-            public SavedState createFromParcel(Parcel parcel, ClassLoader classLoader) {
-                return new SavedState(parcel, classLoader);
-            }
-
-            @Override // android.os.Parcelable.Creator
-            public Object[] newArray(int i) {
-                return new SavedState[i];
-            }
-
-            @Override // android.os.Parcelable.Creator
-            public Object createFromParcel(Parcel parcel) {
-                return new SavedState(parcel, (ClassLoader) null);
-            }
-        };
-        public boolean fitToContents;
-        public boolean hideable;
-        public int peekHeight;
-        public boolean skipCollapsed;
-        public final int state;
-
-        public SavedState(Parcel parcel, ClassLoader classLoader) {
-            super(parcel, classLoader);
-            this.state = parcel.readInt();
-            this.peekHeight = parcel.readInt();
-            boolean z = false;
-            this.fitToContents = parcel.readInt() == 1;
-            this.hideable = parcel.readInt() == 1;
-            this.skipCollapsed = parcel.readInt() == 1 ? true : z;
+    @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
+    public final boolean onTouchEvent(CoordinatorLayout coordinatorLayout, V v, MotionEvent motionEvent) {
+        boolean z;
+        boolean z2 = false;
+        if (!v.isShown()) {
+            return false;
         }
-
-        @Override // androidx.customview.view.AbsSavedState, android.os.Parcelable
-        public void writeToParcel(Parcel parcel, int i) {
-            parcel.writeParcelable(this.mSuperState, i);
-            parcel.writeInt(this.state);
-            parcel.writeInt(this.peekHeight);
-            parcel.writeInt(this.fitToContents ? 1 : 0);
-            parcel.writeInt(this.hideable ? 1 : 0);
-            parcel.writeInt(this.skipCollapsed ? 1 : 0);
+        int actionMasked = motionEvent.getActionMasked();
+        int i = this.state;
+        if (i == 1 && actionMasked == 0) {
+            return true;
         }
-
-        public SavedState(Parcelable parcelable, BottomSheetBehavior<?> bottomSheetBehavior) {
-            super(parcelable);
-            this.state = bottomSheetBehavior.state;
-            this.peekHeight = bottomSheetBehavior.peekHeight;
-            this.fitToContents = bottomSheetBehavior.fitToContents;
-            this.hideable = bottomSheetBehavior.hideable;
-            this.skipCollapsed = bottomSheetBehavior.skipCollapsed;
+        ViewDragHelper viewDragHelper = this.viewDragHelper;
+        if (viewDragHelper == null || (!this.draggable && i != 1)) {
+            z = false;
+        } else {
+            z = true;
         }
+        if (z) {
+            viewDragHelper.processTouchEvent(motionEvent);
+        }
+        if (actionMasked == 0) {
+            reset$1();
+        }
+        if (this.velocityTracker == null) {
+            this.velocityTracker = VelocityTracker.obtain();
+        }
+        this.velocityTracker.addMovement(motionEvent);
+        if (this.viewDragHelper != null && (this.draggable || this.state == 1)) {
+            z2 = true;
+        }
+        if (z2 && actionMasked == 2 && !this.ignoreEvents) {
+            float abs = Math.abs(this.initialY - motionEvent.getY());
+            ViewDragHelper viewDragHelper2 = this.viewDragHelper;
+            if (abs > viewDragHelper2.mTouchSlop) {
+                viewDragHelper2.captureChildView(v, motionEvent.getPointerId(motionEvent.getActionIndex()));
+            }
+        }
+        return !this.ignoreEvents;
     }
 
+    /* JADX WARN: Type inference failed for: r6v1, types: [com.google.android.material.bottomsheet.BottomSheetBehavior$4] */
     public BottomSheetBehavior(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
         int i;
         this.saveFlags = 0;
         this.fitToContents = true;
         this.maxWidth = -1;
+        this.maxHeight = -1;
         this.settleRunnable = null;
         this.halfExpandedRatio = 0.5f;
         this.elevation = -1.0f;
@@ -1203,30 +1419,9 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
         this.state = 4;
         this.callbacks = new ArrayList<>();
         this.expandHalfwayActionId = -1;
-        this.dragCallback = new ViewDragHelper.Callback() { // from class: com.google.android.material.bottomsheet.BottomSheetBehavior.5
+        this.dragCallback = new ViewDragHelper.Callback() { // from class: com.google.android.material.bottomsheet.BottomSheetBehavior.4
             @Override // androidx.customview.widget.ViewDragHelper.Callback
-            public int clampViewPositionHorizontal(View view, int i2, int i22) {
-                return view.getLeft();
-            }
-
-            @Override // androidx.customview.widget.ViewDragHelper.Callback
-            public int clampViewPositionVertical(View view, int i2, int i22) {
-                int expandedOffset = BottomSheetBehavior.this.getExpandedOffset();
-                BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.this;
-                return MathUtils.clamp(i2, expandedOffset, bottomSheetBehavior.hideable ? bottomSheetBehavior.parentHeight : bottomSheetBehavior.collapsedOffset);
-            }
-
-            @Override // androidx.customview.widget.ViewDragHelper.Callback
-            public int getViewVerticalDragRange(View view) {
-                BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.this;
-                if (bottomSheetBehavior.hideable) {
-                    return bottomSheetBehavior.parentHeight;
-                }
-                return bottomSheetBehavior.collapsedOffset;
-            }
-
-            @Override // androidx.customview.widget.ViewDragHelper.Callback
-            public void onViewDragStateChanged(int i2) {
+            public final void onViewDragStateChanged(int i2) {
                 if (i2 == 1) {
                     BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.this;
                     if (bottomSheetBehavior.draggable) {
@@ -1236,49 +1431,55 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
             }
 
             @Override // androidx.customview.widget.ViewDragHelper.Callback
-            public void onViewPositionChanged(View view, int i2, int i22, int i3, int i4) {
-                BottomSheetBehavior.this.dispatchOnSlide(i22);
-            }
-
-            @Override // androidx.customview.widget.ViewDragHelper.Callback
-            public void onViewReleased(View view, float f, float f2) {
+            public final void onViewReleased(View view, float f, float f2) {
                 int i2;
-                int i22 = 4;
-                i22 = 6;
-                i22 = 3;
+                int i22;
+                boolean z;
+                int i3 = 4;
                 if (f2 < HingeAngleProviderKt.FULLY_CLOSED_DEGREES) {
                     BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.this;
                     if (bottomSheetBehavior.fitToContents) {
                         i2 = bottomSheetBehavior.fitToContentsOffset;
                     } else {
                         int top = view.getTop();
+                        System.currentTimeMillis();
+                        BottomSheetBehavior.this.getClass();
                         BottomSheetBehavior bottomSheetBehavior2 = BottomSheetBehavior.this;
-                        int i3 = bottomSheetBehavior2.halfExpandedOffset;
-                        if (top > i3) {
-                            i2 = i3;
-                        } else {
+                        i22 = bottomSheetBehavior2.halfExpandedOffset;
+                        if (top <= i22) {
                             i2 = bottomSheetBehavior2.getExpandedOffset();
                         }
+                        i3 = 6;
+                        i2 = i22;
                     }
+                    i3 = 3;
                 } else {
                     BottomSheetBehavior bottomSheetBehavior3 = BottomSheetBehavior.this;
                     if (bottomSheetBehavior3.hideable && bottomSheetBehavior3.shouldHide(view, f2)) {
                         if (Math.abs(f) >= Math.abs(f2) || f2 <= 500.0f) {
                             int top2 = view.getTop();
                             BottomSheetBehavior bottomSheetBehavior4 = BottomSheetBehavior.this;
-                            if (!(top2 > (bottomSheetBehavior4.getExpandedOffset() + bottomSheetBehavior4.parentHeight) / 2)) {
+                            if (top2 > (bottomSheetBehavior4.getExpandedOffset() + bottomSheetBehavior4.parentHeight) / 2) {
+                                z = true;
+                            } else {
+                                z = false;
+                            }
+                            if (!z) {
                                 BottomSheetBehavior bottomSheetBehavior5 = BottomSheetBehavior.this;
                                 if (bottomSheetBehavior5.fitToContents) {
                                     i2 = bottomSheetBehavior5.fitToContentsOffset;
                                 } else if (Math.abs(view.getTop() - BottomSheetBehavior.this.getExpandedOffset()) < Math.abs(view.getTop() - BottomSheetBehavior.this.halfExpandedOffset)) {
                                     i2 = BottomSheetBehavior.this.getExpandedOffset();
                                 } else {
-                                    i2 = BottomSheetBehavior.this.halfExpandedOffset;
+                                    i22 = BottomSheetBehavior.this.halfExpandedOffset;
+                                    i3 = 6;
+                                    i2 = i22;
                                 }
+                                i3 = 3;
                             }
                         }
                         i2 = BottomSheetBehavior.this.parentHeight;
-                        i22 = 5;
+                        i3 = 5;
                     } else if (f2 == HingeAngleProviderKt.FULLY_CLOSED_DEGREES || Math.abs(f) > Math.abs(f2)) {
                         int top3 = view.getTop();
                         BottomSheetBehavior bottomSheetBehavior6 = BottomSheetBehavior.this;
@@ -1287,16 +1488,22 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
                             if (top3 < i4) {
                                 if (top3 < Math.abs(top3 - bottomSheetBehavior6.collapsedOffset)) {
                                     i2 = BottomSheetBehavior.this.getExpandedOffset();
+                                    i3 = 3;
                                 } else {
-                                    i2 = BottomSheetBehavior.this.halfExpandedOffset;
+                                    BottomSheetBehavior.this.getClass();
+                                    i22 = BottomSheetBehavior.this.halfExpandedOffset;
                                 }
                             } else if (Math.abs(top3 - i4) < Math.abs(top3 - BottomSheetBehavior.this.collapsedOffset)) {
-                                i2 = BottomSheetBehavior.this.halfExpandedOffset;
+                                BottomSheetBehavior.this.getClass();
+                                i22 = BottomSheetBehavior.this.halfExpandedOffset;
                             } else {
                                 i2 = BottomSheetBehavior.this.collapsedOffset;
                             }
+                            i3 = 6;
+                            i2 = i22;
                         } else if (Math.abs(top3 - bottomSheetBehavior6.fitToContentsOffset) < Math.abs(top3 - BottomSheetBehavior.this.collapsedOffset)) {
                             i2 = BottomSheetBehavior.this.fitToContentsOffset;
+                            i3 = 3;
                         } else {
                             i2 = BottomSheetBehavior.this.collapsedOffset;
                         }
@@ -1307,18 +1514,51 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
                         } else {
                             int top4 = view.getTop();
                             if (Math.abs(top4 - BottomSheetBehavior.this.halfExpandedOffset) < Math.abs(top4 - BottomSheetBehavior.this.collapsedOffset)) {
-                                i2 = BottomSheetBehavior.this.halfExpandedOffset;
+                                BottomSheetBehavior.this.getClass();
+                                i22 = BottomSheetBehavior.this.halfExpandedOffset;
+                                i3 = 6;
+                                i2 = i22;
                             } else {
                                 i2 = BottomSheetBehavior.this.collapsedOffset;
                             }
                         }
                     }
                 }
-                BottomSheetBehavior.this.startSettlingAnimation(view, i22, i2, true);
+                BottomSheetBehavior bottomSheetBehavior8 = BottomSheetBehavior.this;
+                bottomSheetBehavior8.getClass();
+                bottomSheetBehavior8.startSettlingAnimation(view, i3, i2, true);
             }
 
             @Override // androidx.customview.widget.ViewDragHelper.Callback
-            public boolean tryCaptureView(View view, int i2) {
+            public final int clampViewPositionVertical(View view, int i2) {
+                int i22;
+                int expandedOffset = BottomSheetBehavior.this.getExpandedOffset();
+                BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.this;
+                if (bottomSheetBehavior.hideable) {
+                    i22 = bottomSheetBehavior.parentHeight;
+                } else {
+                    i22 = bottomSheetBehavior.collapsedOffset;
+                }
+                return MathUtils.clamp(i2, expandedOffset, i22);
+            }
+
+            @Override // androidx.customview.widget.ViewDragHelper.Callback
+            public final int getViewVerticalDragRange() {
+                BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.this;
+                if (bottomSheetBehavior.hideable) {
+                    return bottomSheetBehavior.parentHeight;
+                }
+                return bottomSheetBehavior.collapsedOffset;
+            }
+
+            @Override // androidx.customview.widget.ViewDragHelper.Callback
+            public final void onViewPositionChanged(View view, int i2, int i22) {
+                BottomSheetBehavior.this.dispatchOnSlide(i22);
+            }
+
+            @Override // androidx.customview.widget.ViewDragHelper.Callback
+            public final boolean tryCaptureView(View view, int i2) {
+                View view2;
                 BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.this;
                 int i22 = bottomSheetBehavior.state;
                 if (i22 == 1 || bottomSheetBehavior.touchingScrollingChild) {
@@ -1326,69 +1566,103 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
                 }
                 if (i22 == 3 && bottomSheetBehavior.activePointerId == i2) {
                     WeakReference<View> weakReference = bottomSheetBehavior.nestedScrollingChildRef;
-                    View view2 = weakReference != null ? weakReference.get() : null;
+                    if (weakReference != null) {
+                        view2 = weakReference.get();
+                    } else {
+                        view2 = null;
+                    }
                     if (view2 != null && view2.canScrollVertically(-1)) {
                         return false;
                     }
                 }
+                System.currentTimeMillis();
                 WeakReference<V> weakReference2 = BottomSheetBehavior.this.viewRef;
-                return weakReference2 != null && weakReference2.get() == view;
+                if (weakReference2 == null || weakReference2.get() != view) {
+                    return false;
+                }
+                return true;
+            }
+
+            @Override // androidx.customview.widget.ViewDragHelper.Callback
+            public final int clampViewPositionHorizontal(View view, int i2) {
+                return view.getLeft();
             }
         };
         this.peekHeightGestureInsetBuffer = context.getResources().getDimensionPixelSize(R.dimen.mtrl_min_touch_target_size);
         TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, R$styleable.BottomSheetBehavior_Layout);
-        this.shapeThemingEnabled = obtainStyledAttributes.hasValue(16);
-        boolean hasValue = obtainStyledAttributes.hasValue(2);
-        if (hasValue) {
-            createMaterialShapeDrawable(context, attributeSet, hasValue, MaterialResources.getColorStateList(context, obtainStyledAttributes, 2));
-        } else {
-            createMaterialShapeDrawable(context, attributeSet, hasValue, null);
+        int i2 = 3;
+        if (obtainStyledAttributes.hasValue(3)) {
+            this.backgroundTint = MaterialResources.getColorStateList(context, obtainStyledAttributes, 3);
+        }
+        if (obtainStyledAttributes.hasValue(20)) {
+            this.shapeAppearanceModelDefault = new ShapeAppearanceModel(ShapeAppearanceModel.builder(context, attributeSet, (int) R.attr.bottomSheetStyle, (int) R.style.Widget_Design_BottomSheet_Modal));
+        }
+        if (this.shapeAppearanceModelDefault != null) {
+            MaterialShapeDrawable materialShapeDrawable = new MaterialShapeDrawable(this.shapeAppearanceModelDefault);
+            this.materialShapeDrawable = materialShapeDrawable;
+            materialShapeDrawable.initializeElevationOverlay(context);
+            ColorStateList colorStateList = this.backgroundTint;
+            if (colorStateList != null) {
+                this.materialShapeDrawable.setFillColor(colorStateList);
+            } else {
+                TypedValue typedValue = new TypedValue();
+                context.getTheme().resolveAttribute(16842801, typedValue, true);
+                this.materialShapeDrawable.setTint(typedValue.data);
+            }
         }
         ValueAnimator ofFloat = ValueAnimator.ofFloat(HingeAngleProviderKt.FULLY_CLOSED_DEGREES, 1.0f);
         this.interpolatorAnimator = ofFloat;
         ofFloat.setDuration(500L);
-        this.interpolatorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() { // from class: com.google.android.material.bottomsheet.BottomSheetBehavior.3
+        this.interpolatorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() { // from class: com.google.android.material.bottomsheet.BottomSheetBehavior.2
             @Override // android.animation.ValueAnimator.AnimatorUpdateListener
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+            public final void onAnimationUpdate(ValueAnimator valueAnimator) {
                 float floatValue = ((Float) valueAnimator.getAnimatedValue()).floatValue();
-                MaterialShapeDrawable materialShapeDrawable = BottomSheetBehavior.this.materialShapeDrawable;
-                if (materialShapeDrawable != null) {
-                    materialShapeDrawable.setInterpolation(floatValue);
+                MaterialShapeDrawable materialShapeDrawable2 = BottomSheetBehavior.this.materialShapeDrawable;
+                if (materialShapeDrawable2 != null) {
+                    MaterialShapeDrawable.MaterialShapeDrawableState materialShapeDrawableState = materialShapeDrawable2.drawableState;
+                    if (materialShapeDrawableState.interpolation != floatValue) {
+                        materialShapeDrawableState.interpolation = floatValue;
+                        materialShapeDrawable2.pathDirty = true;
+                        materialShapeDrawable2.invalidateSelf();
+                    }
                 }
             }
         });
-        this.elevation = obtainStyledAttributes.getDimension(1, -1.0f);
+        this.elevation = obtainStyledAttributes.getDimension(2, -1.0f);
         if (obtainStyledAttributes.hasValue(0)) {
             this.maxWidth = obtainStyledAttributes.getDimensionPixelSize(0, -1);
         }
-        TypedValue peekValue = obtainStyledAttributes.peekValue(8);
+        if (obtainStyledAttributes.hasValue(1)) {
+            this.maxHeight = obtainStyledAttributes.getDimensionPixelSize(1, -1);
+        }
+        TypedValue peekValue = obtainStyledAttributes.peekValue(9);
         if (peekValue == null || (i = peekValue.data) != -1) {
-            setPeekHeight(obtainStyledAttributes.getDimensionPixelSize(8, -1));
+            setPeekHeight(obtainStyledAttributes.getDimensionPixelSize(9, -1));
         } else {
             setPeekHeight(i);
         }
-        boolean z = obtainStyledAttributes.getBoolean(7, false);
+        boolean z = obtainStyledAttributes.getBoolean(8, false);
         if (this.hideable != z) {
             this.hideable = z;
             if (!z && this.state == 5) {
                 setState(4);
             }
-            updateAccessibilityActions();
+            updateAccessibilityActions$1();
         }
-        this.gestureInsetBottomIgnored = obtainStyledAttributes.getBoolean(11, false);
-        boolean z2 = obtainStyledAttributes.getBoolean(5, true);
+        this.gestureInsetBottomIgnored = obtainStyledAttributes.getBoolean(12, false);
+        boolean z2 = obtainStyledAttributes.getBoolean(6, true);
         if (this.fitToContents != z2) {
             this.fitToContents = z2;
             if (this.viewRef != null) {
                 calculateCollapsedOffset();
             }
-            setStateInternal((!this.fitToContents || this.state != 6) ? this.state : 3);
-            updateAccessibilityActions();
+            setStateInternal((!this.fitToContents || this.state != 6) ? this.state : i2);
+            updateAccessibilityActions$1();
         }
-        this.skipCollapsed = obtainStyledAttributes.getBoolean(10, false);
-        this.draggable = obtainStyledAttributes.getBoolean(3, true);
-        this.saveFlags = obtainStyledAttributes.getInt(9, 0);
-        float f = obtainStyledAttributes.getFloat(6, 0.5f);
+        this.skipCollapsed = obtainStyledAttributes.getBoolean(11, false);
+        this.draggable = obtainStyledAttributes.getBoolean(4, true);
+        this.saveFlags = obtainStyledAttributes.getInt(10, 0);
+        float f = obtainStyledAttributes.getFloat(7, 0.5f);
         if (f <= HingeAngleProviderKt.FULLY_CLOSED_DEGREES || f >= 1.0f) {
             throw new IllegalArgumentException("ratio must be a float value between 0 and 1");
         }
@@ -1396,27 +1670,34 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
         if (this.viewRef != null) {
             this.halfExpandedOffset = (int) ((1.0f - f) * this.parentHeight);
         }
-        TypedValue peekValue2 = obtainStyledAttributes.peekValue(4);
+        TypedValue peekValue2 = obtainStyledAttributes.peekValue(5);
         if (peekValue2 == null || peekValue2.type != 16) {
-            int dimensionPixelOffset = obtainStyledAttributes.getDimensionPixelOffset(4, 0);
+            int dimensionPixelOffset = obtainStyledAttributes.getDimensionPixelOffset(5, 0);
             if (dimensionPixelOffset >= 0) {
                 this.expandedOffset = dimensionPixelOffset;
             } else {
                 throw new IllegalArgumentException("offset must be greater than or equal to 0");
             }
         } else {
-            int i2 = peekValue2.data;
-            if (i2 >= 0) {
-                this.expandedOffset = i2;
+            int i3 = peekValue2.data;
+            if (i3 >= 0) {
+                this.expandedOffset = i3;
             } else {
                 throw new IllegalArgumentException("offset must be greater than or equal to 0");
             }
         }
-        this.paddingBottomSystemWindowInsets = obtainStyledAttributes.getBoolean(12, false);
-        this.paddingLeftSystemWindowInsets = obtainStyledAttributes.getBoolean(13, false);
-        this.paddingRightSystemWindowInsets = obtainStyledAttributes.getBoolean(14, false);
-        this.paddingTopSystemWindowInsets = obtainStyledAttributes.getBoolean(15, true);
+        this.paddingBottomSystemWindowInsets = obtainStyledAttributes.getBoolean(16, false);
+        this.paddingLeftSystemWindowInsets = obtainStyledAttributes.getBoolean(17, false);
+        this.paddingRightSystemWindowInsets = obtainStyledAttributes.getBoolean(18, false);
+        this.paddingTopSystemWindowInsets = obtainStyledAttributes.getBoolean(19, true);
+        this.marginLeftSystemWindowInsets = obtainStyledAttributes.getBoolean(13, false);
+        this.marginRightSystemWindowInsets = obtainStyledAttributes.getBoolean(14, false);
+        this.marginTopSystemWindowInsets = obtainStyledAttributes.getBoolean(15, false);
         obtainStyledAttributes.recycle();
         this.maximumVelocity = ViewConfiguration.get(context).getScaledMaximumFlingVelocity();
+    }
+
+    public int getPeekHeightMin() {
+        return this.peekHeightMin;
     }
 }

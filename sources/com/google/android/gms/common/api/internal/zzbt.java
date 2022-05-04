@@ -1,8 +1,7 @@
 package com.google.android.gms.common.api.internal;
-
-import com.google.android.gms.common.internal.BaseGmsClient;
+/* compiled from: GoogleApiManager.java */
 /* loaded from: classes.dex */
-public final class zzbt implements BaseGmsClient.SignOutCallbacks {
+public final class zzbt {
     public final /* synthetic */ zzbp zza;
 
     public zzbt(zzbp zzbpVar) {

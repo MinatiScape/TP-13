@@ -6,14 +6,13 @@ import android.os.Parcelable;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.internal.zzbkw;
 import java.util.ArrayList;
+/* compiled from: GoogleSignInAccountCreator.java */
 /* loaded from: classes.dex */
 public final class zzb implements Parcelable.Creator<GoogleSignInAccount> {
     @Override // android.os.Parcelable.Creator
     public final /* synthetic */ GoogleSignInAccount createFromParcel(Parcel parcel) {
         int zza = zzbkw.zza(parcel);
         String str = null;
-        int i = 0;
-        long j = 0;
         String str2 = null;
         String str3 = null;
         String str4 = null;
@@ -23,6 +22,8 @@ public final class zzb implements Parcelable.Creator<GoogleSignInAccount> {
         ArrayList arrayList = null;
         String str7 = null;
         String str8 = null;
+        int i = 0;
+        long j = 0;
         while (parcel.dataPosition() < zza) {
             int readInt = parcel.readInt();
             switch (65535 & readInt) {

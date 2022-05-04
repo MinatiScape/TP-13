@@ -1,20 +1,20 @@
 package com.android.wallpaper.model;
 
-import android.app.Activity;
 import android.content.Context;
+import androidx.fragment.app.FragmentActivity;
 import com.android.wallpaper.asset.Asset;
 /* loaded from: classes.dex */
-public class PlaceholderCategory extends Category {
-    public PlaceholderCategory(String str, String str2, int i) {
-        super(str, str2, i);
-    }
-
+public final class PlaceholderCategory extends Category {
     @Override // com.android.wallpaper.model.Category
-    public Asset getThumbnail(Context context) {
+    public final Asset getThumbnail(Context context) {
         return null;
     }
 
     @Override // com.android.wallpaper.model.Category
-    public void show(Activity activity, PickerIntentFactory pickerIntentFactory, int i) {
+    public final void show(FragmentActivity fragmentActivity) {
+    }
+
+    public PlaceholderCategory(String str, String str2, int i) {
+        super(str, str2, i);
     }
 }

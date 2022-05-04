@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.android.gms.internal.zzbkw;
+/* compiled from: StatusCreator.java */
 /* loaded from: classes.dex */
 public final class zzf implements Parcelable.Creator<Status> {
     @Override // android.os.Parcelable.Creator

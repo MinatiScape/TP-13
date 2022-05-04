@@ -10,14 +10,14 @@ import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 /* loaded from: classes.dex */
 public abstract class ForwardingListener implements View.OnTouchListener, View.OnAttachStateChangeListener {
     public int mActivePointerId;
-    public Runnable mDisallowIntercept;
+    public DisallowIntercept mDisallowIntercept;
     public boolean mForwarding;
     public final int mLongPressTimeout;
     public final float mScaledTouchSlop;
     public final View mSrc;
     public final int mTapTimeout;
     public final int[] mTmpLocation = new int[2];
-    public Runnable mTriggerLongPress;
+    public TriggerLongPress mTriggerLongPress;
 
     /* loaded from: classes.dex */
     public class DisallowIntercept implements Runnable {
@@ -25,7 +25,7 @@ public abstract class ForwardingListener implements View.OnTouchListener, View.O
         }
 
         @Override // java.lang.Runnable
-        public void run() {
+        public final void run() {
             ViewParent parent = ForwardingListener.this.mSrc.getParent();
             if (parent != null) {
                 parent.requestDisallowInterceptTouchEvent(true);
@@ -39,7 +39,7 @@ public abstract class ForwardingListener implements View.OnTouchListener, View.O
         }
 
         @Override // java.lang.Runnable
-        public void run() {
+        public final void run() {
             ForwardingListener forwardingListener = ForwardingListener.this;
             forwardingListener.clearCallbacks();
             View view = forwardingListener.mSrc;
@@ -54,6 +54,52 @@ public abstract class ForwardingListener implements View.OnTouchListener, View.O
         }
     }
 
+    public abstract ShowableListMenu getPopup();
+
+    public abstract boolean onForwardingStarted();
+
+    @Override // android.view.View.OnAttachStateChangeListener
+    public final void onViewAttachedToWindow(View view) {
+    }
+
+    @Override // android.view.View.OnAttachStateChangeListener
+    public final void onViewDetachedFromWindow(View view) {
+        this.mForwarding = false;
+        this.mActivePointerId = -1;
+        DisallowIntercept disallowIntercept = this.mDisallowIntercept;
+        if (disallowIntercept != null) {
+            this.mSrc.removeCallbacks(disallowIntercept);
+        }
+    }
+
+    public final void clearCallbacks() {
+        TriggerLongPress triggerLongPress = this.mTriggerLongPress;
+        if (triggerLongPress != null) {
+            this.mSrc.removeCallbacks(triggerLongPress);
+        }
+        DisallowIntercept disallowIntercept = this.mDisallowIntercept;
+        if (disallowIntercept != null) {
+            this.mSrc.removeCallbacks(disallowIntercept);
+        }
+    }
+
+    /* JADX WARN: Code restructure failed: missing block: B:33:0x0084, code lost:
+        if (r4 != 3) goto L56;
+     */
+    /* JADX WARN: Removed duplicated region for block: B:63:0x0110  */
+    @Override // android.view.View.OnTouchListener
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+        To view partially-correct add '--show-bad-code' argument
+    */
+    public final boolean onTouch(android.view.View r12, android.view.MotionEvent r13) {
+        /*
+            Method dump skipped, instructions count: 302
+            To view this dump add '--comments-level debug' option
+        */
+        throw new UnsupportedOperationException("Method not decompiled: androidx.appcompat.widget.ForwardingListener.onTouch(android.view.View, android.view.MotionEvent):boolean");
+    }
+
     public ForwardingListener(View view) {
         this.mSrc = view;
         view.setLongClickable(true);
@@ -64,21 +110,6 @@ public abstract class ForwardingListener implements View.OnTouchListener, View.O
         this.mLongPressTimeout = (ViewConfiguration.getLongPressTimeout() + tapTimeout) / 2;
     }
 
-    public final void clearCallbacks() {
-        Runnable runnable = this.mTriggerLongPress;
-        if (runnable != null) {
-            this.mSrc.removeCallbacks(runnable);
-        }
-        Runnable runnable2 = this.mDisallowIntercept;
-        if (runnable2 != null) {
-            this.mSrc.removeCallbacks(runnable2);
-        }
-    }
-
-    public abstract ShowableListMenu getPopup();
-
-    public abstract boolean onForwardingStarted();
-
     public boolean onForwardingStopped() {
         ShowableListMenu popup = getPopup();
         if (popup == null || !popup.isShowing()) {
@@ -86,36 +117,5 @@ public abstract class ForwardingListener implements View.OnTouchListener, View.O
         }
         popup.dismiss();
         return true;
-    }
-
-    /* JADX WARN: Code restructure failed: missing block: B:34:0x0087, code lost:
-        if (r4 != 3) goto L28;
-     */
-    /* JADX WARN: Removed duplicated region for block: B:63:0x0113  */
-    @Override // android.view.View.OnTouchListener
-    /*
-        Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
-    */
-    public boolean onTouch(android.view.View r12, android.view.MotionEvent r13) {
-        /*
-            Method dump skipped, instructions count: 305
-            To view this dump add '--comments-level debug' option
-        */
-        throw new UnsupportedOperationException("Method not decompiled: androidx.appcompat.widget.ForwardingListener.onTouch(android.view.View, android.view.MotionEvent):boolean");
-    }
-
-    @Override // android.view.View.OnAttachStateChangeListener
-    public void onViewAttachedToWindow(View view) {
-    }
-
-    @Override // android.view.View.OnAttachStateChangeListener
-    public void onViewDetachedFromWindow(View view) {
-        this.mForwarding = false;
-        this.mActivePointerId = -1;
-        Runnable runnable = this.mDisallowIntercept;
-        if (runnable != null) {
-            this.mSrc.removeCallbacks(runnable);
-        }
     }
 }

@@ -8,39 +8,45 @@ public final class Throwables {
     public static final Object jla;
 
     static {
-        Object jla2 = getJLA();
-        jla = jla2;
-        if (jla2 != null) {
-            getJlaMethod("getStackTraceElement", Throwable.class, Integer.TYPE);
+        Object obj;
+        Method method;
+        Object obj2 = null;
+        try {
+            obj = Class.forName(SHARED_SECRETS_CLASSNAME, false, null).getMethod("getJavaLangAccess", new Class[0]).invoke(null, new Object[0]);
+        } catch (ThreadDeath e) {
+            throw e;
+        } catch (Throwable unused) {
+            obj = null;
         }
-        if (jla2 != null) {
+        jla = obj;
+        if (obj != null) {
             try {
-                Method jlaMethod = getJlaMethod("getStackTraceDepth", Throwable.class);
-                if (jlaMethod != null) {
-                    jlaMethod.invoke(getJLA(), new Throwable());
-                }
-            } catch (IllegalAccessException | UnsupportedOperationException | InvocationTargetException unused) {
+                Class.forName("sun.misc.JavaLangAccess", false, null).getMethod("getStackTraceElement", Throwable.class, Integer.TYPE);
+            } catch (ThreadDeath e2) {
+                throw e2;
+            } catch (Throwable unused2) {
             }
         }
-    }
-
-    public static Object getJLA() {
-        try {
-            return Class.forName(SHARED_SECRETS_CLASSNAME, false, null).getMethod("getJavaLangAccess", new Class[0]).invoke(null, new Object[0]);
-        } catch (ThreadDeath e) {
-            throw e;
-        } catch (Throwable unused) {
-            return null;
-        }
-    }
-
-    public static Method getJlaMethod(String name, Class<?>... parameterTypes) throws ThreadDeath {
-        try {
-            return Class.forName("sun.misc.JavaLangAccess", false, null).getMethod(name, parameterTypes);
-        } catch (ThreadDeath e) {
-            throw e;
-        } catch (Throwable unused) {
-            return null;
+        if (obj != null) {
+            try {
+                try {
+                    method = Class.forName("sun.misc.JavaLangAccess", false, null).getMethod("getStackTraceDepth", Throwable.class);
+                } catch (ThreadDeath e3) {
+                    throw e3;
+                } catch (Throwable unused3) {
+                    method = null;
+                }
+                if (method != null) {
+                    try {
+                        obj2 = Class.forName(SHARED_SECRETS_CLASSNAME, false, null).getMethod("getJavaLangAccess", new Class[0]).invoke(null, new Object[0]);
+                    } catch (ThreadDeath e4) {
+                        throw e4;
+                    } catch (Throwable unused4) {
+                    }
+                    method.invoke(obj2, new Throwable());
+                }
+            } catch (IllegalAccessException | UnsupportedOperationException | InvocationTargetException unused5) {
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.android.gms.internal.zzbkw;
+/* compiled from: ConnectionResultCreator.java */
 /* loaded from: classes.dex */
 public final class zzb implements Parcelable.Creator<ConnectionResult> {
     @Override // android.os.Parcelable.Creator

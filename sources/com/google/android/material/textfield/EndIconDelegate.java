@@ -5,14 +5,9 @@ import com.google.android.material.internal.CheckableImageButton;
 /* loaded from: classes.dex */
 public abstract class EndIconDelegate {
     public Context context;
+    public final int customEndIcon;
     public CheckableImageButton endIconView;
     public TextInputLayout textInputLayout;
-
-    public EndIconDelegate(TextInputLayout textInputLayout) {
-        this.textInputLayout = textInputLayout;
-        this.context = textInputLayout.getContext();
-        this.endIconView = textInputLayout.endIconView;
-    }
 
     public abstract void initialize();
 
@@ -21,5 +16,12 @@ public abstract class EndIconDelegate {
     }
 
     public void onSuffixVisibilityChanged(boolean z) {
+    }
+
+    public EndIconDelegate(TextInputLayout textInputLayout, int i) {
+        this.textInputLayout = textInputLayout;
+        this.context = textInputLayout.getContext();
+        this.endIconView = textInputLayout.endIconView;
+        this.customEndIcon = i;
     }
 }

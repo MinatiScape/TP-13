@@ -1,8 +1,11 @@
 package com.google.android.gms.common.api.internal;
+/* compiled from: ListenerHolder.java */
 /* loaded from: classes.dex */
 public final class zzcl<L> {
-    public final L zza;
-    public final String zzb;
+    public final int hashCode() {
+        System.identityHashCode(null);
+        throw null;
+    }
 
     public final boolean equals(Object obj) {
         if (this == obj) {
@@ -11,11 +14,7 @@ public final class zzcl<L> {
         if (!(obj instanceof zzcl)) {
             return false;
         }
-        zzcl zzclVar = (zzcl) obj;
-        return this.zza == zzclVar.zza && this.zzb.equals(zzclVar.zzb);
-    }
-
-    public final int hashCode() {
-        return this.zzb.hashCode() + (System.identityHashCode(this.zza) * 31);
+        ((zzcl) obj).getClass();
+        throw null;
     }
 }

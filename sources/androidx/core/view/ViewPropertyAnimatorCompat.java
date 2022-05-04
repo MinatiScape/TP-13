@@ -2,65 +2,53 @@ package androidx.core.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.ValueAnimator;
 import android.view.View;
-import androidx.appcompat.app.WindowDecorActionBar;
 import java.lang.ref.WeakReference;
 /* loaded from: classes.dex */
 public final class ViewPropertyAnimatorCompat {
     public WeakReference<View> mView;
 
-    public ViewPropertyAnimatorCompat(View view) {
-        this.mView = new WeakReference<>(view);
-    }
-
-    public ViewPropertyAnimatorCompat alpha(float value) {
+    public final void alpha(float f) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().alpha(value);
+            view.animate().alpha(f);
         }
-        return this;
     }
 
-    public void cancel() {
+    public final void cancel() {
         View view = this.mView.get();
         if (view != null) {
             view.animate().cancel();
         }
     }
 
-    public ViewPropertyAnimatorCompat setDuration(long value) {
+    public final void setDuration(long j) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().setDuration(value);
+            view.animate().setDuration(j);
         }
-        return this;
     }
 
-    public ViewPropertyAnimatorCompat setListener(final ViewPropertyAnimatorListener listener) {
-        View view = this.mView.get();
-        if (view != null) {
-            setListenerInternal(view, listener);
+    public final void setListener(final ViewPropertyAnimatorListener viewPropertyAnimatorListener) {
+        final View view = this.mView.get();
+        if (view == null) {
+            return;
         }
-        return this;
-    }
-
-    public final void setListenerInternal(final View view, final ViewPropertyAnimatorListener listener) {
-        if (listener != null) {
-            view.animate().setListener(new AnimatorListenerAdapter(this) { // from class: androidx.core.view.ViewPropertyAnimatorCompat.1
+        if (viewPropertyAnimatorListener != null) {
+            view.animate().setListener(new AnimatorListenerAdapter() { // from class: androidx.core.view.ViewPropertyAnimatorCompat.1
                 @Override // android.animation.AnimatorListenerAdapter, android.animation.Animator.AnimatorListener
-                public void onAnimationCancel(Animator animation) {
-                    listener.onAnimationCancel(view);
+                public final void onAnimationCancel(Animator animator) {
+                    ViewPropertyAnimatorListener.this.onAnimationCancel(view);
                 }
 
                 @Override // android.animation.AnimatorListenerAdapter, android.animation.Animator.AnimatorListener
-                public void onAnimationEnd(Animator animation) {
-                    listener.onAnimationEnd(view);
+                public final void onAnimationEnd(Animator animator) {
+                    ViewPropertyAnimatorListener.this.onAnimationEnd();
                 }
 
                 @Override // android.animation.AnimatorListenerAdapter, android.animation.Animator.AnimatorListener
-                public void onAnimationStart(Animator animation) {
-                    listener.onAnimationStart(view);
+                public final void onAnimationStart(Animator animator) {
+                    ViewPropertyAnimatorListener.this.onAnimationStart();
                 }
             });
         } else {
@@ -68,30 +56,14 @@ public final class ViewPropertyAnimatorCompat {
         }
     }
 
-    public ViewPropertyAnimatorCompat setUpdateListener(final ViewPropertyAnimatorUpdateListener listener) {
+    public final void translationY(float f) {
         View view = this.mView.get();
         if (view != null) {
-            ValueAnimator.AnimatorUpdateListener animatorUpdateListener = null;
-            if (listener != null) {
-                animatorUpdateListener = new ValueAnimator.AnimatorUpdateListener(this, listener, view) { // from class: androidx.core.view.ViewPropertyAnimatorCompat.2
-                    public final /* synthetic */ ViewPropertyAnimatorUpdateListener val$listener;
-
-                    @Override // android.animation.ValueAnimator.AnimatorUpdateListener
-                    public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                        ((View) WindowDecorActionBar.this.mContainerView.getParent()).invalidate();
-                    }
-                };
-            }
-            view.animate().setUpdateListener(animatorUpdateListener);
+            view.animate().translationY(f);
         }
-        return this;
     }
 
-    public ViewPropertyAnimatorCompat translationY(float value) {
-        View view = this.mView.get();
-        if (view != null) {
-            view.animate().translationY(value);
-        }
-        return this;
+    public ViewPropertyAnimatorCompat(View view) {
+        this.mView = new WeakReference<>(view);
     }
 }

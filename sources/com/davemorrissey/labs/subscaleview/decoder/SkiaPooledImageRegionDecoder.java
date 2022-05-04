@@ -15,25 +15,23 @@ import android.support.annotation.Keep;
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 import android.text.TextUtils;
 import android.util.Log;
+import androidx.exifinterface.media.ExifInterface$$ExternalSyntheticOutline0;
 import androidx.recyclerview.widget.RecyclerView;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import java.io.File;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 /* loaded from: classes.dex */
 public class SkiaPooledImageRegionDecoder implements ImageRegionDecoder {
     public static boolean debug = false;
     public Context context;
     public Uri uri;
-    public DecoderPool decoderPool = new DecoderPool(null);
-    public final ReadWriteLock decoderLock = new ReentrantReadWriteLock(true);
+    public DecoderPool decoderPool = new DecoderPool();
+    public final ReentrantReadWriteLock decoderLock = new ReentrantReadWriteLock(true);
     public long fileLength = RecyclerView.FOREVER_NS;
     public final Point imageDimensions = new Point(0, 0);
     public final AtomicBoolean lazyInited = new AtomicBoolean(false);
@@ -42,10 +40,7 @@ public class SkiaPooledImageRegionDecoder implements ImageRegionDecoder {
     /* loaded from: classes.dex */
     public static class DecoderPool {
         public final Semaphore available = new Semaphore(0, true);
-        public final Map<BitmapRegionDecoder, Boolean> decoders = new ConcurrentHashMap();
-
-        public DecoderPool(AnonymousClass1 r3) {
-        }
+        public final ConcurrentHashMap decoders = new ConcurrentHashMap();
 
         /* JADX WARN: Code restructure failed: missing block: B:10:0x002a, code lost:
             r1.setValue(java.lang.Boolean.FALSE);
@@ -54,16 +49,17 @@ public class SkiaPooledImageRegionDecoder implements ImageRegionDecoder {
             r2 = true;
          */
         /* JADX WARN: Code restructure failed: missing block: B:9:0x0028, code lost:
-            if (r1.getValue().booleanValue() == false) goto L13;
+            if (((java.lang.Boolean) r1.getValue()).booleanValue() == false) goto L13;
          */
+        /* renamed from: -$$Nest$mrelease  reason: not valid java name */
         /*
             Code decompiled incorrectly, please refer to instructions dump.
             To view partially-correct add '--show-bad-code' argument
         */
-        public static void access$800(com.davemorrissey.labs.subscaleview.decoder.SkiaPooledImageRegionDecoder.DecoderPool r4, android.graphics.BitmapRegionDecoder r5) {
+        public static void m34$$Nest$mrelease(com.davemorrissey.labs.subscaleview.decoder.SkiaPooledImageRegionDecoder.DecoderPool r4, android.graphics.BitmapRegionDecoder r5) {
             /*
                 monitor-enter(r4)
-                java.util.Map<android.graphics.BitmapRegionDecoder, java.lang.Boolean> r0 = r4.decoders     // Catch: java.lang.Throwable -> L3d
+                java.util.concurrent.ConcurrentHashMap r0 = r4.decoders     // Catch: java.lang.Throwable -> L3d
                 java.util.Set r0 = r0.entrySet()     // Catch: java.lang.Throwable -> L3d
                 java.util.Iterator r0 = r0.iterator()     // Catch: java.lang.Throwable -> L3d
             Lb:
@@ -99,12 +95,12 @@ public class SkiaPooledImageRegionDecoder implements ImageRegionDecoder {
                 monitor-exit(r4)
                 throw r5
             */
-            throw new UnsupportedOperationException("Method not decompiled: com.davemorrissey.labs.subscaleview.decoder.SkiaPooledImageRegionDecoder.DecoderPool.access$800(com.davemorrissey.labs.subscaleview.decoder.SkiaPooledImageRegionDecoder$DecoderPool, android.graphics.BitmapRegionDecoder):void");
+            throw new UnsupportedOperationException("Method not decompiled: com.davemorrissey.labs.subscaleview.decoder.SkiaPooledImageRegionDecoder.DecoderPool.m34$$Nest$mrelease(com.davemorrissey.labs.subscaleview.decoder.SkiaPooledImageRegionDecoder$DecoderPool, android.graphics.BitmapRegionDecoder):void");
         }
 
         /* JADX WARN: Code restructure failed: missing block: B:9:0x0028, code lost:
             r1.setValue(java.lang.Boolean.TRUE);
-            r0 = r1.getKey();
+            r0 = (android.graphics.BitmapRegionDecoder) r1.getKey();
          */
         /*
             Code decompiled incorrectly, please refer to instructions dump.
@@ -116,7 +112,7 @@ public class SkiaPooledImageRegionDecoder implements ImageRegionDecoder {
                 java.util.concurrent.Semaphore r0 = r3.available
                 r0.acquireUninterruptibly()
                 monitor-enter(r3)
-                java.util.Map<android.graphics.BitmapRegionDecoder, java.lang.Boolean> r0 = r3.decoders     // Catch: java.lang.Throwable -> L38
+                java.util.concurrent.ConcurrentHashMap r0 = r3.decoders     // Catch: java.lang.Throwable -> L38
                 java.util.Set r0 = r0.entrySet()     // Catch: java.lang.Throwable -> L38
                 java.util.Iterator r0 = r0.iterator()     // Catch: java.lang.Throwable -> L38
             L10:
@@ -148,32 +144,57 @@ public class SkiaPooledImageRegionDecoder implements ImageRegionDecoder {
         }
     }
 
-    @Keep
-    public SkiaPooledImageRegionDecoder() {
-        List<Integer> list = SubsamplingScaleImageView.VALID_ORIENTATIONS;
+    @Override // com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder
+    public final synchronized boolean isReady() {
+        boolean z;
+        boolean isEmpty;
+        DecoderPool decoderPool = this.decoderPool;
+        if (decoderPool != null) {
+            synchronized (decoderPool) {
+                isEmpty = decoderPool.decoders.isEmpty();
+            }
+            if (!isEmpty) {
+                z = true;
+            }
+        }
+        z = false;
+        return z;
     }
 
-    @Keep
-    public static void setDebug(boolean z) {
-        debug = z;
+    @Override // com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder
+    public final synchronized void recycle() {
+        this.decoderLock.writeLock().lock();
+        DecoderPool decoderPool = this.decoderPool;
+        if (decoderPool != null) {
+            synchronized (decoderPool) {
+                while (!decoderPool.decoders.isEmpty()) {
+                    BitmapRegionDecoder acquire = decoderPool.acquire();
+                    acquire.recycle();
+                    decoderPool.decoders.remove(acquire);
+                }
+            }
+            this.decoderPool = null;
+            this.context = null;
+            this.uri = null;
+        }
+        this.decoderLock.writeLock().unlock();
     }
 
-    public final void debug(String str) {
+    public static void debug(String str) {
         if (debug) {
             Log.d("SkiaPooledImageRegionDecoder", str);
         }
     }
 
     @Override // com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder
-    public Bitmap decodeRegion(Rect rect, int i) {
+    public final Bitmap decodeRegion(Rect rect, int i) {
         debug("Decode region " + rect + " on thread " + Thread.currentThread().getName());
         if ((rect.width() < this.imageDimensions.x || rect.height() < this.imageDimensions.y) && this.lazyInited.compareAndSet(false, true) && this.fileLength < RecyclerView.FOREVER_NS) {
             debug("Starting lazy init of additional decoders");
             new Thread() { // from class: com.davemorrissey.labs.subscaleview.decoder.SkiaPooledImageRegionDecoder.1
                 @Override // java.lang.Thread, java.lang.Runnable
-                public void run() {
+                public final void run() {
                     int size;
-                    long j;
                     boolean z;
                     while (true) {
                         SkiaPooledImageRegionDecoder skiaPooledImageRegionDecoder = SkiaPooledImageRegionDecoder.this;
@@ -182,19 +203,19 @@ public class SkiaPooledImageRegionDecoder implements ImageRegionDecoder {
                             synchronized (decoderPool) {
                                 size = decoderPool.decoders.size();
                             }
-                            long j2 = SkiaPooledImageRegionDecoder.this.fileLength;
-                            Objects.requireNonNull(skiaPooledImageRegionDecoder);
+                            long j = SkiaPooledImageRegionDecoder.this.fileLength;
                             boolean z2 = false;
                             if (size >= 4) {
-                                skiaPooledImageRegionDecoder.debug("No additional decoders allowed, reached hard limit (4)");
+                                SkiaPooledImageRegionDecoder.debug("No additional decoders allowed, reached hard limit (4)");
                             } else {
-                                if (size * j2 > 20971520) {
-                                    skiaPooledImageRegionDecoder.debug("No additional encoders allowed, reached hard memory limit (20Mb)");
+                                long j2 = size * j;
+                                if (j2 > 20971520) {
+                                    SkiaPooledImageRegionDecoder.debug("No additional encoders allowed, reached hard memory limit (20Mb)");
                                 } else if (size >= Runtime.getRuntime().availableProcessors()) {
                                     StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("No additional encoders allowed, limited by CPU cores (");
                                     m.append(Runtime.getRuntime().availableProcessors());
                                     m.append(")");
-                                    skiaPooledImageRegionDecoder.debug(m.toString());
+                                    SkiaPooledImageRegionDecoder.debug(m.toString());
                                 } else {
                                     ActivityManager activityManager = (ActivityManager) skiaPooledImageRegionDecoder.context.getSystemService("activity");
                                     if (activityManager != null) {
@@ -205,9 +226,12 @@ public class SkiaPooledImageRegionDecoder implements ImageRegionDecoder {
                                         z = true;
                                     }
                                     if (z) {
-                                        skiaPooledImageRegionDecoder.debug("No additional encoders allowed, memory is low");
+                                        SkiaPooledImageRegionDecoder.debug("No additional encoders allowed, memory is low");
                                     } else {
-                                        skiaPooledImageRegionDecoder.debug("Additional decoder allowed, current count is " + size + ", estimated native memory " + (j / 1048576) + "Mb");
+                                        StringBuilder m2 = ExifInterface$$ExternalSyntheticOutline0.m("Additional decoder allowed, current count is ", size, ", estimated native memory ");
+                                        m2.append(j2 / 1048576);
+                                        m2.append("Mb");
+                                        SkiaPooledImageRegionDecoder.debug(m2.toString());
                                         z2 = true;
                                     }
                                 }
@@ -216,16 +240,20 @@ public class SkiaPooledImageRegionDecoder implements ImageRegionDecoder {
                                 try {
                                     if (SkiaPooledImageRegionDecoder.this.decoderPool != null) {
                                         long currentTimeMillis = System.currentTimeMillis();
-                                        SkiaPooledImageRegionDecoder.this.debug("Starting decoder");
+                                        SkiaPooledImageRegionDecoder.this.getClass();
+                                        SkiaPooledImageRegionDecoder.debug("Starting decoder");
                                         SkiaPooledImageRegionDecoder.this.initialiseDecoder();
                                         long currentTimeMillis2 = System.currentTimeMillis();
-                                        SkiaPooledImageRegionDecoder.this.debug("Started decoder, took " + (currentTimeMillis2 - currentTimeMillis) + "ms");
+                                        SkiaPooledImageRegionDecoder.this.getClass();
+                                        SkiaPooledImageRegionDecoder.debug("Started decoder, took " + (currentTimeMillis2 - currentTimeMillis) + "ms");
                                     }
                                 } catch (Exception e) {
                                     SkiaPooledImageRegionDecoder skiaPooledImageRegionDecoder2 = SkiaPooledImageRegionDecoder.this;
-                                    StringBuilder m2 = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Failed to start decoder: ");
-                                    m2.append(e.getMessage());
-                                    skiaPooledImageRegionDecoder2.debug(m2.toString());
+                                    StringBuilder m3 = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Failed to start decoder: ");
+                                    m3.append(e.getMessage());
+                                    String sb = m3.toString();
+                                    skiaPooledImageRegionDecoder2.getClass();
+                                    SkiaPooledImageRegionDecoder.debug(sb);
                                 }
                             } else {
                                 return;
@@ -248,12 +276,12 @@ public class SkiaPooledImageRegionDecoder implements ImageRegionDecoder {
                     options.inPreferredConfig = this.bitmapConfig;
                     Bitmap decodeRegion = acquire.decodeRegion(rect, options);
                     if (decodeRegion != null) {
-                        DecoderPool.access$800(this.decoderPool, acquire);
+                        DecoderPool.m34$$Nest$mrelease(this.decoderPool, acquire);
                         return decodeRegion;
                     }
                     throw new RuntimeException("Skia image decoder returned null bitmap - image format may not be supported");
                 } else if (acquire != null) {
-                    DecoderPool.access$800(this.decoderPool, acquire);
+                    DecoderPool.m34$$Nest$mrelease(this.decoderPool, acquire);
                 }
             }
             throw new IllegalStateException("Cannot decode region after decoder has been recycled");
@@ -263,7 +291,7 @@ public class SkiaPooledImageRegionDecoder implements ImageRegionDecoder {
     }
 
     @Override // com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder
-    public Point init(Context context, Uri uri) throws Exception {
+    public final Point init(Context context, Uri uri) throws Exception {
         this.context = context;
         this.uri = uri;
         initialiseDecoder();
@@ -310,7 +338,7 @@ public class SkiaPooledImageRegionDecoder implements ImageRegionDecoder {
             }
             bitmapRegionDecoder = BitmapRegionDecoder.newInstance(this.context.getAssets().open(substring, 1), false);
         } else if (uri.startsWith("file://")) {
-            bitmapRegionDecoder = BitmapRegionDecoder.newInstance(uri.substring(7), false);
+            BitmapRegionDecoder newInstance = BitmapRegionDecoder.newInstance(uri.substring(7), false);
             try {
                 File file = new File(uri);
                 if (file.exists()) {
@@ -318,12 +346,13 @@ public class SkiaPooledImageRegionDecoder implements ImageRegionDecoder {
                 }
             } catch (Exception unused4) {
             }
+            bitmapRegionDecoder = newInstance;
         } else {
             InputStream inputStream = null;
             try {
                 ContentResolver contentResolver = this.context.getContentResolver();
                 inputStream = contentResolver.openInputStream(this.uri);
-                BitmapRegionDecoder newInstance = BitmapRegionDecoder.newInstance(inputStream, false);
+                BitmapRegionDecoder newInstance2 = BitmapRegionDecoder.newInstance(inputStream, false);
                 try {
                     AssetFileDescriptor openAssetFileDescriptor = contentResolver.openAssetFileDescriptor(this.uri, "r");
                     if (openAssetFileDescriptor != null) {
@@ -331,7 +360,7 @@ public class SkiaPooledImageRegionDecoder implements ImageRegionDecoder {
                     }
                 } catch (Exception unused5) {
                 }
-                bitmapRegionDecoder = newInstance;
+                bitmapRegionDecoder = newInstance2;
             } finally {
                 if (inputStream != null) {
                     try {
@@ -357,39 +386,13 @@ public class SkiaPooledImageRegionDecoder implements ImageRegionDecoder {
         }
     }
 
-    @Override // com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder
-    public synchronized boolean isReady() {
-        boolean z;
-        boolean isEmpty;
-        DecoderPool decoderPool = this.decoderPool;
-        if (decoderPool != null) {
-            synchronized (decoderPool) {
-                isEmpty = decoderPool.decoders.isEmpty();
-            }
-            if (!isEmpty) {
-                z = true;
-            }
-        }
-        z = false;
-        return z;
+    @Keep
+    public SkiaPooledImageRegionDecoder() {
+        List<Integer> list = SubsamplingScaleImageView.VALID_ORIENTATIONS;
     }
 
-    @Override // com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder
-    public synchronized void recycle() {
-        this.decoderLock.writeLock().lock();
-        DecoderPool decoderPool = this.decoderPool;
-        if (decoderPool != null) {
-            synchronized (decoderPool) {
-                while (!decoderPool.decoders.isEmpty()) {
-                    BitmapRegionDecoder acquire = decoderPool.acquire();
-                    acquire.recycle();
-                    decoderPool.decoders.remove(acquire);
-                }
-            }
-            this.decoderPool = null;
-            this.context = null;
-            this.uri = null;
-        }
-        this.decoderLock.writeLock().unlock();
+    @Keep
+    public static void setDebug(boolean z) {
+        debug = z;
     }
 }

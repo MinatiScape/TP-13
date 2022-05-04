@@ -12,6 +12,10 @@ public final class IntMath {
     public static final int[] halfPowersOf10 = {3, 31, 316, 3162, 31622, 316227, 3162277, 31622776, 316227766, Integer.MAX_VALUE};
     public static int[] biggestBinomials = {Integer.MAX_VALUE, Integer.MAX_VALUE, QuickStepContract.SYSUI_STATE_ONE_HANDED_ACTIVE, 2345, 477, 193, 110, 75, 58, 49, 43, 39, 37, 35, 34, 34, 33};
 
+    public static int lessThanBranchFree(int x, int y) {
+        return (~(~(x - y))) >>> 31;
+    }
+
     /* renamed from: com.google.common.math.IntMath$1  reason: invalid class name */
     /* loaded from: classes.dex */
     public static /* synthetic */ class AnonymousClass1 {
@@ -56,8 +60,51 @@ public final class IntMath {
     }
 
     /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
+    public static int log2(int x, RoundingMode mode) {
+        boolean z;
+        if (x > 0) {
+            boolean z2 = true;
+            switch (AnonymousClass1.$SwitchMap$java$math$RoundingMode[mode.ordinal()]) {
+                case 1:
+                    if (x > 0) {
+                        z = true;
+                    } else {
+                        z = false;
+                    }
+                    if (((x - 1) & x) != 0) {
+                        z2 = false;
+                    }
+                    if (!z || !z2) {
+                        throw new ArithmeticException("mode was UNNECESSARY, but rounding was necessary");
+                    }
+                    break;
+                case 2:
+                case 3:
+                    break;
+                case 4:
+                case 5:
+                    return 32 - Integer.numberOfLeadingZeros(x - 1);
+                case 6:
+                case 7:
+                case 8:
+                    int numberOfLeadingZeros = Integer.numberOfLeadingZeros(x);
+                    return lessThanBranchFree(MAX_POWER_OF_SQRT2_UNSIGNED >>> numberOfLeadingZeros, x) + (31 - numberOfLeadingZeros);
+                default:
+                    throw new AssertionError();
+            }
+            return 31 - Integer.numberOfLeadingZeros(x);
+        }
+        StringBuilder sb = new StringBuilder(27);
+        sb.append("x");
+        sb.append(" (");
+        sb.append(x);
+        sb.append(") must be > 0");
+        throw new IllegalArgumentException(sb.toString());
+    }
+
+    /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
     /* JADX WARN: Code restructure failed: missing block: B:24:0x0044, code lost:
-        if (((r7 == java.math.RoundingMode.HALF_EVEN) & ((r0 & 1) != 0)) != false) goto L32;
+        if ((r6 & r7) != false) goto L32;
      */
     /* JADX WARN: Code restructure failed: missing block: B:25:0x0047, code lost:
         if (r1 > 0) goto L32;
@@ -74,7 +121,7 @@ public final class IntMath {
     */
     public static int divide(int r5, int r6, java.math.RoundingMode r7) {
         /*
-            java.util.Objects.requireNonNull(r7)
+            r7.getClass()
             if (r6 == 0) goto L63
             int r0 = r5 / r6
             int r1 = r6 * r0
@@ -165,47 +212,5 @@ public final class IntMath {
             throw r5
         */
         throw new UnsupportedOperationException("Method not decompiled: com.google.common.math.IntMath.divide(int, int, java.math.RoundingMode):int");
-    }
-
-    public static int lessThanBranchFree(int x, int y) {
-        return (~(~(x - y))) >>> 31;
-    }
-
-    /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
-    public static int log2(int x, RoundingMode mode) {
-        if (x > 0) {
-            boolean z = true;
-            switch (AnonymousClass1.$SwitchMap$java$math$RoundingMode[mode.ordinal()]) {
-                case 1:
-                    boolean z2 = x > 0;
-                    if (((x - 1) & x) != 0) {
-                        z = false;
-                    }
-                    if (!z2 || !z) {
-                        throw new ArithmeticException("mode was UNNECESSARY, but rounding was necessary");
-                    }
-                    break;
-                case 2:
-                case 3:
-                    break;
-                case 4:
-                case 5:
-                    return 32 - Integer.numberOfLeadingZeros(x - 1);
-                case 6:
-                case 7:
-                case 8:
-                    int numberOfLeadingZeros = Integer.numberOfLeadingZeros(x);
-                    return lessThanBranchFree(MAX_POWER_OF_SQRT2_UNSIGNED >>> numberOfLeadingZeros, x) + (31 - numberOfLeadingZeros);
-                default:
-                    throw new AssertionError();
-            }
-            return 31 - Integer.numberOfLeadingZeros(x);
-        }
-        StringBuilder sb = new StringBuilder(27);
-        sb.append("x");
-        sb.append(" (");
-        sb.append(x);
-        sb.append(") must be > 0");
-        throw new IllegalArgumentException(sb.toString());
     }
 }

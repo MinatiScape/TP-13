@@ -10,18 +10,8 @@ public class Task implements ReflectedParcelable {
     public final boolean zzc;
     public final boolean zzd;
 
-    @Deprecated
-    public Task(Parcel parcel) {
-        Log.e(com.android.systemui.shared.recents.model.Task.TAG, "Constructing a Task object using a parcel.");
-        this.zza = parcel.readString();
-        this.zzb = parcel.readString();
-        boolean z = false;
-        this.zzc = parcel.readInt() == 1;
-        this.zzd = parcel.readInt() == 1 ? true : z;
-    }
-
     @Override // android.os.Parcelable
-    public int describeContents() {
+    public final int describeContents() {
         return 0;
     }
 
@@ -31,5 +21,21 @@ public class Task implements ReflectedParcelable {
         parcel.writeString(this.zzb);
         parcel.writeInt(this.zzc ? 1 : 0);
         parcel.writeInt(this.zzd ? 1 : 0);
+    }
+
+    @Deprecated
+    public Task(Parcel parcel) {
+        boolean z;
+        Log.e(com.android.systemui.shared.recents.model.Task.TAG, "Constructing a Task object using a parcel.");
+        this.zza = parcel.readString();
+        this.zzb = parcel.readString();
+        boolean z2 = false;
+        if (parcel.readInt() == 1) {
+            z = true;
+        } else {
+            z = false;
+        }
+        this.zzc = z;
+        this.zzd = parcel.readInt() == 1 ? true : z2;
     }
 }

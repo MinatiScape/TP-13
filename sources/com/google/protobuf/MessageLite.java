@@ -1,5 +1,6 @@
 package com.google.protobuf;
 
+import com.google.protobuf.GeneratedMessageLite;
 import java.io.IOException;
 /* loaded from: classes.dex */
 public interface MessageLite extends MessageLiteOrBuilder {
@@ -10,9 +11,9 @@ public interface MessageLite extends MessageLiteOrBuilder {
 
     int getSerializedSize();
 
-    Builder newBuilderForType();
+    GeneratedMessageLite.Builder newBuilderForType$1();
 
-    Builder toBuilder();
+    GeneratedMessageLite.Builder toBuilder$1();
 
     byte[] toByteArray();
 

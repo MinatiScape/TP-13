@@ -8,12 +8,12 @@ import android.util.SparseArray;
 import android.util.Xml;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import androidx.slice.compat.SliceProviderCompat$2;
 import java.io.IOException;
 import java.util.ArrayList;
-import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 /* loaded from: classes.dex */
-public class ConstraintLayoutStates {
+public final class ConstraintLayoutStates {
     public SparseArray<State> mStateList = new SparseArray<>();
     public SparseArray<ConstraintSet> mConstraintSetMap = new SparseArray<>();
 
@@ -23,9 +23,9 @@ public class ConstraintLayoutStates {
         public int mId;
         public ArrayList<Variant> mVariants = new ArrayList<>();
 
-        public State(Context context, XmlPullParser xmlPullParser) {
+        public State(Context context, XmlResourceParser xmlResourceParser) {
             this.mConstraintID = -1;
-            TypedArray obtainStyledAttributes = context.obtainStyledAttributes(Xml.asAttributeSet(xmlPullParser), R$styleable.State);
+            TypedArray obtainStyledAttributes = context.obtainStyledAttributes(Xml.asAttributeSet(xmlResourceParser), SliceProviderCompat$2.State);
             int indexCount = obtainStyledAttributes.getIndexCount();
             for (int i = 0; i < indexCount; i++) {
                 int index = obtainStyledAttributes.getIndex(i);
@@ -52,13 +52,13 @@ public class ConstraintLayoutStates {
         public float mMinHeight;
         public float mMinWidth;
 
-        public Variant(Context context, XmlPullParser xmlPullParser) {
+        public Variant(Context context, XmlResourceParser xmlResourceParser) {
             this.mMinWidth = Float.NaN;
             this.mMinHeight = Float.NaN;
             this.mMaxWidth = Float.NaN;
             this.mMaxHeight = Float.NaN;
             this.mConstraintID = -1;
-            TypedArray obtainStyledAttributes = context.obtainStyledAttributes(Xml.asAttributeSet(xmlPullParser), R$styleable.Variant);
+            TypedArray obtainStyledAttributes = context.obtainStyledAttributes(Xml.asAttributeSet(xmlResourceParser), SliceProviderCompat$2.Variant);
             int indexCount = obtainStyledAttributes.getIndexCount();
             for (int i = 0; i < indexCount; i++) {
                 int index = obtainStyledAttributes.getIndex(i);
@@ -85,7 +85,22 @@ public class ConstraintLayoutStates {
         }
     }
 
-    public ConstraintLayoutStates(Context context, ConstraintLayout constraintLayout, int i) {
+    /* JADX WARN: Code restructure failed: missing block: B:111:0x01ce, code lost:
+        continue;
+     */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+        To view partially-correct add '--show-bad-code' argument
+    */
+    public final void parseConstraintSet(android.content.Context r13, android.content.res.XmlResourceParser r14) {
+        /*
+            Method dump skipped, instructions count: 542
+            To view this dump add '--comments-level debug' option
+        */
+        throw new UnsupportedOperationException("Method not decompiled: androidx.constraintlayout.widget.ConstraintLayoutStates.parseConstraintSet(android.content.Context, android.content.res.XmlResourceParser):void");
+    }
+
+    public ConstraintLayoutStates(Context context, int i) {
         XmlResourceParser xml = context.getResources().getXml(i);
         try {
             State state = null;
@@ -150,20 +165,5 @@ public class ConstraintLayoutStates {
         } catch (XmlPullParserException e2) {
             e2.printStackTrace();
         }
-    }
-
-    /* JADX WARN: Code restructure failed: missing block: B:111:0x01d0, code lost:
-        continue;
-     */
-    /*
-        Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
-    */
-    public final void parseConstraintSet(android.content.Context r13, org.xmlpull.v1.XmlPullParser r14) {
-        /*
-            Method dump skipped, instructions count: 544
-            To view this dump add '--comments-level debug' option
-        */
-        throw new UnsupportedOperationException("Method not decompiled: androidx.constraintlayout.widget.ConstraintLayoutStates.parseConstraintSet(android.content.Context, org.xmlpull.v1.XmlPullParser):void");
     }
 }

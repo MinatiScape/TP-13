@@ -28,10 +28,9 @@ import com.android.systemui.shared.system.QuickStepContract;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 /* loaded from: classes.dex */
-public class SupportMenuInflater extends MenuInflater {
+public final class SupportMenuInflater extends MenuInflater {
     public static final Class<?>[] ACTION_PROVIDER_CONSTRUCTOR_SIGNATURE;
     public static final Class<?>[] ACTION_VIEW_CONSTRUCTOR_SIGNATURE;
     public final Object[] mActionProviderConstructorArguments;
@@ -45,6 +44,19 @@ public class SupportMenuInflater extends MenuInflater {
         public Method mMethod;
         public Object mRealOwner;
 
+        @Override // android.view.MenuItem.OnMenuItemClickListener
+        public final boolean onMenuItemClick(MenuItem menuItem) {
+            try {
+                if (this.mMethod.getReturnType() == Boolean.TYPE) {
+                    return ((Boolean) this.mMethod.invoke(this.mRealOwner, menuItem)).booleanValue();
+                }
+                this.mMethod.invoke(this.mRealOwner, menuItem);
+                return true;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         public InflatedOnMenuItemClickListener(Object obj, String str) {
             this.mRealOwner = obj;
             Class<?> cls = obj.getClass();
@@ -54,19 +66,6 @@ public class SupportMenuInflater extends MenuInflater {
                 InflateException inflateException = new InflateException("Couldn't resolve menu item onClick handler " + str + " in class " + cls.getName());
                 inflateException.initCause(e);
                 throw inflateException;
-            }
-        }
-
-        @Override // android.view.MenuItem.OnMenuItemClickListener
-        public boolean onMenuItemClick(MenuItem menuItem) {
-            try {
-                if (this.mMethod.getReturnType() == Boolean.TYPE) {
-                    return ((Boolean) this.mMethod.invoke(this.mRealOwner, menuItem)).booleanValue();
-                }
-                this.mMethod.invoke(this.mRealOwner, menuItem);
-                return true;
-            } catch (Exception e) {
-                throw new RuntimeException(e);
             }
         }
     }
@@ -108,13 +107,6 @@ public class SupportMenuInflater extends MenuInflater {
             this.menu = menu;
         }
 
-        public SubMenu addSubMenuItem() {
-            this.itemAdded = true;
-            SubMenu addSubMenu = this.menu.addSubMenu(this.groupId, this.itemId, this.itemCategoryOrder, this.itemTitle);
-            setItem(addSubMenu.getItem());
-            return addSubMenu;
-        }
-
         public final <T> T newInstance(String str, Class<?>[] clsArr, Object[] objArr) {
             try {
                 Constructor<?> constructor = Class.forName(str, false, SupportMenuInflater.this.mContext.getClassLoader()).getConstructor(clsArr);
@@ -127,8 +119,15 @@ public class SupportMenuInflater extends MenuInflater {
         }
 
         public final void setItem(MenuItem menuItem) {
-            boolean z = false;
-            menuItem.setChecked(this.itemChecked).setVisible(this.itemVisible).setEnabled(this.itemEnabled).setCheckable(this.itemCheckable >= 1).setTitleCondensed(this.itemTitleCondensed).setIcon(this.itemIconResId);
+            boolean z;
+            MenuItem enabled = menuItem.setChecked(this.itemChecked).setVisible(this.itemVisible).setEnabled(this.itemEnabled);
+            boolean z2 = false;
+            if (this.itemCheckable >= 1) {
+                z = true;
+            } else {
+                z = false;
+            }
+            enabled.setCheckable(z).setTitleCondensed(this.itemTitleCondensed).setIcon(this.itemIconResId);
             int i = this.itemShowAsAction;
             if (i >= 0) {
                 menuItem.setShowAsAction(i);
@@ -137,7 +136,7 @@ public class SupportMenuInflater extends MenuInflater {
                 if (!SupportMenuInflater.this.mContext.isRestricted()) {
                     SupportMenuInflater supportMenuInflater = SupportMenuInflater.this;
                     if (supportMenuInflater.mRealOwner == null) {
-                        supportMenuInflater.mRealOwner = supportMenuInflater.findRealOwner(supportMenuInflater.mContext);
+                        supportMenuInflater.mRealOwner = SupportMenuInflater.findRealOwner(supportMenuInflater.mContext);
                     }
                     menuItem.setOnMenuItemClickListener(new InflatedOnMenuItemClickListener(supportMenuInflater.mRealOwner, this.itemListenerMethodName));
                 } else {
@@ -163,11 +162,11 @@ public class SupportMenuInflater extends MenuInflater {
             String str = this.itemActionViewClassName;
             if (str != null) {
                 menuItem.setActionView((View) newInstance(str, SupportMenuInflater.ACTION_VIEW_CONSTRUCTOR_SIGNATURE, SupportMenuInflater.this.mActionViewConstructorArguments));
-                z = true;
+                z2 = true;
             }
             int i2 = this.itemActionViewLayout;
             if (i2 > 0) {
-                if (!z) {
+                if (!z2) {
                     menuItem.setActionView(i2);
                 } else {
                     Log.w("SupportMenuInflater", "Ignoring attribute 'itemActionViewLayout'. Action view already specified.");
@@ -182,35 +181,35 @@ public class SupportMenuInflater extends MenuInflater {
                 }
             }
             CharSequence charSequence = this.itemContentDescription;
-            boolean z2 = menuItem instanceof SupportMenuItem;
-            if (z2) {
-                ((SupportMenuItem) menuItem).mo2setContentDescription(charSequence);
+            boolean z3 = menuItem instanceof SupportMenuItem;
+            if (z3) {
+                ((SupportMenuItem) menuItem).mo0setContentDescription(charSequence);
             } else {
                 menuItem.setContentDescription(charSequence);
             }
             CharSequence charSequence2 = this.itemTooltipText;
-            if (z2) {
-                ((SupportMenuItem) menuItem).mo3setTooltipText(charSequence2);
+            if (z3) {
+                ((SupportMenuItem) menuItem).mo1setTooltipText(charSequence2);
             } else {
                 menuItem.setTooltipText(charSequence2);
             }
             char c = this.itemAlphabeticShortcut;
             int i3 = this.itemAlphabeticModifiers;
-            if (z2) {
+            if (z3) {
                 ((SupportMenuItem) menuItem).setAlphabeticShortcut(c, i3);
             } else {
                 menuItem.setAlphabeticShortcut(c, i3);
             }
             char c2 = this.itemNumericShortcut;
             int i4 = this.itemNumericModifiers;
-            if (z2) {
+            if (z3) {
                 ((SupportMenuItem) menuItem).setNumericShortcut(c2, i4);
             } else {
                 menuItem.setNumericShortcut(c2, i4);
             }
             PorterDuff.Mode mode = this.itemIconTintMode;
             if (mode != null) {
-                if (z2) {
+                if (z3) {
                     ((SupportMenuItem) menuItem).setIconTintMode(mode);
                 } else {
                     menuItem.setIconTintMode(mode);
@@ -220,7 +219,7 @@ public class SupportMenuInflater extends MenuInflater {
             if (colorStateList == null) {
                 return;
             }
-            if (z2) {
+            if (z3) {
                 ((SupportMenuItem) menuItem).setIconTintList(colorStateList);
             } else {
                 menuItem.setIconTintList(colorStateList);
@@ -234,20 +233,18 @@ public class SupportMenuInflater extends MenuInflater {
         ACTION_PROVIDER_CONSTRUCTOR_SIGNATURE = clsArr;
     }
 
-    public SupportMenuInflater(Context context) {
-        super(context);
-        this.mContext = context;
-        Object[] objArr = {context};
-        this.mActionViewConstructorArguments = objArr;
-        this.mActionProviderConstructorArguments = objArr;
-    }
-
-    public final Object findRealOwner(Object obj) {
-        return (!(obj instanceof Activity) && (obj instanceof ContextWrapper)) ? findRealOwner(((ContextWrapper) obj).getBaseContext()) : obj;
+    public static Object findRealOwner(Context context) {
+        if (context instanceof Activity) {
+            return context;
+        }
+        if (context instanceof ContextWrapper) {
+            return findRealOwner(((ContextWrapper) context).getBaseContext());
+        }
+        return context;
     }
 
     @Override // android.view.MenuInflater
-    public void inflate(int i, Menu menu) {
+    public final void inflate(int i, Menu menu) {
         if (!(menu instanceof SupportMenu)) {
             super.inflate(i, menu);
             return;
@@ -273,41 +270,44 @@ public class SupportMenuInflater extends MenuInflater {
         }
     }
 
-    public final void parseMenu(XmlPullParser xmlPullParser, AttributeSet attributeSet, Menu menu) throws XmlPullParserException, IOException {
+    public final void parseMenu(XmlResourceParser xmlResourceParser, AttributeSet attributeSet, Menu menu) throws XmlPullParserException, IOException {
+        char c;
+        char c2;
+        boolean z;
         ColorStateList colorStateList;
         MenuState menuState = new MenuState(menu);
-        int eventType = xmlPullParser.getEventType();
+        int eventType = xmlResourceParser.getEventType();
         while (true) {
             if (eventType == 2) {
-                String name = xmlPullParser.getName();
+                String name = xmlResourceParser.getName();
                 if (name.equals("menu")) {
-                    eventType = xmlPullParser.next();
+                    eventType = xmlResourceParser.next();
                 } else {
                     throw new RuntimeException(SupportMenuInflater$$ExternalSyntheticOutline0.m("Expecting menu, got ", name));
                 }
             } else {
-                eventType = xmlPullParser.next();
+                eventType = xmlResourceParser.next();
                 if (eventType == 1) {
                     break;
                 }
             }
         }
         String str = null;
-        boolean z = false;
         boolean z2 = false;
-        while (!z) {
+        boolean z3 = false;
+        while (!z2) {
             if (eventType != 1) {
-                z = z;
-                z = z;
+                z2 = z2;
+                z2 = z2;
                 if (eventType != 2) {
                     if (eventType == 3) {
-                        String name2 = xmlPullParser.getName();
-                        if (z2 && name2.equals(str)) {
+                        String name2 = xmlResourceParser.getName();
+                        if (z3 && name2.equals(str)) {
                             str = null;
-                            z2 = false;
-                            eventType = xmlPullParser.next();
-                            z = z;
+                            z3 = false;
+                            eventType = xmlResourceParser.next();
                             z2 = z2;
+                            z3 = z3;
                         } else if (name2.equals("group")) {
                             menuState.groupId = 0;
                             menuState.groupCategory = 0;
@@ -315,33 +315,34 @@ public class SupportMenuInflater extends MenuInflater {
                             menuState.groupCheckable = 0;
                             menuState.groupVisible = true;
                             menuState.groupEnabled = true;
-                            z = z;
+                            z2 = z2;
                         } else if (name2.equals("item")) {
-                            z = z;
+                            z2 = z2;
                             if (!menuState.itemAdded) {
                                 ActionProvider actionProvider = menuState.itemActionProvider;
                                 if (actionProvider == null || !actionProvider.hasSubMenu()) {
                                     menuState.itemAdded = true;
                                     menuState.setItem(menuState.menu.add(menuState.groupId, menuState.itemId, menuState.itemCategoryOrder, menuState.itemTitle));
-                                    z = z;
+                                    z2 = z2;
                                 } else {
-                                    menuState.addSubMenuItem();
-                                    z = z;
+                                    menuState.itemAdded = true;
+                                    menuState.setItem(menuState.menu.addSubMenu(menuState.groupId, menuState.itemId, menuState.itemCategoryOrder, menuState.itemTitle).getItem());
+                                    z2 = z2;
                                 }
                             }
                         } else {
-                            z = z;
+                            z2 = z2;
                             if (name2.equals("menu")) {
-                                z = true;
+                                z2 = true;
                             }
                         }
                     }
-                    eventType = xmlPullParser.next();
-                    z = z;
+                    eventType = xmlResourceParser.next();
                     z2 = z2;
+                    z3 = z3;
                 } else {
-                    if (!z2) {
-                        String name3 = xmlPullParser.getName();
+                    if (!z3) {
+                        String name3 = xmlResourceParser.getName();
                         if (name3.equals("group")) {
                             TypedArray obtainStyledAttributes = SupportMenuInflater.this.mContext.obtainStyledAttributes(attributeSet, R$styleable.MenuGroup);
                             menuState.groupId = obtainStyledAttributes.getResourceId(1, 0);
@@ -351,78 +352,104 @@ public class SupportMenuInflater extends MenuInflater {
                             menuState.groupVisible = obtainStyledAttributes.getBoolean(2, true);
                             menuState.groupEnabled = obtainStyledAttributes.getBoolean(0, true);
                             obtainStyledAttributes.recycle();
-                            z = z;
+                            z2 = z2;
                         } else if (name3.equals("item")) {
-                            TintTypedArray obtainStyledAttributes2 = TintTypedArray.obtainStyledAttributes(SupportMenuInflater.this.mContext, attributeSet, R$styleable.MenuItem);
-                            menuState.itemId = obtainStyledAttributes2.getResourceId(2, 0);
-                            menuState.itemCategoryOrder = (obtainStyledAttributes2.getInt(5, menuState.groupCategory) & (-65536)) | (obtainStyledAttributes2.getInt(6, menuState.groupOrder) & 65535);
-                            menuState.itemTitle = obtainStyledAttributes2.getText(7);
-                            menuState.itemTitleCondensed = obtainStyledAttributes2.getText(8);
-                            menuState.itemIconResId = obtainStyledAttributes2.getResourceId(0, 0);
-                            String string = obtainStyledAttributes2.getString(9);
-                            menuState.itemAlphabeticShortcut = string == null ? (char) 0 : string.charAt(0);
-                            menuState.itemAlphabeticModifiers = obtainStyledAttributes2.getInt(16, QuickStepContract.SYSUI_STATE_TRACING_ENABLED);
-                            String string2 = obtainStyledAttributes2.getString(10);
-                            menuState.itemNumericShortcut = string2 == null ? (char) 0 : string2.charAt(0);
-                            menuState.itemNumericModifiers = obtainStyledAttributes2.getInt(20, QuickStepContract.SYSUI_STATE_TRACING_ENABLED);
-                            if (obtainStyledAttributes2.hasValue(11)) {
-                                menuState.itemCheckable = obtainStyledAttributes2.getBoolean(11, false) ? 1 : 0;
+                            Context context = SupportMenuInflater.this.mContext;
+                            TintTypedArray tintTypedArray = new TintTypedArray(context, context.obtainStyledAttributes(attributeSet, R$styleable.MenuItem));
+                            menuState.itemId = tintTypedArray.getResourceId(2, 0);
+                            menuState.itemCategoryOrder = (tintTypedArray.getInt(5, menuState.groupCategory) & (-65536)) | (tintTypedArray.getInt(6, menuState.groupOrder) & 65535);
+                            menuState.itemTitle = tintTypedArray.getText(7);
+                            menuState.itemTitleCondensed = tintTypedArray.getText(8);
+                            menuState.itemIconResId = tintTypedArray.getResourceId(0, 0);
+                            String string = tintTypedArray.getString(9);
+                            if (string == null) {
+                                c = 0;
+                            } else {
+                                c = string.charAt(0);
+                            }
+                            menuState.itemAlphabeticShortcut = c;
+                            menuState.itemAlphabeticModifiers = tintTypedArray.getInt(16, QuickStepContract.SYSUI_STATE_TRACING_ENABLED);
+                            String string2 = tintTypedArray.getString(10);
+                            if (string2 == null) {
+                                c2 = 0;
+                            } else {
+                                c2 = string2.charAt(0);
+                            }
+                            menuState.itemNumericShortcut = c2;
+                            menuState.itemNumericModifiers = tintTypedArray.getInt(20, QuickStepContract.SYSUI_STATE_TRACING_ENABLED);
+                            if (tintTypedArray.hasValue(11)) {
+                                menuState.itemCheckable = tintTypedArray.getBoolean(11, false) ? 1 : 0;
                             } else {
                                 menuState.itemCheckable = menuState.groupCheckable;
                             }
-                            menuState.itemChecked = obtainStyledAttributes2.getBoolean(3, false);
-                            menuState.itemVisible = obtainStyledAttributes2.getBoolean(4, menuState.groupVisible);
-                            menuState.itemEnabled = obtainStyledAttributes2.getBoolean(1, menuState.groupEnabled);
-                            menuState.itemShowAsAction = obtainStyledAttributes2.getInt(21, -1);
-                            menuState.itemListenerMethodName = obtainStyledAttributes2.getString(12);
-                            menuState.itemActionViewLayout = obtainStyledAttributes2.getResourceId(13, 0);
-                            menuState.itemActionViewClassName = obtainStyledAttributes2.getString(15);
-                            String string3 = obtainStyledAttributes2.getString(14);
-                            boolean z3 = string3 != null;
-                            if (z3 && menuState.itemActionViewLayout == 0 && menuState.itemActionViewClassName == null) {
+                            menuState.itemChecked = tintTypedArray.getBoolean(3, false);
+                            menuState.itemVisible = tintTypedArray.getBoolean(4, menuState.groupVisible);
+                            menuState.itemEnabled = tintTypedArray.getBoolean(1, menuState.groupEnabled);
+                            menuState.itemShowAsAction = tintTypedArray.getInt(21, -1);
+                            menuState.itemListenerMethodName = tintTypedArray.getString(12);
+                            menuState.itemActionViewLayout = tintTypedArray.getResourceId(13, 0);
+                            menuState.itemActionViewClassName = tintTypedArray.getString(15);
+                            String string3 = tintTypedArray.getString(14);
+                            if (string3 != null) {
+                                z = true;
+                            } else {
+                                z = false;
+                            }
+                            if (z && menuState.itemActionViewLayout == 0 && menuState.itemActionViewClassName == null) {
                                 menuState.itemActionProvider = (ActionProvider) menuState.newInstance(string3, ACTION_PROVIDER_CONSTRUCTOR_SIGNATURE, SupportMenuInflater.this.mActionProviderConstructorArguments);
                             } else {
-                                if (z3) {
+                                if (z) {
                                     Log.w("SupportMenuInflater", "Ignoring attribute 'actionProviderClass'. Action view already specified.");
                                 }
                                 menuState.itemActionProvider = null;
                             }
-                            menuState.itemContentDescription = obtainStyledAttributes2.getText(17);
-                            menuState.itemTooltipText = obtainStyledAttributes2.getText(22);
-                            if (obtainStyledAttributes2.hasValue(19)) {
-                                menuState.itemIconTintMode = DrawableUtils.parseTintMode(obtainStyledAttributes2.getInt(19, -1), menuState.itemIconTintMode);
+                            menuState.itemContentDescription = tintTypedArray.getText(17);
+                            menuState.itemTooltipText = tintTypedArray.getText(22);
+                            if (tintTypedArray.hasValue(19)) {
+                                menuState.itemIconTintMode = DrawableUtils.parseTintMode(tintTypedArray.getInt(19, -1), menuState.itemIconTintMode);
                                 colorStateList = null;
                             } else {
                                 colorStateList = null;
                                 menuState.itemIconTintMode = null;
                             }
-                            if (obtainStyledAttributes2.hasValue(18)) {
-                                menuState.itemIconTintList = obtainStyledAttributes2.getColorStateList(18);
+                            if (tintTypedArray.hasValue(18)) {
+                                menuState.itemIconTintList = tintTypedArray.getColorStateList(18);
                             } else {
                                 menuState.itemIconTintList = colorStateList;
                             }
-                            obtainStyledAttributes2.mWrapped.recycle();
+                            tintTypedArray.recycle();
                             menuState.itemAdded = false;
-                            z = z;
+                            z2 = z2;
                         } else {
                             if (name3.equals("menu")) {
-                                parseMenu(xmlPullParser, attributeSet, menuState.addSubMenuItem());
+                                menuState.itemAdded = true;
+                                SubMenu addSubMenu = menuState.menu.addSubMenu(menuState.groupId, menuState.itemId, menuState.itemCategoryOrder, menuState.itemTitle);
+                                menuState.setItem(addSubMenu.getItem());
+                                parseMenu(xmlResourceParser, attributeSet, addSubMenu);
                             } else {
                                 str = name3;
-                                z2 = true;
+                                z3 = true;
                             }
-                            eventType = xmlPullParser.next();
-                            z = z;
+                            eventType = xmlResourceParser.next();
                             z2 = z2;
+                            z3 = z3;
                         }
                     }
-                    eventType = xmlPullParser.next();
-                    z = z;
+                    eventType = xmlResourceParser.next();
                     z2 = z2;
+                    z3 = z3;
                 }
             } else {
                 throw new RuntimeException("Unexpected end of document");
             }
         }
+    }
+
+    public SupportMenuInflater(Context context) {
+        super(context);
+        this.mContext = context;
+        Object[] objArr = {context};
+        this.mActionViewConstructorArguments = objArr;
+        this.mActionProviderConstructorArguments = objArr;
     }
 }

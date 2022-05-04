@@ -3,7 +3,7 @@ package androidx.constraintlayout.solver.widgets;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 import java.util.ArrayList;
 /* loaded from: classes.dex */
-public class ChainHead {
+public final class ChainHead {
     public boolean mDefined;
     public ConstraintWidget mFirst;
     public ConstraintWidget mFirstMatchConstraintWidget;
@@ -17,16 +17,12 @@ public class ChainHead {
     public ConstraintWidget mLastMatchConstraintWidget;
     public ConstraintWidget mLastVisibleWidget;
     public int mOrientation;
-    public int mTotalMargins;
-    public int mTotalSize;
     public float mTotalWeight = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
-    public int mVisibleWidgets;
     public ArrayList<ConstraintWidget> mWeightedMatchConstraintsWidgets;
     public int mWidgetsCount;
     public int mWidgetsMatchCount;
 
     public ChainHead(ConstraintWidget constraintWidget, int i, boolean z) {
-        this.mIsRtl = false;
         this.mFirst = constraintWidget;
         this.mOrientation = i;
         this.mIsRtl = z;

@@ -7,7 +7,7 @@ import android.util.SparseBooleanArray;
 public class ParcelableSparseBooleanArray extends SparseBooleanArray implements Parcelable {
     public static final Parcelable.Creator<ParcelableSparseBooleanArray> CREATOR = new Parcelable.Creator<ParcelableSparseBooleanArray>() { // from class: com.google.android.material.internal.ParcelableSparseBooleanArray.1
         @Override // android.os.Parcelable.Creator
-        public ParcelableSparseBooleanArray createFromParcel(Parcel parcel) {
+        public final ParcelableSparseBooleanArray createFromParcel(Parcel parcel) {
             int readInt = parcel.readInt();
             ParcelableSparseBooleanArray parcelableSparseBooleanArray = new ParcelableSparseBooleanArray(readInt);
             int[] iArr = new int[readInt];
@@ -21,21 +21,22 @@ public class ParcelableSparseBooleanArray extends SparseBooleanArray implements 
         }
 
         @Override // android.os.Parcelable.Creator
-        public ParcelableSparseBooleanArray[] newArray(int i) {
+        public final ParcelableSparseBooleanArray[] newArray(int i) {
             return new ParcelableSparseBooleanArray[i];
         }
     };
 
     public ParcelableSparseBooleanArray() {
+        throw null;
     }
 
     @Override // android.os.Parcelable
-    public int describeContents() {
+    public final int describeContents() {
         return 0;
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
+    public final void writeToParcel(Parcel parcel, int i) {
         int[] iArr = new int[size()];
         boolean[] zArr = new boolean[size()];
         for (int i2 = 0; i2 < size(); i2++) {

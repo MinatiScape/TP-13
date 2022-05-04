@@ -5,37 +5,44 @@ import android.graphics.PorterDuff;
 import android.os.Parcelable;
 import androidx.versionedparcelable.VersionedParcel;
 import java.nio.charset.Charset;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public class IconCompatParcelizer {
-    public static IconCompat read(VersionedParcel parcel) {
+    public static IconCompat read(VersionedParcel versionedParcel) {
         IconCompat iconCompat = new IconCompat();
-        iconCompat.mType = parcel.readInt(iconCompat.mType, 1);
+        iconCompat.mType = versionedParcel.readInt(iconCompat.mType, 1);
         byte[] bArr = iconCompat.mData;
-        if (parcel.readField(2)) {
-            bArr = parcel.readByteArray();
+        if (versionedParcel.readField(2)) {
+            bArr = versionedParcel.readByteArray();
         }
         iconCompat.mData = bArr;
-        iconCompat.mParcelable = parcel.readParcelable(iconCompat.mParcelable, 3);
-        iconCompat.mInt1 = parcel.readInt(iconCompat.mInt1, 4);
-        iconCompat.mInt2 = parcel.readInt(iconCompat.mInt2, 5);
-        iconCompat.mTintList = (ColorStateList) parcel.readParcelable(iconCompat.mTintList, 6);
-        iconCompat.mTintModeStr = parcel.readString(iconCompat.mTintModeStr, 7);
-        iconCompat.mString1 = parcel.readString(iconCompat.mString1, 8);
+        Parcelable parcelable = iconCompat.mParcelable;
+        if (versionedParcel.readField(3)) {
+            parcelable = versionedParcel.readParcelable();
+        }
+        iconCompat.mParcelable = parcelable;
+        iconCompat.mInt1 = versionedParcel.readInt(iconCompat.mInt1, 4);
+        iconCompat.mInt2 = versionedParcel.readInt(iconCompat.mInt2, 5);
+        Parcelable parcelable2 = iconCompat.mTintList;
+        if (versionedParcel.readField(6)) {
+            parcelable2 = versionedParcel.readParcelable();
+        }
+        iconCompat.mTintList = (ColorStateList) parcelable2;
+        iconCompat.mTintModeStr = versionedParcel.readString(iconCompat.mTintModeStr, 7);
+        iconCompat.mString1 = versionedParcel.readString(iconCompat.mString1, 8);
         iconCompat.mTintMode = PorterDuff.Mode.valueOf(iconCompat.mTintModeStr);
         switch (iconCompat.mType) {
             case -1:
-                Parcelable parcelable = iconCompat.mParcelable;
-                if (parcelable != null) {
-                    iconCompat.mObj1 = parcelable;
+                Parcelable parcelable3 = iconCompat.mParcelable;
+                if (parcelable3 != null) {
+                    iconCompat.mObj1 = parcelable3;
                     break;
                 } else {
                     throw new IllegalArgumentException("Invalid icon");
                 }
             case 1:
             case 5:
-                Parcelable parcelable2 = iconCompat.mParcelable;
-                if (parcelable2 == null) {
+                Parcelable parcelable4 = iconCompat.mParcelable;
+                if (parcelable4 == null) {
                     byte[] bArr2 = iconCompat.mData;
                     iconCompat.mObj1 = bArr2;
                     iconCompat.mType = 3;
@@ -43,7 +50,7 @@ public class IconCompatParcelizer {
                     iconCompat.mInt2 = bArr2.length;
                     break;
                 } else {
-                    iconCompat.mObj1 = parcelable2;
+                    iconCompat.mObj1 = parcelable4;
                     break;
                 }
             case 2:
@@ -63,67 +70,65 @@ public class IconCompatParcelizer {
         return iconCompat;
     }
 
-    public static void write(IconCompat obj, VersionedParcel parcel) {
-        Objects.requireNonNull(parcel);
-        obj.mTintModeStr = obj.mTintMode.name();
-        switch (obj.mType) {
+    public static void write(IconCompat iconCompat, VersionedParcel versionedParcel) {
+        versionedParcel.getClass();
+        iconCompat.mTintModeStr = iconCompat.mTintMode.name();
+        switch (iconCompat.mType) {
             case -1:
-                obj.mParcelable = (Parcelable) obj.mObj1;
+                iconCompat.mParcelable = (Parcelable) iconCompat.mObj1;
                 break;
             case 1:
             case 5:
-                obj.mParcelable = (Parcelable) obj.mObj1;
+                iconCompat.mParcelable = (Parcelable) iconCompat.mObj1;
                 break;
             case 2:
-                obj.mData = ((String) obj.mObj1).getBytes(Charset.forName("UTF-16"));
+                iconCompat.mData = ((String) iconCompat.mObj1).getBytes(Charset.forName("UTF-16"));
                 break;
             case 3:
-                obj.mData = (byte[]) obj.mObj1;
+                iconCompat.mData = (byte[]) iconCompat.mObj1;
                 break;
             case 4:
             case 6:
-                obj.mData = obj.mObj1.toString().getBytes(Charset.forName("UTF-16"));
+                iconCompat.mData = iconCompat.mObj1.toString().getBytes(Charset.forName("UTF-16"));
                 break;
         }
-        int i = obj.mType;
+        int i = iconCompat.mType;
         if (-1 != i) {
-            parcel.setOutputField(1);
-            parcel.writeInt(i);
+            versionedParcel.setOutputField(1);
+            versionedParcel.writeInt(i);
         }
-        byte[] bArr = obj.mData;
+        byte[] bArr = iconCompat.mData;
         if (bArr != null) {
-            parcel.setOutputField(2);
-            parcel.writeByteArray(bArr);
+            versionedParcel.setOutputField(2);
+            versionedParcel.writeByteArray(bArr);
         }
-        Parcelable parcelable = obj.mParcelable;
+        Parcelable parcelable = iconCompat.mParcelable;
         if (parcelable != null) {
-            parcel.setOutputField(3);
-            parcel.writeParcelable(parcelable);
+            versionedParcel.setOutputField(3);
+            versionedParcel.writeParcelable(parcelable);
         }
-        int i2 = obj.mInt1;
+        int i2 = iconCompat.mInt1;
         if (i2 != 0) {
-            parcel.setOutputField(4);
-            parcel.writeInt(i2);
+            versionedParcel.setOutputField(4);
+            versionedParcel.writeInt(i2);
         }
-        int i3 = obj.mInt2;
+        int i3 = iconCompat.mInt2;
         if (i3 != 0) {
-            parcel.setOutputField(5);
-            parcel.writeInt(i3);
+            versionedParcel.setOutputField(5);
+            versionedParcel.writeInt(i3);
         }
-        ColorStateList colorStateList = obj.mTintList;
+        ColorStateList colorStateList = iconCompat.mTintList;
         if (colorStateList != null) {
-            parcel.setOutputField(6);
-            parcel.writeParcelable(colorStateList);
+            versionedParcel.setOutputField(6);
+            versionedParcel.writeParcelable(colorStateList);
         }
-        String str = obj.mTintModeStr;
+        String str = iconCompat.mTintModeStr;
         if (str != null) {
-            parcel.setOutputField(7);
-            parcel.writeString(str);
+            versionedParcel.writeString(str, 7);
         }
-        String str2 = obj.mString1;
+        String str2 = iconCompat.mString1;
         if (str2 != null) {
-            parcel.setOutputField(8);
-            parcel.writeString(str2);
+            versionedParcel.writeString(str2, 8);
         }
     }
 }

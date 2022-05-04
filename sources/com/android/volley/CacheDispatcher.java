@@ -4,8 +4,9 @@ import android.os.Process;
 import com.android.volley.Cache;
 import com.android.volley.toolbox.DiskBasedCache;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 /* loaded from: classes.dex */
-public class CacheDispatcher extends Thread {
+public final class CacheDispatcher extends Thread {
     public static final boolean DEBUG = VolleyLog.DEBUG;
     public final Cache mCache;
     public final BlockingQueue<Request<?>> mCacheQueue;
@@ -14,19 +15,16 @@ public class CacheDispatcher extends Thread {
     public volatile boolean mQuit = false;
     public final WaitingRequestManager mWaitingRequestManager;
 
-    public CacheDispatcher(BlockingQueue<Request<?>> blockingQueue, BlockingQueue<Request<?>> blockingQueue2, Cache cache, ResponseDelivery responseDelivery) {
-        this.mCacheQueue = blockingQueue;
-        this.mNetworkQueue = blockingQueue2;
-        this.mCache = cache;
-        this.mDelivery = responseDelivery;
-        this.mWaitingRequestManager = new WaitingRequestManager(this, blockingQueue2, responseDelivery);
-    }
-
+    /* JADX WARN: Multi-variable type inference failed */
+    /* JADX WARN: Type inference failed for: r2v4, types: [com.android.volley.CacheDispatcher$1] */
     public void processRequest(final Request<?> request) throws InterruptedException {
+        boolean z;
+        boolean z2;
         request.addMarker("cache-queue-take");
         request.sendEvent(1);
         try {
-            request.isCanceled();
+            synchronized (request.mLock) {
+            }
             Cache.Entry entry = ((DiskBasedCache) this.mCache).get(request.getCacheKey());
             if (entry == null) {
                 request.addMarker("cache-miss");
@@ -35,8 +33,14 @@ public class CacheDispatcher extends Thread {
                 }
                 return;
             }
-            boolean z = false;
-            if (entry.ttl < System.currentTimeMillis()) {
+            long currentTimeMillis = System.currentTimeMillis();
+            boolean z3 = false;
+            if (entry.ttl < currentTimeMillis) {
+                z = true;
+            } else {
+                z = false;
+            }
+            if (z) {
                 request.addMarker("cache-hit-expired");
                 request.mCacheEntry = entry;
                 if (!this.mWaitingRequestManager.maybeAddToWaitingRequests(request)) {
@@ -47,7 +51,12 @@ public class CacheDispatcher extends Thread {
             request.addMarker("cache-hit");
             Response<?> parseNetworkResponse = request.parseNetworkResponse(new NetworkResponse(entry.data, entry.responseHeaders));
             request.addMarker("cache-hit-parsed");
-            if (!(parseNetworkResponse.error == null)) {
+            if (parseNetworkResponse.error == null) {
+                z2 = true;
+            } else {
+                z2 = false;
+            }
+            if (!z2) {
                 request.addMarker("cache-parsing-failed");
                 Cache cache = this.mCache;
                 String cacheKey = request.getCacheKey();
@@ -66,10 +75,10 @@ public class CacheDispatcher extends Thread {
                 }
                 return;
             }
-            if (entry.softTtl < System.currentTimeMillis()) {
-                z = true;
+            if (entry.softTtl < currentTimeMillis) {
+                z3 = true;
             }
-            if (!z) {
+            if (!z3) {
                 ((ExecutorDelivery) this.mDelivery).postResponse(request, parseNetworkResponse, null);
             } else {
                 request.addMarker("cache-hit-refresh-needed");
@@ -78,7 +87,7 @@ public class CacheDispatcher extends Thread {
                 if (!this.mWaitingRequestManager.maybeAddToWaitingRequests(request)) {
                     ((ExecutorDelivery) this.mDelivery).postResponse(request, parseNetworkResponse, new Runnable() { // from class: com.android.volley.CacheDispatcher.1
                         @Override // java.lang.Runnable
-                        public void run() {
+                        public final void run() {
                             try {
                                 CacheDispatcher.this.mNetworkQueue.put(request);
                             } catch (InterruptedException unused) {
@@ -96,7 +105,7 @@ public class CacheDispatcher extends Thread {
     }
 
     @Override // java.lang.Thread, java.lang.Runnable
-    public void run() {
+    public final void run() {
         if (DEBUG) {
             VolleyLog.v("start new dispatcher", new Object[0]);
         }
@@ -113,5 +122,13 @@ public class CacheDispatcher extends Thread {
                 VolleyLog.e("Ignoring spurious interrupt of CacheDispatcher thread; use quit() to terminate it", new Object[0]);
             }
         }
+    }
+
+    public CacheDispatcher(PriorityBlockingQueue priorityBlockingQueue, PriorityBlockingQueue priorityBlockingQueue2, Cache cache, ResponseDelivery responseDelivery) {
+        this.mCacheQueue = priorityBlockingQueue;
+        this.mNetworkQueue = priorityBlockingQueue2;
+        this.mCache = cache;
+        this.mDelivery = responseDelivery;
+        this.mWaitingRequestManager = new WaitingRequestManager(this, priorityBlockingQueue2, responseDelivery);
     }
 }

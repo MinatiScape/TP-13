@@ -1,24 +1,26 @@
 package com.android.customization.picker;
 
 import android.app.Activity;
-import android.app.WallpaperColors;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.view.Surface;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import androidx.cardview.R$style;
 import androidx.cardview.widget.CardView;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.LifecycleRegistry;
 import androidx.lifecycle.OnLifecycleEvent;
 import com.android.wallpaper.model.WallpaperInfo;
+import com.android.wallpaper.picker.LivePreviewFragment$$ExternalSyntheticLambda6;
 import com.android.wallpaper.util.ScreenSizeCalculator;
-import com.android.wallpaper.util.SizeCalculator;
 import com.android.wallpaper.util.WallpaperConnection;
 import com.android.wallpaper.util.WallpaperSurfaceCallback;
-import com.android.wallpaper.widget.PreviewPager$$ExternalSyntheticLambda1;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public class WallpaperPreviewer implements LifecycleObserver {
     public final Activity mActivity;
@@ -34,33 +36,7 @@ public class WallpaperPreviewer implements LifecycleObserver {
 
     /* loaded from: classes.dex */
     public interface WallpaperColorsListener {
-        void onWallpaperColorsChanged(WallpaperColors wallpaperColors);
-    }
-
-    public WallpaperPreviewer(Lifecycle lifecycle, Activity activity, ImageView imageView, SurfaceView surfaceView) {
-        lifecycle.addObserver(this);
-        this.mActivity = activity;
-        this.mHomePreview = imageView;
-        this.mWallpaperSurface = surfaceView;
-        this.mWallpaperSurfaceCallback = new WallpaperSurfaceCallback(activity, imageView, surfaceView, null, new PreviewPager$$ExternalSyntheticLambda1(this));
-        surfaceView.setZOrderMediaOverlay(true);
-        surfaceView.getHolder().addCallback(this.mWallpaperSurfaceCallback);
-        final View rootView = imageView.getRootView();
-        rootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() { // from class: com.android.customization.picker.WallpaperPreviewer.1
-            @Override // android.view.View.OnLayoutChangeListener
-            public void onLayoutChange(View view, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8) {
-                WallpaperPreviewer wallpaperPreviewer = WallpaperPreviewer.this;
-                Objects.requireNonNull(wallpaperPreviewer);
-                float screenAspectRatio = ScreenSizeCalculator.getInstance().getScreenAspectRatio(wallpaperPreviewer.mActivity);
-                CardView cardView = (CardView) wallpaperPreviewer.mHomePreview.getParent();
-                int measuredHeight = (int) (cardView.getMeasuredHeight() / screenAspectRatio);
-                ViewGroup.LayoutParams layoutParams = cardView.getLayoutParams();
-                layoutParams.width = measuredHeight;
-                cardView.setLayoutParams(layoutParams);
-                cardView.setRadius(SizeCalculator.getPreviewCornerRadius(wallpaperPreviewer.mActivity, measuredHeight));
-                rootView.removeOnLayoutChangeListener(this);
-            }
-        });
+        void onWallpaperColorsChanged();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
@@ -82,8 +58,7 @@ public class WallpaperPreviewer implements LifecycleObserver {
     public void onPause() {
         WallpaperConnection wallpaperConnection = this.mWallpaperConnection;
         if (wallpaperConnection != null) {
-            wallpaperConnection.mIsVisible = false;
-            wallpaperConnection.setEngineVisibility(false);
+            wallpaperConnection.setVisibility(false);
         }
     }
 
@@ -91,8 +66,7 @@ public class WallpaperPreviewer implements LifecycleObserver {
     public void onResume() {
         WallpaperConnection wallpaperConnection = this.mWallpaperConnection;
         if (wallpaperConnection != null) {
-            wallpaperConnection.mIsVisible = true;
-            wallpaperConnection.setEngineVisibility(true);
+            wallpaperConnection.setVisibility(true);
         }
     }
 
@@ -103,5 +77,35 @@ public class WallpaperPreviewer implements LifecycleObserver {
             wallpaperConnection.disconnect();
             this.mWallpaperConnection = null;
         }
+    }
+
+    public WallpaperPreviewer(LifecycleRegistry lifecycleRegistry, FragmentActivity fragmentActivity, ImageView imageView, SurfaceView surfaceView) {
+        lifecycleRegistry.addObserver(this);
+        this.mActivity = fragmentActivity;
+        this.mHomePreview = imageView;
+        this.mWallpaperSurface = surfaceView;
+        this.mWallpaperSurfaceCallback = new WallpaperSurfaceCallback(fragmentActivity, imageView, surfaceView, null, new LivePreviewFragment$$ExternalSyntheticLambda6(this));
+        surfaceView.setZOrderMediaOverlay(true);
+        surfaceView.getHolder().addCallback(this.mWallpaperSurfaceCallback);
+        final View rootView = imageView.getRootView();
+        rootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() { // from class: com.android.customization.picker.WallpaperPreviewer.1
+            @Override // android.view.View.OnLayoutChangeListener
+            public final void onLayoutChange(View view, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8) {
+                WallpaperPreviewer wallpaperPreviewer = WallpaperPreviewer.this;
+                wallpaperPreviewer.getClass();
+                ScreenSizeCalculator screenSizeCalculator = ScreenSizeCalculator.getInstance();
+                Activity activity = wallpaperPreviewer.mActivity;
+                screenSizeCalculator.getClass();
+                Point screenSize = screenSizeCalculator.getScreenSize(((WindowManager) activity.getSystemService(WindowManager.class)).getDefaultDisplay());
+                float f = screenSize.y / screenSize.x;
+                CardView cardView = (CardView) wallpaperPreviewer.mHomePreview.getParent();
+                int measuredHeight = (int) (cardView.getMeasuredHeight() / f);
+                ViewGroup.LayoutParams layoutParams = cardView.getLayoutParams();
+                layoutParams.width = measuredHeight;
+                cardView.setLayoutParams(layoutParams);
+                cardView.setRadius(R$style.getPreviewCornerRadius(wallpaperPreviewer.mActivity, measuredHeight));
+                rootView.removeOnLayoutChangeListener(this);
+            }
+        });
     }
 }

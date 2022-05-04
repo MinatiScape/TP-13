@@ -1,19 +1,21 @@
 package com.google.common.collect;
 
 import java.util.Set;
+import java.util.SortedSet;
 /* loaded from: classes.dex */
 public abstract class ForwardingSet<E> extends ForwardingCollection<E> implements Set<E> {
-    @Override // com.google.common.collect.ForwardingCollection, com.google.common.collect.ForwardingObject
-    /* renamed from: delegate */
-    public abstract Set<E> mo31delegate();
+    public abstract SortedSet delegate$1();
 
     @Override // java.util.Collection, java.util.Set
-    public boolean equals(Object object) {
-        return object == this || mo31delegate().equals(object);
+    public final boolean equals(Object object) {
+        if (object == this || delegate$1().equals(object)) {
+            return true;
+        }
+        return false;
     }
 
     @Override // java.util.Collection, java.util.Set
-    public int hashCode() {
-        return mo31delegate().hashCode();
+    public final int hashCode() {
+        return delegate$1().hashCode();
     }
 }

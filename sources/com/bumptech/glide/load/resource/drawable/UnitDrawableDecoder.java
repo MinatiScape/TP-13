@@ -6,18 +6,18 @@ import com.bumptech.glide.load.ResourceDecoder;
 import com.bumptech.glide.load.engine.Resource;
 import java.io.IOException;
 /* loaded from: classes.dex */
-public class UnitDrawableDecoder implements ResourceDecoder<Drawable, Drawable> {
+public final class UnitDrawableDecoder implements ResourceDecoder<Drawable, Drawable> {
     @Override // com.bumptech.glide.load.ResourceDecoder
-    public Resource<Drawable> decode(Drawable source, int width, int height, Options options) throws IOException {
-        Drawable drawable = source;
-        if (drawable != null) {
-            return new NonOwnedDrawableResource(drawable);
+    public final Resource<Drawable> decode(Drawable drawable, int i, int i2, Options options) throws IOException {
+        Drawable drawable2 = drawable;
+        if (drawable2 != null) {
+            return new NonOwnedDrawableResource(drawable2);
         }
         return null;
     }
 
     @Override // com.bumptech.glide.load.ResourceDecoder
-    public /* bridge */ /* synthetic */ boolean handles(Drawable source, Options options) throws IOException {
+    public final /* bridge */ /* synthetic */ boolean handles(Drawable drawable, Options options) throws IOException {
         return true;
     }
 }

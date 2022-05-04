@@ -7,6 +7,10 @@ import androidx.fragment.app.Fragment;
 public class FragmentFactory {
     public static final SimpleArrayMap<ClassLoader, SimpleArrayMap<String, Class<?>>> sClassCacheMap = new SimpleArrayMap<>();
 
+    public Fragment instantiate(String str) {
+        throw null;
+    }
+
     public static Class<?> loadClass(ClassLoader classLoader, String str) throws ClassNotFoundException {
         SimpleArrayMap<ClassLoader, SimpleArrayMap<String, Class<?>>> simpleArrayMap = sClassCacheMap;
         SimpleArrayMap<String, Class<?>> orDefault = simpleArrayMap.getOrDefault(classLoader, null);
@@ -31,9 +35,5 @@ public class FragmentFactory {
         } catch (ClassNotFoundException e2) {
             throw new Fragment.InstantiationException(AbstractResolvableFuture$$ExternalSyntheticOutline0.m("Unable to instantiate fragment ", str, ": make sure class name exists"), e2);
         }
-    }
-
-    public Fragment instantiate(ClassLoader classLoader, String str) {
-        throw null;
     }
 }

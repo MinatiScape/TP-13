@@ -14,6 +14,7 @@ import androidx.core.view.OneShotPreDrawListener;
 import com.android.systemui.shared.rotation.FloatingRotationButtonPositionCalculator;
 import com.android.systemui.shared.rotation.RotationButton;
 import com.android.systemui.shared.system.QuickStepContract;
+import com.android.wallpaper.picker.ImagePreviewFragment$$ExternalSyntheticLambda3;
 /* loaded from: classes.dex */
 public class FloatingRotationButton implements RotationButton {
     private static final int MARGIN_ANIMATION_DURATION_MILLIS = 300;
@@ -39,25 +40,6 @@ public class FloatingRotationButton implements RotationButton {
     private boolean mIsTaskbarVisible = false;
     private boolean mIsTaskbarStashed = false;
 
-    public FloatingRotationButton(Context context, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8, int i9) {
-        this.mWindowManager = (WindowManager) context.getSystemService(WindowManager.class);
-        ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(context).inflate(i2, (ViewGroup) null);
-        this.mKeyButtonContainer = viewGroup;
-        FloatingRotationButtonView floatingRotationButtonView = (FloatingRotationButtonView) viewGroup.findViewById(i3);
-        this.mKeyButtonView = floatingRotationButtonView;
-        floatingRotationButtonView.setVisibility(0);
-        floatingRotationButtonView.setContentDescription(context.getString(i));
-        floatingRotationButtonView.setRipple(i9);
-        this.mContext = context;
-        this.mContentDescriptionResource = i;
-        this.mMinMarginResource = i4;
-        this.mRoundedContentPaddingResource = i5;
-        this.mTaskbarLeftMarginResource = i6;
-        this.mTaskbarBottomMarginResource = i7;
-        this.mButtonDiameterResource = i8;
-        updateDimensionResources();
-    }
-
     private WindowManager.LayoutParams adjustViewPositionAndCreateLayoutParams() {
         int i = this.mContainerSize;
         WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams(i, i, 0, 0, 2024, 8, -3);
@@ -74,6 +56,7 @@ public class FloatingRotationButton implements RotationButton {
         return layoutParams;
     }
 
+    /* JADX INFO: Access modifiers changed from: private */
     public /* synthetic */ void lambda$show$0() {
         RotationButton.RotationButtonUpdatesCallback rotationButtonUpdatesCallback;
         if (this.mIsShowing && (rotationButtonUpdatesCallback = this.mUpdatesCallback) != null) {
@@ -81,6 +64,7 @@ public class FloatingRotationButton implements RotationButton {
         }
     }
 
+    /* JADX INFO: Access modifiers changed from: private */
     public /* synthetic */ void lambda$updateTranslation$1() {
         RotationButton.RotationButtonUpdatesCallback rotationButtonUpdatesCallback = this.mUpdatesCallback;
         if (rotationButtonUpdatesCallback != null && this.mIsShowing) {
@@ -97,27 +81,6 @@ public class FloatingRotationButton implements RotationButton {
         this.mContainerSize = Math.max(max, Math.max(dimensionPixelSize, dimensionPixelSize2)) + resources.getDimensionPixelSize(this.mButtonDiameterResource);
     }
 
-    private void updateTranslation(FloatingRotationButtonPositionCalculator.Position position, boolean z) {
-        int translationX = position.getTranslationX();
-        int translationY = position.getTranslationY();
-        if (z) {
-            this.mKeyButtonView.animate().translationX(translationX).translationY(translationY).setDuration(300L).setInterpolator(new AccelerateDecelerateInterpolator()).withEndAction(new FloatingRotationButton$$ExternalSyntheticLambda0(this, 1)).start();
-            return;
-        }
-        this.mKeyButtonView.setTranslationX(translationX);
-        this.mKeyButtonView.setTranslationY(translationY);
-    }
-
-    @Override // com.android.systemui.shared.rotation.RotationButton
-    public View getCurrentView() {
-        return this.mKeyButtonView;
-    }
-
-    @Override // com.android.systemui.shared.rotation.RotationButton
-    public Drawable getImageDrawable() {
-        return this.mAnimatedDrawable;
-    }
-
     @Override // com.android.systemui.shared.rotation.RotationButton
     public boolean hide() {
         if (!this.mIsShowing) {
@@ -131,11 +94,6 @@ public class FloatingRotationButton implements RotationButton {
         }
         rotationButtonUpdatesCallback.onVisibilityChanged(false);
         return true;
-    }
-
-    @Override // com.android.systemui.shared.rotation.RotationButton
-    public boolean isVisible() {
-        return this.mIsShowing;
     }
 
     public void onConfigurationChanged(int i) {
@@ -193,11 +151,6 @@ public class FloatingRotationButton implements RotationButton {
     }
 
     @Override // com.android.systemui.shared.rotation.RotationButton
-    public void setUpdatesCallback(RotationButton.RotationButtonUpdatesCallback rotationButtonUpdatesCallback) {
-        this.mUpdatesCallback = rotationButtonUpdatesCallback;
-    }
-
-    @Override // com.android.systemui.shared.rotation.RotationButton
     public boolean show() {
         if (!this.mCanShow || this.mIsShowing) {
             return false;
@@ -209,7 +162,7 @@ public class FloatingRotationButton implements RotationButton {
             animatedVectorDrawable.reset();
             this.mAnimatedDrawable.start();
         }
-        OneShotPreDrawListener.add(this.mKeyButtonView, new FloatingRotationButton$$ExternalSyntheticLambda0(this, 0));
+        OneShotPreDrawListener.add(this.mKeyButtonView, new ImagePreviewFragment$$ExternalSyntheticLambda3(this, 1));
         return true;
     }
 
@@ -219,5 +172,60 @@ public class FloatingRotationButton implements RotationButton {
         this.mAnimatedDrawable = animatedVectorDrawable;
         this.mKeyButtonView.setImageDrawable(animatedVectorDrawable);
         this.mKeyButtonView.setColors(i, i2);
+    }
+
+    public FloatingRotationButton(Context context, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8, int i9) {
+        this.mWindowManager = (WindowManager) context.getSystemService(WindowManager.class);
+        ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(context).inflate(i2, (ViewGroup) null);
+        this.mKeyButtonContainer = viewGroup;
+        FloatingRotationButtonView floatingRotationButtonView = (FloatingRotationButtonView) viewGroup.findViewById(i3);
+        this.mKeyButtonView = floatingRotationButtonView;
+        floatingRotationButtonView.setVisibility(0);
+        floatingRotationButtonView.setContentDescription(context.getString(i));
+        floatingRotationButtonView.setRipple(i9);
+        this.mContext = context;
+        this.mContentDescriptionResource = i;
+        this.mMinMarginResource = i4;
+        this.mRoundedContentPaddingResource = i5;
+        this.mTaskbarLeftMarginResource = i6;
+        this.mTaskbarBottomMarginResource = i7;
+        this.mButtonDiameterResource = i8;
+        updateDimensionResources();
+    }
+
+    private void updateTranslation(FloatingRotationButtonPositionCalculator.Position position, boolean z) {
+        int translationX = position.getTranslationX();
+        int translationY = position.getTranslationY();
+        if (z) {
+            this.mKeyButtonView.animate().translationX(translationX).translationY(translationY).setDuration(300L).setInterpolator(new AccelerateDecelerateInterpolator()).withEndAction(new Runnable() { // from class: com.android.systemui.shared.rotation.FloatingRotationButton$$ExternalSyntheticLambda0
+                @Override // java.lang.Runnable
+                public final void run() {
+                    FloatingRotationButton.this.lambda$updateTranslation$1();
+                }
+            }).start();
+            return;
+        }
+        this.mKeyButtonView.setTranslationX(translationX);
+        this.mKeyButtonView.setTranslationY(translationY);
+    }
+
+    @Override // com.android.systemui.shared.rotation.RotationButton
+    public void setUpdatesCallback(RotationButton.RotationButtonUpdatesCallback rotationButtonUpdatesCallback) {
+        this.mUpdatesCallback = rotationButtonUpdatesCallback;
+    }
+
+    @Override // com.android.systemui.shared.rotation.RotationButton
+    public View getCurrentView() {
+        return this.mKeyButtonView;
+    }
+
+    @Override // com.android.systemui.shared.rotation.RotationButton
+    public Drawable getImageDrawable() {
+        return this.mAnimatedDrawable;
+    }
+
+    @Override // com.android.systemui.shared.rotation.RotationButton
+    public boolean isVisible() {
+        return this.mIsShowing;
     }
 }

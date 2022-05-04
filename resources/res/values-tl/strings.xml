@@ -30,13 +30,12 @@
     <string name="abc_slice_more">Higit pa</string>
     <string name="abc_slice_more_content">+ %1$d</string>
     <string name="abc_slice_permission_allow">Payagan</string>
-    <string name="abc_slice_permission_checkbox">Payagan ang %1$s na ipakita ang mga slice mula sa anumang app</string>
     <string name="abc_slice_permission_deny">Tanggihan</string>
     <string name="abc_slice_permission_text_1">- Nakakabasa ito ng impormasyon mula sa %1$s</string>
-    <string name="abc_slice_permission_text_2">- Nakakagawa ito ng mga pagkilos sa loob ng %1$s</string>
+    <string name="abc_slice_permission_text_2">- Nakakagawa ito ng mga pagkilos sa %1$s</string>
     <string name="abc_slice_permission_title">Payagan ang %1$s na ipakita ang mga slice ng %2$s?</string>
     <string name="abc_slice_show_more">Magpakita pa</string>
-    <string name="abc_slice_updated">Na-update noong %1$s</string>
+    <string name="abc_slice_updated">Na-update %1$s</string>
     <string name="abc_slices_permission_request">Gustong ipakita ng %1$s ang mga slice ng %2$s</string>
     <string name="abc_toolbar_collapse_description">I-collapse</string>
     <string name="accessibility_custom_color_title">Custom na kulay</string>
@@ -72,6 +71,7 @@
     <string name="center_wallpaper_position">Center</string>
     <string name="character_counter_content_description">Mga character na nailagay %1$d sa %2$d</string>
     <string name="character_counter_overflowed_content_description">Lumampas sa limitasyon sa bilang ng character %1$d sa %2$d</string>
+    <string name="cinematic_effects_toogle">Mga 3D na wallpaper</string>
     <string name="clear_text_end_icon_content_description">I-clear ang text</string>
     <string name="clock_preview_content_description">%1$s preview ng orasan</string>
     <string name="clock_title">Orasan</string>
@@ -117,6 +117,8 @@
     <string name="delete_live_wallpaper">I-delete</string>
     <string name="delete_wallpaper_confirmation">I-delete ang wallpaper na ito sa iyong telepono?</string>
     <string name="edit_custom_theme_lbl">I-tap para ma-edit</string>
+    <string name="effect_error_dialog_body">Hindi namin mailapat ang mga effect.\nSubukan sa ibang larawan.</string>
+    <string name="effect_error_dialog_title">Naku!</string>
     <string name="error_icon_content_description">Error</string>
     <string name="expand_button_title">Advanced</string>
     <string name="explore">I-explore</string>
@@ -199,6 +201,7 @@
     <string name="mtrl_picker_toggle_to_day_selection">I-tap para lumipat sa pagpili ng araw</string>
     <string name="mtrl_picker_toggle_to_text_input_mode">Lumipat sa pamamaraan ng pag-input ng text</string>
     <string name="mtrl_picker_toggle_to_year_selection">I-tap para lumipat sa pagpili ng taon</string>
+    <string name="my_photos">Mga Larawan Ko</string>
     <string name="my_photos_category_title">Aking mga larawan</string>
     <string name="my_photos_generic_wallpaper_title">Aking larawan</string>
     <string name="name_component_title">Pangalanan ang iyong istilo</string>
@@ -236,7 +239,7 @@
     <string name="search_menu_title">Maghanap</string>
     <string name="select_wallpaper_label">Mga kategorya ng wallpaper</string>
     <string name="set_theme_wallpaper_dialog_message">Itakda ang wallpaper ng istilo</string>
-    <string name="set_wallpaper_both_destination">Home at lock screen</string>
+    <string name="set_wallpaper_both_destination">Mga home at lock screen</string>
     <string name="set_wallpaper_button_text">Itakda na Wallpaper</string>
     <string name="set_wallpaper_dialog_message">Itakda ang wallpaper</string>
     <string name="set_wallpaper_error_message">Hindi maitakda ang wallpaper.</string>
@@ -244,6 +247,8 @@
     <string name="set_wallpaper_lock_screen_destination">Lock screen</string>
     <string name="set_wallpaper_progress_message">Itinatakda ang wallpaper…</string>
     <string name="settings_button_label">Mga Setting</string>
+    <string name="settings_snackbar_description">Paki-enable ang mga file at media sa mga setting.</string>
+    <string name="settings_snackbar_enable">I-enable</string>
     <string name="shape_component_title">Pumili ng hugis</string>
     <string name="shape_preview_content_description">Preview ng hugis</string>
     <string name="show_ui_preview_text">Ipakita ang Preview ng UI</string>
@@ -261,6 +266,7 @@
     <string name="style_info_description">Preview ng font, mga icon, hugis ng app, at kulay</string>
     <string name="summary_collapsed_preference_list">%1$s, %2$s</string>
     <string name="tab_customize">I-customize</string>
+    <string name="tab_effects">Mga Effect</string>
     <string name="tab_info">Impormasyon</string>
     <string name="theme_description">Font: %1$s, mga icon: %2$s, hugis: %3$s, kulay: %4$s</string>
     <string name="theme_preview_card_content_description">Preview ng istilo</string>
@@ -280,6 +286,8 @@
     <string name="wallpaper_destination_both">Home &amp; Lock screen</string>
     <string name="wallpaper_disabled_by_administrator_message">Na-disable ng administrator ng iyong device ang pagtatakda ng wallpaper</string>
     <string name="wallpaper_disabled_message">Naka-disable sa device na ito ang pagtatakda ng wallpaper</string>
+    <string name="wallpaper_effects_subtitle">Gawing 3D na wallpaper ang iyong larawan na gumagalaw kapag nagagalaw ang telepono mo</string>
+    <string name="wallpaper_effects_title">Mga 3D na Wallpaper</string>
     <string name="wallpaper_picker_entry_title">Palitan ang wallpaper</string>
     <string name="wallpaper_preview_card_content_description">Preview ng wallpaper</string>
     <string name="wallpaper_set_successfully_message">Matagumpay na naitakda ang wallpaper</string>

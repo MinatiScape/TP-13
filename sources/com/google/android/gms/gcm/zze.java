@@ -2,6 +2,7 @@ package com.google.android.gms.gcm;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+/* compiled from: PendingCallback.java */
 /* loaded from: classes.dex */
 public final class zze implements Parcelable.Creator<PendingCallback> {
     @Override // android.os.Parcelable.Creator

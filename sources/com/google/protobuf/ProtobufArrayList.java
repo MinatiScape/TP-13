@@ -15,24 +15,29 @@ public final class ProtobufArrayList<E> extends AbstractProtobufList<E> {
         protobufArrayList.isMutable = false;
     }
 
-    public ProtobufArrayList(List<E> list) {
-        this.list = list;
+    @Override // java.util.AbstractList, java.util.List
+    public final E get(int i) {
+        return this.list.get(i);
+    }
+
+    @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
+    public final int size() {
+        return this.list.size();
+    }
+
+    public ProtobufArrayList(ArrayList arrayList) {
+        this.list = arrayList;
     }
 
     @Override // java.util.AbstractList, java.util.List
-    public void add(int i, E e) {
+    public final void add(int i, E e) {
         ensureIsMutable();
         this.list.add(i, e);
         ((AbstractList) this).modCount++;
     }
 
-    @Override // java.util.AbstractList, java.util.List
-    public E get(int i) {
-        return this.list.get(i);
-    }
-
     @Override // com.google.protobuf.Internal.ProtobufList
-    public Internal.ProtobufList mutableCopyWithCapacity(int i) {
+    public final Internal.ProtobufList mutableCopyWithCapacity(int i) {
         if (i >= size()) {
             ArrayList arrayList = new ArrayList(i);
             arrayList.addAll(this.list);
@@ -42,7 +47,7 @@ public final class ProtobufArrayList<E> extends AbstractProtobufList<E> {
     }
 
     @Override // java.util.AbstractList, java.util.List
-    public E remove(int i) {
+    public final E remove(int i) {
         ensureIsMutable();
         E remove = this.list.remove(i);
         ((AbstractList) this).modCount++;
@@ -50,15 +55,10 @@ public final class ProtobufArrayList<E> extends AbstractProtobufList<E> {
     }
 
     @Override // java.util.AbstractList, java.util.List
-    public E set(int i, E e) {
+    public final E set(int i, E e) {
         ensureIsMutable();
         E e2 = this.list.set(i, e);
         ((AbstractList) this).modCount++;
         return e2;
-    }
-
-    @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
-    public int size() {
-        return this.list.size();
     }
 }

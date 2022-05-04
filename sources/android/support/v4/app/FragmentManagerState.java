@@ -2,16 +2,17 @@ package android.support.v4.app;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+/* compiled from: FragmentManager.java */
 /* loaded from: classes.dex */
-public final class FragmentManagerState implements Parcelable {
+final class FragmentManagerState implements Parcelable {
     public static final Parcelable.Creator<FragmentManagerState> CREATOR = new Parcelable.Creator<FragmentManagerState>() { // from class: android.support.v4.app.FragmentManagerState.1
         @Override // android.os.Parcelable.Creator
-        public FragmentManagerState createFromParcel(Parcel parcel) {
+        public final FragmentManagerState createFromParcel(Parcel parcel) {
             return new FragmentManagerState(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public FragmentManagerState[] newArray(int i) {
+        public final FragmentManagerState[] newArray(int i) {
             return new FragmentManagerState[i];
         }
     };
@@ -22,16 +23,16 @@ public final class FragmentManagerState implements Parcelable {
     public int mPrimaryNavActiveIndex;
 
     public FragmentManagerState() {
-        this.mPrimaryNavActiveIndex = -1;
+        throw null;
     }
 
     @Override // android.os.Parcelable
-    public int describeContents() {
+    public final int describeContents() {
         return 0;
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
+    public final void writeToParcel(Parcel parcel, int i) {
         parcel.writeTypedArray(this.mActive, i);
         parcel.writeIntArray(this.mAdded);
         parcel.writeTypedArray(this.mBackStack, i);

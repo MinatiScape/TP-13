@@ -5,7 +5,7 @@ import android.util.TypedValue;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 /* loaded from: classes.dex */
-public class ActionRow extends FrameLayout {
+public final class ActionRow extends FrameLayout {
     public final LinearLayout mActionsGroup;
     public int mColor = -16777216;
     public final int mIconPadding;

@@ -12,9 +12,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.ViewPropertyAnimatorCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
-import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
-import com.google.android.material.appbar.AppBarLayout;
 import com.google.common.math.IntMath;
+import java.util.List;
 import java.util.WeakHashMap;
 /* loaded from: classes.dex */
 public abstract class HeaderScrollingViewBehavior extends ViewOffsetBehavior<View> {
@@ -26,51 +25,45 @@ public abstract class HeaderScrollingViewBehavior extends ViewOffsetBehavior<Vie
     public HeaderScrollingViewBehavior() {
     }
 
-    public final int getOverlapPixelsForOffset(View view) {
-        int i;
-        if (this.overlayTop == 0) {
-            return 0;
-        }
-        boolean z = view instanceof AppBarLayout;
-        float f = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
-        if (z) {
-            AppBarLayout appBarLayout = (AppBarLayout) view;
-            int totalScrollRange = appBarLayout.getTotalScrollRange();
-            int downNestedPreScrollRange = appBarLayout.getDownNestedPreScrollRange();
-            CoordinatorLayout.Behavior behavior = ((CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams()).mBehavior;
-            int topBottomOffsetForScrollingSibling = behavior instanceof AppBarLayout.BaseBehavior ? ((AppBarLayout.BaseBehavior) behavior).getTopBottomOffsetForScrollingSibling() : 0;
-            if ((downNestedPreScrollRange == 0 || totalScrollRange + topBottomOffsetForScrollingSibling > downNestedPreScrollRange) && (i = totalScrollRange - downNestedPreScrollRange) != 0) {
-                f = 1.0f + (topBottomOffsetForScrollingSibling / i);
-            }
-        }
-        int i2 = this.overlayTop;
-        return MathUtils.clamp((int) (f * i2), 0, i2);
+    public abstract AppBarLayout findFirstDependency$1(List list);
+
+    public float getOverlapRatioForOffset(View view) {
+        return 1.0f;
+    }
+
+    public int getScrollRange(View view) {
+        return view.getMeasuredHeight();
     }
 
     @Override // com.google.android.material.appbar.ViewOffsetBehavior
-    public void layoutChild(CoordinatorLayout coordinatorLayout, View view, int i) {
-        AppBarLayout findFirstDependency = ((AppBarLayout.ScrollingViewBehavior) this).findFirstDependency(coordinatorLayout.getDependencies(view));
-        if (findFirstDependency != null) {
+    public final void layoutChild(CoordinatorLayout coordinatorLayout, View view, int i) {
+        AppBarLayout findFirstDependency$1 = findFirstDependency$1(coordinatorLayout.getDependencies(view));
+        int i2 = 0;
+        if (findFirstDependency$1 != null) {
             CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) view.getLayoutParams();
             Rect rect = this.tempRect1;
-            rect.set(coordinatorLayout.getPaddingLeft() + ((ViewGroup.MarginLayoutParams) layoutParams).leftMargin, findFirstDependency.getBottom() + ((ViewGroup.MarginLayoutParams) layoutParams).topMargin, (coordinatorLayout.getWidth() - coordinatorLayout.getPaddingRight()) - ((ViewGroup.MarginLayoutParams) layoutParams).rightMargin, ((findFirstDependency.getBottom() + coordinatorLayout.getHeight()) - coordinatorLayout.getPaddingBottom()) - ((ViewGroup.MarginLayoutParams) layoutParams).bottomMargin);
+            rect.set(coordinatorLayout.getPaddingLeft() + ((ViewGroup.MarginLayoutParams) layoutParams).leftMargin, findFirstDependency$1.getBottom() + ((ViewGroup.MarginLayoutParams) layoutParams).topMargin, (coordinatorLayout.getWidth() - coordinatorLayout.getPaddingRight()) - ((ViewGroup.MarginLayoutParams) layoutParams).rightMargin, ((findFirstDependency$1.getBottom() + coordinatorLayout.getHeight()) - coordinatorLayout.getPaddingBottom()) - ((ViewGroup.MarginLayoutParams) layoutParams).bottomMargin);
             WindowInsetsCompat windowInsetsCompat = coordinatorLayout.mLastInsets;
             if (windowInsetsCompat != null) {
                 WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-                if (coordinatorLayout.getFitsSystemWindows() && !view.getFitsSystemWindows()) {
+                if (ViewCompat.Api16Impl.getFitsSystemWindows(coordinatorLayout) && !ViewCompat.Api16Impl.getFitsSystemWindows(view)) {
                     rect.left = windowInsetsCompat.getSystemWindowInsetLeft() + rect.left;
                     rect.right -= windowInsetsCompat.getSystemWindowInsetRight();
                 }
             }
             Rect rect2 = this.tempRect2;
-            int i2 = layoutParams.gravity;
-            if (i2 == 0) {
-                i2 = 8388659;
+            int i3 = layoutParams.gravity;
+            if (i3 == 0) {
+                i3 = 8388659;
             }
-            Gravity.apply(i2, view.getMeasuredWidth(), view.getMeasuredHeight(), rect, rect2, i);
-            int overlapPixelsForOffset = getOverlapPixelsForOffset(findFirstDependency);
-            view.layout(rect2.left, rect2.top - overlapPixelsForOffset, rect2.right, rect2.bottom - overlapPixelsForOffset);
-            this.verticalLayoutGap = rect2.top - findFirstDependency.getBottom();
+            Gravity.apply(i3, view.getMeasuredWidth(), view.getMeasuredHeight(), rect, rect2, i);
+            if (this.overlayTop != 0) {
+                float overlapRatioForOffset = getOverlapRatioForOffset(findFirstDependency$1);
+                int i4 = this.overlayTop;
+                i2 = MathUtils.clamp((int) (overlapRatioForOffset * i4), 0, i4);
+            }
+            view.layout(rect2.left, rect2.top - i2, rect2.right, rect2.bottom - i2);
+            this.verticalLayoutGap = rect2.top - findFirstDependency$1.getBottom();
             return;
         }
         coordinatorLayout.onLayoutChild(view, i);
@@ -78,26 +71,30 @@ public abstract class HeaderScrollingViewBehavior extends ViewOffsetBehavior<Vie
     }
 
     @Override // androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
-    public boolean onMeasureChild(CoordinatorLayout coordinatorLayout, View view, int i, int i2, int i3, int i4) {
+    public final boolean onMeasureChild(CoordinatorLayout coordinatorLayout, View view, int i, int i2, int i3) {
+        AppBarLayout findFirstDependency$1;
+        int i4;
         WindowInsetsCompat windowInsetsCompat;
         int i5 = view.getLayoutParams().height;
-        if (i5 != -1 && i5 != -2) {
-            return false;
-        }
-        AppBarLayout findFirstDependency = ((AppBarLayout.ScrollingViewBehavior) this).findFirstDependency(coordinatorLayout.getDependencies(view));
-        if (findFirstDependency == null) {
+        if ((i5 != -1 && i5 != -2) || (findFirstDependency$1 = findFirstDependency$1(coordinatorLayout.getDependencies(view))) == null) {
             return false;
         }
         int size = View.MeasureSpec.getSize(i3);
         if (size > 0) {
             WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-            if (findFirstDependency.getFitsSystemWindows() && (windowInsetsCompat = coordinatorLayout.mLastInsets) != null) {
+            if (ViewCompat.Api16Impl.getFitsSystemWindows(findFirstDependency$1) && (windowInsetsCompat = coordinatorLayout.mLastInsets) != null) {
                 size += windowInsetsCompat.getSystemWindowInsetBottom() + windowInsetsCompat.getSystemWindowInsetTop();
             }
         } else {
             size = coordinatorLayout.getHeight();
         }
-        coordinatorLayout.onMeasureChild(view, i, i2, View.MeasureSpec.makeMeasureSpec((size + findFirstDependency.getTotalScrollRange()) - findFirstDependency.getMeasuredHeight(), i5 == -1 ? IntMath.MAX_SIGNED_POWER_OF_TWO : RecyclerView.UNDEFINED_DURATION), i4);
+        int scrollRange = (getScrollRange(findFirstDependency$1) + size) - findFirstDependency$1.getMeasuredHeight();
+        if (i5 == -1) {
+            i4 = IntMath.MAX_SIGNED_POWER_OF_TWO;
+        } else {
+            i4 = RecyclerView.UNDEFINED_DURATION;
+        }
+        coordinatorLayout.onMeasureChild(view, i, i2, View.MeasureSpec.makeMeasureSpec(scrollRange, i4));
         return true;
     }
 

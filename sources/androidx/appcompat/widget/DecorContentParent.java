@@ -1,8 +1,8 @@
 package androidx.appcompat.widget;
 
-import android.view.Menu;
 import android.view.Window;
-import androidx.appcompat.view.menu.MenuPresenter;
+import androidx.appcompat.app.AppCompatDelegateImpl;
+import androidx.appcompat.view.menu.MenuBuilder;
 /* loaded from: classes.dex */
 public interface DecorContentParent {
     boolean canShowOverflowMenu();
@@ -17,7 +17,7 @@ public interface DecorContentParent {
 
     boolean isOverflowMenuShowing();
 
-    void setMenu(Menu menu, MenuPresenter.Callback callback);
+    void setMenu(MenuBuilder menuBuilder, AppCompatDelegateImpl.ActionMenuPresenterCallback actionMenuPresenterCallback);
 
     void setMenuPrepared();
 

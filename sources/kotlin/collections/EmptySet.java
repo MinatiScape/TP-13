@@ -8,79 +8,45 @@ import kotlin.jvm.internal.CollectionToArray;
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: Sets.kt */
 /* loaded from: classes.dex */
 public final class EmptySet implements Set, Serializable {
     @NotNull
     public static final EmptySet INSTANCE = new EmptySet();
     private static final long serialVersionUID = 3406603774387020532L;
 
-    private final Object readResolve() {
-        return INSTANCE;
-    }
-
     @Override // java.util.Set, java.util.Collection
-    public /* synthetic */ boolean add(Object obj) {
+    public final boolean addAll(Collection collection) {
         throw new UnsupportedOperationException("Operation is not supported for read-only collection");
     }
 
     @Override // java.util.Set, java.util.Collection
-    public boolean addAll(Collection collection) {
+    public final void clear() {
         throw new UnsupportedOperationException("Operation is not supported for read-only collection");
     }
 
     @Override // java.util.Set, java.util.Collection
-    public void clear() {
-        throw new UnsupportedOperationException("Operation is not supported for read-only collection");
-    }
-
-    @Override // java.util.Set, java.util.Collection
-    public final boolean contains(Object obj) {
-        if (obj instanceof Void) {
-            Void element = (Void) obj;
-            Intrinsics.checkNotNullParameter(element, "element");
-        }
-        return false;
-    }
-
-    @Override // java.util.Set, java.util.Collection
-    public boolean containsAll(@NotNull Collection elements) {
-        Intrinsics.checkNotNullParameter(elements, "elements");
-        return elements.isEmpty();
-    }
-
-    @Override // java.util.Set, java.util.Collection
-    public boolean equals(@Nullable Object obj) {
-        return (obj instanceof Set) && ((Set) obj).isEmpty();
-    }
-
-    @Override // java.util.Set, java.util.Collection
-    public int hashCode() {
+    public final int hashCode() {
         return 0;
     }
 
     @Override // java.util.Set, java.util.Collection
-    public boolean isEmpty() {
+    public final boolean isEmpty() {
         return true;
     }
 
-    @Override // java.util.Set, java.util.Collection, java.lang.Iterable
-    @NotNull
-    public Iterator iterator() {
-        return EmptyIterator.INSTANCE;
-    }
-
     @Override // java.util.Set, java.util.Collection
-    public boolean remove(Object obj) {
+    public final boolean remove(Object obj) {
         throw new UnsupportedOperationException("Operation is not supported for read-only collection");
     }
 
     @Override // java.util.Set, java.util.Collection
-    public boolean removeAll(Collection collection) {
+    public final boolean removeAll(Collection collection) {
         throw new UnsupportedOperationException("Operation is not supported for read-only collection");
     }
 
     @Override // java.util.Set, java.util.Collection
-    public boolean retainAll(Collection collection) {
+    public final boolean retainAll(Collection collection) {
         throw new UnsupportedOperationException("Operation is not supported for read-only collection");
     }
 
@@ -90,17 +56,61 @@ public final class EmptySet implements Set, Serializable {
     }
 
     @Override // java.util.Set, java.util.Collection
-    public Object[] toArray() {
+    public final Object[] toArray() {
         return CollectionToArray.toArray(this);
     }
 
     @Override // java.util.Set, java.util.Collection
-    public <T> T[] toArray(T[] tArr) {
-        return (T[]) CollectionToArray.toArray(this, tArr);
+    public final <T> T[] toArray(T[] array) {
+        Intrinsics.checkNotNullParameter(array, "array");
+        return (T[]) CollectionToArray.toArray(this, array);
     }
 
     @NotNull
-    public String toString() {
+    public final String toString() {
         return "[]";
+    }
+
+    @Override // java.util.Set, java.util.Collection
+    public final boolean add(Object obj) {
+        Void r1 = (Void) obj;
+        throw new UnsupportedOperationException("Operation is not supported for read-only collection");
+    }
+
+    @Override // java.util.Set, java.util.Collection
+    public final boolean contains(Object obj) {
+        if (!(obj instanceof Void)) {
+            return false;
+        }
+        Void element = (Void) obj;
+        Intrinsics.checkNotNullParameter(element, "element");
+        return false;
+    }
+
+    @Override // java.util.Set, java.util.Collection
+    public final boolean containsAll(@NotNull Collection elements) {
+        Intrinsics.checkNotNullParameter(elements, "elements");
+        return elements.isEmpty();
+    }
+
+    @Override // java.util.Set, java.util.Collection
+    public final boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof Set) || !((Set) obj).isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
+    private EmptySet() {
+    }
+
+    private final Object readResolve() {
+        return INSTANCE;
+    }
+
+    @Override // java.util.Set, java.util.Collection, java.lang.Iterable
+    @NotNull
+    public final Iterator iterator() {
+        return EmptyIterator.INSTANCE;
     }
 }

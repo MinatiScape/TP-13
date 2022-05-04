@@ -7,6 +7,7 @@ import android.os.RemoteException;
 import com.google.android.gms.dynamic.IObjectWrapper;
 import com.google.android.gms.dynamic.zzm;
 import com.google.android.gms.internal.zzez;
+/* compiled from: ICertData.java */
 /* loaded from: classes.dex */
 public final class zzac extends zzez implements zzaa {
     public zzac(IBinder iBinder) {

@@ -6,29 +6,28 @@ import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalS
 import android.util.ArrayMap;
 import android.util.Log;
 import android.util.SparseArray;
+import androidx.activity.ComponentActivity$$ExternalSyntheticLambda2;
+import androidx.cardview.R$style;
+import androidx.dynamicanimation.animation.AnimationHandler$$ExternalSyntheticLambda0;
 import com.android.customization.model.grid.GridOption;
 import com.android.customization.module.ThemesUserEventLogger;
 import com.android.systemui.shared.R;
-import com.android.systemui.shared.rotation.RotationButtonController$1$$ExternalSyntheticLambda0;
 import com.android.systemui.shared.system.QuickStepContract;
 import com.android.wallpaper.module.Injector;
-import com.android.wallpaper.module.InjectorProvider;
 import com.android.wallpaper.module.LoggingOptInStatusProvider;
-import com.android.wallpaper.module.NoOpUserEventLogger;
 import com.android.wallpaper.module.WallpaperPreferences;
-import com.android.wallpaper.picker.ImagePreviewFragment$4$$ExternalSyntheticLambda0;
-import com.android.wallpaper.util.PreviewUtils$$ExternalSyntheticLambda1;
-import com.android.wallpaper.util.WallpaperConnection$$ExternalSyntheticLambda1;
+import com.android.wallpaper.picker.PreviewFragment$$ExternalSyntheticLambda8;
+import com.android.wallpaper.util.LaunchUtils;
+import com.bumptech.glide.manager.ApplicationLifecycle;
 import com.google.android.gms.clearcut.ClearcutLogger;
 import com.google.android.gms.clearcut.Counters;
 import com.google.android.gms.common.util.zzh;
-import com.google.android.material.shape.EdgeTreatment;
 import com.google.wireless.android.apps.wallpaper.WallpaperLogProto$WallpaperEvent;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Objects;
+import java.util.ArrayList;
 /* loaded from: classes.dex */
-public class ClearcutUserEventLogger extends NoOpUserEventLogger implements ThemesUserEventLogger {
+public final class ClearcutUserEventLogger extends ApplicationLifecycle implements ThemesUserEventLogger {
     public static final boolean IS_VERBOSE = Log.isLoggable("UserEvent", 2);
     public static final ArrayMap<Class, SparseArray<String>> sNameCache = new ArrayMap<>();
     public ClearcutLogger mClearcutLogger;
@@ -36,16 +35,25 @@ public class ClearcutUserEventLogger extends NoOpUserEventLogger implements Them
     public Counters mCounters;
     public LoggingOptInStatusProvider mLoggingOptInStatusProvider;
     public WallpaperPreferences mPreferences;
-    public final EdgeTreatment mWallpaperStatusChecker;
+    public final zzh mWallpaperStatusChecker;
 
-    public ClearcutUserEventLogger(Context context) {
-        this.mContext = context;
-        Injector injector = InjectorProvider.getInjector();
-        this.mPreferences = injector.getPreferences(context);
-        this.mClearcutLogger = new ClearcutLogger(context, "WALLPAPER_PICKER", null);
-        this.mLoggingOptInStatusProvider = injector.getLoggingOptInStatusProvider(context);
-        this.mCounters = new Counters(this.mClearcutLogger, "WALLPAPER_PICKER_COUNTERS", QuickStepContract.SYSUI_STATE_SEARCH_DISABLED, zzh.zza);
-        this.mWallpaperStatusChecker = injector.getWallpaperStatusChecker();
+    @Override // com.android.wallpaper.module.UserEventLogger
+    public final void logAppLaunched(Intent intent) {
+    }
+
+    @Override // com.android.customization.module.ThemesUserEventLogger
+    public final void logColorApplied(int i, int i2) {
+    }
+
+    @Override // com.bumptech.glide.manager.ApplicationLifecycle, com.android.wallpaper.module.UserEventLogger
+    public final void logCurrentWallpaperPreviewed() {
+        logBasicEvent(6);
+    }
+
+    @Override // com.bumptech.glide.manager.ApplicationLifecycle, com.android.wallpaper.module.UserEventLogger
+    public final void logDailyRefreshTurnedOn() {
+        logBasicEvent(3);
+        logIfOptedIn(new AnimationHandler$$ExternalSyntheticLambda0(this, 2));
     }
 
     public final void log(WallpaperLogProto$WallpaperEvent wallpaperLogProto$WallpaperEvent) {
@@ -55,7 +63,7 @@ public class ClearcutUserEventLogger extends NoOpUserEventLogger implements Them
         Field[] declaredFields2;
         ClearcutLogger clearcutLogger = this.mClearcutLogger;
         byte[] byteArray = wallpaperLogProto$WallpaperEvent.toByteArray();
-        Objects.requireNonNull(clearcutLogger);
+        clearcutLogger.getClass();
         new ClearcutLogger.LogEventBuilder(byteArray, null).logAsync();
         if (IS_VERBOSE) {
             StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("type:");
@@ -95,147 +103,164 @@ public class ClearcutUserEventLogger extends NoOpUserEventLogger implements Them
         }
     }
 
-    @Override // com.android.wallpaper.module.UserEventLogger
-    public void logActionClicked(String str, int i) {
-        logEventWithCollectionId(i == R.string.build_case ? true : true ? 8 : 7, str);
+    public final void logBasicEvent(final int i) {
+        logIfOptedIn(new Runnable() { // from class: com.google.android.apps.wallpaper.module.ClearcutUserEventLogger$$ExternalSyntheticLambda2
+            @Override // java.lang.Runnable
+            public final void run() {
+                ClearcutUserEventLogger clearcutUserEventLogger = ClearcutUserEventLogger.this;
+                int i2 = i;
+                clearcutUserEventLogger.getClass();
+                WallpaperLogProto$WallpaperEvent.Builder newBuilder = WallpaperLogProto$WallpaperEvent.newBuilder();
+                newBuilder.setType(WallpaperLogProto$WallpaperEvent.Type.forNumber(i2));
+                clearcutUserEventLogger.log(newBuilder.build());
+            }
+        });
     }
 
     @Override // com.android.wallpaper.module.UserEventLogger
-    public void logAppLaunched(Intent intent) {
+    public final void logCategorySelected(String str) {
+        logIfOptedIn(new ClearcutUserEventLogger$$ExternalSyntheticLambda13(this, 4, str));
     }
 
-    public final void logBasicEvent(int i) {
-        RotationButtonController$1$$ExternalSyntheticLambda0 rotationButtonController$1$$ExternalSyntheticLambda0 = new RotationButtonController$1$$ExternalSyntheticLambda0(this, i, 4);
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        rotationButtonController$1$$ExternalSyntheticLambda0.run();
+    @Override // com.bumptech.glide.manager.ApplicationLifecycle, com.android.wallpaper.module.UserEventLogger
+    public final void logDailyWallpaperMetadataRequestFailure(final int i) {
+        logIfOptedIn(new Runnable() { // from class: com.google.android.apps.wallpaper.module.ClearcutUserEventLogger$$ExternalSyntheticLambda9
+            @Override // java.lang.Runnable
+            public final void run() {
+                ClearcutUserEventLogger clearcutUserEventLogger = ClearcutUserEventLogger.this;
+                clearcutUserEventLogger.mCounters.getIntegerHistogram("DailyWallpaper.MetadataRequestFailureReason").increment(i);
+                clearcutUserEventLogger.mCounters.logAllAsync();
+            }
+        });
     }
 
-    @Override // com.android.wallpaper.module.UserEventLogger
-    public void logCategorySelected(String str) {
-        logEventWithCollectionId(4, str);
+    @Override // com.bumptech.glide.manager.ApplicationLifecycle, com.android.wallpaper.module.UserEventLogger
+    public final void logDailyWallpaperRotationHour(final int i) {
+        logIfOptedIn(new Runnable() { // from class: com.google.android.apps.wallpaper.module.ClearcutUserEventLogger$$ExternalSyntheticLambda5
+            @Override // java.lang.Runnable
+            public final void run() {
+                ClearcutUserEventLogger clearcutUserEventLogger = ClearcutUserEventLogger.this;
+                clearcutUserEventLogger.mCounters.getIntegerHistogram("DailyWallpaper.RotationHourOfDay").increment(i);
+                clearcutUserEventLogger.mCounters.logAllAsync();
+            }
+        });
+    }
+
+    @Override // com.bumptech.glide.manager.ApplicationLifecycle, com.android.wallpaper.module.UserEventLogger
+    public final void logDailyWallpaperRotationStatus(final int i) {
+        logIfOptedIn(new Runnable() { // from class: com.google.android.apps.wallpaper.module.ClearcutUserEventLogger$$ExternalSyntheticLambda6
+            @Override // java.lang.Runnable
+            public final void run() {
+                ClearcutUserEventLogger clearcutUserEventLogger = ClearcutUserEventLogger.this;
+                int i2 = i;
+                clearcutUserEventLogger.mCounters.getIntegerHistogram("DailyWallpaper.RotationStatus").increment(i2);
+                Counters.IntegerHistogram integerHistogram = clearcutUserEventLogger.mCounters.getIntegerHistogram("DailyWallpaper.DailyRotationResult");
+                if (2 == i2 || 3 == i2 || 4 == i2) {
+                    integerHistogram.increment(0);
+                }
+                if (i2 == 0 || 5 == i2) {
+                    integerHistogram.increment(1);
+                }
+                clearcutUserEventLogger.mCounters.logAllAsync();
+            }
+        });
+    }
+
+    @Override // com.bumptech.glide.manager.ApplicationLifecycle, com.android.wallpaper.module.UserEventLogger
+    public final void logDailyWallpaperSetNextWallpaperCrash(final int i) {
+        logIfOptedIn(new Runnable() { // from class: com.google.android.apps.wallpaper.module.ClearcutUserEventLogger$$ExternalSyntheticLambda8
+            @Override // java.lang.Runnable
+            public final void run() {
+                ClearcutUserEventLogger clearcutUserEventLogger = ClearcutUserEventLogger.this;
+                clearcutUserEventLogger.mCounters.getIntegerHistogram("DailyWallpaper.SetNextWallpaperCrash").increment(i);
+                clearcutUserEventLogger.mCounters.logAllAsync();
+            }
+        });
+    }
+
+    @Override // com.bumptech.glide.manager.ApplicationLifecycle, com.android.wallpaper.module.UserEventLogger
+    public final void logDailyWallpaperSetNextWallpaperResult(final int i) {
+        logIfOptedIn(new Runnable() { // from class: com.google.android.apps.wallpaper.module.ClearcutUserEventLogger$$ExternalSyntheticLambda7
+            @Override // java.lang.Runnable
+            public final void run() {
+                ClearcutUserEventLogger clearcutUserEventLogger = ClearcutUserEventLogger.this;
+                clearcutUserEventLogger.mCounters.getIntegerHistogram("DailyWallpaper.SetNextWallpaperResult").increment(i);
+                clearcutUserEventLogger.mCounters.logAllAsync();
+            }
+        });
     }
 
     @Override // com.android.customization.module.ThemesUserEventLogger
-    public void logColorApplied(int i, int i2) {
-    }
-
-    @Override // com.android.wallpaper.module.NoOpUserEventLogger, com.android.wallpaper.module.UserEventLogger
-    public void logCurrentWallpaperPreviewed() {
-        logBasicEvent(6);
-    }
-
-    @Override // com.android.wallpaper.module.NoOpUserEventLogger, com.android.wallpaper.module.UserEventLogger
-    public void logDailyRefreshTurnedOn() {
-        logBasicEvent(3);
-        ClearcutUserEventLogger$$ExternalSyntheticLambda0 clearcutUserEventLogger$$ExternalSyntheticLambda0 = new ClearcutUserEventLogger$$ExternalSyntheticLambda0(this, 1);
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        clearcutUserEventLogger$$ExternalSyntheticLambda0.run();
-    }
-
-    @Override // com.android.wallpaper.module.NoOpUserEventLogger, com.android.wallpaper.module.UserEventLogger
-    public void logDailyWallpaperMetadataRequestFailure(int i) {
-        RotationButtonController$1$$ExternalSyntheticLambda0 rotationButtonController$1$$ExternalSyntheticLambda0 = new RotationButtonController$1$$ExternalSyntheticLambda0(this, i, 1);
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        rotationButtonController$1$$ExternalSyntheticLambda0.run();
-    }
-
-    @Override // com.android.wallpaper.module.NoOpUserEventLogger, com.android.wallpaper.module.UserEventLogger
-    public void logDailyWallpaperRotationHour(int i) {
-        RotationButtonController$1$$ExternalSyntheticLambda0 rotationButtonController$1$$ExternalSyntheticLambda0 = new RotationButtonController$1$$ExternalSyntheticLambda0(this, i, 8);
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        rotationButtonController$1$$ExternalSyntheticLambda0.run();
-    }
-
-    @Override // com.android.wallpaper.module.NoOpUserEventLogger, com.android.wallpaper.module.UserEventLogger
-    public void logDailyWallpaperRotationStatus(int i) {
-        RotationButtonController$1$$ExternalSyntheticLambda0 rotationButtonController$1$$ExternalSyntheticLambda0 = new RotationButtonController$1$$ExternalSyntheticLambda0(this, i, 3);
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        rotationButtonController$1$$ExternalSyntheticLambda0.run();
-    }
-
-    @Override // com.android.wallpaper.module.NoOpUserEventLogger, com.android.wallpaper.module.UserEventLogger
-    public void logDailyWallpaperSetNextWallpaperCrash(int i) {
-        RotationButtonController$1$$ExternalSyntheticLambda0 rotationButtonController$1$$ExternalSyntheticLambda0 = new RotationButtonController$1$$ExternalSyntheticLambda0(this, i, 10);
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        rotationButtonController$1$$ExternalSyntheticLambda0.run();
-    }
-
-    @Override // com.android.wallpaper.module.NoOpUserEventLogger, com.android.wallpaper.module.UserEventLogger
-    public void logDailyWallpaperSetNextWallpaperResult(int i) {
-        RotationButtonController$1$$ExternalSyntheticLambda0 rotationButtonController$1$$ExternalSyntheticLambda0 = new RotationButtonController$1$$ExternalSyntheticLambda0(this, i, 9);
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        rotationButtonController$1$$ExternalSyntheticLambda0.run();
-    }
-
-    public final void logEventWithCollectionId(int i, String str) {
-        WallpaperConnection$$ExternalSyntheticLambda1 wallpaperConnection$$ExternalSyntheticLambda1 = new WallpaperConnection$$ExternalSyntheticLambda1(this, i, str);
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        wallpaperConnection$$ExternalSyntheticLambda1.run();
+    public final void logGridApplied(GridOption gridOption) {
+        logIfOptedIn(new ClearcutUserEventLogger$$ExternalSyntheticLambda12(this, 14, gridOption));
     }
 
     @Override // com.android.customization.module.ThemesUserEventLogger
-    public void logGridApplied(GridOption gridOption) {
-        WallpaperConnection$$ExternalSyntheticLambda1 wallpaperConnection$$ExternalSyntheticLambda1 = new WallpaperConnection$$ExternalSyntheticLambda1(this, 14, gridOption);
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        wallpaperConnection$$ExternalSyntheticLambda1.run();
+    public final void logGridSelected(GridOption gridOption) {
+        logIfOptedIn(new ClearcutUserEventLogger$$ExternalSyntheticLambda12(this, 13, gridOption));
     }
 
-    @Override // com.android.customization.module.ThemesUserEventLogger
-    public void logGridSelected(GridOption gridOption) {
-        WallpaperConnection$$ExternalSyntheticLambda1 wallpaperConnection$$ExternalSyntheticLambda1 = new WallpaperConnection$$ExternalSyntheticLambda1(this, 13, gridOption);
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        wallpaperConnection$$ExternalSyntheticLambda1.run();
+    public final void logIfOptedIn(Runnable runnable) {
+        ((LaunchUtils) this.mLoggingOptInStatusProvider).getClass();
+        runnable.run();
     }
 
     @Override // com.android.wallpaper.module.UserEventLogger
-    public void logIndividualWallpaperSelected(String str) {
-        logEventWithCollectionId(5, str);
+    public final void logIndividualWallpaperSelected(String str) {
+        logIfOptedIn(new ClearcutUserEventLogger$$ExternalSyntheticLambda13(this, 5, str));
     }
 
-    @Override // com.android.wallpaper.module.NoOpUserEventLogger, com.android.wallpaper.module.UserEventLogger
-    public void logNumDailyWallpaperRotationsInLastWeek() {
-        ClearcutUserEventLogger$$ExternalSyntheticLambda0 clearcutUserEventLogger$$ExternalSyntheticLambda0 = new ClearcutUserEventLogger$$ExternalSyntheticLambda0(this, 0);
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        clearcutUserEventLogger$$ExternalSyntheticLambda0.run();
+    @Override // com.bumptech.glide.manager.ApplicationLifecycle, com.android.wallpaper.module.UserEventLogger
+    public final void logNumDailyWallpaperRotationsInLastWeek() {
+        logIfOptedIn(new ComponentActivity$$ExternalSyntheticLambda2(this, 3));
     }
 
-    @Override // com.android.wallpaper.module.NoOpUserEventLogger, com.android.wallpaper.module.UserEventLogger
-    public void logNumDailyWallpaperRotationsPreviousDay() {
-        ClearcutUserEventLogger$$ExternalSyntheticLambda0 clearcutUserEventLogger$$ExternalSyntheticLambda0 = new ClearcutUserEventLogger$$ExternalSyntheticLambda0(this, 4);
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        clearcutUserEventLogger$$ExternalSyntheticLambda0.run();
+    @Override // com.bumptech.glide.manager.ApplicationLifecycle, com.android.wallpaper.module.UserEventLogger
+    public final void logNumDailyWallpaperRotationsPreviousDay() {
+        logIfOptedIn(new Runnable() { // from class: com.google.android.apps.wallpaper.module.ClearcutUserEventLogger$$ExternalSyntheticLambda1
+            @Override // java.lang.Runnable
+            public final void run() {
+                ArrayList dailyRotationsPreviousDay;
+                ClearcutUserEventLogger clearcutUserEventLogger = ClearcutUserEventLogger.this;
+                if (clearcutUserEventLogger.mPreferences.getWallpaperPresentationMode() == 2 && (dailyRotationsPreviousDay = clearcutUserEventLogger.mPreferences.getDailyRotationsPreviousDay()) != null) {
+                    clearcutUserEventLogger.mCounters.getIntegerHistogram("DailyWallpaper.NumRotationsPreviousDay").incrementBase(dailyRotationsPreviousDay.size());
+                    clearcutUserEventLogger.mCounters.logAllAsync();
+                }
+            }
+        });
     }
 
-    @Override // com.android.wallpaper.module.NoOpUserEventLogger, com.android.wallpaper.module.UserEventLogger
-    public void logNumDaysDailyRotationFailed(int i) {
-        RotationButtonController$1$$ExternalSyntheticLambda0 rotationButtonController$1$$ExternalSyntheticLambda0 = new RotationButtonController$1$$ExternalSyntheticLambda0(this, i, 2);
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        rotationButtonController$1$$ExternalSyntheticLambda0.run();
+    @Override // com.bumptech.glide.manager.ApplicationLifecycle, com.android.wallpaper.module.UserEventLogger
+    public final void logNumDaysDailyRotationFailed(final int i) {
+        logIfOptedIn(new Runnable() { // from class: com.google.android.apps.wallpaper.module.ClearcutUserEventLogger$$ExternalSyntheticLambda10
+            @Override // java.lang.Runnable
+            public final void run() {
+                ClearcutUserEventLogger clearcutUserEventLogger = ClearcutUserEventLogger.this;
+                clearcutUserEventLogger.mCounters.getIntegerHistogram("DailyWallpaper.NumDaysInFailedState").increment(i);
+                clearcutUserEventLogger.mCounters.logAllAsync();
+            }
+        });
     }
 
-    @Override // com.android.wallpaper.module.NoOpUserEventLogger, com.android.wallpaper.module.UserEventLogger
-    public void logNumDaysDailyRotationNotAttempted(int i) {
-        RotationButtonController$1$$ExternalSyntheticLambda0 rotationButtonController$1$$ExternalSyntheticLambda0 = new RotationButtonController$1$$ExternalSyntheticLambda0(this, i, 6);
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        rotationButtonController$1$$ExternalSyntheticLambda0.run();
+    @Override // com.bumptech.glide.manager.ApplicationLifecycle, com.android.wallpaper.module.UserEventLogger
+    public final void logNumDaysDailyRotationNotAttempted(final int i) {
+        logIfOptedIn(new Runnable() { // from class: com.google.android.apps.wallpaper.module.ClearcutUserEventLogger$$ExternalSyntheticLambda11
+            @Override // java.lang.Runnable
+            public final void run() {
+                ClearcutUserEventLogger clearcutUserEventLogger = ClearcutUserEventLogger.this;
+                clearcutUserEventLogger.mCounters.getIntegerHistogram("DailyWallpaper.NumDaysInNotAttemptedState").increment(i);
+                clearcutUserEventLogger.mCounters.logAllAsync();
+            }
+        });
     }
 
-    @Override // com.android.wallpaper.module.NoOpUserEventLogger, com.android.wallpaper.module.UserEventLogger
-    public void logRefreshDailyWallpaperButtonClicked() {
-        ImagePreviewFragment$4$$ExternalSyntheticLambda0 imagePreviewFragment$4$$ExternalSyntheticLambda0 = new ImagePreviewFragment$4$$ExternalSyntheticLambda0(this, "DailyWallpaper.RefreshButtonClicked");
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        imagePreviewFragment$4$$ExternalSyntheticLambda0.run();
-    }
-
-    @Override // com.android.wallpaper.module.NoOpUserEventLogger, com.android.wallpaper.module.UserEventLogger
-    public void logRestored() {
-        ImagePreviewFragment$4$$ExternalSyntheticLambda0 imagePreviewFragment$4$$ExternalSyntheticLambda0 = new ImagePreviewFragment$4$$ExternalSyntheticLambda0(this, "BackupAndRestore.Restored");
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        imagePreviewFragment$4$$ExternalSyntheticLambda0.run();
+    @Override // com.bumptech.glide.manager.ApplicationLifecycle, com.android.wallpaper.module.UserEventLogger
+    public final void logRestored() {
+        logIfOptedIn(new ClearcutUserEventLogger$$ExternalSyntheticLambda14(this, "BackupAndRestore.Restored"));
     }
 
     @Override // com.android.wallpaper.module.UserEventLogger
-    public void logResumed(boolean z, boolean z2) {
+    public final void logResumed(boolean z, boolean z2) {
         if (z) {
             if (z2) {
                 logBasicEvent(17);
@@ -249,66 +274,129 @@ public class ClearcutUserEventLogger extends NoOpUserEventLogger implements Them
         }
     }
 
-    @Override // com.android.wallpaper.module.NoOpUserEventLogger, com.android.wallpaper.module.UserEventLogger
-    public void logSnapshot() {
-        ClearcutUserEventLogger$$ExternalSyntheticLambda0 clearcutUserEventLogger$$ExternalSyntheticLambda0 = new ClearcutUserEventLogger$$ExternalSyntheticLambda0(this, 3);
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        clearcutUserEventLogger$$ExternalSyntheticLambda0.run();
+    @Override // com.bumptech.glide.manager.ApplicationLifecycle, com.android.wallpaper.module.UserEventLogger
+    public final void logSnapshot() {
+        logIfOptedIn(new PreviewFragment$$ExternalSyntheticLambda8(this, 3));
     }
 
-    @Override // com.android.wallpaper.module.NoOpUserEventLogger, com.android.wallpaper.module.UserEventLogger
-    public void logStandalonePreviewImageUriHasReadPermission(boolean z) {
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        this.mCounters.getIntegerHistogram("StandalonePreview.ImageUriPermissionStatus").increment(!z ? 1 : 0);
-        Counters counters = this.mCounters;
-        counters.logAllAsync(counters.zzf);
+    @Override // com.bumptech.glide.manager.ApplicationLifecycle, com.android.wallpaper.module.UserEventLogger
+    public final void logStandalonePreviewImageUriHasReadPermission(final boolean z) {
+        logIfOptedIn(new Runnable() { // from class: com.google.android.apps.wallpaper.module.ClearcutUserEventLogger$$ExternalSyntheticLambda16
+            @Override // java.lang.Runnable
+            public final void run() {
+                ClearcutUserEventLogger clearcutUserEventLogger = ClearcutUserEventLogger.this;
+                clearcutUserEventLogger.mCounters.getIntegerHistogram("StandalonePreview.ImageUriPermissionStatus").increment(!z ? 1 : 0);
+                clearcutUserEventLogger.mCounters.logAllAsync();
+            }
+        });
     }
 
-    @Override // com.android.wallpaper.module.NoOpUserEventLogger, com.android.wallpaper.module.UserEventLogger
-    public void logStandalonePreviewLaunched() {
-        ImagePreviewFragment$4$$ExternalSyntheticLambda0 imagePreviewFragment$4$$ExternalSyntheticLambda0 = new ImagePreviewFragment$4$$ExternalSyntheticLambda0(this, "StandalonePreview.Launched");
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        imagePreviewFragment$4$$ExternalSyntheticLambda0.run();
+    @Override // com.bumptech.glide.manager.ApplicationLifecycle, com.android.wallpaper.module.UserEventLogger
+    public final void logStandalonePreviewLaunched() {
+        logIfOptedIn(new ClearcutUserEventLogger$$ExternalSyntheticLambda14(this, "StandalonePreview.Launched"));
     }
 
-    @Override // com.android.wallpaper.module.NoOpUserEventLogger, com.android.wallpaper.module.UserEventLogger
-    public void logStandalonePreviewStorageDialogApproved(boolean z) {
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        this.mCounters.getIntegerHistogram("StandalonePreview.StorageDialogResponse").increment(!z ? 1 : 0);
-        Counters counters = this.mCounters;
-        counters.logAllAsync(counters.zzf);
+    @Override // com.bumptech.glide.manager.ApplicationLifecycle, com.android.wallpaper.module.UserEventLogger
+    public final void logStandalonePreviewStorageDialogApproved(final boolean z) {
+        logIfOptedIn(new Runnable() { // from class: com.google.android.apps.wallpaper.module.ClearcutUserEventLogger$$ExternalSyntheticLambda17
+            @Override // java.lang.Runnable
+            public final void run() {
+                ClearcutUserEventLogger clearcutUserEventLogger = ClearcutUserEventLogger.this;
+                clearcutUserEventLogger.mCounters.getIntegerHistogram("StandalonePreview.StorageDialogResponse").increment(!z ? 1 : 0);
+                clearcutUserEventLogger.mCounters.logAllAsync();
+            }
+        });
     }
 
     @Override // com.android.wallpaper.module.UserEventLogger
-    public void logStopped() {
+    public final void logStopped() {
         logBasicEvent(19);
     }
 
-    @Override // com.android.wallpaper.module.NoOpUserEventLogger, com.android.wallpaper.module.UserEventLogger
-    public void logWallpaperPresentationMode() {
-        ClearcutUserEventLogger$$ExternalSyntheticLambda0 clearcutUserEventLogger$$ExternalSyntheticLambda0 = new ClearcutUserEventLogger$$ExternalSyntheticLambda0(this, 2);
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        clearcutUserEventLogger$$ExternalSyntheticLambda0.run();
+    @Override // com.bumptech.glide.manager.ApplicationLifecycle, com.android.wallpaper.module.UserEventLogger
+    public final void logWallpaperPresentationMode() {
+        logIfOptedIn(new Runnable() { // from class: com.google.android.apps.wallpaper.module.ClearcutUserEventLogger$$ExternalSyntheticLambda0
+            @Override // java.lang.Runnable
+            public final void run() {
+                ClearcutUserEventLogger clearcutUserEventLogger = ClearcutUserEventLogger.this;
+                clearcutUserEventLogger.mCounters.getIntegerHistogram("WallpaperPresentationMode").increment(clearcutUserEventLogger.mPreferences.getWallpaperPresentationMode());
+                clearcutUserEventLogger.mCounters.logAllAsync();
+            }
+        });
     }
 
     @Override // com.android.wallpaper.module.UserEventLogger
-    public void logWallpaperSet(String str, String str2) {
-        PreviewUtils$$ExternalSyntheticLambda1 previewUtils$$ExternalSyntheticLambda1 = new PreviewUtils$$ExternalSyntheticLambda1(this, str, str2);
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        previewUtils$$ExternalSyntheticLambda1.run();
+    public final void logWallpaperSet(final String str, final String str2) {
+        logIfOptedIn(new Runnable() { // from class: com.google.android.apps.wallpaper.module.ClearcutUserEventLogger$$ExternalSyntheticLambda15
+            @Override // java.lang.Runnable
+            public final void run() {
+                ClearcutUserEventLogger clearcutUserEventLogger = ClearcutUserEventLogger.this;
+                String str3 = str;
+                String str4 = str2;
+                clearcutUserEventLogger.getClass();
+                WallpaperLogProto$WallpaperEvent.Builder newBuilder = WallpaperLogProto$WallpaperEvent.newBuilder();
+                newBuilder.setType(WallpaperLogProto$WallpaperEvent.Type.WALLPAPER_SET);
+                if (str3 != null) {
+                    newBuilder.copyOnWrite();
+                    WallpaperLogProto$WallpaperEvent.m66$$Nest$msetCategoryCollectionId((WallpaperLogProto$WallpaperEvent) newBuilder.instance, str3);
+                }
+                if (str4 != null) {
+                    newBuilder.copyOnWrite();
+                    WallpaperLogProto$WallpaperEvent.m69$$Nest$msetWallpaperId((WallpaperLogProto$WallpaperEvent) newBuilder.instance, str4);
+                }
+                clearcutUserEventLogger.log(newBuilder.build());
+            }
+        });
     }
 
-    @Override // com.android.wallpaper.module.NoOpUserEventLogger, com.android.wallpaper.module.UserEventLogger
-    public void logWallpaperSetFailureReason(int i) {
-        RotationButtonController$1$$ExternalSyntheticLambda0 rotationButtonController$1$$ExternalSyntheticLambda0 = new RotationButtonController$1$$ExternalSyntheticLambda0(this, i, 5);
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        rotationButtonController$1$$ExternalSyntheticLambda0.run();
+    @Override // com.bumptech.glide.manager.ApplicationLifecycle, com.android.wallpaper.module.UserEventLogger
+    public final void logWallpaperSetFailureReason(final int i) {
+        logIfOptedIn(new Runnable() { // from class: com.google.android.apps.wallpaper.module.ClearcutUserEventLogger$$ExternalSyntheticLambda4
+            @Override // java.lang.Runnable
+            public final void run() {
+                ClearcutUserEventLogger clearcutUserEventLogger = ClearcutUserEventLogger.this;
+                clearcutUserEventLogger.mCounters.getIntegerHistogram("IndividualWallpaperSetFailureReason").increment(i);
+                clearcutUserEventLogger.mCounters.logAllAsync();
+            }
+        });
     }
 
-    @Override // com.android.wallpaper.module.NoOpUserEventLogger, com.android.wallpaper.module.UserEventLogger
-    public void logWallpaperSetResult(int i) {
-        RotationButtonController$1$$ExternalSyntheticLambda0 rotationButtonController$1$$ExternalSyntheticLambda0 = new RotationButtonController$1$$ExternalSyntheticLambda0(this, i, 7);
-        Objects.requireNonNull((AlwaysLoggingOptInStatusProvider) this.mLoggingOptInStatusProvider);
-        rotationButtonController$1$$ExternalSyntheticLambda0.run();
+    @Override // com.bumptech.glide.manager.ApplicationLifecycle, com.android.wallpaper.module.UserEventLogger
+    public final void logWallpaperSetResult(final int i) {
+        logIfOptedIn(new Runnable() { // from class: com.google.android.apps.wallpaper.module.ClearcutUserEventLogger$$ExternalSyntheticLambda3
+            @Override // java.lang.Runnable
+            public final void run() {
+                ClearcutUserEventLogger clearcutUserEventLogger = ClearcutUserEventLogger.this;
+                clearcutUserEventLogger.mCounters.getIntegerHistogram("IndividualWallpaperSetResult").increment(i);
+                clearcutUserEventLogger.mCounters.logAllAsync();
+            }
+        });
+    }
+
+    public ClearcutUserEventLogger(Context context) {
+        this.mContext = context;
+        Injector injector = R$style.getInjector();
+        this.mPreferences = injector.getPreferences(context);
+        this.mClearcutLogger = new ClearcutLogger(context);
+        this.mLoggingOptInStatusProvider = injector.getLoggingOptInStatusProvider();
+        this.mCounters = new Counters(this.mClearcutLogger, "WALLPAPER_PICKER_COUNTERS", QuickStepContract.SYSUI_STATE_SEARCH_DISABLED, zzh.zza);
+        this.mWallpaperStatusChecker = injector.getWallpaperStatusChecker();
+    }
+
+    @Override // com.android.wallpaper.module.UserEventLogger
+    public final void logActionClicked(String str, int i) {
+        boolean z;
+        int i2;
+        if (i == R.string.build_case) {
+            z = true;
+        } else {
+            z = true;
+        }
+        if (z) {
+            i2 = 8;
+        } else {
+            i2 = 7;
+        }
+        logIfOptedIn(new ClearcutUserEventLogger$$ExternalSyntheticLambda13(this, i2, str));
     }
 }

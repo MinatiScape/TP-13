@@ -1,11 +1,15 @@
 package com.google.android.gms.internal;
 
-import android.os.IInterface;
 import android.os.Parcel;
 import android.os.Parcelable;
+/* compiled from: Codecs.java */
 /* loaded from: classes.dex */
-public class zzfb {
+public final class zzfb {
     public static final /* synthetic */ int $r8$clinit = 0;
+
+    public zzfb() {
+        throw null;
+    }
 
     static {
         zzfb.class.getClassLoader();
@@ -16,13 +20,5 @@ public class zzfb {
             return null;
         }
         return creator.createFromParcel(parcel);
-    }
-
-    public static void zza(Parcel parcel, IInterface iInterface) {
-        if (iInterface == null) {
-            parcel.writeStrongBinder(null);
-        } else {
-            parcel.writeStrongBinder(iInterface.asBinder());
-        }
     }
 }

@@ -1,67 +1,70 @@
 package com.google.android.material.circularreveal;
 
 import android.animation.TypeEvaluator;
-import android.graphics.drawable.Drawable;
 import android.util.Property;
-import androidx.core.R$attr;
 /* loaded from: classes.dex */
 public interface CircularRevealWidget {
 
     /* loaded from: classes.dex */
     public static class CircularRevealEvaluator implements TypeEvaluator<RevealInfo> {
-        public static final TypeEvaluator<RevealInfo> CIRCULAR_REVEAL = new CircularRevealEvaluator();
-        public final RevealInfo revealInfo = new RevealInfo(null);
+        public static final CircularRevealEvaluator CIRCULAR_REVEAL = new CircularRevealEvaluator();
+        public final RevealInfo revealInfo = new RevealInfo(0);
 
         @Override // android.animation.TypeEvaluator
-        public RevealInfo evaluate(float f, RevealInfo revealInfo, RevealInfo revealInfo2) {
+        public final RevealInfo evaluate(float f, RevealInfo revealInfo, RevealInfo revealInfo2) {
             RevealInfo revealInfo3 = revealInfo;
             RevealInfo revealInfo4 = revealInfo2;
             RevealInfo revealInfo5 = this.revealInfo;
-            float lerp = R$attr.lerp(revealInfo3.centerX, revealInfo4.centerX, f);
-            float lerp2 = R$attr.lerp(revealInfo3.centerY, revealInfo4.centerY, f);
-            float lerp3 = R$attr.lerp(revealInfo3.radius, revealInfo4.radius, f);
-            revealInfo5.centerX = lerp;
-            revealInfo5.centerY = lerp2;
-            revealInfo5.radius = lerp3;
-            return this.revealInfo;
+            float f2 = revealInfo3.centerX;
+            float f3 = 1.0f - f;
+            float f4 = (revealInfo4.centerX * f) + (f2 * f3);
+            float f5 = revealInfo3.centerY;
+            float f6 = revealInfo4.centerY * f;
+            float f7 = revealInfo3.radius;
+            float f8 = f * revealInfo4.radius;
+            revealInfo5.centerX = f4;
+            revealInfo5.centerY = f6 + (f5 * f3);
+            revealInfo5.radius = f8 + (f3 * f7);
+            return revealInfo5;
         }
     }
 
     /* loaded from: classes.dex */
     public static class CircularRevealProperty extends Property<CircularRevealWidget, RevealInfo> {
-        public static final Property<CircularRevealWidget, RevealInfo> CIRCULAR_REVEAL = new CircularRevealProperty("circularReveal");
+        public static final CircularRevealProperty CIRCULAR_REVEAL = new CircularRevealProperty();
 
-        public CircularRevealProperty(String str) {
-            super(RevealInfo.class, str);
+        public CircularRevealProperty() {
+            super(RevealInfo.class, "circularReveal");
         }
 
         @Override // android.util.Property
-        public RevealInfo get(CircularRevealWidget circularRevealWidget) {
+        public final RevealInfo get(CircularRevealWidget circularRevealWidget) {
             return circularRevealWidget.getRevealInfo();
         }
 
         @Override // android.util.Property
-        public void set(CircularRevealWidget circularRevealWidget, RevealInfo revealInfo) {
-            circularRevealWidget.setRevealInfo(revealInfo);
+        public final void set(CircularRevealWidget circularRevealWidget, RevealInfo revealInfo) {
+            circularRevealWidget.setRevealInfo();
         }
     }
 
     /* loaded from: classes.dex */
     public static class CircularRevealScrimColorProperty extends Property<CircularRevealWidget, Integer> {
-        public static final Property<CircularRevealWidget, Integer> CIRCULAR_REVEAL_SCRIM_COLOR = new CircularRevealScrimColorProperty("circularRevealScrimColor");
+        public static final CircularRevealScrimColorProperty CIRCULAR_REVEAL_SCRIM_COLOR = new CircularRevealScrimColorProperty();
 
-        public CircularRevealScrimColorProperty(String str) {
-            super(Integer.class, str);
+        public CircularRevealScrimColorProperty() {
+            super(Integer.class, "circularRevealScrimColor");
         }
 
         @Override // android.util.Property
-        public Integer get(CircularRevealWidget circularRevealWidget) {
+        public final Integer get(CircularRevealWidget circularRevealWidget) {
             return Integer.valueOf(circularRevealWidget.getCircularRevealScrimColor());
         }
 
         @Override // android.util.Property
-        public void set(CircularRevealWidget circularRevealWidget, Integer num) {
-            circularRevealWidget.setCircularRevealScrimColor(num.intValue());
+        public final void set(CircularRevealWidget circularRevealWidget, Integer num) {
+            num.intValue();
+            circularRevealWidget.setCircularRevealScrimColor();
         }
     }
 
@@ -72,9 +75,10 @@ public interface CircularRevealWidget {
         public float radius;
 
         public RevealInfo() {
+            throw null;
         }
 
-        public RevealInfo(AnonymousClass1 r1) {
+        public RevealInfo(int i) {
         }
 
         public RevealInfo(float f, float f2, float f3) {
@@ -92,9 +96,9 @@ public interface CircularRevealWidget {
 
     RevealInfo getRevealInfo();
 
-    void setCircularRevealOverlayDrawable(Drawable drawable);
+    void setCircularRevealOverlayDrawable();
 
-    void setCircularRevealScrimColor(int i);
+    void setCircularRevealScrimColor();
 
-    void setRevealInfo(RevealInfo revealInfo);
+    void setRevealInfo();
 }

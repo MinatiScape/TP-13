@@ -1,15 +1,16 @@
 package com.google.android.gms.dynamic;
 
 import android.os.IBinder;
-import androidx.fragment.R$id$$ExternalSyntheticOutline0;
+import androidx.cardview.R$style$$ExternalSyntheticOutline0;
 import com.google.android.gms.dynamic.IObjectWrapper;
 import java.lang.reflect.Field;
+/* compiled from: ObjectWrapper.java */
 /* loaded from: classes.dex */
 public final class zzn<T> extends IObjectWrapper.zza {
-    public final T zza;
+    private final T zza;
 
-    public zzn(T t) {
-        this.zza = t;
+    public static zzn zza(Object obj) {
+        return new zzn(obj);
     }
 
     public static <T> T zza(IObjectWrapper iObjectWrapper) {
@@ -27,7 +28,7 @@ public final class zzn<T> extends IObjectWrapper.zza {
             }
         }
         if (i != 1) {
-            throw new IllegalArgumentException(R$id$$ExternalSyntheticOutline0.m(64, "Unexpected number of IObjectWrapper declared fields: ", declaredFields.length));
+            throw new IllegalArgumentException(R$style$$ExternalSyntheticOutline0.m(64, "Unexpected number of IObjectWrapper declared fields: ", declaredFields.length));
         } else if (!field.isAccessible()) {
             field.setAccessible(true);
             try {
@@ -40,5 +41,9 @@ public final class zzn<T> extends IObjectWrapper.zza {
         } else {
             throw new IllegalArgumentException("IObjectWrapper declared field not private!");
         }
+    }
+
+    private zzn(T t) {
+        this.zza = t;
     }
 }

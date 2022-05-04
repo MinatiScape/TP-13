@@ -8,28 +8,23 @@ import android.os.CancellationSignal;
 import java.util.ArrayList;
 import java.util.Comparator;
 /* loaded from: classes.dex */
-public class FontProvider {
-    public static final Comparator<byte[]> sByteArrayComparator = new Comparator<byte[]>() { // from class: androidx.core.provider.FontProvider.1
-        /* JADX WARN: Multi-variable type inference failed */
+public final class FontProvider {
+    public static final AnonymousClass1 sByteArrayComparator = new Comparator<byte[]>() { // from class: androidx.core.provider.FontProvider.1
         @Override // java.util.Comparator
-        public int compare(byte[] l, byte[] r) {
-            int i;
-            int i2;
-            byte[] bArr = l;
-            byte[] bArr2 = r;
-            if (bArr.length != bArr2.length) {
-                i2 = bArr.length;
-                i = bArr2.length;
-            } else {
-                for (int i3 = 0; i3 < bArr.length; i3++) {
-                    if (bArr[i3] != bArr2[i3]) {
-                        i2 = bArr[i3];
-                        i = bArr2[i3];
-                    }
-                }
-                return 0;
+        public final int compare(byte[] bArr, byte[] bArr2) {
+            byte[] bArr3 = bArr;
+            byte[] bArr4 = bArr2;
+            if (bArr3.length != bArr4.length) {
+                return bArr3.length - bArr4.length;
             }
-            return i2 - i;
+            for (int i = 0; i < bArr3.length; i++) {
+                byte b = bArr3[i];
+                byte b2 = bArr4[i];
+                if (b != b2) {
+                    return b - b2;
+                }
+            }
+            return 0;
         }
     };
 
@@ -65,7 +60,7 @@ public class FontProvider {
             int r3 = r3 + 1
             goto L23
         L32:
-            java.util.Comparator<byte[]> r6 = androidx.core.provider.FontProvider.sByteArrayComparator
+            androidx.core.provider.FontProvider$1 r6 = androidx.core.provider.FontProvider.sByteArrayComparator
             java.util.Collections.sort(r0, r6)
             java.util.List<java.util.List<byte[]>> r6 = r7.mCertificates
             if (r6 == 0) goto L3c
@@ -81,7 +76,7 @@ public class FontProvider {
             java.lang.Object r3 = r6.get(r7)
             java.util.Collection r3 = (java.util.Collection) r3
             r8.<init>(r3)
-            java.util.Comparator<byte[]> r3 = androidx.core.provider.FontProvider.sByteArrayComparator
+            androidx.core.provider.FontProvider$1 r3 = androidx.core.provider.FontProvider.sByteArrayComparator
             java.util.Collections.sort(r8, r3)
             int r3 = r0.size()
             int r4 = r8.size()
@@ -139,14 +134,18 @@ public class FontProvider {
         throw new UnsupportedOperationException("Method not decompiled: androidx.core.provider.FontProvider.getProvider(android.content.pm.PackageManager, androidx.core.provider.FontRequest, android.content.res.Resources):android.content.pm.ProviderInfo");
     }
 
-    public static FontsContractCompat$FontInfo[] query(Context context, FontRequest request, String authority, CancellationSignal cancellationSignal) {
+    public static FontsContractCompat$FontInfo[] query(Context context, FontRequest fontRequest, String str, CancellationSignal cancellationSignal) {
+        int i;
+        int i2;
         Uri uri;
+        int i3;
+        boolean z;
         ArrayList arrayList = new ArrayList();
-        Uri build = new Uri.Builder().scheme("content").authority(authority).build();
-        Uri build2 = new Uri.Builder().scheme("content").authority(authority).appendPath("file").build();
+        Uri build = new Uri.Builder().scheme("content").authority(str).build();
+        Uri build2 = new Uri.Builder().scheme("content").authority(str).appendPath("file").build();
         Cursor cursor = null;
         try {
-            cursor = context.getContentResolver().query(build, new String[]{"_id", "file_id", "font_ttc_index", "font_variation_settings", "font_weight", "font_italic", "result_code"}, "query = ?", new String[]{request.mQuery}, null, cancellationSignal);
+            cursor = context.getContentResolver().query(build, new String[]{"_id", "file_id", "font_ttc_index", "font_variation_settings", "font_weight", "font_italic", "result_code"}, "query = ?", new String[]{fontRequest.mQuery}, null, cancellationSignal);
             if (cursor != null && cursor.getCount() > 0) {
                 int columnIndex = cursor.getColumnIndex("result_code");
                 ArrayList arrayList2 = new ArrayList();
@@ -156,14 +155,34 @@ public class FontProvider {
                 int columnIndex5 = cursor.getColumnIndex("font_weight");
                 int columnIndex6 = cursor.getColumnIndex("font_italic");
                 while (cursor.moveToNext()) {
-                    int i = columnIndex != -1 ? cursor.getInt(columnIndex) : 0;
-                    int i2 = columnIndex4 != -1 ? cursor.getInt(columnIndex4) : 0;
+                    if (columnIndex != -1) {
+                        i = cursor.getInt(columnIndex);
+                    } else {
+                        i = 0;
+                    }
+                    if (columnIndex4 != -1) {
+                        i2 = cursor.getInt(columnIndex4);
+                    } else {
+                        i2 = 0;
+                    }
                     if (columnIndex3 == -1) {
                         uri = ContentUris.withAppendedId(build, cursor.getLong(columnIndex2));
                     } else {
                         uri = ContentUris.withAppendedId(build2, cursor.getLong(columnIndex3));
                     }
-                    arrayList2.add(new FontsContractCompat$FontInfo(uri, i2, columnIndex5 != -1 ? cursor.getInt(columnIndex5) : 400, columnIndex6 != -1 && cursor.getInt(columnIndex6) == 1, i));
+                    Uri uri2 = uri;
+                    if (columnIndex5 != -1) {
+                        i3 = cursor.getInt(columnIndex5);
+                    } else {
+                        i3 = 400;
+                    }
+                    int i4 = i3;
+                    if (columnIndex6 == -1 || cursor.getInt(columnIndex6) != 1) {
+                        z = false;
+                    } else {
+                        z = true;
+                    }
+                    arrayList2.add(new FontsContractCompat$FontInfo(uri2, i2, i4, z, i));
                 }
                 arrayList = arrayList2;
             }

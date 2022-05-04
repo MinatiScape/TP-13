@@ -14,15 +14,7 @@ public abstract class TaskStackChangeListener {
     public void onActivityLaunchOnSecondaryDisplayFailed() {
     }
 
-    public void onActivityLaunchOnSecondaryDisplayFailed(ActivityManager.RunningTaskInfo runningTaskInfo) {
-        onActivityLaunchOnSecondaryDisplayFailed();
-    }
-
     public void onActivityLaunchOnSecondaryDisplayRerouted() {
-    }
-
-    public void onActivityLaunchOnSecondaryDisplayRerouted(ActivityManager.RunningTaskInfo runningTaskInfo) {
-        onActivityLaunchOnSecondaryDisplayRerouted();
     }
 
     public void onActivityPinned(String str, int i, int i2, int i3) {
@@ -64,10 +56,6 @@ public abstract class TaskStackChangeListener {
     public void onTaskMovedToFront(int i) {
     }
 
-    public void onTaskMovedToFront(ActivityManager.RunningTaskInfo runningTaskInfo) {
-        onTaskMovedToFront(runningTaskInfo.taskId);
-    }
-
     public void onTaskProfileLocked(int i, int i2) {
     }
 
@@ -81,5 +69,17 @@ public abstract class TaskStackChangeListener {
     }
 
     public void onTaskStackChangedBackground() {
+    }
+
+    public void onTaskMovedToFront(ActivityManager.RunningTaskInfo runningTaskInfo) {
+        onTaskMovedToFront(runningTaskInfo.taskId);
+    }
+
+    public void onActivityLaunchOnSecondaryDisplayFailed(ActivityManager.RunningTaskInfo runningTaskInfo) {
+        onActivityLaunchOnSecondaryDisplayFailed();
+    }
+
+    public void onActivityLaunchOnSecondaryDisplayRerouted(ActivityManager.RunningTaskInfo runningTaskInfo) {
+        onActivityLaunchOnSecondaryDisplayRerouted();
     }
 }

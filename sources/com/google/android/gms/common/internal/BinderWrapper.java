@@ -24,7 +24,7 @@ public final class BinderWrapper implements Parcelable {
         parcel.writeStrongBinder(this.zza);
     }
 
-    public BinderWrapper(Parcel parcel, zzd zzdVar) {
+    public BinderWrapper(Parcel parcel) {
         this.zza = null;
         this.zza = parcel.readStrongBinder();
     }

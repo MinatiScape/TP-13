@@ -1,30 +1,8 @@
 package com.adobe.xmp.impl;
 /* loaded from: classes.dex */
-public class Base64 {
+public final class Base64 {
     public static byte[] base64 = {65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 43, 47};
     public static byte[] ascii = new byte[255];
-
-    static {
-        int i = 0;
-        for (int i2 = 0; i2 < 255; i2++) {
-            ascii[i2] = -1;
-        }
-        while (true) {
-            byte[] bArr = base64;
-            if (i < bArr.length) {
-                ascii[bArr[i]] = (byte) i;
-                i++;
-            } else {
-                byte[] bArr2 = ascii;
-                bArr2[9] = -2;
-                bArr2[10] = -2;
-                bArr2[13] = -2;
-                bArr2[32] = -2;
-                bArr2[61] = -3;
-                return;
-            }
-        }
-    }
 
     public static final byte[] decode(byte[] src) throws IllegalArgumentException {
         int i = 0;
@@ -32,8 +10,8 @@ public class Base64 {
         for (byte b : src) {
             byte b2 = ascii[b];
             if (b2 >= 0) {
-                i2++;
                 src[i2] = b2;
+                i2++;
             } else if (b2 == -1) {
                 throw new IllegalArgumentException("Invalid base 64 string");
             }
@@ -61,5 +39,27 @@ public class Base64 {
             bArr[i7] = (byte) (((src[i4 + 2] >>> 2) & 15) | ((src[i4 + 1] << 4) & 255));
         }
         return bArr;
+    }
+
+    static {
+        int i = 0;
+        for (int i2 = 0; i2 < 255; i2++) {
+            ascii[i2] = -1;
+        }
+        while (true) {
+            byte[] bArr = base64;
+            if (i < bArr.length) {
+                ascii[bArr[i]] = (byte) i;
+                i++;
+            } else {
+                byte[] bArr2 = ascii;
+                bArr2[9] = -2;
+                bArr2[10] = -2;
+                bArr2[13] = -2;
+                bArr2[32] = -2;
+                bArr2[61] = -3;
+                return;
+            }
+        }
     }
 }

@@ -15,28 +15,31 @@ import android.os.RemoteException;
 import android.util.Log;
 import com.android.wallpaper.util.ActivityUtils;
 import java.util.ArrayList;
-import java.util.List;
 /* loaded from: classes.dex */
 public class DownloadableLiveWallpaperInfo extends LiveWallpaperInfo {
     public static final Parcelable.Creator<DownloadableLiveWallpaperInfo> CREATOR = new Parcelable.Creator<DownloadableLiveWallpaperInfo>() { // from class: com.android.wallpaper.model.DownloadableLiveWallpaperInfo.1
         @Override // android.os.Parcelable.Creator
-        public DownloadableLiveWallpaperInfo createFromParcel(Parcel parcel) {
-            return new DownloadableLiveWallpaperInfo(parcel, null);
+        public final DownloadableLiveWallpaperInfo createFromParcel(Parcel parcel) {
+            return new DownloadableLiveWallpaperInfo(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public DownloadableLiveWallpaperInfo[] newArray(int i) {
+        public final DownloadableLiveWallpaperInfo[] newArray(int i) {
             return new DownloadableLiveWallpaperInfo[i];
         }
     };
     public static final Uri WALLPAPERS_URI = Uri.parse("content://com.google.pixel.livewallpaper.provider/wallpapers");
     public static final String[] COLUMNS = {"to_be_installed_wallpaper"};
 
-    public DownloadableLiveWallpaperInfo(WallpaperInfo wallpaperInfo, boolean z, String str) {
-        super(wallpaperInfo, z, str);
+    public DownloadableLiveWallpaperInfo(WallpaperInfo wallpaperInfo, String str) {
+        super(wallpaperInfo, false, str);
     }
 
-    public static List<String> getToBeInstalledComponent(Context context) {
+    public DownloadableLiveWallpaperInfo(Parcel parcel) {
+        super(parcel);
+    }
+
+    public static ArrayList getToBeInstalledComponent(Context context) {
         Uri uri;
         ContentProviderClient acquireUnstableContentProviderClient;
         Cursor query;
@@ -92,13 +95,9 @@ public class DownloadableLiveWallpaperInfo extends LiveWallpaperInfo {
         }
     }
 
-    public boolean isToBeInstalled(List<String> list) {
-        return list.contains(this.mInfo.getComponent().flattenToString());
-    }
-
     @Override // com.android.wallpaper.model.LiveWallpaperInfo, com.android.wallpaper.model.WallpaperInfo
-    public void showPreview(Activity activity, InlinePreviewIntentFactory inlinePreviewIntentFactory, int i) {
-        if (!isToBeInstalled(getToBeInstalledComponent(activity))) {
+    public final void showPreview(Activity activity, InlinePreviewIntentFactory inlinePreviewIntentFactory, int i) {
+        if (!getToBeInstalledComponent(activity).contains(this.mInfo.getComponent().flattenToString())) {
             super.showPreview(activity, inlinePreviewIntentFactory, i);
             return;
         }
@@ -120,9 +119,5 @@ public class DownloadableLiveWallpaperInfo extends LiveWallpaperInfo {
             return;
         }
         activity.startActivityForResult(inlinePreviewIntentFactory.newIntent(activity, this), i);
-    }
-
-    public DownloadableLiveWallpaperInfo(Parcel parcel, AnonymousClass1 r2) {
-        super(parcel);
     }
 }

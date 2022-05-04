@@ -1,6 +1,5 @@
 package androidx.slice;
 
-import android.content.Intent;
 import android.net.Uri;
 /* loaded from: classes.dex */
 public abstract class SliceViewManager {
@@ -9,13 +8,7 @@ public abstract class SliceViewManager {
     public interface SliceCallback {
     }
 
-    public abstract Slice bindSlice(Intent intent);
-
-    public abstract Slice bindSlice(Uri uri);
-
     public abstract void pinSlice(Uri uri);
-
-    public abstract void registerSliceCallback(Uri uri, SliceCallback callback);
 
     public abstract void unpinSlice(Uri uri);
 }

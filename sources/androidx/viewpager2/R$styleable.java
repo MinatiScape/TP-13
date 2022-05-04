@@ -1,5 +1,8 @@
 package androidx.viewpager2;
+
+import com.android.systemui.shared.R;
 /* loaded from: classes.dex */
 public final class R$styleable {
+    public static final int[] RecyclerView = {16842948, 16842987, 16842993, R.attr.fastScrollEnabled, R.attr.fastScrollHorizontalThumbDrawable, R.attr.fastScrollHorizontalTrackDrawable, R.attr.fastScrollVerticalThumbDrawable, R.attr.fastScrollVerticalTrackDrawable, R.attr.layoutManager, R.attr.reverseLayout, R.attr.spanCount, R.attr.stackFromEnd};
     public static final int[] ViewPager2 = {16842948};
 }

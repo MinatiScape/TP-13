@@ -10,9 +10,6 @@ public class SurfaceViewRequestUtils {
     private static final String KEY_HOST_TOKEN = "host_token";
     private static final String KEY_SURFACE_CONTROL = "surface_control";
 
-    private SurfaceViewRequestUtils() {
-    }
-
     public static Bundle createSurfaceBundle(SurfaceView surfaceView) {
         Bundle bundle = new Bundle();
         bundle.putBinder(KEY_HOST_TOKEN, surfaceView.getHostToken());
@@ -31,5 +28,8 @@ public class SurfaceViewRequestUtils {
 
     public static SurfaceControl getSurfaceControl(Bundle bundle) {
         return (SurfaceControl) bundle.getParcelable(KEY_SURFACE_CONTROL);
+    }
+
+    private SurfaceViewRequestUtils() {
     }
 }

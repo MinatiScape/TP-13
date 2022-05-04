@@ -7,6 +7,7 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.AbsSavedState;
+import androidx.appcompat.R$id;
 import androidx.core.content.res.TypedArrayUtils;
 import com.android.systemui.shared.R;
 /* loaded from: classes.dex */
@@ -19,63 +20,38 @@ public class Preference implements Comparable<Preference> {
     public String mKey;
     public int mOrder;
     public boolean mParentDependencyMet;
-    public boolean mPersistent;
     public boolean mSelectable;
     public CharSequence mSummary;
     public SummaryProvider mSummaryProvider;
     public CharSequence mTitle;
 
     /* loaded from: classes.dex */
-    public static class BaseSavedState extends AbsSavedState {
-        public static final Parcelable.Creator<BaseSavedState> CREATOR = new Parcelable.Creator<BaseSavedState>() { // from class: androidx.preference.Preference.BaseSavedState.1
-            @Override // android.os.Parcelable.Creator
-            public BaseSavedState createFromParcel(Parcel parcel) {
-                return new BaseSavedState(parcel);
-            }
-
-            @Override // android.os.Parcelable.Creator
-            public BaseSavedState[] newArray(int i) {
-                return new BaseSavedState[i];
-            }
-        };
-
-        public BaseSavedState(Parcel parcel) {
-            super(parcel);
-        }
-    }
-
-    /* loaded from: classes.dex */
     public interface SummaryProvider<T extends Preference> {
         CharSequence provideSummary(T t);
     }
 
-    public Preference(Context context, AttributeSet attributeSet, int i, int i2) {
+    public Preference(Context context, AttributeSet attributeSet, int i) {
         this.mOrder = Integer.MAX_VALUE;
         this.mEnabled = true;
         this.mSelectable = true;
-        this.mPersistent = true;
         this.mDependencyMet = true;
         this.mParentDependencyMet = true;
         this.mContext = context;
-        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, R$styleable.Preference, i, i2);
-        TypedArrayUtils.getResourceId(obtainStyledAttributes, 23, 0, 0);
-        String string = obtainStyledAttributes.getString(26);
-        this.mKey = string == null ? obtainStyledAttributes.getString(6) : string;
+        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, R$id.Preference, i, 0);
+        obtainStyledAttributes.getResourceId(23, obtainStyledAttributes.getResourceId(0, 0));
+        this.mKey = TypedArrayUtils.getString(obtainStyledAttributes, 26, 6);
         CharSequence text = obtainStyledAttributes.getText(34);
         this.mTitle = text == null ? obtainStyledAttributes.getText(4) : text;
         CharSequence text2 = obtainStyledAttributes.getText(33);
         this.mSummary = text2 == null ? obtainStyledAttributes.getText(7) : text2;
         this.mOrder = obtainStyledAttributes.getInt(28, obtainStyledAttributes.getInt(8, Integer.MAX_VALUE));
-        String string2 = obtainStyledAttributes.getString(22);
-        this.mFragment = string2 == null ? obtainStyledAttributes.getString(13) : string2;
+        this.mFragment = TypedArrayUtils.getString(obtainStyledAttributes, 22, 13);
         obtainStyledAttributes.getResourceId(27, obtainStyledAttributes.getResourceId(3, R.layout.preference));
         obtainStyledAttributes.getResourceId(35, obtainStyledAttributes.getResourceId(9, 0));
         this.mEnabled = obtainStyledAttributes.getBoolean(21, obtainStyledAttributes.getBoolean(2, true));
         this.mSelectable = obtainStyledAttributes.getBoolean(30, obtainStyledAttributes.getBoolean(5, true));
-        this.mPersistent = obtainStyledAttributes.getBoolean(29, obtainStyledAttributes.getBoolean(1, true));
-        if (obtainStyledAttributes.getString(19) == null) {
-            obtainStyledAttributes.getString(10);
-        }
+        obtainStyledAttributes.getBoolean(29, obtainStyledAttributes.getBoolean(1, true));
+        TypedArrayUtils.getString(obtainStyledAttributes, 19, 10);
         obtainStyledAttributes.getBoolean(16, obtainStyledAttributes.getBoolean(16, this.mSelectable));
         obtainStyledAttributes.getBoolean(17, obtainStyledAttributes.getBoolean(17, this.mSelectable));
         if (obtainStyledAttributes.hasValue(18)) {
@@ -93,8 +69,15 @@ public class Preference implements Comparable<Preference> {
         obtainStyledAttributes.recycle();
     }
 
+    public void notifyChanged() {
+    }
+
+    public Object onGetDefaultValue(TypedArray typedArray, int i) {
+        return null;
+    }
+
     @Override // java.lang.Comparable
-    public int compareTo(Preference preference) {
+    public final int compareTo(Preference preference) {
         Preference preference2 = preference;
         int i = this.mOrder;
         int i2 = preference2.mOrder;
@@ -123,22 +106,7 @@ public class Preference implements Comparable<Preference> {
         return this.mSummary;
     }
 
-    public boolean isEnabled() {
-        return this.mEnabled && this.mDependencyMet && this.mParentDependencyMet;
-    }
-
-    public void notifyChanged() {
-    }
-
-    public Object onGetDefaultValue(TypedArray typedArray, int i) {
-        return null;
-    }
-
-    public boolean shouldDisableDependents() {
-        return !isEnabled();
-    }
-
-    public String toString() {
+    public final String toString() {
         StringBuilder sb = new StringBuilder();
         CharSequence charSequence = this.mTitle;
         if (!TextUtils.isEmpty(charSequence)) {
@@ -157,6 +125,25 @@ public class Preference implements Comparable<Preference> {
     }
 
     public Preference(Context context, AttributeSet attributeSet) {
-        this(context, attributeSet, TypedArrayUtils.getAttr(context, R.attr.preferenceStyle, 16842894), 0);
+        this(context, attributeSet, TypedArrayUtils.getAttr(context, R.attr.preferenceStyle, 16842894));
+    }
+
+    /* loaded from: classes.dex */
+    public static class BaseSavedState extends AbsSavedState {
+        public static final Parcelable.Creator<BaseSavedState> CREATOR = new Parcelable.Creator<BaseSavedState>() { // from class: androidx.preference.Preference.BaseSavedState.1
+            @Override // android.os.Parcelable.Creator
+            public final BaseSavedState createFromParcel(Parcel parcel) {
+                return new BaseSavedState(parcel);
+            }
+
+            @Override // android.os.Parcelable.Creator
+            public final BaseSavedState[] newArray(int i) {
+                return new BaseSavedState[i];
+            }
+        };
+
+        public BaseSavedState(Parcel parcel) {
+            super(parcel);
+        }
     }
 }

@@ -4,14 +4,15 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.android.gms.internal.zzbkw;
+/* compiled from: WebImageCreator.java */
 /* loaded from: classes.dex */
 public final class zze implements Parcelable.Creator<WebImage> {
     @Override // android.os.Parcelable.Creator
     public final /* synthetic */ WebImage createFromParcel(Parcel parcel) {
         int zza = zzbkw.zza(parcel);
         int i = 0;
-        Uri uri = null;
         int i2 = 0;
+        Uri uri = null;
         int i3 = 0;
         while (parcel.dataPosition() < zza) {
             int readInt = parcel.readInt();

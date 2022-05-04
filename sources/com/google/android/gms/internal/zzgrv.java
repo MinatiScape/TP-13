@@ -1,27 +1,15 @@
 package com.google.android.gms.internal;
+
+import java.util.ArrayList;
+/* compiled from: FieldArray.java */
 /* loaded from: classes.dex */
 public final class zzgrv implements Cloneable {
-    public static final zzgrw zza = new zzgrw();
     public int[] zzc;
     public zzgrw[] zzd;
     public int zze;
 
     public zzgrv() {
-        this(10);
-    }
-
-    public final Object clone() throws CloneNotSupportedException {
-        int i = this.zze;
-        zzgrv zzgrvVar = new zzgrv(i);
-        System.arraycopy(this.zzc, 0, zzgrvVar.zzc, 0, i);
-        for (int i2 = 0; i2 < i; i2++) {
-            zzgrw[] zzgrwVarArr = this.zzd;
-            if (zzgrwVarArr[i2] != null) {
-                zzgrvVar.zzd[i2] = zzgrwVarArr[i2].clone();
-            }
-        }
-        zzgrvVar.zze = i;
-        return zzgrvVar;
+        throw null;
     }
 
     public final boolean equals(Object obj) {
@@ -75,6 +63,24 @@ public final class zzgrv implements Cloneable {
         return false;
     }
 
+    static {
+        new ArrayList();
+    }
+
+    public final Object clone() throws CloneNotSupportedException {
+        int i = this.zze;
+        zzgrv zzgrvVar = new zzgrv(i);
+        System.arraycopy(this.zzc, 0, zzgrvVar.zzc, 0, i);
+        for (int i2 = 0; i2 < i; i2++) {
+            zzgrw zzgrwVar = this.zzd[i2];
+            if (zzgrwVar != null) {
+                zzgrvVar.zzd[i2] = zzgrwVar.zzc();
+            }
+        }
+        zzgrvVar.zze = i;
+        return zzgrvVar;
+    }
+
     public final int hashCode() {
         int i = 17;
         for (int i2 = 0; i2 < this.zze; i2++) {
@@ -84,7 +90,10 @@ public final class zzgrv implements Cloneable {
     }
 
     public final boolean zzb() {
-        return this.zze == 0;
+        if (this.zze == 0) {
+            return true;
+        }
+        return false;
     }
 
     public zzgrv(int i) {

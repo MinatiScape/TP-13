@@ -1,6 +1,7 @@
 package androidx.constraintlayout.solver.widgets;
 
 import androidx.constraintlayout.solver.LinearSystem;
+import androidx.constraintlayout.solver.widgets.ConstraintWidget;
 import androidx.constraintlayout.solver.widgets.analyzer.BasicMeasure;
 import androidx.constraintlayout.solver.widgets.analyzer.ChainRun;
 import androidx.constraintlayout.solver.widgets.analyzer.DependencyGraph;
@@ -8,7 +9,7 @@ import androidx.constraintlayout.solver.widgets.analyzer.WidgetRun;
 import java.util.Arrays;
 import java.util.Iterator;
 /* loaded from: classes.dex */
-public class ConstraintWidgetContainer extends WidgetContainer {
+public final class ConstraintWidgetContainer extends WidgetContainer {
     public int mPaddingLeft;
     public int mPaddingTop;
     public BasicMeasure mBasicMeasureSolver = new BasicMeasure(this);
@@ -24,7 +25,7 @@ public class ConstraintWidgetContainer extends WidgetContainer {
     public boolean mWidthMeasuredTooSmall = false;
     public boolean mHeightMeasuredTooSmall = false;
 
-    public void addChain(ConstraintWidget constraintWidget, int i) {
+    public final void addChain(ConstraintWidget constraintWidget, int i) {
         if (i == 0) {
             int i2 = this.mHorizontalChainsSize + 1;
             ChainHead[] chainHeadArr = this.mHorizontalChainsArray;
@@ -48,7 +49,9 @@ public class ConstraintWidgetContainer extends WidgetContainer {
         }
     }
 
-    public boolean addChildrenToSolver(LinearSystem linearSystem) {
+    public final void addChildrenToSolver(LinearSystem linearSystem) {
+        ConstraintWidget.DimensionBehaviour dimensionBehaviour = ConstraintWidget.DimensionBehaviour.FIXED;
+        ConstraintWidget.DimensionBehaviour dimensionBehaviour2 = ConstraintWidget.DimensionBehaviour.WRAP_CONTENT;
         addToSolver(linearSystem);
         int size = this.mChildren.size();
         for (int i = 0; i < size; i++) {
@@ -60,64 +63,65 @@ public class ConstraintWidgetContainer extends WidgetContainer {
         for (int i2 = 0; i2 < size; i2++) {
             ConstraintWidget constraintWidget2 = this.mChildren.get(i2);
             if (constraintWidget2 instanceof ConstraintWidgetContainer) {
-                int[] iArr = constraintWidget2.mListDimensionBehaviors;
-                int i3 = iArr[0];
-                int i4 = iArr[1];
-                if (i3 == 2) {
-                    iArr[0] = 1;
+                ConstraintWidget.DimensionBehaviour[] dimensionBehaviourArr = constraintWidget2.mListDimensionBehaviors;
+                ConstraintWidget.DimensionBehaviour dimensionBehaviour3 = dimensionBehaviourArr[0];
+                ConstraintWidget.DimensionBehaviour dimensionBehaviour4 = dimensionBehaviourArr[1];
+                if (dimensionBehaviour3 == dimensionBehaviour2) {
+                    constraintWidget2.setHorizontalDimensionBehaviour(dimensionBehaviour);
                 }
-                if (i4 == 2) {
-                    iArr[1] = 1;
+                if (dimensionBehaviour4 == dimensionBehaviour2) {
+                    constraintWidget2.setVerticalDimensionBehaviour(dimensionBehaviour);
                 }
                 constraintWidget2.addToSolver(linearSystem);
-                if (i3 == 2) {
-                    constraintWidget2.setHorizontalDimensionBehaviour$enumunboxing$(i3);
+                if (dimensionBehaviour3 == dimensionBehaviour2) {
+                    constraintWidget2.setHorizontalDimensionBehaviour(dimensionBehaviour3);
                 }
-                if (i4 == 2) {
-                    constraintWidget2.setVerticalDimensionBehaviour$enumunboxing$(i4);
+                if (dimensionBehaviour4 == dimensionBehaviour2) {
+                    constraintWidget2.setVerticalDimensionBehaviour(dimensionBehaviour4);
                 }
             } else {
+                ConstraintWidget.DimensionBehaviour dimensionBehaviour5 = ConstraintWidget.DimensionBehaviour.MATCH_PARENT;
                 constraintWidget2.mHorizontalResolution = -1;
                 constraintWidget2.mVerticalResolution = -1;
-                if (this.mListDimensionBehaviors[0] != 2 && constraintWidget2.mListDimensionBehaviors[0] == 4) {
-                    int i5 = constraintWidget2.mLeft.mMargin;
+                if (this.mListDimensionBehaviors[0] != dimensionBehaviour2 && constraintWidget2.mListDimensionBehaviors[0] == dimensionBehaviour5) {
+                    int i3 = constraintWidget2.mLeft.mMargin;
                     int width = getWidth() - constraintWidget2.mRight.mMargin;
                     ConstraintAnchor constraintAnchor = constraintWidget2.mLeft;
                     constraintAnchor.mSolverVariable = linearSystem.createObjectVariable(constraintAnchor);
                     ConstraintAnchor constraintAnchor2 = constraintWidget2.mRight;
                     constraintAnchor2.mSolverVariable = linearSystem.createObjectVariable(constraintAnchor2);
-                    linearSystem.addEquality(constraintWidget2.mLeft.mSolverVariable, i5);
+                    linearSystem.addEquality(constraintWidget2.mLeft.mSolverVariable, i3);
                     linearSystem.addEquality(constraintWidget2.mRight.mSolverVariable, width);
                     constraintWidget2.mHorizontalResolution = 2;
-                    constraintWidget2.mX = i5;
-                    int i6 = width - i5;
-                    constraintWidget2.mWidth = i6;
-                    int i7 = constraintWidget2.mMinWidth;
-                    if (i6 < i7) {
-                        constraintWidget2.mWidth = i7;
+                    constraintWidget2.mX = i3;
+                    int i4 = width - i3;
+                    constraintWidget2.mWidth = i4;
+                    int i5 = constraintWidget2.mMinWidth;
+                    if (i4 < i5) {
+                        constraintWidget2.mWidth = i5;
                     }
                 }
-                if (this.mListDimensionBehaviors[1] != 2 && constraintWidget2.mListDimensionBehaviors[1] == 4) {
-                    int i8 = constraintWidget2.mTop.mMargin;
+                if (this.mListDimensionBehaviors[1] != dimensionBehaviour2 && constraintWidget2.mListDimensionBehaviors[1] == dimensionBehaviour5) {
+                    int i6 = constraintWidget2.mTop.mMargin;
                     int height = getHeight() - constraintWidget2.mBottom.mMargin;
                     ConstraintAnchor constraintAnchor3 = constraintWidget2.mTop;
                     constraintAnchor3.mSolverVariable = linearSystem.createObjectVariable(constraintAnchor3);
                     ConstraintAnchor constraintAnchor4 = constraintWidget2.mBottom;
                     constraintAnchor4.mSolverVariable = linearSystem.createObjectVariable(constraintAnchor4);
-                    linearSystem.addEquality(constraintWidget2.mTop.mSolverVariable, i8);
+                    linearSystem.addEquality(constraintWidget2.mTop.mSolverVariable, i6);
                     linearSystem.addEquality(constraintWidget2.mBottom.mSolverVariable, height);
                     if (constraintWidget2.mBaselineDistance > 0 || constraintWidget2.mVisibility == 8) {
                         ConstraintAnchor constraintAnchor5 = constraintWidget2.mBaseline;
                         constraintAnchor5.mSolverVariable = linearSystem.createObjectVariable(constraintAnchor5);
-                        linearSystem.addEquality(constraintWidget2.mBaseline.mSolverVariable, constraintWidget2.mBaselineDistance + i8);
+                        linearSystem.addEquality(constraintWidget2.mBaseline.mSolverVariable, constraintWidget2.mBaselineDistance + i6);
                     }
                     constraintWidget2.mVerticalResolution = 2;
-                    constraintWidget2.mY = i8;
-                    int i9 = height - i8;
-                    constraintWidget2.mHeight = i9;
-                    int i10 = constraintWidget2.mMinHeight;
-                    if (i9 < i10) {
-                        constraintWidget2.mHeight = i10;
+                    constraintWidget2.mY = i6;
+                    int i7 = height - i6;
+                    constraintWidget2.mHeight = i7;
+                    int i8 = constraintWidget2.mMinHeight;
+                    if (i7 < i8) {
+                        constraintWidget2.mHeight = i8;
                     }
                 }
                 if (!(constraintWidget2 instanceof VirtualLayout) && !(constraintWidget2 instanceof Guideline)) {
@@ -131,19 +135,21 @@ public class ConstraintWidgetContainer extends WidgetContainer {
         if (this.mVerticalChainsSize > 0) {
             Chain.applyChainConstraints(this, linearSystem, 1);
         }
-        return true;
     }
 
-    public boolean directMeasureWithOrientation(boolean z, int i) {
+    public final boolean directMeasureWithOrientation(boolean z, int i) {
         boolean z2;
         DependencyGraph dependencyGraph = this.mDependencyGraph;
+        ConstraintWidget.DimensionBehaviour dimensionBehaviour = ConstraintWidget.DimensionBehaviour.MATCH_PARENT;
+        ConstraintWidget.DimensionBehaviour dimensionBehaviour2 = ConstraintWidget.DimensionBehaviour.WRAP_CONTENT;
+        ConstraintWidget.DimensionBehaviour dimensionBehaviour3 = ConstraintWidget.DimensionBehaviour.FIXED;
         boolean z3 = true;
         boolean z4 = z & true;
-        int dimensionBehaviour$enumunboxing$ = dependencyGraph.container.getDimensionBehaviour$enumunboxing$(0);
-        int dimensionBehaviour$enumunboxing$2 = dependencyGraph.container.getDimensionBehaviour$enumunboxing$(1);
+        ConstraintWidget.DimensionBehaviour dimensionBehaviour4 = dependencyGraph.container.getDimensionBehaviour(0);
+        ConstraintWidget.DimensionBehaviour dimensionBehaviour5 = dependencyGraph.container.getDimensionBehaviour(1);
         int x = dependencyGraph.container.getX();
         int y = dependencyGraph.container.getY();
-        if (z4 && (dimensionBehaviour$enumunboxing$ == 2 || dimensionBehaviour$enumunboxing$2 == 2)) {
+        if (z4 && (dimensionBehaviour4 == dimensionBehaviour2 || dimensionBehaviour5 == dimensionBehaviour2)) {
             Iterator<WidgetRun> it = dependencyGraph.mRuns.iterator();
             while (true) {
                 if (!it.hasNext()) {
@@ -156,16 +162,16 @@ public class ConstraintWidgetContainer extends WidgetContainer {
                 }
             }
             if (i == 0) {
-                if (z4 && dimensionBehaviour$enumunboxing$ == 2) {
+                if (z4 && dimensionBehaviour4 == dimensionBehaviour2) {
+                    dependencyGraph.container.setHorizontalDimensionBehaviour(dimensionBehaviour3);
                     ConstraintWidgetContainer constraintWidgetContainer = dependencyGraph.container;
-                    constraintWidgetContainer.mListDimensionBehaviors[0] = 1;
                     constraintWidgetContainer.setWidth(dependencyGraph.computeWrap(constraintWidgetContainer, 0));
                     ConstraintWidgetContainer constraintWidgetContainer2 = dependencyGraph.container;
                     constraintWidgetContainer2.horizontalRun.dimension.resolve(constraintWidgetContainer2.getWidth());
                 }
-            } else if (z4 && dimensionBehaviour$enumunboxing$2 == 2) {
+            } else if (z4 && dimensionBehaviour5 == dimensionBehaviour2) {
+                dependencyGraph.container.setVerticalDimensionBehaviour(dimensionBehaviour3);
                 ConstraintWidgetContainer constraintWidgetContainer3 = dependencyGraph.container;
-                constraintWidgetContainer3.mListDimensionBehaviors[1] = 1;
                 constraintWidgetContainer3.setHeight(dependencyGraph.computeWrap(constraintWidgetContainer3, 1));
                 ConstraintWidgetContainer constraintWidgetContainer4 = dependencyGraph.container;
                 constraintWidgetContainer4.verticalRun.dimension.resolve(constraintWidgetContainer4.getHeight());
@@ -173,8 +179,8 @@ public class ConstraintWidgetContainer extends WidgetContainer {
         }
         if (i == 0) {
             ConstraintWidgetContainer constraintWidgetContainer5 = dependencyGraph.container;
-            int[] iArr = constraintWidgetContainer5.mListDimensionBehaviors;
-            if (iArr[0] == 1 || iArr[0] == 4) {
+            ConstraintWidget.DimensionBehaviour dimensionBehaviour6 = constraintWidgetContainer5.mListDimensionBehaviors[0];
+            if (dimensionBehaviour6 == dimensionBehaviour3 || dimensionBehaviour6 == dimensionBehaviour) {
                 int width = constraintWidgetContainer5.getWidth() + x;
                 dependencyGraph.container.horizontalRun.end.resolve(width);
                 dependencyGraph.container.horizontalRun.dimension.resolve(width - x);
@@ -183,8 +189,8 @@ public class ConstraintWidgetContainer extends WidgetContainer {
             z2 = false;
         } else {
             ConstraintWidgetContainer constraintWidgetContainer6 = dependencyGraph.container;
-            int[] iArr2 = constraintWidgetContainer6.mListDimensionBehaviors;
-            if (iArr2[1] == 1 || iArr2[1] == 4) {
+            ConstraintWidget.DimensionBehaviour dimensionBehaviour7 = constraintWidgetContainer6.mListDimensionBehaviors[1];
+            if (dimensionBehaviour7 == dimensionBehaviour3 || dimensionBehaviour7 == dimensionBehaviour) {
                 int height = constraintWidgetContainer6.getHeight() + y;
                 dependencyGraph.container.verticalRun.end.resolve(height);
                 dependencyGraph.container.verticalRun.dimension.resolve(height - y);
@@ -210,44 +216,38 @@ public class ConstraintWidgetContainer extends WidgetContainer {
                 }
             }
         }
-        dependencyGraph.container.setHorizontalDimensionBehaviour$enumunboxing$(dimensionBehaviour$enumunboxing$);
-        dependencyGraph.container.setVerticalDimensionBehaviour$enumunboxing$(dimensionBehaviour$enumunboxing$2);
+        dependencyGraph.container.setHorizontalDimensionBehaviour(dimensionBehaviour4);
+        dependencyGraph.container.setVerticalDimensionBehaviour(dimensionBehaviour5);
         return z3;
     }
 
-    public void invalidateGraph() {
-        this.mDependencyGraph.mNeedBuildGraph = true;
-    }
-
-    /* JADX WARN: Multi-variable type inference failed */
-    /* JADX WARN: Removed duplicated region for block: B:107:0x0219  */
-    /* JADX WARN: Removed duplicated region for block: B:26:0x006b  */
-    /* JADX WARN: Removed duplicated region for block: B:32:0x0084  */
-    /* JADX WARN: Removed duplicated region for block: B:57:0x00fb  */
-    /* JADX WARN: Removed duplicated region for block: B:60:0x011c  */
-    /* JADX WARN: Removed duplicated region for block: B:84:0x01ab  */
-    /* JADX WARN: Removed duplicated region for block: B:85:0x01b8  */
-    /* JADX WARN: Removed duplicated region for block: B:88:0x01cb  */
-    /* JADX WARN: Removed duplicated region for block: B:89:0x01d5  */
-    /* JADX WARN: Removed duplicated region for block: B:91:0x01da  */
-    /* JADX WARN: Type inference failed for: r2v6, types: [boolean] */
-    /* JADX WARN: Type inference failed for: r2v8 */
-    /* JADX WARN: Type inference failed for: r2v9 */
+    /* JADX WARN: Removed duplicated region for block: B:109:0x022a  */
+    /* JADX WARN: Removed duplicated region for block: B:25:0x0065  */
+    /* JADX WARN: Removed duplicated region for block: B:31:0x007e  */
+    /* JADX WARN: Removed duplicated region for block: B:60:0x0108  */
+    /* JADX WARN: Removed duplicated region for block: B:63:0x012a  */
+    /* JADX WARN: Removed duplicated region for block: B:87:0x01c2  */
+    /* JADX WARN: Removed duplicated region for block: B:90:0x01dc  */
+    /* JADX WARN: Removed duplicated region for block: B:91:0x01e7  */
+    /* JADX WARN: Removed duplicated region for block: B:93:0x01ea  */
+    /* JADX WARN: Type inference failed for: r4v6, types: [boolean] */
+    /* JADX WARN: Type inference failed for: r4v8 */
+    /* JADX WARN: Type inference failed for: r4v9 */
     @Override // androidx.constraintlayout.solver.widgets.WidgetContainer
     /*
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public void layout() {
+    public final void layout() {
         /*
-            Method dump skipped, instructions count: 553
+            Method dump skipped, instructions count: 570
             To view this dump add '--comments-level debug' option
         */
         throw new UnsupportedOperationException("Method not decompiled: androidx.constraintlayout.solver.widgets.ConstraintWidgetContainer.layout():void");
     }
 
     @Override // androidx.constraintlayout.solver.widgets.WidgetContainer, androidx.constraintlayout.solver.widgets.ConstraintWidget
-    public void reset() {
+    public final void reset() {
         this.mSystem.reset();
         this.mPaddingLeft = 0;
         this.mPaddingTop = 0;
@@ -255,7 +255,7 @@ public class ConstraintWidgetContainer extends WidgetContainer {
     }
 
     @Override // androidx.constraintlayout.solver.widgets.ConstraintWidget
-    public void updateFromRuns(boolean z, boolean z2) {
+    public final void updateFromRuns(boolean z, boolean z2) {
         super.updateFromRuns(z, z2);
         int size = this.mChildren.size();
         for (int i = 0; i < size; i++) {

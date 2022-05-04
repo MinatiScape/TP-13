@@ -7,9 +7,8 @@ import android.view.View;
 import androidx.recyclerview.widget.RecyclerView;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 import java.util.ArrayList;
-import java.util.List;
 /* loaded from: classes.dex */
-public class DefaultItemAnimator extends SimpleItemAnimator {
+public final class DefaultItemAnimator extends SimpleItemAnimator {
     public static TimeInterpolator sDefaultInterpolator;
     public ArrayList<RecyclerView.ViewHolder> mPendingRemovals = new ArrayList<>();
     public ArrayList<RecyclerView.ViewHolder> mPendingAdditions = new ArrayList<>();
@@ -32,16 +31,7 @@ public class DefaultItemAnimator extends SimpleItemAnimator {
         public int toX;
         public int toY;
 
-        public ChangeInfo(RecyclerView.ViewHolder oldHolder, RecyclerView.ViewHolder newHolder, int fromX, int fromY, int toX, int toY) {
-            this.oldHolder = oldHolder;
-            this.newHolder = newHolder;
-            this.fromX = fromX;
-            this.fromY = fromY;
-            this.toX = toX;
-            this.toY = toY;
-        }
-
-        public String toString() {
+        public final String toString() {
             StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("ChangeInfo{oldHolder=");
             m.append(this.oldHolder);
             m.append(", newHolder=");
@@ -57,6 +47,15 @@ public class DefaultItemAnimator extends SimpleItemAnimator {
             m.append('}');
             return m.toString();
         }
+
+        public ChangeInfo(RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder viewHolder2, int i, int i2, int i3, int i4) {
+            this.oldHolder = viewHolder;
+            this.newHolder = viewHolder2;
+            this.fromX = i;
+            this.fromY = i2;
+            this.toX = i3;
+            this.toY = i4;
+        }
     }
 
     /* loaded from: classes.dex */
@@ -67,79 +66,61 @@ public class DefaultItemAnimator extends SimpleItemAnimator {
         public int toX;
         public int toY;
 
-        public MoveInfo(RecyclerView.ViewHolder holder, int fromX, int fromY, int toX, int toY) {
-            this.holder = holder;
-            this.fromX = fromX;
-            this.fromY = fromY;
-            this.toX = toX;
-            this.toY = toY;
+        public MoveInfo(RecyclerView.ViewHolder viewHolder, int i, int i2, int i3, int i4) {
+            this.holder = viewHolder;
+            this.fromX = i;
+            this.fromY = i2;
+            this.toX = i3;
+            this.toY = i4;
         }
     }
 
     @Override // androidx.recyclerview.widget.SimpleItemAnimator
-    public boolean animateMove(final RecyclerView.ViewHolder holder, int fromX, int fromY, int toX, int toY) {
-        View view = holder.itemView;
-        int translationX = fromX + ((int) view.getTranslationX());
-        int translationY = fromY + ((int) holder.itemView.getTranslationY());
-        resetAnimation(holder);
-        int i = toX - translationX;
-        int i2 = toY - translationY;
-        if (i == 0 && i2 == 0) {
-            dispatchAnimationFinished(holder);
+    public final boolean animateMove(RecyclerView.ViewHolder viewHolder, int i, int i2, int i3, int i4) {
+        View view = viewHolder.itemView;
+        int translationX = i + ((int) view.getTranslationX());
+        int translationY = i2 + ((int) viewHolder.itemView.getTranslationY());
+        resetAnimation(viewHolder);
+        int i5 = i3 - translationX;
+        int i6 = i4 - translationY;
+        if (i5 == 0 && i6 == 0) {
+            dispatchAnimationFinished(viewHolder);
             return false;
         }
-        if (i != 0) {
-            view.setTranslationX(-i);
+        if (i5 != 0) {
+            view.setTranslationX(-i5);
         }
-        if (i2 != 0) {
-            view.setTranslationY(-i2);
+        if (i6 != 0) {
+            view.setTranslationY(-i6);
         }
-        this.mPendingMoves.add(new MoveInfo(holder, translationX, translationY, toX, toY));
+        this.mPendingMoves.add(new MoveInfo(viewHolder, translationX, translationY, i3, i4));
         return true;
     }
 
-    public void cancelAll(List<RecyclerView.ViewHolder> viewHolders) {
-        int size = viewHolders.size();
-        while (true) {
-            size--;
-            if (size >= 0) {
-                viewHolders.get(size).itemView.animate().cancel();
-            } else {
-                return;
-            }
-        }
-    }
-
-    public void dispatchFinishedWhenDone() {
-        if (!isRunning()) {
-            dispatchAnimationsFinished();
-        }
-    }
-
     @Override // androidx.recyclerview.widget.RecyclerView.ItemAnimator
-    public void endAnimation(RecyclerView.ViewHolder item) {
-        View view = item.itemView;
+    public final void endAnimation(RecyclerView.ViewHolder viewHolder) {
+        View view = viewHolder.itemView;
         view.animate().cancel();
         int size = this.mPendingMoves.size();
         while (true) {
             size--;
             if (size < 0) {
                 break;
-            } else if (this.mPendingMoves.get(size).holder == item) {
+            } else if (this.mPendingMoves.get(size).holder == viewHolder) {
                 view.setTranslationY(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
                 view.setTranslationX(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
-                dispatchAnimationFinished(item);
+                dispatchAnimationFinished(viewHolder);
                 this.mPendingMoves.remove(size);
             }
         }
-        endChangeAnimation(this.mPendingChanges, item);
-        if (this.mPendingRemovals.remove(item)) {
+        endChangeAnimation(this.mPendingChanges, viewHolder);
+        if (this.mPendingRemovals.remove(viewHolder)) {
             view.setAlpha(1.0f);
-            dispatchAnimationFinished(item);
+            dispatchAnimationFinished(viewHolder);
         }
-        if (this.mPendingAdditions.remove(item)) {
+        if (this.mPendingAdditions.remove(viewHolder)) {
             view.setAlpha(1.0f);
-            dispatchAnimationFinished(item);
+            dispatchAnimationFinished(viewHolder);
         }
         int size2 = this.mChangesList.size();
         while (true) {
@@ -148,7 +129,7 @@ public class DefaultItemAnimator extends SimpleItemAnimator {
                 break;
             }
             ArrayList<ChangeInfo> arrayList = this.mChangesList.get(size2);
-            endChangeAnimation(arrayList, item);
+            endChangeAnimation(arrayList, viewHolder);
             if (arrayList.isEmpty()) {
                 this.mChangesList.remove(size2);
             }
@@ -165,10 +146,10 @@ public class DefaultItemAnimator extends SimpleItemAnimator {
                 size4--;
                 if (size4 < 0) {
                     break;
-                } else if (arrayList2.get(size4).holder == item) {
+                } else if (arrayList2.get(size4).holder == viewHolder) {
                     view.setTranslationY(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
                     view.setTranslationX(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
-                    dispatchAnimationFinished(item);
+                    dispatchAnimationFinished(viewHolder);
                     arrayList2.remove(size4);
                     if (arrayList2.isEmpty()) {
                         this.mMovesList.remove(size3);
@@ -181,18 +162,18 @@ public class DefaultItemAnimator extends SimpleItemAnimator {
             size5--;
             if (size5 >= 0) {
                 ArrayList<RecyclerView.ViewHolder> arrayList3 = this.mAdditionsList.get(size5);
-                if (arrayList3.remove(item)) {
+                if (arrayList3.remove(viewHolder)) {
                     view.setAlpha(1.0f);
-                    dispatchAnimationFinished(item);
+                    dispatchAnimationFinished(viewHolder);
                     if (arrayList3.isEmpty()) {
                         this.mAdditionsList.remove(size5);
                     }
                 }
             } else {
-                this.mRemoveAnimations.remove(item);
-                this.mAddAnimations.remove(item);
-                this.mChangeAnimations.remove(item);
-                this.mMoveAnimations.remove(item);
+                this.mRemoveAnimations.remove(viewHolder);
+                this.mAddAnimations.remove(viewHolder);
+                this.mChangeAnimations.remove(viewHolder);
+                this.mMoveAnimations.remove(viewHolder);
                 dispatchFinishedWhenDone();
                 return;
             }
@@ -200,7 +181,7 @@ public class DefaultItemAnimator extends SimpleItemAnimator {
     }
 
     @Override // androidx.recyclerview.widget.RecyclerView.ItemAnimator
-    public void endAnimations() {
+    public final void endAnimations() {
         int size = this.mPendingMoves.size();
         while (true) {
             size--;
@@ -331,46 +312,67 @@ public class DefaultItemAnimator extends SimpleItemAnimator {
         }
     }
 
-    public final void endChangeAnimation(List<ChangeInfo> infoList, RecyclerView.ViewHolder item) {
-        int size = infoList.size();
+    public final boolean endChangeAnimationIfNecessary(ChangeInfo changeInfo, RecyclerView.ViewHolder viewHolder) {
+        if (changeInfo.newHolder == viewHolder) {
+            changeInfo.newHolder = null;
+        } else if (changeInfo.oldHolder != viewHolder) {
+            return false;
+        } else {
+            changeInfo.oldHolder = null;
+        }
+        viewHolder.itemView.setAlpha(1.0f);
+        viewHolder.itemView.setTranslationX(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
+        viewHolder.itemView.setTranslationY(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
+        dispatchAnimationFinished(viewHolder);
+        return true;
+    }
+
+    @Override // androidx.recyclerview.widget.RecyclerView.ItemAnimator
+    public final boolean isRunning() {
+        if (!this.mPendingAdditions.isEmpty() || !this.mPendingChanges.isEmpty() || !this.mPendingMoves.isEmpty() || !this.mPendingRemovals.isEmpty() || !this.mMoveAnimations.isEmpty() || !this.mRemoveAnimations.isEmpty() || !this.mAddAnimations.isEmpty() || !this.mChangeAnimations.isEmpty() || !this.mMovesList.isEmpty() || !this.mAdditionsList.isEmpty() || !this.mChangesList.isEmpty()) {
+            return true;
+        }
+        return false;
+    }
+
+    public final void resetAnimation(RecyclerView.ViewHolder viewHolder) {
+        if (sDefaultInterpolator == null) {
+            sDefaultInterpolator = new ValueAnimator().getInterpolator();
+        }
+        viewHolder.itemView.animate().setInterpolator(sDefaultInterpolator);
+        endAnimation(viewHolder);
+    }
+
+    public static void cancelAll(ArrayList arrayList) {
+        int size = arrayList.size();
         while (true) {
             size--;
             if (size >= 0) {
-                ChangeInfo changeInfo = infoList.get(size);
-                if (endChangeAnimationIfNecessary(changeInfo, item) && changeInfo.oldHolder == null && changeInfo.newHolder == null) {
-                    infoList.remove(changeInfo);
-                }
+                ((RecyclerView.ViewHolder) arrayList.get(size)).itemView.animate().cancel();
             } else {
                 return;
             }
         }
     }
 
-    public final boolean endChangeAnimationIfNecessary(ChangeInfo changeInfo, RecyclerView.ViewHolder item) {
-        if (changeInfo.newHolder == item) {
-            changeInfo.newHolder = null;
-        } else if (changeInfo.oldHolder != item) {
-            return false;
-        } else {
-            changeInfo.oldHolder = null;
+    public final void dispatchFinishedWhenDone() {
+        if (!isRunning()) {
+            dispatchAnimationsFinished();
         }
-        item.itemView.setAlpha(1.0f);
-        item.itemView.setTranslationX(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
-        item.itemView.setTranslationY(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
-        dispatchAnimationFinished(item);
-        return true;
     }
 
-    @Override // androidx.recyclerview.widget.RecyclerView.ItemAnimator
-    public boolean isRunning() {
-        return !this.mPendingAdditions.isEmpty() || !this.mPendingChanges.isEmpty() || !this.mPendingMoves.isEmpty() || !this.mPendingRemovals.isEmpty() || !this.mMoveAnimations.isEmpty() || !this.mRemoveAnimations.isEmpty() || !this.mAddAnimations.isEmpty() || !this.mChangeAnimations.isEmpty() || !this.mMovesList.isEmpty() || !this.mAdditionsList.isEmpty() || !this.mChangesList.isEmpty();
-    }
-
-    public final void resetAnimation(RecyclerView.ViewHolder holder) {
-        if (sDefaultInterpolator == null) {
-            sDefaultInterpolator = new ValueAnimator().getInterpolator();
+    public final void endChangeAnimation(ArrayList arrayList, RecyclerView.ViewHolder viewHolder) {
+        int size = arrayList.size();
+        while (true) {
+            size--;
+            if (size >= 0) {
+                ChangeInfo changeInfo = (ChangeInfo) arrayList.get(size);
+                if (endChangeAnimationIfNecessary(changeInfo, viewHolder) && changeInfo.oldHolder == null && changeInfo.newHolder == null) {
+                    arrayList.remove(changeInfo);
+                }
+            } else {
+                return;
+            }
         }
-        holder.itemView.animate().setInterpolator(sDefaultInterpolator);
-        endAnimation(holder);
     }
 }

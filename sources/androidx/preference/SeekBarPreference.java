@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import androidx.appcompat.R$id;
 import androidx.preference.Preference;
 import com.android.systemui.shared.R;
 /* loaded from: classes.dex */
@@ -13,16 +14,21 @@ public class SeekBarPreference extends Preference {
     public int mMin;
     public int mSeekBarIncrement;
 
+    @Override // androidx.preference.Preference
+    public final Object onGetDefaultValue(TypedArray typedArray, int i) {
+        return Integer.valueOf(typedArray.getInt(i, 0));
+    }
+
     /* loaded from: classes.dex */
     public static class SavedState extends Preference.BaseSavedState {
         public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<SavedState>() { // from class: androidx.preference.SeekBarPreference.SavedState.1
             @Override // android.os.Parcelable.Creator
-            public SavedState createFromParcel(Parcel parcel) {
+            public final SavedState createFromParcel(Parcel parcel) {
                 return new SavedState(parcel);
             }
 
             @Override // android.os.Parcelable.Creator
-            public SavedState[] newArray(int i) {
+            public final SavedState[] newArray(int i) {
                 return new SavedState[i];
             }
         };
@@ -38,7 +44,7 @@ public class SeekBarPreference extends Preference {
         }
 
         @Override // android.view.AbsSavedState, android.os.Parcelable
-        public void writeToParcel(Parcel parcel, int i) {
+        public final void writeToParcel(Parcel parcel, int i) {
             super.writeToParcel(parcel, i);
             parcel.writeInt(this.mSeekBarValue);
             parcel.writeInt(this.mMin);
@@ -47,8 +53,8 @@ public class SeekBarPreference extends Preference {
     }
 
     public SeekBarPreference(Context context, AttributeSet attributeSet) {
-        super(context, attributeSet, R.attr.seekBarPreferenceStyle, 0);
-        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, R$styleable.SeekBarPreference, R.attr.seekBarPreferenceStyle, 0);
+        super(context, attributeSet, R.attr.seekBarPreferenceStyle);
+        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, R$id.SeekBarPreference, R.attr.seekBarPreferenceStyle, 0);
         this.mMin = obtainStyledAttributes.getInt(3, 0);
         int i = obtainStyledAttributes.getInt(1, 100);
         int i2 = this.mMin;
@@ -64,10 +70,5 @@ public class SeekBarPreference extends Preference {
         obtainStyledAttributes.getBoolean(5, false);
         obtainStyledAttributes.getBoolean(6, false);
         obtainStyledAttributes.recycle();
-    }
-
-    @Override // androidx.preference.Preference
-    public Object onGetDefaultValue(TypedArray typedArray, int i) {
-        return Integer.valueOf(typedArray.getInt(i, 0));
     }
 }

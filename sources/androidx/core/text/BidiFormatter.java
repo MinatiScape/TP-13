@@ -1,9 +1,11 @@
 package androidx.core.text;
+
+import androidx.core.text.TextDirectionHeuristicsCompat;
 /* loaded from: classes.dex */
 public final class BidiFormatter {
     public static final BidiFormatter DEFAULT_LTR_INSTANCE;
     public static final BidiFormatter DEFAULT_RTL_INSTANCE;
-    public static final TextDirectionHeuristicCompat DEFAULT_TEXT_DIRECTION_HEURISTIC;
+    public static final TextDirectionHeuristicsCompat.TextDirectionHeuristicInternal DEFAULT_TEXT_DIRECTION_HEURISTIC;
     public static final String LRM_STRING = Character.toString(8206);
     public static final String RLM_STRING = Character.toString(8207);
     public final TextDirectionHeuristicCompat mDefaultTextDirectionHeuristicCompat;
@@ -24,12 +26,7 @@ public final class BidiFormatter {
             }
         }
 
-        public DirectionalityEstimator(CharSequence text, boolean isHtml) {
-            this.text = text;
-            this.length = text.length();
-        }
-
-        public byte dirTypeBackward() {
+        public final byte dirTypeBackward() {
             char charAt = this.text.charAt(this.charIndex - 1);
             this.lastChar = charAt;
             if (Character.isLowSurrogate(charAt)) {
@@ -39,21 +36,23 @@ public final class BidiFormatter {
             }
             this.charIndex--;
             char c = this.lastChar;
-            return c < 1792 ? DIR_TYPE_CACHE[c] : Character.getDirectionality(c);
+            if (c < 1792) {
+                return DIR_TYPE_CACHE[c];
+            }
+            return Character.getDirectionality(c);
+        }
+
+        public DirectionalityEstimator(String str) {
+            this.text = str;
+            this.length = str.length();
         }
     }
 
     static {
-        TextDirectionHeuristicCompat textDirectionHeuristicCompat = TextDirectionHeuristicsCompat.FIRSTSTRONG_LTR;
-        DEFAULT_TEXT_DIRECTION_HEURISTIC = textDirectionHeuristicCompat;
-        DEFAULT_LTR_INSTANCE = new BidiFormatter(false, 2, textDirectionHeuristicCompat);
-        DEFAULT_RTL_INSTANCE = new BidiFormatter(true, 2, textDirectionHeuristicCompat);
-    }
-
-    public BidiFormatter(boolean isRtlContext, int flags, TextDirectionHeuristicCompat heuristic) {
-        this.mIsRtlContext = isRtlContext;
-        this.mFlags = flags;
-        this.mDefaultTextDirectionHeuristicCompat = heuristic;
+        TextDirectionHeuristicsCompat.TextDirectionHeuristicInternal textDirectionHeuristicInternal = TextDirectionHeuristicsCompat.FIRSTSTRONG_LTR;
+        DEFAULT_TEXT_DIRECTION_HEURISTIC = textDirectionHeuristicInternal;
+        DEFAULT_LTR_INSTANCE = new BidiFormatter(false, 2, textDirectionHeuristicInternal);
+        DEFAULT_RTL_INSTANCE = new BidiFormatter(true, 2, textDirectionHeuristicInternal);
     }
 
     /* JADX WARN: Code restructure failed: missing block: B:26:0x0070, code lost:
@@ -103,15 +102,15 @@ public final class BidiFormatter {
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public static int getEntryDir(java.lang.CharSequence r9) {
+    public static int getEntryDir(java.lang.String r9) {
         /*
             androidx.core.text.BidiFormatter$DirectionalityEstimator r0 = new androidx.core.text.BidiFormatter$DirectionalityEstimator
-            r1 = 0
-            r0.<init>(r9, r1)
-            r0.charIndex = r1
-            r9 = -1
+            r0.<init>(r9)
+            r9 = 0
+            r0.charIndex = r9
+            r1 = -1
             r2 = 1
-            r3 = r1
+            r3 = r9
             r4 = r3
             r5 = r4
         Ld:
@@ -164,7 +163,7 @@ public final class BidiFormatter {
             goto L6e
         L5c:
             int r5 = r5 + (-1)
-            r4 = r1
+            r4 = r9
             goto Ld
         L60:
             int r5 = r5 + 1
@@ -172,7 +171,7 @@ public final class BidiFormatter {
             goto Ld
         L64:
             int r5 = r5 + 1
-            r4 = r9
+            r4 = r1
             goto Ld
         L68:
             if (r5 != 0) goto L6e
@@ -188,7 +187,7 @@ public final class BidiFormatter {
             goto L91
         L73:
             if (r4 == 0) goto L77
-            r1 = r4
+            r9 = r4
             goto L91
         L77:
             int r4 = r0.charIndex
@@ -210,20 +209,20 @@ public final class BidiFormatter {
         L86:
             if (r3 != r5) goto L8e
         L88:
-            r1 = r2
+            r9 = r2
             goto L91
         L8a:
             if (r3 != r5) goto L8e
         L8c:
-            r1 = r9
+            r9 = r1
             goto L91
         L8e:
             int r5 = r5 + (-1)
             goto L77
         L91:
-            return r1
+            return r9
         */
-        throw new UnsupportedOperationException("Method not decompiled: androidx.core.text.BidiFormatter.getEntryDir(java.lang.CharSequence):int");
+        throw new UnsupportedOperationException("Method not decompiled: androidx.core.text.BidiFormatter.getEntryDir(java.lang.String):int");
     }
 
     /* JADX WARN: Code restructure failed: missing block: B:26:0x0041, code lost:
@@ -233,16 +232,16 @@ public final class BidiFormatter {
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public static int getExitDir(java.lang.CharSequence r6) {
+    public static int getExitDir(java.lang.String r6) {
         /*
             androidx.core.text.BidiFormatter$DirectionalityEstimator r0 = new androidx.core.text.BidiFormatter$DirectionalityEstimator
-            r1 = 0
-            r0.<init>(r6, r1)
+            r0.<init>(r6)
             int r6 = r0.length
             r0.charIndex = r6
-            r6 = r1
+            r6 = 0
+            r1 = r6
         Lb:
-            r2 = r6
+            r2 = r1
         Lc:
             int r3 = r0.charIndex
             r4 = 1
@@ -263,16 +262,16 @@ public final class BidiFormatter {
                 default: goto L23;
             }
         L23:
-            if (r6 != 0) goto Lc
+            if (r1 != 0) goto Lc
             goto L3f
         L26:
             int r2 = r2 + 1
             goto Lc
         L29:
-            if (r6 != r2) goto L2f
+            if (r1 != r2) goto L2f
             goto L34
         L2c:
-            if (r6 != r2) goto L2f
+            if (r1 != r2) goto L2f
             goto L3b
         L2f:
             int r2 = r2 + (-1)
@@ -280,24 +279,30 @@ public final class BidiFormatter {
         L32:
             if (r2 != 0) goto L36
         L34:
-            r1 = r4
+            r6 = r4
             goto L41
         L36:
-            if (r6 != 0) goto Lc
+            if (r1 != 0) goto Lc
             goto L3f
         L39:
             if (r2 != 0) goto L3d
         L3b:
-            r1 = -1
+            r6 = -1
             goto L41
         L3d:
-            if (r6 != 0) goto Lc
+            if (r1 != 0) goto Lc
         L3f:
-            r6 = r2
+            r1 = r2
             goto Lb
         L41:
-            return r1
+            return r6
         */
-        throw new UnsupportedOperationException("Method not decompiled: androidx.core.text.BidiFormatter.getExitDir(java.lang.CharSequence):int");
+        throw new UnsupportedOperationException("Method not decompiled: androidx.core.text.BidiFormatter.getExitDir(java.lang.String):int");
+    }
+
+    public BidiFormatter(boolean z, int i, TextDirectionHeuristicsCompat.TextDirectionHeuristicInternal textDirectionHeuristicInternal) {
+        this.mIsRtlContext = z;
+        this.mFlags = i;
+        this.mDefaultTextDirectionHeuristicCompat = textDirectionHeuristicInternal;
     }
 }

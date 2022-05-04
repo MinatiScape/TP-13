@@ -1,26 +1,24 @@
 package androidx.slice.widget;
 
-import android.annotation.TargetApi;
 import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.Iterator;
 /* loaded from: classes.dex */
-public class LocationBasedViewTracker implements Runnable, View.OnLayoutChangeListener {
+public final class LocationBasedViewTracker implements Runnable, View.OnLayoutChangeListener {
     public final Rect mFocusRect;
     public final ViewGroup mParent;
     public final SelectionLogic mSelectionLogic;
-    public static final SelectionLogic INPUT_FOCUS = new SelectionLogic() { // from class: androidx.slice.widget.LocationBasedViewTracker.1
+    public static final AnonymousClass1 INPUT_FOCUS = new SelectionLogic() { // from class: androidx.slice.widget.LocationBasedViewTracker.1
         @Override // androidx.slice.widget.LocationBasedViewTracker.SelectionLogic
-        public void selectView(View view) {
+        public final void selectView(View view) {
             view.requestFocus();
         }
     };
-    @TargetApi(21)
-    public static final SelectionLogic A11Y_FOCUS = new SelectionLogic() { // from class: androidx.slice.widget.LocationBasedViewTracker.2
+    public static final AnonymousClass2 A11Y_FOCUS = new SelectionLogic() { // from class: androidx.slice.widget.LocationBasedViewTracker.2
         @Override // androidx.slice.widget.LocationBasedViewTracker.SelectionLogic
-        public void selectView(View view) {
+        public final void selectView(View view) {
             view.performAccessibilityAction(64, null);
         }
     };
@@ -30,25 +28,14 @@ public class LocationBasedViewTracker implements Runnable, View.OnLayoutChangeLi
         void selectView(View view);
     }
 
-    public LocationBasedViewTracker(ViewGroup parent, View selected, SelectionLogic selectionLogic) {
-        Rect rect = new Rect();
-        this.mFocusRect = rect;
-        this.mParent = parent;
-        this.mSelectionLogic = selectionLogic;
-        selected.getDrawingRect(rect);
-        parent.offsetDescendantRectToMyCoords(selected, rect);
-        parent.addOnLayoutChangeListener(this);
-        parent.requestLayout();
-    }
-
     @Override // android.view.View.OnLayoutChangeListener
-    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+    public final void onLayoutChange(View view, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8) {
         this.mParent.removeOnLayoutChangeListener(this);
         this.mParent.post(this);
     }
 
     @Override // java.lang.Runnable
-    public void run() {
+    public final void run() {
         ArrayList<View> arrayList = new ArrayList<>();
         this.mParent.addFocusables(arrayList, 2, 0);
         Rect rect = new Rect();
@@ -70,5 +57,16 @@ public class LocationBasedViewTracker implements Runnable, View.OnLayoutChangeLi
         if (view != null) {
             this.mSelectionLogic.selectView(view);
         }
+    }
+
+    public LocationBasedViewTracker(ViewGroup viewGroup, View view, SelectionLogic selectionLogic) {
+        Rect rect = new Rect();
+        this.mFocusRect = rect;
+        this.mParent = viewGroup;
+        this.mSelectionLogic = selectionLogic;
+        view.getDrawingRect(rect);
+        viewGroup.offsetDescendantRectToMyCoords(view, rect);
+        viewGroup.addOnLayoutChangeListener(this);
+        viewGroup.requestLayout();
     }
 }

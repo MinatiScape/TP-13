@@ -2,7 +2,7 @@ package androidx.appcompat.widget;
 
 import androidx.recyclerview.widget.RecyclerView;
 /* loaded from: classes.dex */
-public class RtlSpacingHelper {
+public final class RtlSpacingHelper {
     public int mLeft = 0;
     public int mRight = 0;
     public int mStart = RecyclerView.UNDEFINED_DURATION;
@@ -12,7 +12,7 @@ public class RtlSpacingHelper {
     public boolean mIsRtl = false;
     public boolean mIsRelative = false;
 
-    public void setRelative(int i, int i2) {
+    public final void setRelative(int i, int i2) {
         this.mStart = i;
         this.mEnd = i2;
         this.mIsRelative = true;

@@ -2,9 +2,9 @@ package androidx.fragment.app;
 
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 import android.util.Log;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.fragment.app.strictmode.FragmentStrictMode;
 import java.io.PrintWriter;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -14,33 +14,29 @@ public final class BackStackRecord extends FragmentTransaction implements Fragme
     public int mIndex;
     public final FragmentManager mManager;
 
-    /* JADX WARN: Illegal instructions before constructor call */
-    /*
-        Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
-    */
-    public BackStackRecord(androidx.fragment.app.FragmentManager r3) {
-        /*
-            r2 = this;
-            androidx.fragment.app.FragmentFactory r0 = r3.getFragmentFactory()
-            androidx.fragment.app.FragmentHostCallback<?> r1 = r3.mHost
-            if (r1 == 0) goto Lf
-            android.content.Context r1 = r1.mContext
-            java.lang.ClassLoader r1 = r1.getClassLoader()
-            goto L10
-        Lf:
-            r1 = 0
-        L10:
-            r2.<init>(r0, r1)
-            r0 = -1
-            r2.mIndex = r0
-            r2.mManager = r3
-            return
-        */
-        throw new UnsupportedOperationException("Method not decompiled: androidx.fragment.app.BackStackRecord.<init>(androidx.fragment.app.FragmentManager):void");
+    public final int commit() {
+        return commitInternal(false);
     }
 
-    public void bumpBackStackNesting(int i) {
+    @Override // androidx.fragment.app.FragmentManager.OpGenerator
+    public final boolean generateOps(ArrayList<BackStackRecord> arrayList, ArrayList<Boolean> arrayList2) {
+        if (FragmentManager.isLoggingEnabled(2)) {
+            Log.v("FragmentManager", "Run: " + this);
+        }
+        arrayList.add(this);
+        arrayList2.add(Boolean.FALSE);
+        if (!this.mAddToBackStack) {
+            return true;
+        }
+        FragmentManager fragmentManager = this.mManager;
+        if (fragmentManager.mBackStack == null) {
+            fragmentManager.mBackStack = new ArrayList<>();
+        }
+        fragmentManager.mBackStack.add(this);
+        return true;
+    }
+
+    public final void bumpBackStackNesting(int i) {
         if (this.mAddToBackStack) {
             if (FragmentManager.isLoggingEnabled(2)) {
                 Log.v("FragmentManager", "Bump nesting in " + this + " by " + i);
@@ -63,20 +59,11 @@ public final class BackStackRecord extends FragmentTransaction implements Fragme
         }
     }
 
-    @Override // androidx.fragment.app.FragmentTransaction
-    public int commit() {
-        return commitInternal(false);
-    }
-
-    public int commitAllowingStateLoss() {
-        return commitInternal(true);
-    }
-
-    public int commitInternal(boolean z) {
+    public final int commitInternal(boolean z) {
         if (!this.mCommitted) {
             if (FragmentManager.isLoggingEnabled(2)) {
                 Log.v("FragmentManager", "Commit: " + this);
-                PrintWriter printWriter = new PrintWriter(new LogWriter("FragmentManager"));
+                PrintWriter printWriter = new PrintWriter(new LogWriter());
                 dump("  ", printWriter, true);
                 printWriter.close();
             }
@@ -93,17 +80,11 @@ public final class BackStackRecord extends FragmentTransaction implements Fragme
     }
 
     @Override // androidx.fragment.app.FragmentTransaction
-    public void commitNow() {
-        if (!this.mAddToBackStack) {
-            this.mAllowAddToBackStack = false;
-            this.mManager.execSingleAction(this, false);
-            return;
+    public final void doAddOp(int i, Fragment fragment, String str, int i2) {
+        String str2 = fragment.mPreviousWho;
+        if (str2 != null) {
+            FragmentStrictMode.onFragmentReuse(fragment, str2);
         }
-        throw new IllegalStateException("This transaction is already being added to the back stack");
-    }
-
-    @Override // androidx.fragment.app.FragmentTransaction
-    public void doAddOp(int i, Fragment fragment, String str, int i2) {
         Class<?> cls = fragment.getClass();
         int modifiers = cls.getModifiers();
         if (cls.isAnonymousClass() || !Modifier.isPublic(modifiers) || (cls.isMemberClass() && !Modifier.isStatic(modifiers))) {
@@ -113,8 +94,8 @@ public final class BackStackRecord extends FragmentTransaction implements Fragme
             throw new IllegalStateException(m.toString());
         }
         if (str != null) {
-            String str2 = fragment.mTag;
-            if (str2 == null || str.equals(str2)) {
+            String str3 = fragment.mTag;
+            if (str3 == null || str.equals(str3)) {
                 fragment.mTag = str;
             } else {
                 throw new IllegalStateException("Can't change tag of fragment " + fragment + ": was " + fragment.mTag + " now " + str);
@@ -137,7 +118,7 @@ public final class BackStackRecord extends FragmentTransaction implements Fragme
         fragment.mFragmentManager = this.mManager;
     }
 
-    public void dump(String str, PrintWriter printWriter, boolean z) {
+    public final void dump(String str, PrintWriter printWriter, boolean z) {
         String str2;
         if (z) {
             printWriter.print(str);
@@ -254,180 +235,7 @@ public final class BackStackRecord extends FragmentTransaction implements Fragme
         }
     }
 
-    public void executeOps() {
-        int size = this.mOps.size();
-        for (int i = 0; i < size; i++) {
-            FragmentTransaction.Op op = this.mOps.get(i);
-            Fragment fragment = op.mFragment;
-            if (fragment != null) {
-                int i2 = this.mTransition;
-                if (!(fragment.mAnimationInfo == null && i2 == 0)) {
-                    fragment.ensureAnimationInfo();
-                    fragment.mAnimationInfo.mNextTransition = i2;
-                }
-                ArrayList<String> arrayList = this.mSharedElementSourceNames;
-                ArrayList<String> arrayList2 = this.mSharedElementTargetNames;
-                fragment.ensureAnimationInfo();
-                Fragment.AnimationInfo animationInfo = fragment.mAnimationInfo;
-                animationInfo.mSharedElementSourceNames = arrayList;
-                animationInfo.mSharedElementTargetNames = arrayList2;
-            }
-            switch (op.mCmd) {
-                case 1:
-                    fragment.setNextAnim(op.mEnterAnim);
-                    this.mManager.setExitAnimationOrder(fragment, false);
-                    this.mManager.addFragment(fragment);
-                    break;
-                case 2:
-                default:
-                    StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Unknown cmd: ");
-                    m.append(op.mCmd);
-                    throw new IllegalArgumentException(m.toString());
-                case 3:
-                    fragment.setNextAnim(op.mExitAnim);
-                    this.mManager.removeFragment(fragment);
-                    break;
-                case 4:
-                    fragment.setNextAnim(op.mExitAnim);
-                    this.mManager.hideFragment(fragment);
-                    break;
-                case 5:
-                    fragment.setNextAnim(op.mEnterAnim);
-                    this.mManager.setExitAnimationOrder(fragment, false);
-                    this.mManager.showFragment(fragment);
-                    break;
-                case 6:
-                    fragment.setNextAnim(op.mExitAnim);
-                    this.mManager.detachFragment(fragment);
-                    break;
-                case 7:
-                    fragment.setNextAnim(op.mEnterAnim);
-                    this.mManager.setExitAnimationOrder(fragment, false);
-                    this.mManager.attachFragment(fragment);
-                    break;
-                case 8:
-                    this.mManager.setPrimaryNavigationFragment(fragment);
-                    break;
-                case 9:
-                    this.mManager.setPrimaryNavigationFragment(null);
-                    break;
-                case 10:
-                    this.mManager.setMaxLifecycle(fragment, op.mCurrentMaxState);
-                    break;
-            }
-        }
-    }
-
-    public void executePopOps(boolean z) {
-        for (int size = this.mOps.size() - 1; size >= 0; size--) {
-            FragmentTransaction.Op op = this.mOps.get(size);
-            Fragment fragment = op.mFragment;
-            if (fragment != null) {
-                int i = this.mTransition;
-                int i2 = 8194;
-                if (i != 4097) {
-                    i2 = i != 4099 ? i != 8194 ? 0 : 4097 : 4099;
-                }
-                if (!(fragment.mAnimationInfo == null && i2 == 0)) {
-                    fragment.ensureAnimationInfo();
-                    fragment.mAnimationInfo.mNextTransition = i2;
-                }
-                ArrayList<String> arrayList = this.mSharedElementTargetNames;
-                ArrayList<String> arrayList2 = this.mSharedElementSourceNames;
-                fragment.ensureAnimationInfo();
-                Fragment.AnimationInfo animationInfo = fragment.mAnimationInfo;
-                animationInfo.mSharedElementSourceNames = arrayList;
-                animationInfo.mSharedElementTargetNames = arrayList2;
-            }
-            switch (op.mCmd) {
-                case 1:
-                    fragment.setNextAnim(op.mPopExitAnim);
-                    this.mManager.setExitAnimationOrder(fragment, true);
-                    this.mManager.removeFragment(fragment);
-                    break;
-                case 2:
-                default:
-                    StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Unknown cmd: ");
-                    m.append(op.mCmd);
-                    throw new IllegalArgumentException(m.toString());
-                case 3:
-                    fragment.setNextAnim(op.mPopEnterAnim);
-                    this.mManager.addFragment(fragment);
-                    break;
-                case 4:
-                    fragment.setNextAnim(op.mPopEnterAnim);
-                    this.mManager.showFragment(fragment);
-                    break;
-                case 5:
-                    fragment.setNextAnim(op.mPopExitAnim);
-                    this.mManager.setExitAnimationOrder(fragment, true);
-                    this.mManager.hideFragment(fragment);
-                    break;
-                case 6:
-                    fragment.setNextAnim(op.mPopEnterAnim);
-                    this.mManager.attachFragment(fragment);
-                    break;
-                case 7:
-                    fragment.setNextAnim(op.mPopExitAnim);
-                    this.mManager.setExitAnimationOrder(fragment, true);
-                    this.mManager.detachFragment(fragment);
-                    break;
-                case 8:
-                    this.mManager.setPrimaryNavigationFragment(null);
-                    break;
-                case 9:
-                    this.mManager.setPrimaryNavigationFragment(fragment);
-                    break;
-                case 10:
-                    this.mManager.setMaxLifecycle(fragment, op.mOldMaxState);
-                    break;
-            }
-        }
-    }
-
-    @Override // androidx.fragment.app.FragmentManager.OpGenerator
-    public boolean generateOps(ArrayList<BackStackRecord> arrayList, ArrayList<Boolean> arrayList2) {
-        if (FragmentManager.isLoggingEnabled(2)) {
-            Log.v("FragmentManager", "Run: " + this);
-        }
-        arrayList.add(this);
-        arrayList2.add(Boolean.FALSE);
-        if (!this.mAddToBackStack) {
-            return true;
-        }
-        FragmentManager fragmentManager = this.mManager;
-        if (fragmentManager.mBackStack == null) {
-            fragmentManager.mBackStack = new ArrayList<>();
-        }
-        fragmentManager.mBackStack.add(this);
-        return true;
-    }
-
-    public boolean interactsWith(int i) {
-        int size = this.mOps.size();
-        for (int i2 = 0; i2 < size; i2++) {
-            Fragment fragment = this.mOps.get(i2).mFragment;
-            int i3 = fragment != null ? fragment.mContainerId : 0;
-            if (i3 != 0 && i3 == i) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public FragmentTransaction remove(Fragment fragment) {
-        FragmentManager fragmentManager = fragment.mFragmentManager;
-        if (fragmentManager == null || fragmentManager == this.mManager) {
-            addOp(new FragmentTransaction.Op(3, fragment));
-            return this;
-        }
-        StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Cannot remove Fragment attached to a different FragmentManager. Fragment ");
-        m.append(fragment.toString());
-        m.append(" is already attached to a FragmentManager.");
-        throw new IllegalStateException(m.toString());
-    }
-
-    public String toString() {
+    public final String toString() {
         StringBuilder sb = new StringBuilder(128);
         sb.append("BackStackEntry{");
         sb.append(Integer.toHexString(System.identityHashCode(this)));
@@ -443,35 +251,13 @@ public final class BackStackRecord extends FragmentTransaction implements Fragme
         return sb.toString();
     }
 
-    public boolean interactsWith(ArrayList<BackStackRecord> arrayList, int i, int i2) {
-        int i3;
-        if (i2 == i) {
-            return false;
+    public BackStackRecord(FragmentManager fragmentManager) {
+        fragmentManager.getFragmentFactory();
+        FragmentHostCallback<?> fragmentHostCallback = fragmentManager.mHost;
+        if (fragmentHostCallback != null) {
+            fragmentHostCallback.mContext.getClassLoader();
         }
-        int size = this.mOps.size();
-        int i4 = -1;
-        for (int i5 = 0; i5 < size; i5++) {
-            Fragment fragment = this.mOps.get(i5).mFragment;
-            int i6 = fragment != null ? fragment.mContainerId : 0;
-            if (!(i6 == 0 || i6 == i4)) {
-                for (int i7 = i; i7 < i2; i7++) {
-                    BackStackRecord backStackRecord = arrayList.get(i7);
-                    int size2 = backStackRecord.mOps.size();
-                    for (int i8 = 0; i8 < size2; i8++) {
-                        Fragment fragment2 = backStackRecord.mOps.get(i8).mFragment;
-                        if (fragment2 != null) {
-                            i3 = fragment2.mContainerId;
-                        } else {
-                            i3 = 0;
-                        }
-                        if (i3 == i6) {
-                            return true;
-                        }
-                    }
-                }
-                i4 = i6;
-            }
-        }
-        return false;
+        this.mIndex = -1;
+        this.mManager = fragmentManager;
     }
 }

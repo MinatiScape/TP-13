@@ -4,30 +4,32 @@ import kotlin.coroutines.Continuation;
 import kotlin.jvm.internal.FunctionBase;
 import kotlin.jvm.internal.Intrinsics;
 import kotlin.jvm.internal.Reflection;
+import kotlin.jvm.internal.ReflectionFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: ContinuationImpl.kt */
 /* loaded from: classes.dex */
 public abstract class SuspendLambda extends ContinuationImpl implements FunctionBase<Object> {
-    private final int arity;
+    private final int arity = 2;
 
-    public SuspendLambda(int i, @Nullable Continuation<Object> continuation) {
+    public SuspendLambda(@Nullable Continuation continuation) {
         super(continuation);
-        this.arity = i;
-    }
-
-    @Override // kotlin.jvm.internal.FunctionBase
-    public int getArity() {
-        return this.arity;
     }
 
     @Override // kotlin.coroutines.jvm.internal.BaseContinuationImpl
     @NotNull
-    public String toString() {
+    public final String toString() {
         if (getCompletion() != null) {
             return super.toString();
         }
-        String renderLambdaToString = Reflection.factory.renderLambdaToString(this);
-        Intrinsics.checkNotNullExpressionValue(renderLambdaToString, "Reflection.renderLambdaToString(this)");
+        Reflection.factory.getClass();
+        String renderLambdaToString = ReflectionFactory.renderLambdaToString(this);
+        Intrinsics.checkNotNullExpressionValue(renderLambdaToString, "renderLambdaToString(this)");
         return renderLambdaToString;
+    }
+
+    @Override // kotlin.jvm.internal.FunctionBase
+    public final int getArity() {
+        return this.arity;
     }
 }

@@ -12,7 +12,6 @@ import android.util.Log;
 import com.android.systemui.flags.FlagManager;
 import com.android.systemui.shared.R;
 import com.android.wallpaper.asset.Asset;
-import com.android.wallpaper.asset.ResourceAsset;
 import com.android.wallpaper.asset.SystemStaticAsset;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,20 +19,20 @@ import java.util.List;
 public class SystemStaticWallpaperInfo extends WallpaperInfo {
     public static final Parcelable.Creator<SystemStaticWallpaperInfo> CREATOR = new Parcelable.Creator<SystemStaticWallpaperInfo>() { // from class: com.android.wallpaper.model.SystemStaticWallpaperInfo.1
         @Override // android.os.Parcelable.Creator
-        public SystemStaticWallpaperInfo createFromParcel(Parcel parcel) {
-            return new SystemStaticWallpaperInfo(parcel, null);
+        public final SystemStaticWallpaperInfo createFromParcel(Parcel parcel) {
+            return new SystemStaticWallpaperInfo(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public SystemStaticWallpaperInfo[] newArray(int i) {
+        public final SystemStaticWallpaperInfo[] newArray(int i) {
             return new SystemStaticWallpaperInfo[i];
         }
     };
     public final int mActionTypeResId;
     public String mActionUrl;
     public final int mActionUrlResId;
-    public ResourceAsset mAsset;
-    public List<String> mAttributions;
+    public SystemStaticAsset mAsset;
+    public ArrayList mAttributions;
     public final String mCollectionId;
     public final int mDrawableResId;
     public final String mPackageName;
@@ -56,7 +55,7 @@ public class SystemStaticWallpaperInfo extends WallpaperInfo {
     }
 
     public static SystemStaticWallpaperInfo fromAttributeSet(String str, String str2, AttributeSet attributeSet) {
-        String attributeValue = attributeSet.getAttributeValue(null, FlagManager.FIELD_ID);
+        String attributeValue = attributeSet.getAttributeValue(null, FlagManager.EXTRA_ID);
         if (TextUtils.isEmpty(attributeValue)) {
             return null;
         }
@@ -64,17 +63,17 @@ public class SystemStaticWallpaperInfo extends WallpaperInfo {
     }
 
     @Override // com.android.wallpaper.model.WallpaperInfo
-    public int getActionIconRes(Context context) {
+    public final int getActionIconRes() {
         return R.drawable.ic_explore_24px;
     }
 
     @Override // com.android.wallpaper.model.WallpaperInfo
-    public int getActionLabelRes(Context context) {
+    public final int getActionLabelRes() {
         return R.string.explore;
     }
 
     @Override // com.android.wallpaper.model.WallpaperInfo
-    public String getActionUrl(Context context) {
+    public final String getActionUrl(Context context) {
         if (this.mActionUrl == null && this.mActionUrlResId != 0) {
             this.mActionUrl = getPackageResources(context).getString(this.mActionUrlResId);
         }
@@ -82,7 +81,7 @@ public class SystemStaticWallpaperInfo extends WallpaperInfo {
     }
 
     @Override // com.android.wallpaper.model.WallpaperInfo
-    public Asset getAsset(Context context) {
+    public final Asset getAsset(Context context) {
         if (this.mAsset == null) {
             this.mAsset = new SystemStaticAsset(getPackageResources(context), this.mDrawableResId, this.mWallpaperId);
         }
@@ -90,7 +89,7 @@ public class SystemStaticWallpaperInfo extends WallpaperInfo {
     }
 
     @Override // com.android.wallpaper.model.WallpaperInfo
-    public List<String> getAttributions(Context context) {
+    public final List<String> getAttributions(Context context) {
         if (this.mAttributions == null) {
             Resources packageResources = getPackageResources(context);
             ArrayList arrayList = new ArrayList();
@@ -111,11 +110,6 @@ public class SystemStaticWallpaperInfo extends WallpaperInfo {
         return this.mAttributions;
     }
 
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public String getCollectionId(Context context) {
-        return this.mCollectionId;
-    }
-
     public final Resources getPackageResources(Context context) {
         Resources resources = this.mResources;
         if (resources != null) {
@@ -129,23 +123,8 @@ public class SystemStaticWallpaperInfo extends WallpaperInfo {
         return this.mResources;
     }
 
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public Asset getThumbAsset(Context context) {
-        return getAsset(context);
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public String getWallpaperId() {
-        return this.mWallpaperId;
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public void showPreview(Activity activity, InlinePreviewIntentFactory inlinePreviewIntentFactory, int i) {
-        activity.startActivityForResult(inlinePreviewIntentFactory.newIntent(activity, this), i);
-    }
-
     @Override // com.android.wallpaper.model.WallpaperInfo, android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
+    public final void writeToParcel(Parcel parcel, int i) {
         parcel.writeInt(this.mPlaceholderColor);
         parcel.writeString(this.mPackageName);
         parcel.writeString(this.mWallpaperId);
@@ -158,7 +137,17 @@ public class SystemStaticWallpaperInfo extends WallpaperInfo {
         parcel.writeInt(this.mActionUrlResId);
     }
 
-    public SystemStaticWallpaperInfo(Parcel parcel, AnonymousClass1 r2) {
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final Asset getThumbAsset(Context context) {
+        return getAsset(context);
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final void showPreview(Activity activity, InlinePreviewIntentFactory inlinePreviewIntentFactory, int i) {
+        activity.startActivityForResult(inlinePreviewIntentFactory.newIntent(activity, this), i);
+    }
+
+    public SystemStaticWallpaperInfo(Parcel parcel) {
         super(parcel);
         this.mPackageName = parcel.readString();
         this.mWallpaperId = parcel.readString();
@@ -169,5 +158,15 @@ public class SystemStaticWallpaperInfo extends WallpaperInfo {
         this.mSubtitle2ResId = parcel.readInt();
         this.mActionTypeResId = parcel.readInt();
         this.mActionUrlResId = parcel.readInt();
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final String getCollectionId(Context context) {
+        return this.mCollectionId;
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final String getWallpaperId() {
+        return this.mWallpaperId;
     }
 }

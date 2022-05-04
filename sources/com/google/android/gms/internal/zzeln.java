@@ -3,9 +3,10 @@ package com.google.android.gms.internal;
 import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
-import androidx.slice.view.R$layout;
+import androidx.core.R$id;
 import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.Status;
+/* compiled from: AuthAccountResult.java */
 /* loaded from: classes.dex */
 public final class zzeln extends zzbkv implements Result {
     public static final Parcelable.Creator<zzeln> CREATOR = new zzelo();
@@ -14,9 +15,7 @@ public final class zzeln extends zzbkv implements Result {
     public Intent zzc;
 
     public zzeln() {
-        this.zza = 2;
-        this.zzb = 0;
-        this.zzc = null;
+        throw null;
     }
 
     @Override // com.google.android.gms.common.api.Result
@@ -29,15 +28,15 @@ public final class zzeln extends zzbkv implements Result {
 
     @Override // android.os.Parcelable
     public final void writeToParcel(Parcel parcel, int i) {
-        int zzb = R$layout.zzb(parcel, 20293);
+        int zzb = R$id.zzb(parcel, 20293);
         int i2 = this.zza;
-        R$layout.zzb(parcel, 1, 4);
+        R$id.zzb(parcel, 1, 4);
         parcel.writeInt(i2);
         int i3 = this.zzb;
-        R$layout.zzb(parcel, 2, 4);
+        R$id.zzb(parcel, 2, 4);
         parcel.writeInt(i3);
-        R$layout.zza(parcel, 3, this.zzc, i, false);
-        R$layout.zzc(parcel, zzb);
+        R$id.zza(parcel, 3, this.zzc, i);
+        R$id.zzc(parcel, zzb);
     }
 
     public zzeln(int i, int i2, Intent intent) {

@@ -12,21 +12,17 @@ import android.widget.SeekBar;
 import androidx.appcompat.R$styleable;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.ViewPropertyAnimatorCompat;
+import com.android.systemui.shared.R;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 import java.util.WeakHashMap;
 /* loaded from: classes.dex */
-public class AppCompatSeekBarHelper extends AppCompatProgressBarHelper {
+public final class AppCompatSeekBarHelper extends AppCompatProgressBarHelper {
     public Drawable mTickMark;
     public final SeekBar mView;
     public ColorStateList mTickMarkTintList = null;
     public PorterDuff.Mode mTickMarkTintMode = null;
     public boolean mHasTickMarkTint = false;
     public boolean mHasTickMarkTintMode = false;
-
-    public AppCompatSeekBarHelper(SeekBar seekBar) {
-        super(seekBar);
-        this.mView = seekBar;
-    }
 
     public final void applyTickMarkTint() {
         Drawable drawable = this.mTickMark;
@@ -48,18 +44,23 @@ public class AppCompatSeekBarHelper extends AppCompatProgressBarHelper {
         }
     }
 
-    public void drawTickMarks(Canvas canvas) {
+    public final void drawTickMarks(Canvas canvas) {
+        int i;
         if (this.mTickMark != null) {
             int max = this.mView.getMax();
-            int i = 1;
+            int i2 = 1;
             if (max > 1) {
                 int intrinsicWidth = this.mTickMark.getIntrinsicWidth();
                 int intrinsicHeight = this.mTickMark.getIntrinsicHeight();
-                int i2 = intrinsicWidth >= 0 ? intrinsicWidth / 2 : 1;
-                if (intrinsicHeight >= 0) {
-                    i = intrinsicHeight / 2;
+                if (intrinsicWidth >= 0) {
+                    i = intrinsicWidth / 2;
+                } else {
+                    i = 1;
                 }
-                this.mTickMark.setBounds(-i2, -i, i2, i);
+                if (intrinsicHeight >= 0) {
+                    i2 = intrinsicHeight / 2;
+                }
+                this.mTickMark.setBounds(-i, -i2, i, i2);
                 float width = ((this.mView.getWidth() - this.mView.getPaddingLeft()) - this.mView.getPaddingRight()) / max;
                 int save = canvas.save();
                 canvas.translate(this.mView.getPaddingLeft(), this.mView.getHeight() / 2);
@@ -72,17 +73,22 @@ public class AppCompatSeekBarHelper extends AppCompatProgressBarHelper {
         }
     }
 
+    public AppCompatSeekBarHelper(SeekBar seekBar) {
+        super(seekBar);
+        this.mView = seekBar;
+    }
+
     @Override // androidx.appcompat.widget.AppCompatProgressBarHelper
-    public void loadFromAttributes(AttributeSet attributeSet, int i) {
-        super.loadFromAttributes(attributeSet, i);
+    public final void loadFromAttributes(AttributeSet attributeSet, int i) {
+        super.loadFromAttributes(attributeSet, R.attr.seekBarStyle);
         Context context = this.mView.getContext();
         int[] iArr = R$styleable.AppCompatSeekBar;
-        TintTypedArray obtainStyledAttributes = TintTypedArray.obtainStyledAttributes(context, attributeSet, iArr, i, 0);
+        TintTypedArray obtainStyledAttributes = TintTypedArray.obtainStyledAttributes(context, attributeSet, iArr, R.attr.seekBarStyle);
         SeekBar seekBar = this.mView;
         Context context2 = seekBar.getContext();
         TypedArray typedArray = obtainStyledAttributes.mWrapped;
         WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-        ViewCompat.Api29Impl.saveAttributeDataForStyleable(seekBar, context2, iArr, attributeSet, typedArray, i, 0);
+        ViewCompat.Api29Impl.saveAttributeDataForStyleable(seekBar, context2, iArr, attributeSet, typedArray, R.attr.seekBarStyle, 0);
         Drawable drawableIfKnown = obtainStyledAttributes.getDrawableIfKnown(0);
         if (drawableIfKnown != null) {
             this.mView.setThumb(drawableIfKnown);
@@ -95,7 +101,7 @@ public class AppCompatSeekBarHelper extends AppCompatProgressBarHelper {
         this.mTickMark = drawable;
         if (drawable != null) {
             drawable.setCallback(this.mView);
-            drawable.setLayoutDirection(this.mView.getLayoutDirection());
+            drawable.setLayoutDirection(ViewCompat.Api17Impl.getLayoutDirection(this.mView));
             if (drawable.isStateful()) {
                 drawable.setState(this.mView.getDrawableState());
             }
@@ -110,7 +116,7 @@ public class AppCompatSeekBarHelper extends AppCompatProgressBarHelper {
             this.mTickMarkTintList = obtainStyledAttributes.getColorStateList(2);
             this.mHasTickMarkTint = true;
         }
-        obtainStyledAttributes.mWrapped.recycle();
+        obtainStyledAttributes.recycle();
         applyTickMarkTint();
     }
 }

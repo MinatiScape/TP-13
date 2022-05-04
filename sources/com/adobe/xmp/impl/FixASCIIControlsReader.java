@@ -3,7 +3,7 @@ package com.adobe.xmp.impl;
 import java.io.PushbackReader;
 import java.io.Reader;
 /* loaded from: classes.dex */
-public class FixASCIIControlsReader extends PushbackReader {
+public final class FixASCIIControlsReader extends PushbackReader {
     public int state = 0;
     public int control = 0;
     public int digits = 0;
@@ -19,7 +19,7 @@ public class FixASCIIControlsReader extends PushbackReader {
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public int read(char[] r17, int r18, int r19) throws java.io.IOException {
+    public final int read(char[] r17, int r18, int r19) throws java.io.IOException {
         /*
             Method dump skipped, instructions count: 282
             To view this dump add '--comments-level debug' option

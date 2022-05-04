@@ -6,9 +6,9 @@ public abstract class OnBackPressedCallback {
     public CopyOnWriteArrayList<Cancellable> mCancellables = new CopyOnWriteArrayList<>();
     public boolean mEnabled;
 
+    public abstract void handleOnBackPressed();
+
     public OnBackPressedCallback(boolean z) {
         this.mEnabled = z;
     }
-
-    public abstract void handleOnBackPressed();
 }

@@ -1,14 +1,13 @@
 package com.google.common.collect;
 
 import java.util.Comparator;
-import java.util.Objects;
 import java.util.SortedSet;
 /* loaded from: classes.dex */
 public final class SortedIterables {
     public static boolean hasSameComparator(Comparator<?> comparator, Iterable<?> elements) {
         Object obj;
-        Objects.requireNonNull(comparator);
-        Objects.requireNonNull(elements);
+        comparator.getClass();
+        elements.getClass();
         if (elements instanceof SortedSet) {
             obj = ((SortedSet) elements).comparator();
             if (obj == null) {

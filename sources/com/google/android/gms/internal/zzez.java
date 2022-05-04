@@ -4,10 +4,19 @@ import android.os.IBinder;
 import android.os.IInterface;
 import android.os.Parcel;
 import android.os.RemoteException;
+/* compiled from: BaseProxy.java */
 /* loaded from: classes.dex */
 public class zzez implements IInterface {
-    public final IBinder zza;
-    public final String zzb;
+    private final IBinder zza;
+    private final String zzb;
+
+    public final void zzc(Parcel parcel) throws RemoteException {
+        try {
+            this.zza.transact(1, parcel, null, 1);
+        } finally {
+            parcel.recycle();
+        }
+    }
 
     public zzez(IBinder iBinder, String str) {
         this.zza = iBinder;
@@ -18,11 +27,6 @@ public class zzez implements IInterface {
         Parcel obtain = Parcel.obtain();
         obtain.writeInterfaceToken(this.zzb);
         return obtain;
-    }
-
-    @Override // android.os.IInterface
-    public IBinder asBinder() {
-        return this.zza;
     }
 
     public final Parcel zza(int i, Parcel parcel) throws RemoteException {
@@ -47,5 +51,10 @@ public class zzez implements IInterface {
             parcel.recycle();
             obtain.recycle();
         }
+    }
+
+    @Override // android.os.IInterface
+    public final IBinder asBinder() {
+        return this.zza;
     }
 }

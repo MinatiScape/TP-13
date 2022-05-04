@@ -26,10 +26,6 @@ public class InputConsumerController {
 
     /* loaded from: classes.dex */
     public final class InputEventReceiver extends BatchedInputEventReceiver {
-        public InputEventReceiver(InputChannel inputChannel, Looper looper, Choreographer choreographer) {
-            super(inputChannel, looper, choreographer);
-        }
-
         public void onInputEvent(InputEvent inputEvent) {
             boolean z = true;
             try {
@@ -39,6 +35,10 @@ public class InputConsumerController {
             } finally {
                 finishInputEvent(inputEvent, true);
             }
+        }
+
+        public InputEventReceiver(InputChannel inputChannel, Looper looper, Choreographer choreographer) {
+            super(inputChannel, looper, choreographer);
         }
     }
 
@@ -52,16 +52,12 @@ public class InputConsumerController {
         void onRegistrationChanged(boolean z);
     }
 
-    public InputConsumerController(IWindowManager iWindowManager, String str) {
-        this.mWindowManager = iWindowManager;
-        this.mName = str;
-    }
-
     public static InputConsumerController getRecentsAnimationInputConsumer() {
         return new InputConsumerController(WindowManagerGlobal.getWindowManagerService(), "recents_animation_input_consumer");
     }
 
     public void dump(PrintWriter printWriter, String str) {
+        boolean z;
         String m = SupportMenuInflater$$ExternalSyntheticOutline0.m(str, "  ");
         StringBuilder m2 = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m(str);
         m2.append(TAG);
@@ -69,26 +65,49 @@ public class InputConsumerController {
         StringBuilder sb = new StringBuilder();
         sb.append(m);
         sb.append("registered=");
-        sb.append(this.mInputEventReceiver != null);
+        if (this.mInputEventReceiver != null) {
+            z = true;
+        } else {
+            z = false;
+        }
+        sb.append(z);
         printWriter.println(sb.toString());
     }
 
     public boolean isRegistered() {
-        return this.mInputEventReceiver != null;
+        if (this.mInputEventReceiver != null) {
+            return true;
+        }
+        return false;
     }
 
     public void registerInputConsumer() {
-        registerInputConsumer(false);
-    }
-
-    public void setInputListener(InputListener inputListener) {
-        this.mListener = inputListener;
+        if (this.mInputEventReceiver == null) {
+            InputChannel inputChannel = new InputChannel();
+            try {
+                this.mWindowManager.destroyInputConsumer(this.mName, 0);
+                this.mWindowManager.createInputConsumer(this.mToken, this.mName, 0, inputChannel);
+            } catch (RemoteException e) {
+                Log.e(TAG, "Failed to create input consumer", e);
+            }
+            this.mInputEventReceiver = new InputEventReceiver(inputChannel, Looper.myLooper(), Choreographer.getInstance());
+            RegistrationListener registrationListener = this.mRegistrationListener;
+            if (registrationListener != null) {
+                registrationListener.onRegistrationChanged(true);
+            }
+        }
     }
 
     public void setRegistrationListener(RegistrationListener registrationListener) {
+        boolean z;
         this.mRegistrationListener = registrationListener;
         if (registrationListener != null) {
-            registrationListener.onRegistrationChanged(this.mInputEventReceiver != null);
+            if (this.mInputEventReceiver != null) {
+                z = true;
+            } else {
+                z = false;
+            }
+            registrationListener.onRegistrationChanged(z);
         }
     }
 
@@ -108,20 +127,12 @@ public class InputConsumerController {
         }
     }
 
-    public void registerInputConsumer(boolean z) {
-        if (this.mInputEventReceiver == null) {
-            InputChannel inputChannel = new InputChannel();
-            try {
-                this.mWindowManager.destroyInputConsumer(this.mName, 0);
-                this.mWindowManager.createInputConsumer(this.mToken, this.mName, 0, inputChannel);
-            } catch (RemoteException e) {
-                Log.e(TAG, "Failed to create input consumer", e);
-            }
-            this.mInputEventReceiver = new InputEventReceiver(inputChannel, Looper.myLooper(), z ? Choreographer.getSfInstance() : Choreographer.getInstance());
-            RegistrationListener registrationListener = this.mRegistrationListener;
-            if (registrationListener != null) {
-                registrationListener.onRegistrationChanged(true);
-            }
-        }
+    public InputConsumerController(IWindowManager iWindowManager, String str) {
+        this.mWindowManager = iWindowManager;
+        this.mName = str;
+    }
+
+    public void setInputListener(InputListener inputListener) {
+        this.mListener = inputListener;
     }
 }

@@ -6,7 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 import java.util.ArrayList;
 /* loaded from: classes.dex */
-public class NotificationCompat$Builder {
+public final class NotificationCompat$Builder {
     public PendingIntent mContentIntent;
     public CharSequence mContentText;
     public CharSequence mContentTitle;
@@ -24,6 +24,33 @@ public class NotificationCompat$Builder {
     public ArrayList<String> mPeople = new ArrayList<>();
     public boolean mAllowSystemGeneratedContextualActions = true;
 
+    public static CharSequence limitCharSequenceLength(String str) {
+        if (str == null) {
+            return str;
+        }
+        if (str.length() > 5120) {
+            return str.subSequence(0, 5120);
+        }
+        return str;
+    }
+
+    public final Bundle getExtras() {
+        if (this.mExtras == null) {
+            this.mExtras = new Bundle();
+        }
+        return this.mExtras;
+    }
+
+    public final void setStyle(NotificationCompat$BigTextStyle notificationCompat$BigTextStyle) {
+        if (this.mStyle != notificationCompat$BigTextStyle) {
+            this.mStyle = notificationCompat$BigTextStyle;
+            if (notificationCompat$BigTextStyle.mBuilder != this) {
+                notificationCompat$BigTextStyle.mBuilder = this;
+                setStyle(notificationCompat$BigTextStyle);
+            }
+        }
+    }
+
     @Deprecated
     public NotificationCompat$Builder(Context context) {
         Notification notification = new Notification();
@@ -31,20 +58,5 @@ public class NotificationCompat$Builder {
         this.mContext = context;
         notification.when = System.currentTimeMillis();
         this.mNotification.audioStreamType = -1;
-    }
-
-    public static CharSequence limitCharSequenceLength(CharSequence cs) {
-        return (cs != null && cs.length() > 5120) ? cs.subSequence(0, 5120) : cs;
-    }
-
-    public NotificationCompat$Builder setStyle(NotificationCompat$Style style) {
-        if (this.mStyle != style) {
-            this.mStyle = style;
-            if (style.mBuilder != this) {
-                style.mBuilder = this;
-                setStyle(style);
-            }
-        }
-        return this;
     }
 }

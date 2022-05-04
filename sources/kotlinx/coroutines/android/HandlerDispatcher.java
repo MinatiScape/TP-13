@@ -1,12 +1,13 @@
 package kotlinx.coroutines.android;
 
-import kotlin.jvm.internal.DefaultConstructorMarker;
 import kotlinx.coroutines.MainCoroutineDispatcher;
+/* compiled from: HandlerDispatcher.kt */
 /* loaded from: classes.dex */
 public abstract class HandlerDispatcher extends MainCoroutineDispatcher {
     public HandlerDispatcher() {
+        throw null;
     }
 
-    public HandlerDispatcher(DefaultConstructorMarker defaultConstructorMarker) {
+    public HandlerDispatcher(int i) {
     }
 }

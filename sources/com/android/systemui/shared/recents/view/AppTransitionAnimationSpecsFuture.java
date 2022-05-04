@@ -39,11 +39,11 @@ public abstract class AppTransitionAnimationSpecsFuture {
     };
     private final Handler mHandler;
 
+    public abstract List<AppTransitionAnimationSpecCompat> composeSpecs();
+
     public AppTransitionAnimationSpecsFuture(Handler handler) {
         this.mHandler = handler;
     }
-
-    public abstract List<AppTransitionAnimationSpecCompat> composeSpecs();
 
     public final void composeSpecsSynchronous() {
         if (Looper.myLooper() == this.mHandler.getLooper()) {

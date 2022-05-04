@@ -1,27 +1,44 @@
 package com.android.wallpaper.picker;
 
-import com.android.customization.model.color.ColorSectionController;
-import java.util.function.Supplier;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.RippleDrawable;
+import android.view.View;
+import androidx.appcompat.R$bool;
+import com.android.systemui.shared.R;
+import com.android.wallpaper.model.WallpaperSectionController;
+import com.android.wallpaper.util.FullScreenAnimation;
+/* compiled from: R8$$SyntheticClass */
 /* loaded from: classes.dex */
-public final /* synthetic */ class PreviewFragment$$ExternalSyntheticLambda3 implements Supplier {
-    public final /* synthetic */ int $r8$classId = 1;
+public final /* synthetic */ class PreviewFragment$$ExternalSyntheticLambda3 implements View.OnClickListener {
+    public final /* synthetic */ int $r8$classId;
     public final /* synthetic */ Object f$0;
 
-    public /* synthetic */ PreviewFragment$$ExternalSyntheticLambda3(ColorSectionController colorSectionController) {
-        this.f$0 = colorSectionController;
+    public /* synthetic */ PreviewFragment$$ExternalSyntheticLambda3(Object obj, int i) {
+        this.$r8$classId = i;
+        this.f$0 = obj;
     }
 
-    public /* synthetic */ PreviewFragment$$ExternalSyntheticLambda3(PreviewFragment previewFragment) {
-        this.f$0 = previewFragment;
-    }
-
-    @Override // java.util.function.Supplier
-    public final Object get() {
+    @Override // android.view.View.OnClickListener
+    public final void onClick(View view) {
+        int i;
         switch (this.$r8$classId) {
             case 0:
-                return Integer.valueOf(!((PreviewFragment) this.f$0).mViewAsHome ? 1 : 0);
+                PreviewFragment previewFragment = (PreviewFragment) this.f$0;
+                FullScreenAnimation fullScreenAnimation = previewFragment.mFullScreenAnimation;
+                boolean z = fullScreenAnimation.mWorkspaceVisibility;
+                fullScreenAnimation.setWorkspaceVisibility(!z);
+                Drawable drawable = ((LayerDrawable) ((RippleDrawable) view.findViewById(R.id.hide_ui_view).getBackground()).getDrawable(0)).getDrawable(0);
+                if (!z) {
+                    i = R$bool.getColorAttr(previewFragment.getActivity(), 17956902);
+                } else {
+                    i = R$bool.getColorAttr(previewFragment.getActivity(), 17956900);
+                }
+                drawable.setTint(i);
+                return;
             default:
-                return Integer.valueOf("preset".equals(((ColorSectionController) this.f$0).mColorManager.getCurrentColorSource()) ? 1 : 0);
+                ((CustomizationPickerFragment) ((WallpaperSectionController) this.f$0).mSectionNavigationController).navigateTo(new CategorySelectorFragment());
+                return;
         }
     }
 }

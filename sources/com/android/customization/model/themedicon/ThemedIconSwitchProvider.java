@@ -5,7 +5,7 @@ import com.android.customization.module.CustomizationPreferences;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 /* loaded from: classes.dex */
-public class ThemedIconSwitchProvider {
+public final class ThemedIconSwitchProvider {
     public static ThemedIconSwitchProvider sThemedIconSwitchProvider;
     public final ContentResolver mContentResolver;
     public final CustomizationPreferences mCustomizationPreferences;

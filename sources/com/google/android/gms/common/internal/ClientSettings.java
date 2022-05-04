@@ -1,7 +1,6 @@
 package com.google.android.gms.common.internal;
 
 import android.accounts.Account;
-import android.view.View;
 import androidx.collection.ArraySet;
 import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.Scope;
@@ -9,7 +8,6 @@ import com.google.android.gms.signin.SignInOptions;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 /* loaded from: classes.dex */
 public final class ClientSettings {
@@ -32,24 +30,26 @@ public final class ClientSettings {
         public ArraySet<Scope> zzb;
         public String zzd;
         public String zze;
-
-        public final ClientSettings zza() {
-            return new ClientSettings(this.zza, this.zzb, null, 0, null, this.zzd, this.zze, SignInOptions.DEFAULT);
-        }
     }
 
-    public ClientSettings(Account account, Set<Scope> set, Map<Api<?>, OptionalApiSettings> map, int i, View view, String str, String str2, SignInOptions signInOptions) {
+    public ClientSettings(Account account, ArraySet arraySet, String str, String str2) {
+        Set<Scope> set;
+        SignInOptions signInOptions = SignInOptions.DEFAULT;
         this.zza = account;
-        Set<Scope> unmodifiableSet = set == null ? Collections.EMPTY_SET : Collections.unmodifiableSet(set);
-        this.zzb = unmodifiableSet;
-        map = map == null ? Collections.EMPTY_MAP : map;
+        if (arraySet == null) {
+            set = Collections.EMPTY_SET;
+        } else {
+            set = Collections.unmodifiableSet(arraySet);
+        }
+        this.zzb = set;
+        Map<Api<?>, OptionalApiSettings> map = Collections.EMPTY_MAP;
         this.zzd = map;
         this.zzg = str;
         this.zzh = str2;
         this.zzi = signInOptions;
-        HashSet hashSet = new HashSet(unmodifiableSet);
+        HashSet hashSet = new HashSet(set);
         for (OptionalApiSettings optionalApiSettings : map.values()) {
-            Objects.requireNonNull(optionalApiSettings);
+            optionalApiSettings.getClass();
             hashSet.addAll(null);
         }
         this.zzc = Collections.unmodifiableSet(hashSet);

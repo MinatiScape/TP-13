@@ -5,7 +5,7 @@ import java.io.Serializable;
 public final class Ref$ObjectRef<T> implements Serializable {
     public T element;
 
-    public String toString() {
+    public final String toString() {
         return String.valueOf(this.element);
     }
 }

@@ -4,14 +4,33 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 import kotlin.jvm.internal.Intrinsics;
-import kotlin.ranges.RangesKt___RangesKt;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+/* compiled from: DefaultExecutor.kt */
 /* loaded from: classes.dex */
 public final class DefaultExecutor extends EventLoopImplBase implements Runnable {
+    @NotNull
     public static final DefaultExecutor INSTANCE;
     public static final long KEEP_ALIVE_NANOS;
+    @Nullable
     public static volatile Thread _thread;
     public static volatile int debugStatus;
+
+    public final synchronized void acknowledgeShutdownIfNeeded() {
+        boolean z;
+        int i = debugStatus;
+        if (i == 2 || i == 3) {
+            z = true;
+        } else {
+            z = false;
+        }
+        if (z) {
+            debugStatus = 3;
+            this._queue.setValue(null);
+            this._delayed.setValue(null);
+            notifyAll();
+        }
+    }
 
     static {
         Long l;
@@ -24,22 +43,13 @@ public final class DefaultExecutor extends EventLoopImplBase implements Runnable
         } catch (SecurityException unused) {
             l = 1000L;
         }
-        Intrinsics.checkExpressionValueIsNotNull(l, "try {\n            java.l…AULT_KEEP_ALIVE\n        }");
+        Intrinsics.checkNotNullExpressionValue(l, "try {\n            java.l…AULT_KEEP_ALIVE\n        }");
         KEEP_ALIVE_NANOS = timeUnit.toNanos(l.longValue());
-    }
-
-    public final synchronized void acknowledgeShutdownIfNeeded() {
-        if (isShutdownRequested()) {
-            debugStatus = 3;
-            this._queue = null;
-            this._delayed = null;
-            notifyAll();
-        }
     }
 
     @Override // kotlinx.coroutines.EventLoopImplPlatform
     @NotNull
-    public Thread getThread() {
+    public final Thread getThread() {
         Thread thread = _thread;
         if (thread == null) {
             synchronized (this) {
@@ -55,74 +65,87 @@ public final class DefaultExecutor extends EventLoopImplBase implements Runnable
         return thread;
     }
 
-    public final boolean isShutdownRequested() {
-        int i = debugStatus;
-        return i == 2 || i == 3;
-    }
-
     @Override // java.lang.Runnable
-    public void run() {
+    public final void run() {
         boolean z;
-        ThreadLocalEventLoop threadLocalEventLoop = ThreadLocalEventLoop.INSTANCE;
-        Intrinsics.checkParameterIsNotNull(this, "eventLoop");
+        boolean z2;
+        boolean z3;
         ThreadLocalEventLoop.ref.set(this);
         try {
             synchronized (this) {
-                if (isShutdownRequested()) {
-                    z = false;
-                } else {
+                int i = debugStatus;
+                if (i == 2 || i == 3) {
                     z = true;
+                } else {
+                    z = false;
+                }
+                if (z) {
+                    z2 = false;
+                } else {
                     debugStatus = 1;
                     notifyAll();
+                    z2 = true;
                 }
             }
-            if (z) {
-                long j = Long.MAX_VALUE;
-                while (true) {
-                    Thread.interrupted();
-                    long processNextEvent = processNextEvent();
-                    if (processNextEvent == RecyclerView.FOREVER_NS) {
-                        int i = (j > RecyclerView.FOREVER_NS ? 1 : (j == RecyclerView.FOREVER_NS ? 0 : -1));
-                        if (i == 0) {
-                            long nanoTime = System.nanoTime();
-                            if (i == 0) {
-                                j = KEEP_ALIVE_NANOS + nanoTime;
-                            }
-                            long j2 = j - nanoTime;
-                            if (j2 <= 0) {
-                                _thread = null;
-                                acknowledgeShutdownIfNeeded();
-                                if (!isEmpty()) {
-                                    getThread();
-                                    return;
-                                }
-                                return;
-                            }
-                            processNextEvent = RangesKt___RangesKt.coerceAtMost(processNextEvent, j2);
-                        } else {
-                            processNextEvent = RangesKt___RangesKt.coerceAtMost(processNextEvent, KEEP_ALIVE_NANOS);
-                        }
+            if (!z2) {
+                _thread = null;
+                acknowledgeShutdownIfNeeded();
+                if (!isEmpty()) {
+                    getThread();
+                    return;
+                }
+                return;
+            }
+            long j = Long.MAX_VALUE;
+            while (true) {
+                Thread.interrupted();
+                long processNextEvent = processNextEvent();
+                if (processNextEvent == RecyclerView.FOREVER_NS) {
+                    long nanoTime = System.nanoTime();
+                    if (j == RecyclerView.FOREVER_NS) {
+                        j = KEEP_ALIVE_NANOS + nanoTime;
                     }
-                    if (processNextEvent > 0) {
-                        if (isShutdownRequested()) {
-                            _thread = null;
-                            acknowledgeShutdownIfNeeded();
-                            if (!isEmpty()) {
-                                getThread();
-                                return;
-                            }
+                    long j2 = j - nanoTime;
+                    if (j2 <= 0) {
+                        _thread = null;
+                        acknowledgeShutdownIfNeeded();
+                        if (!isEmpty()) {
+                            getThread();
                             return;
                         }
-                        LockSupport.parkNanos(this, processNextEvent);
+                        return;
+                    } else if (processNextEvent > j2) {
+                        processNextEvent = j2;
                     }
+                } else {
+                    j = Long.MAX_VALUE;
+                }
+                if (processNextEvent > 0) {
+                    int i2 = debugStatus;
+                    if (i2 == 2 || i2 == 3) {
+                        z3 = true;
+                    } else {
+                        z3 = false;
+                    }
+                    if (z3) {
+                        _thread = null;
+                        acknowledgeShutdownIfNeeded();
+                        if (!isEmpty()) {
+                            getThread();
+                            return;
+                        }
+                        return;
+                    }
+                    LockSupport.parkNanos(this, processNextEvent);
                 }
             }
-        } finally {
+        } catch (Throwable th) {
             _thread = null;
             acknowledgeShutdownIfNeeded();
             if (!isEmpty()) {
                 getThread();
             }
+            throw th;
         }
     }
 }

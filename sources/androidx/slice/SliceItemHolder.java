@@ -9,10 +9,9 @@ import androidx.core.util.Pair;
 import androidx.slice.compat.SliceProviderCompat$2;
 import androidx.versionedparcelable.VersionedParcelable;
 import java.util.ArrayList;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public class SliceItemHolder implements VersionedParcelable {
-    public static HolderHandler sHandler;
+    public static SliceProviderCompat$2 sHandler;
     public static final Object sSerializeLock = new Object();
     public Bundle mBundle;
     public int mInt;
@@ -23,79 +22,75 @@ public class SliceItemHolder implements VersionedParcelable {
     public VersionedParcelable mVersionedParcelable;
 
     /* loaded from: classes.dex */
-    public interface HolderHandler {
-    }
-
-    /* loaded from: classes.dex */
     public static class SliceItemPool {
         public final ArrayList<SliceItemHolder> mCached = new ArrayList<>();
     }
 
-    public SliceItemHolder(SliceItemPool pool) {
+    public SliceItemHolder(SliceItemPool sliceItemPool) {
         this.mVersionedParcelable = null;
         this.mParcelable = null;
         this.mStr = null;
         this.mInt = 0;
         this.mLong = 0L;
         this.mBundle = null;
-        this.mPool = pool;
+        this.mPool = sliceItemPool;
     }
 
-    public SliceItemHolder(String format, Object mObj, boolean isStream) {
-        String str;
+    public SliceItemHolder(String str, Object obj) {
+        String str2;
         this.mVersionedParcelable = null;
         this.mParcelable = null;
         this.mStr = null;
         this.mInt = 0;
         this.mLong = 0L;
         this.mBundle = null;
-        Objects.requireNonNull(format);
+        str.getClass();
         char c = 65535;
-        switch (format.hashCode()) {
+        switch (str.hashCode()) {
             case -1422950858:
-                if (format.equals("action")) {
+                if (str.equals("action")) {
                     c = 0;
                     break;
                 }
                 break;
             case -1377881982:
-                if (format.equals("bundle")) {
+                if (str.equals("bundle")) {
                     c = 1;
                     break;
                 }
                 break;
             case 104431:
-                if (format.equals("int")) {
+                if (str.equals("int")) {
                     c = 2;
                     break;
                 }
                 break;
             case 3327612:
-                if (format.equals("long")) {
+                if (str.equals("long")) {
                     c = 3;
                     break;
                 }
                 break;
             case 3556653:
-                if (format.equals("text")) {
+                if (str.equals("text")) {
                     c = 4;
                     break;
                 }
                 break;
             case 100313435:
-                if (format.equals("image")) {
+                if (str.equals("image")) {
                     c = 5;
                     break;
                 }
                 break;
             case 100358090:
-                if (format.equals("input")) {
+                if (str.equals("input")) {
                     c = 6;
                     break;
                 }
                 break;
             case 109526418:
-                if (format.equals("slice")) {
+                if (str.equals("slice")) {
                     c = 7;
                     break;
                 }
@@ -103,43 +98,43 @@ public class SliceItemHolder implements VersionedParcelable {
         }
         switch (c) {
             case 0:
-                Pair pair = (Pair) mObj;
+                Pair pair = (Pair) obj;
                 F f = pair.first;
                 if (f instanceof PendingIntent) {
                     this.mParcelable = (Parcelable) f;
-                } else if (!isStream) {
+                    this.mVersionedParcelable = (VersionedParcelable) pair.second;
+                    break;
+                } else {
                     throw new IllegalArgumentException("Cannot write callback to parcel");
                 }
-                this.mVersionedParcelable = (VersionedParcelable) pair.second;
-                break;
             case 1:
-                this.mBundle = (Bundle) mObj;
+                this.mBundle = (Bundle) obj;
                 break;
             case 2:
-                this.mInt = ((Integer) mObj).intValue();
+                this.mInt = ((Integer) obj).intValue();
                 break;
             case 3:
-                this.mLong = ((Long) mObj).longValue();
+                this.mLong = ((Long) obj).longValue();
                 break;
             case 4:
-                if (mObj instanceof Spanned) {
-                    str = Html.toHtml((Spanned) mObj, 0);
+                if (obj instanceof Spanned) {
+                    str2 = Html.toHtml((Spanned) obj, 0);
                 } else {
-                    str = (String) mObj;
+                    str2 = (String) obj;
                 }
-                this.mStr = str;
+                this.mStr = str2;
                 break;
             case 5:
             case 7:
-                this.mVersionedParcelable = (VersionedParcelable) mObj;
+                this.mVersionedParcelable = (VersionedParcelable) obj;
                 break;
             case 6:
-                this.mParcelable = (Parcelable) mObj;
+                this.mParcelable = (Parcelable) obj;
                 break;
         }
-        HolderHandler holderHandler = sHandler;
-        if (holderHandler != null) {
-            ((SliceProviderCompat$2) holderHandler).handle(this, format);
+        SliceProviderCompat$2 sliceProviderCompat$2 = sHandler;
+        if (sliceProviderCompat$2 != null) {
+            sliceProviderCompat$2.handle(this);
         }
     }
 }

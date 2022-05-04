@@ -1,7 +1,7 @@
 package com.google.protobuf;
 /* loaded from: classes.dex */
 public interface MessageLiteOrBuilder {
-    MessageLite getDefaultInstanceForType();
+    GeneratedMessageLite getDefaultInstanceForType$1();
 
     boolean isInitialized();
 }

@@ -1,7 +1,7 @@
 package com.bumptech.glide.manager;
 /* loaded from: classes.dex */
 public interface Lifecycle {
-    void addListener(LifecycleListener listener);
+    void addListener(LifecycleListener lifecycleListener);
 
-    void removeListener(LifecycleListener listener);
+    void removeListener(LifecycleListener lifecycleListener);
 }

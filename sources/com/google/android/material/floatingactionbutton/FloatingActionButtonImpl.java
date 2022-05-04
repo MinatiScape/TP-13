@@ -6,17 +6,21 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
+import android.content.Context;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.InsetDrawable;
+import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
+import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewTreeObserver;
+import android.view.animation.PathInterpolator;
+import androidx.appcompat.view.SupportMenuInflater$$ExternalSyntheticOutline0;
+import androidx.collection.ContainerHelpers;
+import androidx.constraintlayout.solver.widgets.analyzer.DependencyGraph$$ExternalSyntheticOutline0;
+import androidx.core.graphics.PathParser;
 import androidx.core.util.Preconditions;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.ViewPropertyAnimatorCompat;
-import androidx.transition.R$id;
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
+import com.android.systemui.shared.R;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 import com.google.android.material.animation.AnimationUtils;
 import com.google.android.material.animation.ImageMatrixProperty;
@@ -24,27 +28,25 @@ import com.google.android.material.animation.MatrixEvaluator;
 import com.google.android.material.animation.MotionSpec;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.internal.StateListAnimator;
+import com.google.android.material.motion.MotionUtils;
+import com.google.android.material.resources.MaterialAttributes;
 import com.google.android.material.shadow.ShadowViewDelegate;
-import com.google.android.material.shape.ShapeAppearanceModel;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Objects;
-import java.util.WeakHashMap;
 /* loaded from: classes.dex */
 public class FloatingActionButtonImpl {
     public Animator currentAnimator;
-    public MotionSpec defaultHideMotionSpec;
-    public MotionSpec defaultShowMotionSpec;
     public ArrayList<Animator.AnimatorListener> hideListeners;
-    public ViewTreeObserver.OnPreDrawListener preDrawListener;
+    public MotionSpec hideMotionSpec;
+    public AnonymousClass6 preDrawListener;
     public float rotation;
     public final ShadowViewDelegate shadowViewDelegate;
-    public ShapeAppearanceModel shapeAppearance;
     public ArrayList<Animator.AnimatorListener> showListeners;
+    public MotionSpec showMotionSpec;
     public final StateListAnimator stateListAnimator;
     public ArrayList<InternalTransformationCallback> transformationCallbacks;
     public final FloatingActionButton view;
-    public static final TimeInterpolator ELEVATION_ANIM_INTERPOLATOR = AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR;
+    public static final FastOutLinearInInterpolator ELEVATION_ANIM_INTERPOLATOR = AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR;
     public static final int[] PRESSED_ENABLED_STATE_SET = {16842919, 16842910};
     public static final int[] HOVERED_FOCUSED_ENABLED_STATE_SET = {16843623, 16842908, 16842910};
     public static final int[] FOCUSED_ENABLED_STATE_SET = {16842908, 16842910};
@@ -58,42 +60,36 @@ public class FloatingActionButtonImpl {
     public final Matrix tmpMatrix = new Matrix();
 
     /* loaded from: classes.dex */
-    public class DisabledElevationAnimation extends ShadowAnimatorImpl {
-        public DisabledElevationAnimation(FloatingActionButtonImpl floatingActionButtonImpl) {
-            super(null);
-        }
-
-        @Override // com.google.android.material.floatingactionbutton.FloatingActionButtonImpl.ShadowAnimatorImpl
-        public float getTargetShadowSize() {
-            return HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
-        }
-    }
-
-    /* loaded from: classes.dex */
     public class ElevateToHoveredFocusedTranslationZAnimation extends ShadowAnimatorImpl {
-        public ElevateToHoveredFocusedTranslationZAnimation() {
-            super(null);
+        public final /* synthetic */ FloatingActionButtonImpl this$0;
+
+        /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+        public ElevateToHoveredFocusedTranslationZAnimation(FloatingActionButtonImplLollipop floatingActionButtonImplLollipop) {
+            super(floatingActionButtonImplLollipop);
+            this.this$0 = floatingActionButtonImplLollipop;
         }
 
         @Override // com.google.android.material.floatingactionbutton.FloatingActionButtonImpl.ShadowAnimatorImpl
-        public float getTargetShadowSize() {
-            Objects.requireNonNull(FloatingActionButtonImpl.this);
-            Objects.requireNonNull(FloatingActionButtonImpl.this);
-            return HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
+        public final void getTargetShadowSize() {
+            this.this$0.getClass();
+            this.this$0.getClass();
         }
     }
 
     /* loaded from: classes.dex */
     public class ElevateToPressedTranslationZAnimation extends ShadowAnimatorImpl {
-        public ElevateToPressedTranslationZAnimation() {
-            super(null);
+        public final /* synthetic */ FloatingActionButtonImpl this$0;
+
+        /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+        public ElevateToPressedTranslationZAnimation(FloatingActionButtonImplLollipop floatingActionButtonImplLollipop) {
+            super(floatingActionButtonImplLollipop);
+            this.this$0 = floatingActionButtonImplLollipop;
         }
 
         @Override // com.google.android.material.floatingactionbutton.FloatingActionButtonImpl.ShadowAnimatorImpl
-        public float getTargetShadowSize() {
-            Objects.requireNonNull(FloatingActionButtonImpl.this);
-            Objects.requireNonNull(FloatingActionButtonImpl.this);
-            return HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
+        public final void getTargetShadowSize() {
+            this.this$0.getClass();
+            this.this$0.getClass();
         }
     }
 
@@ -113,59 +109,74 @@ public class FloatingActionButtonImpl {
 
     /* loaded from: classes.dex */
     public class ResetElevationAnimation extends ShadowAnimatorImpl {
-        public ResetElevationAnimation() {
-            super(null);
+        public final /* synthetic */ FloatingActionButtonImpl this$0;
+
+        /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+        public ResetElevationAnimation(FloatingActionButtonImplLollipop floatingActionButtonImplLollipop) {
+            super(floatingActionButtonImplLollipop);
+            this.this$0 = floatingActionButtonImplLollipop;
         }
 
         @Override // com.google.android.material.floatingactionbutton.FloatingActionButtonImpl.ShadowAnimatorImpl
-        public float getTargetShadowSize() {
-            Objects.requireNonNull(FloatingActionButtonImpl.this);
-            return HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
+        public final void getTargetShadowSize() {
+            this.this$0.getClass();
         }
     }
 
     /* loaded from: classes.dex */
     public abstract class ShadowAnimatorImpl extends AnimatorListenerAdapter implements ValueAnimator.AnimatorUpdateListener {
+        public final /* synthetic */ FloatingActionButtonImpl this$0;
         public boolean validValues;
 
-        public ShadowAnimatorImpl(AnonymousClass1 r2) {
+        public abstract void getTargetShadowSize();
+
+        public ShadowAnimatorImpl(FloatingActionButtonImplLollipop floatingActionButtonImplLollipop) {
+            this.this$0 = floatingActionButtonImplLollipop;
         }
 
-        public abstract float getTargetShadowSize();
-
         @Override // android.animation.AnimatorListenerAdapter, android.animation.Animator.AnimatorListener
-        public void onAnimationEnd(Animator animator) {
-            Objects.requireNonNull(FloatingActionButtonImpl.this);
+        public final void onAnimationEnd(Animator animator) {
+            this.this$0.getClass();
             this.validValues = false;
         }
 
         @Override // android.animation.ValueAnimator.AnimatorUpdateListener
-        public void onAnimationUpdate(ValueAnimator valueAnimator) {
+        public final void onAnimationUpdate(ValueAnimator valueAnimator) {
             if (!this.validValues) {
-                Objects.requireNonNull(FloatingActionButtonImpl.this);
+                this.this$0.getClass();
                 getTargetShadowSize();
                 this.validValues = true;
             }
-            FloatingActionButtonImpl floatingActionButtonImpl = FloatingActionButtonImpl.this;
+            FloatingActionButtonImpl floatingActionButtonImpl = this.this$0;
             valueAnimator.getAnimatedFraction();
-            Objects.requireNonNull(floatingActionButtonImpl);
+            floatingActionButtonImpl.getClass();
         }
     }
 
-    public FloatingActionButtonImpl(FloatingActionButton floatingActionButton, ShadowViewDelegate shadowViewDelegate) {
-        new RectF();
-        new RectF();
-        this.view = floatingActionButton;
-        this.shadowViewDelegate = shadowViewDelegate;
-        StateListAnimator stateListAnimator = new StateListAnimator();
-        this.stateListAnimator = stateListAnimator;
-        stateListAnimator.addState(PRESSED_ENABLED_STATE_SET, createElevationAnimator(new ElevateToPressedTranslationZAnimation()));
-        stateListAnimator.addState(HOVERED_FOCUSED_ENABLED_STATE_SET, createElevationAnimator(new ElevateToHoveredFocusedTranslationZAnimation()));
-        stateListAnimator.addState(FOCUSED_ENABLED_STATE_SET, createElevationAnimator(new ElevateToHoveredFocusedTranslationZAnimation()));
-        stateListAnimator.addState(HOVERED_ENABLED_STATE_SET, createElevationAnimator(new ElevateToHoveredFocusedTranslationZAnimation()));
-        stateListAnimator.addState(ENABLED_STATE_SET, createElevationAnimator(new ResetElevationAnimation()));
-        stateListAnimator.addState(EMPTY_STATE_SET, createElevationAnimator(new DisabledElevationAnimation(this)));
-        this.rotation = floatingActionButton.getRotation();
+    public void getPadding(Rect rect) {
+        throw null;
+    }
+
+    public void jumpDrawableToCurrentState() {
+        throw null;
+    }
+
+    public void onDrawableStateChanged(int[] iArr) {
+        throw null;
+    }
+
+    public void updateFromViewRotation() {
+        throw null;
+    }
+
+    public static ValueAnimator createElevationAnimator(ShadowAnimatorImpl shadowAnimatorImpl) {
+        ValueAnimator valueAnimator = new ValueAnimator();
+        valueAnimator.setInterpolator(ELEVATION_ANIM_INTERPOLATOR);
+        valueAnimator.setDuration(100L);
+        valueAnimator.addListener(shadowAnimatorImpl);
+        valueAnimator.addUpdateListener(shadowAnimatorImpl);
+        valueAnimator.setFloatValues(HingeAngleProviderKt.FULLY_CLOSED_DEGREES, 1.0f);
+        return valueAnimator;
     }
 
     public final AnimatorSet createAnimator(MotionSpec motionSpec, float f, float f2, float f3) {
@@ -183,15 +194,15 @@ public class FloatingActionButtonImpl {
         this.view.getDrawable();
         ObjectAnimator ofObject = ObjectAnimator.ofObject(this.view, new ImageMatrixProperty(), new MatrixEvaluator() { // from class: com.google.android.material.floatingactionbutton.FloatingActionButtonImpl.3
             @Override // android.animation.TypeEvaluator
-            public Matrix evaluate(float f4, Matrix matrix, Matrix matrix2) {
+            public final Matrix evaluate(float f4, Matrix matrix, Matrix matrix2) {
                 FloatingActionButtonImpl.this.imageMatrixScale = f4;
                 matrix.getValues(this.tempStartValues);
                 matrix2.getValues(this.tempEndValues);
                 for (int i = 0; i < 9; i++) {
                     float[] fArr = this.tempEndValues;
                     float f5 = fArr[i];
-                    float[] fArr2 = this.tempStartValues;
-                    fArr[i] = ((f5 - fArr2[i]) * f4) + fArr2[i];
+                    float f6 = this.tempStartValues[i];
+                    fArr[i] = DependencyGraph$$ExternalSyntheticOutline0.m(f5, f6, f4, f6);
                 }
                 this.tempMatrix.setValues(this.tempEndValues);
                 return this.tempMatrix;
@@ -200,47 +211,78 @@ public class FloatingActionButtonImpl {
         motionSpec.getTiming("iconScale").apply(ofObject);
         arrayList.add(ofObject);
         AnimatorSet animatorSet = new AnimatorSet();
-        R$id.playTogether(animatorSet, arrayList);
+        ContainerHelpers.playTogether(animatorSet, arrayList);
         return animatorSet;
     }
 
-    public final ValueAnimator createElevationAnimator(ShadowAnimatorImpl shadowAnimatorImpl) {
-        ValueAnimator valueAnimator = new ValueAnimator();
-        valueAnimator.setInterpolator(ELEVATION_ANIM_INTERPOLATOR);
-        valueAnimator.setDuration(100L);
-        valueAnimator.addListener(shadowAnimatorImpl);
-        valueAnimator.addUpdateListener(shadowAnimatorImpl);
-        valueAnimator.setFloatValues(HingeAngleProviderKt.FULLY_CLOSED_DEGREES, 1.0f);
-        return valueAnimator;
-    }
-
-    public void getPadding(Rect rect) {
-        throw null;
-    }
-
-    public boolean isOrWillBeShown() {
-        return this.view.getVisibility() != 0 ? this.animState == 2 : this.animState != 1;
-    }
-
-    public void jumpDrawableToCurrentState() {
-        throw null;
-    }
-
-    public void onDrawableStateChanged(int[] iArr) {
-        throw null;
-    }
-
-    public void onScaleChanged() {
-        ArrayList<InternalTransformationCallback> arrayList = this.transformationCallbacks;
-        if (arrayList != null) {
-            Iterator<InternalTransformationCallback> it = arrayList.iterator();
-            while (it.hasNext()) {
-                it.next().onScaleChanged();
+    public final AnimatorSet createDefaultAnimator(final float f, final float f2, final float f3) {
+        AnimatorSet animatorSet = new AnimatorSet();
+        ArrayList arrayList = new ArrayList();
+        ValueAnimator ofFloat = ValueAnimator.ofFloat(HingeAngleProviderKt.FULLY_CLOSED_DEGREES, 1.0f);
+        final float alpha = this.view.getAlpha();
+        final float scaleX = this.view.getScaleX();
+        final float scaleY = this.view.getScaleY();
+        final float f4 = this.imageMatrixScale;
+        final Matrix matrix = new Matrix(this.tmpMatrix);
+        ofFloat.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() { // from class: com.google.android.material.floatingactionbutton.FloatingActionButtonImpl.4
+            @Override // android.animation.ValueAnimator.AnimatorUpdateListener
+            public final void onAnimationUpdate(ValueAnimator valueAnimator) {
+                float floatValue = ((Float) valueAnimator.getAnimatedValue()).floatValue();
+                FloatingActionButtonImpl.this.view.setAlpha(AnimationUtils.lerp(alpha, f, HingeAngleProviderKt.FULLY_CLOSED_DEGREES, 0.2f, floatValue));
+                FloatingActionButton floatingActionButton = FloatingActionButtonImpl.this.view;
+                float f5 = scaleX;
+                floatingActionButton.setScaleX(((f2 - f5) * floatValue) + f5);
+                FloatingActionButton floatingActionButton2 = FloatingActionButtonImpl.this.view;
+                float f6 = scaleY;
+                floatingActionButton2.setScaleY(((f2 - f6) * floatValue) + f6);
+                FloatingActionButtonImpl floatingActionButtonImpl = FloatingActionButtonImpl.this;
+                float f7 = f4;
+                floatingActionButtonImpl.imageMatrixScale = DependencyGraph$$ExternalSyntheticOutline0.m(f3, f7, floatValue, f7);
+                Matrix matrix2 = matrix;
+                floatingActionButtonImpl.getClass();
+                matrix2.reset();
+                floatingActionButtonImpl.view.getDrawable();
+                FloatingActionButtonImpl.this.view.setImageMatrix(matrix);
+            }
+        });
+        arrayList.add(ofFloat);
+        ContainerHelpers.playTogether(animatorSet, arrayList);
+        Context context = this.view.getContext();
+        int integer = this.view.getContext().getResources().getInteger(R.integer.material_motion_duration_long_1);
+        TypedValue resolve = MaterialAttributes.resolve(context, R.attr.motionDurationLong1);
+        if (resolve != null && resolve.type == 16) {
+            integer = resolve.data;
+        }
+        animatorSet.setDuration(integer);
+        Context context2 = this.view.getContext();
+        TimeInterpolator timeInterpolator = AnimationUtils.FAST_OUT_SLOW_IN_INTERPOLATOR;
+        TypedValue typedValue = new TypedValue();
+        if (context2.getTheme().resolveAttribute(R.attr.motionEasingStandard, typedValue, true)) {
+            if (typedValue.type == 3) {
+                String valueOf = String.valueOf(typedValue.string);
+                if (MotionUtils.isEasingType(valueOf, "cubic-bezier")) {
+                    String[] split = valueOf.substring(13, valueOf.length() - 1).split(",");
+                    if (split.length == 4) {
+                        timeInterpolator = new PathInterpolator(MotionUtils.getControlPoint(split, 0), MotionUtils.getControlPoint(split, 1), MotionUtils.getControlPoint(split, 2), MotionUtils.getControlPoint(split, 3));
+                    } else {
+                        StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Motion easing theme attribute must have 4 control points if using bezier curve format; instead got: ");
+                        m.append(split.length);
+                        throw new IllegalArgumentException(m.toString());
+                    }
+                } else if (MotionUtils.isEasingType(valueOf, "path")) {
+                    timeInterpolator = new PathInterpolator(PathParser.createPathFromPathData(valueOf.substring(5, valueOf.length() - 1)));
+                } else {
+                    throw new IllegalArgumentException(SupportMenuInflater$$ExternalSyntheticOutline0.m("Invalid motion easing type: ", valueOf));
+                }
+            } else {
+                throw new IllegalArgumentException("Motion easing theme attribute must be a string");
             }
         }
+        animatorSet.setInterpolator(timeInterpolator);
+        return animatorSet;
     }
 
-    public void onTranslationChanged() {
+    public final void onTranslationChanged() {
         ArrayList<InternalTransformationCallback> arrayList = this.transformationCallbacks;
         if (arrayList != null) {
             Iterator<InternalTransformationCallback> it = arrayList.iterator();
@@ -250,43 +292,37 @@ public class FloatingActionButtonImpl {
         }
     }
 
-    public final void setImageMatrixScale(float f) {
-        this.imageMatrixScale = f;
-        Matrix matrix = this.tmpMatrix;
-        matrix.reset();
-        this.view.getDrawable();
-        this.view.setImageMatrix(matrix);
-    }
-
-    public boolean shouldAddPadding() {
-        throw null;
-    }
-
-    public final boolean shouldAnimateVisibilityChange() {
-        FloatingActionButton floatingActionButton = this.view;
-        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-        return floatingActionButton.isLaidOut() && !this.view.isInEditMode();
-    }
-
-    public void updateFromViewRotation() {
-        throw null;
-    }
-
     public final void updatePadding() {
-        Rect rect = this.tmpRect;
-        getPadding(rect);
+        getPadding(this.tmpRect);
         Preconditions.checkNotNull(null, "Didn't initialize content background");
-        if (shouldAddPadding()) {
-            InsetDrawable insetDrawable = new InsetDrawable((Drawable) null, rect.left, rect.top, rect.right, rect.bottom);
-            FloatingActionButton.ShadowDelegateImpl shadowDelegateImpl = (FloatingActionButton.ShadowDelegateImpl) this.shadowViewDelegate;
-            Objects.requireNonNull(shadowDelegateImpl);
-            FloatingActionButtonImpl.super.setBackgroundDrawable(insetDrawable);
-        } else {
-            Objects.requireNonNull((FloatingActionButton.ShadowDelegateImpl) this.shadowViewDelegate);
-        }
-        ShadowViewDelegate shadowViewDelegate = this.shadowViewDelegate;
-        int i = rect.left;
-        Objects.requireNonNull(FloatingActionButton.this);
         throw null;
+    }
+
+    public FloatingActionButtonImpl(FloatingActionButton floatingActionButton, FloatingActionButton.ShadowDelegateImpl shadowDelegateImpl) {
+        new RectF();
+        new RectF();
+        this.view = floatingActionButton;
+        this.shadowViewDelegate = shadowDelegateImpl;
+        StateListAnimator stateListAnimator = new StateListAnimator();
+        this.stateListAnimator = stateListAnimator;
+        FloatingActionButtonImplLollipop floatingActionButtonImplLollipop = (FloatingActionButtonImplLollipop) this;
+        stateListAnimator.addState(PRESSED_ENABLED_STATE_SET, createElevationAnimator(new ElevateToPressedTranslationZAnimation(floatingActionButtonImplLollipop)));
+        stateListAnimator.addState(HOVERED_FOCUSED_ENABLED_STATE_SET, createElevationAnimator(new ElevateToHoveredFocusedTranslationZAnimation(floatingActionButtonImplLollipop)));
+        stateListAnimator.addState(FOCUSED_ENABLED_STATE_SET, createElevationAnimator(new ElevateToHoveredFocusedTranslationZAnimation(floatingActionButtonImplLollipop)));
+        stateListAnimator.addState(HOVERED_ENABLED_STATE_SET, createElevationAnimator(new ElevateToHoveredFocusedTranslationZAnimation(floatingActionButtonImplLollipop)));
+        stateListAnimator.addState(ENABLED_STATE_SET, createElevationAnimator(new ResetElevationAnimation(floatingActionButtonImplLollipop)));
+        stateListAnimator.addState(EMPTY_STATE_SET, createElevationAnimator(new DisabledElevationAnimation(floatingActionButtonImplLollipop)));
+        this.rotation = floatingActionButton.getRotation();
+    }
+
+    /* loaded from: classes.dex */
+    public class DisabledElevationAnimation extends ShadowAnimatorImpl {
+        @Override // com.google.android.material.floatingactionbutton.FloatingActionButtonImpl.ShadowAnimatorImpl
+        public final void getTargetShadowSize() {
+        }
+
+        public DisabledElevationAnimation(FloatingActionButtonImplLollipop floatingActionButtonImplLollipop) {
+            super(floatingActionButtonImplLollipop);
+        }
     }
 }

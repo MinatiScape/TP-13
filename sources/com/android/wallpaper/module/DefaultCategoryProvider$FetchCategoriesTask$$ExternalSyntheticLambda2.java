@@ -4,6 +4,7 @@ import com.android.wallpaper.model.Category;
 import com.android.wallpaper.model.WallpaperCategory;
 import com.android.wallpaper.module.DefaultCategoryProvider;
 import java.util.function.Predicate;
+/* compiled from: R8$$SyntheticClass */
 /* loaded from: classes.dex */
 public final /* synthetic */ class DefaultCategoryProvider$FetchCategoriesTask$$ExternalSyntheticLambda2 implements Predicate {
     public static final /* synthetic */ DefaultCategoryProvider$FetchCategoriesTask$$ExternalSyntheticLambda2 INSTANCE = new DefaultCategoryProvider$FetchCategoriesTask$$ExternalSyntheticLambda2();

@@ -8,56 +8,40 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.appcompat.widget.AppCompatTextHelper;
 import androidx.core.content.res.ResourcesCompat;
 /* loaded from: classes.dex */
-public class TintTypedArray {
+public final class TintTypedArray {
     public final Context mContext;
     public TypedValue mTypedValue;
     public final TypedArray mWrapped;
 
-    public TintTypedArray(Context context, TypedArray typedArray) {
-        this.mContext = context;
-        this.mWrapped = typedArray;
+    public static TintTypedArray obtainStyledAttributes(Context context, AttributeSet attributeSet, int[] iArr, int i) {
+        return new TintTypedArray(context, context.obtainStyledAttributes(attributeSet, iArr, i, 0));
     }
 
-    public static TintTypedArray obtainStyledAttributes(Context context, AttributeSet attributeSet, int[] iArr) {
-        return new TintTypedArray(context, context.obtainStyledAttributes(attributeSet, iArr));
-    }
-
-    public boolean getBoolean(int i, boolean z) {
+    public final boolean getBoolean(int i, boolean z) {
         return this.mWrapped.getBoolean(i, z);
     }
 
-    public int getColor(int i, int i2) {
-        return this.mWrapped.getColor(i, i2);
-    }
-
-    public ColorStateList getColorStateList(int i) {
+    public final ColorStateList getColorStateList(int i) {
         int resourceId;
-        if (this.mWrapped.hasValue(i) && (resourceId = this.mWrapped.getResourceId(i, 0)) != 0) {
-            Context context = this.mContext;
-            ThreadLocal<TypedValue> threadLocal = AppCompatResources.TL_TYPED_VALUE;
-            ColorStateList colorStateList = context.getColorStateList(resourceId);
-            if (colorStateList != null) {
-                return colorStateList;
-            }
+        ColorStateList colorStateList;
+        if (!this.mWrapped.hasValue(i) || (resourceId = this.mWrapped.getResourceId(i, 0)) == 0 || (colorStateList = AppCompatResources.getColorStateList(this.mContext, resourceId)) == null) {
+            return this.mWrapped.getColorStateList(i);
         }
-        return this.mWrapped.getColorStateList(i);
+        return colorStateList;
     }
 
-    public float getDimension(int i, float f) {
-        return this.mWrapped.getDimension(i, f);
-    }
-
-    public int getDimensionPixelOffset(int i, int i2) {
+    public final int getDimensionPixelOffset(int i, int i2) {
         return this.mWrapped.getDimensionPixelOffset(i, i2);
     }
 
-    public int getDimensionPixelSize(int i, int i2) {
+    public final int getDimensionPixelSize(int i, int i2) {
         return this.mWrapped.getDimensionPixelSize(i, i2);
     }
 
-    public Drawable getDrawable(int i) {
+    public final Drawable getDrawable(int i) {
         int resourceId;
         if (!this.mWrapped.hasValue(i) || (resourceId = this.mWrapped.getResourceId(i, 0)) == 0) {
             return this.mWrapped.getDrawable(i);
@@ -65,7 +49,7 @@ public class TintTypedArray {
         return AppCompatResources.getDrawable(this.mContext, resourceId);
     }
 
-    public Drawable getDrawableIfKnown(int i) {
+    public final Drawable getDrawableIfKnown(int i) {
         int resourceId;
         Drawable drawable;
         if (!this.mWrapped.hasValue(i) || (resourceId = this.mWrapped.getResourceId(i, 0)) == 0) {
@@ -79,7 +63,7 @@ public class TintTypedArray {
         return drawable;
     }
 
-    public Typeface getFont(int i, int i2, ResourcesCompat.FontCallback fontCallback) {
+    public final Typeface getFont(int i, int i2, AppCompatTextHelper.AnonymousClass1 r12) {
         int resourceId = this.mWrapped.getResourceId(i, 0);
         if (resourceId == 0) {
             return null;
@@ -93,34 +77,35 @@ public class TintTypedArray {
         if (context.isRestricted()) {
             return null;
         }
-        return ResourcesCompat.loadFont(context, resourceId, typedValue, i2, fontCallback, null, true, false);
+        return ResourcesCompat.loadFont(context, resourceId, typedValue, i2, r12, true, false);
     }
 
-    public int getInt(int i, int i2) {
+    public final int getInt(int i, int i2) {
         return this.mWrapped.getInt(i, i2);
     }
 
-    public int getLayoutDimension(int i, int i2) {
-        return this.mWrapped.getLayoutDimension(i, i2);
-    }
-
-    public int getResourceId(int i, int i2) {
+    public final int getResourceId(int i, int i2) {
         return this.mWrapped.getResourceId(i, i2);
     }
 
-    public String getString(int i) {
+    public final String getString(int i) {
         return this.mWrapped.getString(i);
     }
 
-    public CharSequence getText(int i) {
+    public final CharSequence getText(int i) {
         return this.mWrapped.getText(i);
     }
 
-    public boolean hasValue(int i) {
+    public final boolean hasValue(int i) {
         return this.mWrapped.hasValue(i);
     }
 
-    public static TintTypedArray obtainStyledAttributes(Context context, AttributeSet attributeSet, int[] iArr, int i, int i2) {
-        return new TintTypedArray(context, context.obtainStyledAttributes(attributeSet, iArr, i, i2));
+    public final void recycle() {
+        this.mWrapped.recycle();
+    }
+
+    public TintTypedArray(Context context, TypedArray typedArray) {
+        this.mContext = context;
+        this.mWrapped = typedArray;
     }
 }

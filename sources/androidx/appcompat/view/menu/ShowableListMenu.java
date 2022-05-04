@@ -1,11 +1,11 @@
 package androidx.appcompat.view.menu;
 
-import android.widget.ListView;
+import androidx.appcompat.widget.DropDownListView;
 /* loaded from: classes.dex */
 public interface ShowableListMenu {
     void dismiss();
 
-    ListView getListView();
+    DropDownListView getListView();
 
     boolean isShowing();
 

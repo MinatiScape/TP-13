@@ -10,26 +10,19 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
-import androidx.collection.ArrayMap;
 import androidx.collection.ArraySet;
-import androidx.collection.IndexBasedArrayIterator;
-import androidx.preference.R$string;
-import com.adobe.xmp.XMPPathFactory$$ExternalSyntheticOutline0;
-import com.bumptech.glide.Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline1;
+import com.adobe.xmp.impl.ParseRDF$$ExternalSyntheticOutline0;
+import com.android.wallpaper.util.LaunchUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesUtilLight;
 import com.google.android.gms.common.api.GoogleApi;
 import com.google.android.gms.common.api.GoogleApiActivity;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.common.internal.zzv;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+/* compiled from: GoogleApiManager.java */
 /* loaded from: classes.dex */
 public final class zzbn implements Handler.Callback {
     public static final Status zza = new Status(4, "Sign-out occurred while this API call was in progress.");
@@ -38,23 +31,14 @@ public final class zzbn implements Handler.Callback {
     public static zzbn zzg;
     public final Context zzh;
     public final GoogleApiAvailability zzi;
-    public final zzv zzj;
     public final Handler zzq;
     public long zze = 10000;
     public final AtomicInteger zzk = new AtomicInteger(1);
     public final AtomicInteger zzl = new AtomicInteger(0);
-    public final Map<zzi<?>, zzbp<?>> zzm = new ConcurrentHashMap(5, 0.75f, 1);
-    public final Set<zzi<?>> zzo = new ArraySet(0);
-    public final Set<zzi<?>> zzp = new ArraySet(0);
-
-    public zzbn(Context context, Looper looper, GoogleApiAvailability googleApiAvailability) {
-        this.zzh = context;
-        Handler handler = new Handler(looper, this);
-        this.zzq = handler;
-        this.zzi = googleApiAvailability;
-        this.zzj = new zzv(googleApiAvailability);
-        handler.sendMessage(handler.obtainMessage(6));
-    }
+    public final ConcurrentHashMap zzm = new ConcurrentHashMap(5, 0.75f, 1);
+    public final ArraySet zzo = new ArraySet(0);
+    public final ArraySet zzp = new ArraySet(0);
+    public final zzv zzj = new zzv();
 
     public static zzbn zza(Context context) {
         zzbn zzbnVar;
@@ -65,20 +49,29 @@ public final class zzbn implements Handler.Callback {
                 Looper looper = handlerThread.getLooper();
                 Context applicationContext = context.getApplicationContext();
                 Object obj = GoogleApiAvailability.zza;
-                zzg = new zzbn(applicationContext, looper, GoogleApiAvailability.zzb);
+                zzg = new zzbn(applicationContext, looper);
             }
             zzbnVar = zzg;
         }
         return zzbnVar;
     }
 
+    public zzbn(Context context, Looper looper) {
+        GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.zzb;
+        this.zzh = context;
+        Handler handler = new Handler(looper, this);
+        this.zzq = handler;
+        this.zzi = googleApiAvailability;
+        handler.sendMessage(handler.obtainMessage(6));
+    }
+
     @Override // android.os.Handler.Callback
     public final boolean handleMessage(Message message) {
         Status status;
         int i = message.what;
+        zzbp zzbpVar = null;
         long j = 300000;
         boolean z = false;
-        zzbp<?> zzbpVar = null;
         switch (i) {
             case 1:
                 if (((Boolean) message.obj).booleanValue()) {
@@ -86,88 +79,66 @@ public final class zzbn implements Handler.Callback {
                 }
                 this.zze = j;
                 this.zzq.removeMessages(12);
-                for (zzi<?> zziVar : this.zzm.keySet()) {
+                for (zzi zziVar : this.zzm.keySet()) {
                     Handler handler = this.zzq;
                     handler.sendMessageDelayed(handler.obtainMessage(12, zziVar), this.zze);
                 }
                 break;
             case 2:
-                zzk zzkVar = (zzk) message.obj;
-                Iterator it = ((ArrayMap.KeySet) zzkVar.zza.keySet()).iterator();
-                while (true) {
-                    IndexBasedArrayIterator indexBasedArrayIterator = (IndexBasedArrayIterator) it;
-                    if (!indexBasedArrayIterator.hasNext()) {
-                        break;
-                    } else {
-                        zzi<?> zziVar2 = (zzi) indexBasedArrayIterator.next();
-                        zzbp<?> zzbpVar2 = this.zzm.get(zziVar2);
-                        if (zzbpVar2 == null) {
-                            zzkVar.zza(zziVar2, new ConnectionResult(13), null);
-                            break;
-                        } else if (zzbpVar2.zzc.isConnected()) {
-                            zzkVar.zza(zziVar2, ConnectionResult.zza, zzbpVar2.zzc.zzab());
-                        } else {
-                            R$string.zza(zzbpVar2.zza.zzq);
-                            if (zzbpVar2.zzm != null) {
-                                R$string.zza(zzbpVar2.zza.zzq);
-                                zzkVar.zza(zziVar2, zzbpVar2.zzm, null);
-                            } else {
-                                R$string.zza(zzbpVar2.zza.zzq);
-                                zzbpVar2.zzg.add(zzkVar);
-                            }
-                        }
-                    }
-                }
+                ((zzk) message.obj).getClass();
+                throw null;
             case 3:
-                for (zzbp<?> zzbpVar3 : this.zzm.values()) {
-                    zzbpVar3.zzd();
-                    zzbpVar3.zzi();
+                for (zzbp zzbpVar2 : this.zzm.values()) {
+                    LaunchUtils.zza(zzbpVar2.zza.zzq);
+                    zzbpVar2.zzm = null;
+                    zzbpVar2.zzi();
                 }
                 break;
             case 4:
             case 8:
             case 13:
                 zzcu zzcuVar = (zzcu) message.obj;
-                zzbp<?> zzbpVar4 = this.zzm.get(zzcuVar.zzc.zze);
-                if (zzbpVar4 == null) {
+                zzbp zzbpVar3 = (zzbp) this.zzm.get(zzcuVar.zzc.zze);
+                if (zzbpVar3 == null) {
                     zzb(zzcuVar.zzc);
-                    zzbpVar4 = this.zzm.get(zzcuVar.zzc.zze);
+                    zzbpVar3 = (zzbp) this.zzm.get(zzcuVar.zzc.zze);
                 }
-                if (!zzbpVar4.zzk() || this.zzl.get() == zzcuVar.zzb) {
-                    zzbpVar4.zza(zzcuVar.zza);
+                if (!zzbpVar3.zzc.requiresSignIn() || this.zzl.get() == zzcuVar.zzb) {
+                    zzbpVar3.zza(zzcuVar.zza);
                     break;
                 } else {
                     zzcuVar.zza.zza(zza);
-                    zzbpVar4.zza();
+                    zzbpVar3.zza$5();
                     break;
                 }
             case 5:
                 int i2 = message.arg1;
                 ConnectionResult connectionResult = (ConnectionResult) message.obj;
-                Iterator<zzbp<?>> it2 = this.zzm.values().iterator();
+                Iterator it = this.zzm.values().iterator();
                 while (true) {
-                    if (it2.hasNext()) {
-                        zzbp<?> next = it2.next();
-                        if (next.zzi == i2) {
-                            zzbpVar = next;
+                    if (it.hasNext()) {
+                        zzbp zzbpVar4 = (zzbp) it.next();
+                        if (zzbpVar4.zzi == i2) {
+                            zzbpVar = zzbpVar4;
                         }
                     }
                 }
                 if (zzbpVar != null) {
-                    GoogleApiAvailability googleApiAvailability = this.zzi;
-                    int i3 = connectionResult.zzc;
-                    Objects.requireNonNull(googleApiAvailability);
-                    AtomicBoolean atomicBoolean = GooglePlayServicesUtilLight.zza;
-                    String zza2 = ConnectionResult.zza(i3);
+                    String errorString = this.zzi.getErrorString(connectionResult.zzc);
                     String str = connectionResult.zze;
-                    zzbpVar.zza(new Status(17, Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline1.m(XMPPathFactory$$ExternalSyntheticOutline0.m(str, XMPPathFactory$$ExternalSyntheticOutline0.m(zza2, 69)), "Error resolution was canceled by the user, original error message: ", zza2, ": ", str)));
+                    StringBuilder sb = new StringBuilder(ParseRDF$$ExternalSyntheticOutline0.m(str, ParseRDF$$ExternalSyntheticOutline0.m(errorString, 69)));
+                    sb.append("Error resolution was canceled by the user, original error message: ");
+                    sb.append(errorString);
+                    sb.append(": ");
+                    sb.append(str);
+                    zzbpVar.zza(new Status(17, sb.toString()));
                     break;
                 } else {
-                    StringBuilder sb = new StringBuilder(76);
-                    sb.append("Could not find API instance ");
-                    sb.append(i2);
-                    sb.append(" while trying to fail enqueued calls.");
-                    Log.wtf("GoogleApiManager", sb.toString(), new Exception());
+                    StringBuilder sb2 = new StringBuilder(76);
+                    sb2.append("Could not find API instance ");
+                    sb2.append(i2);
+                    sb2.append(" while trying to fail enqueued calls.");
+                    Log.wtf("GoogleApiManager", sb2.toString(), new Exception());
                     break;
                 }
             case 6:
@@ -203,8 +174,8 @@ public final class zzbn implements Handler.Callback {
                 break;
             case 9:
                 if (this.zzm.containsKey(message.obj)) {
-                    zzbp<?> zzbpVar5 = this.zzm.get(message.obj);
-                    R$string.zza(zzbpVar5.zza.zzq);
+                    zzbp zzbpVar5 = (zzbp) this.zzm.get(message.obj);
+                    LaunchUtils.zza(zzbpVar5.zza.zzq);
                     if (zzbpVar5.zzk) {
                         zzbpVar5.zzi();
                         break;
@@ -212,15 +183,18 @@ public final class zzbn implements Handler.Callback {
                 }
                 break;
             case 10:
-                for (zzi<?> zziVar3 : this.zzp) {
-                    this.zzm.remove(zziVar3).zza();
+                ArraySet arraySet = this.zzp;
+                arraySet.getClass();
+                ArraySet.ElementIterator elementIterator = new ArraySet.ElementIterator();
+                while (elementIterator.hasNext()) {
+                    ((zzbp) this.zzm.remove((zzi) elementIterator.next())).zza$5();
                 }
                 this.zzp.clear();
                 break;
             case 11:
                 if (this.zzm.containsKey(message.obj)) {
-                    zzbp<?> zzbpVar6 = this.zzm.get(message.obj);
-                    R$string.zza(zzbpVar6.zza.zzq);
+                    zzbp zzbpVar6 = (zzbp) this.zzm.get(message.obj);
+                    LaunchUtils.zza(zzbpVar6.zza.zzq);
                     if (zzbpVar6.zzk) {
                         zzbpVar6.zzp();
                         zzbn zzbnVar = zzbpVar6.zza;
@@ -237,8 +211,8 @@ public final class zzbn implements Handler.Callback {
                 break;
             case 12:
                 if (this.zzm.containsKey(message.obj)) {
-                    zzbp<?> zzbpVar7 = this.zzm.get(message.obj);
-                    R$string.zza(zzbpVar7.zza.zzq);
+                    zzbp zzbpVar7 = (zzbp) this.zzm.get(message.obj);
+                    LaunchUtils.zza(zzbpVar7.zza.zzq);
                     if (zzbpVar7.zzc.isConnected() && zzbpVar7.zzh.size() == 0) {
                         zzaf zzafVar = zzbpVar7.zzf;
                         if (!zzafVar.zza.isEmpty() || !zzafVar.zzb.isEmpty()) {
@@ -255,10 +229,10 @@ public final class zzbn implements Handler.Callback {
                 }
                 break;
             default:
-                StringBuilder sb2 = new StringBuilder(31);
-                sb2.append("Unknown message id: ");
-                sb2.append(i);
-                Log.w("GoogleApiManager", sb2.toString());
+                StringBuilder sb3 = new StringBuilder(31);
+                sb3.append("Unknown message id: ");
+                sb3.append(i);
+                Log.w("GoogleApiManager", sb3.toString());
                 return false;
         }
         return true;
@@ -266,12 +240,12 @@ public final class zzbn implements Handler.Callback {
 
     public final void zzb(GoogleApi<?> googleApi) {
         zzi<?> zziVar = googleApi.zze;
-        zzbp<?> zzbpVar = this.zzm.get(zziVar);
+        zzbp zzbpVar = (zzbp) this.zzm.get(zziVar);
         if (zzbpVar == null) {
-            zzbpVar = new zzbp<>(this, googleApi);
+            zzbpVar = new zzbp(this, googleApi);
             this.zzm.put(zziVar, zzbpVar);
         }
-        if (zzbpVar.zzk()) {
+        if (zzbpVar.zzc.requiresSignIn()) {
             this.zzp.add(zziVar);
         }
         zzbpVar.zzi();
@@ -281,22 +255,23 @@ public final class zzbn implements Handler.Callback {
         PendingIntent pendingIntent;
         GoogleApiAvailability googleApiAvailability = this.zzi;
         Context context = this.zzh;
-        Objects.requireNonNull(googleApiAvailability);
-        if (connectionResult.hasResolution()) {
+        googleApiAvailability.getClass();
+        int i2 = connectionResult.zzc;
+        if ((i2 == 0 || connectionResult.zzd == null) ? false : true) {
             pendingIntent = connectionResult.zzd;
         } else {
-            pendingIntent = googleApiAvailability.getErrorResolutionPendingIntent(context, connectionResult.zzc, 0, null);
+            pendingIntent = googleApiAvailability.getErrorResolutionPendingIntent(context, i2, null);
         }
         if (pendingIntent == null) {
             return false;
         }
-        int i2 = connectionResult.zzc;
-        int i3 = GoogleApiActivity.$r8$clinit;
+        int i3 = connectionResult.zzc;
+        int i4 = GoogleApiActivity.$r8$clinit;
         Intent intent = new Intent(context, GoogleApiActivity.class);
         intent.putExtra("pending_intent", pendingIntent);
         intent.putExtra("failing_client_id", i);
         intent.putExtra("notify_manager", true);
-        googleApiAvailability.zza(context, i2, PendingIntent.getActivity(context, 0, intent, 134217728));
+        googleApiAvailability.zza(context, i3, PendingIntent.getActivity(context, 0, intent, 134217728));
         return true;
     }
 }

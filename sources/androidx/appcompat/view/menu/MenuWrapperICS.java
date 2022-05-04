@@ -15,23 +15,19 @@ import androidx.core.internal.view.SupportSubMenu;
 public class MenuWrapperICS extends BaseMenuWrapper implements Menu {
     public final SupportMenu mWrappedObject;
 
-    public MenuWrapperICS(Context context, SupportMenu supportMenu) {
-        super(context);
-        if (supportMenu != null) {
-            this.mWrappedObject = supportMenu;
-            return;
-        }
-        throw new IllegalArgumentException("Wrapped Object can not be null.");
-    }
-
     @Override // android.view.Menu
-    public MenuItem add(CharSequence charSequence) {
+    public final MenuItem add(CharSequence charSequence) {
         return getMenuItemWrapper(this.mWrappedObject.add(charSequence));
     }
 
     @Override // android.view.Menu
-    public int addIntentOptions(int i, int i2, int i3, ComponentName componentName, Intent[] intentArr, Intent intent, int i4, MenuItem[] menuItemArr) {
-        MenuItem[] menuItemArr2 = menuItemArr != null ? new MenuItem[menuItemArr.length] : null;
+    public final int addIntentOptions(int i, int i2, int i3, ComponentName componentName, Intent[] intentArr, Intent intent, int i4, MenuItem[] menuItemArr) {
+        MenuItem[] menuItemArr2;
+        if (menuItemArr != null) {
+            menuItemArr2 = new MenuItem[menuItemArr.length];
+        } else {
+            menuItemArr2 = null;
+        }
         int addIntentOptions = this.mWrappedObject.addIntentOptions(i, i2, i3, componentName, intentArr, intent, i4, menuItemArr2);
         if (menuItemArr2 != null) {
             int length = menuItemArr2.length;
@@ -43,12 +39,22 @@ public class MenuWrapperICS extends BaseMenuWrapper implements Menu {
     }
 
     @Override // android.view.Menu
-    public SubMenu addSubMenu(CharSequence charSequence) {
+    public final SubMenu addSubMenu(CharSequence charSequence) {
         return getSubMenuWrapper(this.mWrappedObject.addSubMenu(charSequence));
     }
 
     @Override // android.view.Menu
-    public void clear() {
+    public final MenuItem add(int i) {
+        return getMenuItemWrapper(this.mWrappedObject.add(i));
+    }
+
+    @Override // android.view.Menu
+    public final SubMenu addSubMenu(int i) {
+        return getSubMenuWrapper(this.mWrappedObject.addSubMenu(i));
+    }
+
+    @Override // android.view.Menu
+    public final void clear() {
         SimpleArrayMap<SupportMenuItem, MenuItem> simpleArrayMap = this.mMenuItems;
         if (simpleArrayMap != null) {
             simpleArrayMap.clear();
@@ -61,42 +67,42 @@ public class MenuWrapperICS extends BaseMenuWrapper implements Menu {
     }
 
     @Override // android.view.Menu
-    public void close() {
+    public final void close() {
         this.mWrappedObject.close();
     }
 
     @Override // android.view.Menu
-    public MenuItem findItem(int i) {
+    public final MenuItem findItem(int i) {
         return getMenuItemWrapper(this.mWrappedObject.findItem(i));
     }
 
     @Override // android.view.Menu
-    public MenuItem getItem(int i) {
+    public final MenuItem getItem(int i) {
         return getMenuItemWrapper(this.mWrappedObject.getItem(i));
     }
 
     @Override // android.view.Menu
-    public boolean hasVisibleItems() {
+    public final boolean hasVisibleItems() {
         return this.mWrappedObject.hasVisibleItems();
     }
 
     @Override // android.view.Menu
-    public boolean isShortcutKey(int i, KeyEvent keyEvent) {
+    public final boolean isShortcutKey(int i, KeyEvent keyEvent) {
         return this.mWrappedObject.isShortcutKey(i, keyEvent);
     }
 
     @Override // android.view.Menu
-    public boolean performIdentifierAction(int i, int i2) {
+    public final boolean performIdentifierAction(int i, int i2) {
         return this.mWrappedObject.performIdentifierAction(i, i2);
     }
 
     @Override // android.view.Menu
-    public boolean performShortcut(int i, KeyEvent keyEvent, int i2) {
+    public final boolean performShortcut(int i, KeyEvent keyEvent, int i2) {
         return this.mWrappedObject.performShortcut(i, keyEvent, i2);
     }
 
     @Override // android.view.Menu
-    public void removeGroup(int i) {
+    public final void removeGroup(int i) {
         if (this.mMenuItems != null) {
             int i2 = 0;
             while (true) {
@@ -115,7 +121,7 @@ public class MenuWrapperICS extends BaseMenuWrapper implements Menu {
     }
 
     @Override // android.view.Menu
-    public void removeItem(int i) {
+    public final void removeItem(int i) {
         if (this.mMenuItems != null) {
             int i2 = 0;
             while (true) {
@@ -134,57 +140,56 @@ public class MenuWrapperICS extends BaseMenuWrapper implements Menu {
     }
 
     @Override // android.view.Menu
-    public void setGroupCheckable(int i, boolean z, boolean z2) {
+    public final void setGroupCheckable(int i, boolean z, boolean z2) {
         this.mWrappedObject.setGroupCheckable(i, z, z2);
     }
 
     @Override // android.view.Menu
-    public void setGroupEnabled(int i, boolean z) {
+    public final void setGroupEnabled(int i, boolean z) {
         this.mWrappedObject.setGroupEnabled(i, z);
     }
 
     @Override // android.view.Menu
-    public void setGroupVisible(int i, boolean z) {
+    public final void setGroupVisible(int i, boolean z) {
         this.mWrappedObject.setGroupVisible(i, z);
     }
 
     @Override // android.view.Menu
-    public void setQwertyMode(boolean z) {
+    public final void setQwertyMode(boolean z) {
         this.mWrappedObject.setQwertyMode(z);
     }
 
     @Override // android.view.Menu
-    public int size() {
+    public final int size() {
         return this.mWrappedObject.size();
     }
 
-    @Override // android.view.Menu
-    public MenuItem add(int i) {
-        return getMenuItemWrapper(this.mWrappedObject.add(i));
+    public MenuWrapperICS(Context context, SupportMenu supportMenu) {
+        super(context);
+        if (supportMenu != null) {
+            this.mWrappedObject = supportMenu;
+            return;
+        }
+        throw new IllegalArgumentException("Wrapped Object can not be null.");
     }
 
     @Override // android.view.Menu
-    public SubMenu addSubMenu(int i) {
-        return getSubMenuWrapper(this.mWrappedObject.addSubMenu(i));
-    }
-
-    @Override // android.view.Menu
-    public MenuItem add(int i, int i2, int i3, CharSequence charSequence) {
+    public final MenuItem add(int i, int i2, int i3, CharSequence charSequence) {
         return getMenuItemWrapper(this.mWrappedObject.add(i, i2, i3, charSequence));
     }
 
     @Override // android.view.Menu
-    public SubMenu addSubMenu(int i, int i2, int i3, CharSequence charSequence) {
+    public final SubMenu addSubMenu(int i, int i2, int i3, CharSequence charSequence) {
         return getSubMenuWrapper(this.mWrappedObject.addSubMenu(i, i2, i3, charSequence));
     }
 
     @Override // android.view.Menu
-    public MenuItem add(int i, int i2, int i3, int i4) {
+    public final MenuItem add(int i, int i2, int i3, int i4) {
         return getMenuItemWrapper(this.mWrappedObject.add(i, i2, i3, i4));
     }
 
     @Override // android.view.Menu
-    public SubMenu addSubMenu(int i, int i2, int i3, int i4) {
+    public final SubMenu addSubMenu(int i, int i2, int i3, int i4) {
         return getSubMenuWrapper(this.mWrappedObject.addSubMenu(i, i2, i3, i4));
     }
 }

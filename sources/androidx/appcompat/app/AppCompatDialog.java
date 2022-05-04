@@ -5,14 +5,27 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import androidx.appcompat.view.ActionMode;
 import androidx.collection.ArraySet;
 import androidx.core.view.KeyEventDispatcher$Component;
 import java.lang.ref.WeakReference;
 /* loaded from: classes.dex */
 public class AppCompatDialog extends Dialog implements AppCompatCallback {
-    public AppCompatDelegate mDelegate;
-    public final KeyEventDispatcher$Component mKeyDispatcher;
+    public AppCompatDelegateImpl mDelegate;
+    public final AnonymousClass1 mKeyDispatcher;
+
+    /* renamed from: androidx.appcompat.app.AppCompatDialog$1  reason: invalid class name */
+    /* loaded from: classes.dex */
+    public class AnonymousClass1 implements KeyEventDispatcher$Component {
+        public final /* synthetic */ AppCompatDialog this$0;
+
+        public AnonymousClass1(AlertDialog alertDialog) {
+            this.this$0 = alertDialog;
+        }
+
+        public final boolean superDispatchKeyEvent(KeyEvent keyEvent) {
+            return this.this$0.superDispatchKeyEvent(keyEvent);
+        }
+    }
 
     /* JADX WARN: Illegal instructions before constructor call */
     /*
@@ -23,7 +36,7 @@ public class AppCompatDialog extends Dialog implements AppCompatCallback {
         /*
             r4 = this;
             r0 = 1
-            r1 = 2130968865(0x7f040121, float:1.7546396E38)
+            r1 = 2130968899(0x7f040143, float:1.7546465E38)
             if (r6 != 0) goto L15
             android.util.TypedValue r2 = new android.util.TypedValue
             r2.<init>()
@@ -36,91 +49,41 @@ public class AppCompatDialog extends Dialog implements AppCompatCallback {
         L16:
             r4.<init>(r5, r2)
             androidx.appcompat.app.AppCompatDialog$1 r2 = new androidx.appcompat.app.AppCompatDialog$1
-            r2.<init>()
+            r3 = r4
+            androidx.appcompat.app.AlertDialog r3 = (androidx.appcompat.app.AlertDialog) r3
+            r2.<init>(r3)
             r4.mKeyDispatcher = r2
             androidx.appcompat.app.AppCompatDelegate r4 = r4.getDelegate()
-            if (r6 != 0) goto L34
+            if (r6 != 0) goto L37
             android.util.TypedValue r6 = new android.util.TypedValue
             r6.<init>()
             android.content.res.Resources$Theme r5 = r5.getTheme()
             r5.resolveAttribute(r1, r6, r0)
             int r6 = r6.resourceId
-        L34:
-            r4.setTheme(r6)
-            r5 = 0
-            r4.onCreate(r5)
+        L37:
+            r5 = r4
+            androidx.appcompat.app.AppCompatDelegateImpl r5 = (androidx.appcompat.app.AppCompatDelegateImpl) r5
+            r5.mThemeResId = r6
+            r4.onCreate()
             return
         */
         throw new UnsupportedOperationException("Method not decompiled: androidx.appcompat.app.AppCompatDialog.<init>(android.content.Context, int):void");
     }
 
-    @Override // android.app.Dialog
-    public void addContentView(View view, ViewGroup.LayoutParams layoutParams) {
-        getDelegate().addContentView(view, layoutParams);
-    }
-
-    @Override // android.app.Dialog, android.content.DialogInterface
-    public void dismiss() {
-        super.dismiss();
-        getDelegate().onDestroy();
-    }
-
-    @Override // android.app.Dialog, android.view.Window.Callback
-    public boolean dispatchKeyEvent(KeyEvent keyEvent) {
-        getWindow().getDecorView();
-        KeyEventDispatcher$Component keyEventDispatcher$Component = this.mKeyDispatcher;
-        if (keyEventDispatcher$Component == null) {
-            return false;
-        }
-        return keyEventDispatcher$Component.superDispatchKeyEvent(keyEvent);
-    }
-
-    @Override // android.app.Dialog
-    public <T extends View> T findViewById(int i) {
-        return (T) getDelegate().findViewById(i);
-    }
-
-    public AppCompatDelegate getDelegate() {
-        if (this.mDelegate == null) {
-            ArraySet<WeakReference<AppCompatDelegate>> arraySet = AppCompatDelegate.sActivityDelegates;
-            this.mDelegate = new AppCompatDelegateImpl(getContext(), getWindow(), this, this);
-        }
-        return this.mDelegate;
-    }
-
-    @Override // android.app.Dialog
-    public void invalidateOptionsMenu() {
-        getDelegate().invalidateOptionsMenu();
-    }
-
-    @Override // android.app.Dialog
-    public void onCreate(Bundle bundle) {
-        getDelegate().installViewFactory();
-        super.onCreate(bundle);
-        getDelegate().onCreate(bundle);
-    }
-
-    @Override // android.app.Dialog
-    public void onStop() {
-        super.onStop();
-        getDelegate().onStop();
+    @Override // androidx.appcompat.app.AppCompatCallback
+    public final void onSupportActionModeFinished() {
     }
 
     @Override // androidx.appcompat.app.AppCompatCallback
-    public void onSupportActionModeFinished(ActionMode actionMode) {
+    public final void onSupportActionModeStarted() {
     }
 
     @Override // androidx.appcompat.app.AppCompatCallback
-    public void onSupportActionModeStarted(ActionMode actionMode) {
-    }
-
-    @Override // androidx.appcompat.app.AppCompatCallback
-    public ActionMode onWindowStartingSupportActionMode(ActionMode.Callback callback) {
-        return null;
+    public final void onWindowStartingSupportActionMode() {
     }
 
     @Override // android.app.Dialog
-    public void setContentView(int i) {
+    public final void setContentView(int i) {
         getDelegate().setContentView(i);
     }
 
@@ -130,23 +93,75 @@ public class AppCompatDialog extends Dialog implements AppCompatCallback {
         getDelegate().setTitle(charSequence);
     }
 
-    public boolean superDispatchKeyEvent(KeyEvent keyEvent) {
-        return super.dispatchKeyEvent(keyEvent);
+    public final AppCompatDelegate getDelegate() {
+        if (this.mDelegate == null) {
+            ArraySet<WeakReference<AppCompatDelegate>> arraySet = AppCompatDelegate.sActivityDelegates;
+            this.mDelegate = new AppCompatDelegateImpl(getContext(), getWindow(), this, this);
+        }
+        return this.mDelegate;
     }
 
     @Override // android.app.Dialog
-    public void setContentView(View view) {
+    public final void setContentView(View view) {
         getDelegate().setContentView(view);
     }
 
     @Override // android.app.Dialog
-    public void setContentView(View view, ViewGroup.LayoutParams layoutParams) {
+    public final void addContentView(View view, ViewGroup.LayoutParams layoutParams) {
+        getDelegate().addContentView(view, layoutParams);
+    }
+
+    @Override // android.app.Dialog, android.content.DialogInterface
+    public final void dismiss() {
+        super.dismiss();
+        getDelegate().onDestroy();
+    }
+
+    @Override // android.app.Dialog, android.view.Window.Callback
+    public final boolean dispatchKeyEvent(KeyEvent keyEvent) {
+        getWindow().getDecorView();
+        AnonymousClass1 r1 = this.mKeyDispatcher;
+        if (r1 == null) {
+            return false;
+        }
+        return r1.superDispatchKeyEvent(keyEvent);
+    }
+
+    @Override // android.app.Dialog
+    public final <T extends View> T findViewById(int i) {
+        return (T) getDelegate().findViewById(i);
+    }
+
+    @Override // android.app.Dialog
+    public final void invalidateOptionsMenu() {
+        getDelegate().invalidateOptionsMenu();
+    }
+
+    @Override // android.app.Dialog
+    public void onCreate(Bundle bundle) {
+        getDelegate().installViewFactory();
+        super.onCreate(bundle);
+        getDelegate().onCreate();
+    }
+
+    @Override // android.app.Dialog
+    public final void onStop() {
+        super.onStop();
+        getDelegate().onStop();
+    }
+
+    @Override // android.app.Dialog
+    public final void setContentView(View view, ViewGroup.LayoutParams layoutParams) {
         getDelegate().setContentView(view, layoutParams);
     }
 
     @Override // android.app.Dialog
-    public void setTitle(int i) {
+    public final void setTitle(int i) {
         super.setTitle(i);
         getDelegate().setTitle(getContext().getString(i));
+    }
+
+    public final boolean superDispatchKeyEvent(KeyEvent keyEvent) {
+        return super.dispatchKeyEvent(keyEvent);
     }
 }

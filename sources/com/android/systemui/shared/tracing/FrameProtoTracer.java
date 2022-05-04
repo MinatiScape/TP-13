@@ -42,31 +42,6 @@ public class FrameProtoTracer<P, S extends P, T extends P, R> implements Choreog
         T updateBufferProto(T t, ArrayList<ProtoTraceable<R>> arrayList);
     }
 
-    public FrameProtoTracer(ProtoTraceParams<P, S, T, R> protoTraceParams) {
-        TraceBuffer.ProtoProvider<P, S, T> protoProvider = (TraceBuffer.ProtoProvider<P, S, T>) new TraceBuffer.ProtoProvider<?, ?, ?>() { // from class: com.android.systemui.shared.tracing.FrameProtoTracer.1
-            public byte[] getBytes(Object obj) {
-                return FrameProtoTracer.this.mParams.getProtoBytes(obj);
-            }
-
-            public int getItemSize(Object obj) {
-                return FrameProtoTracer.this.mParams.getProtoSize(obj);
-            }
-
-            public void write(Object obj, Queue<?> queue, OutputStream outputStream) throws IOException {
-                outputStream.write(FrameProtoTracer.this.mParams.serializeEncapsulatingProto(obj, queue));
-            }
-        };
-        this.mProvider = protoProvider;
-        this.mParams = protoTraceParams;
-        this.mBuffer = new TraceBuffer<>(1048576, protoProvider, new Consumer<T>() { // from class: com.android.systemui.shared.tracing.FrameProtoTracer.2
-            @Override // java.util.function.Consumer
-            public void accept(T t) {
-                FrameProtoTracer.this.onProtoDequeued(t);
-            }
-        });
-        this.mTraceFile = protoTraceParams.getTraceFile();
-    }
-
     private void logState() {
         synchronized (this.mLock) {
             this.mTmpTraceables.addAll(this.mTraceables);
@@ -100,17 +75,8 @@ public class FrameProtoTracer<P, S extends P, T extends P, R> implements Choreog
         }
     }
 
-    @Override // android.view.Choreographer.FrameCallback
-    public void doFrame(long j) {
-        logState();
-    }
-
     public float getBufferUsagePct() {
         return this.mBuffer.getBufferSize() / 1048576.0f;
-    }
-
-    public boolean isEnabled() {
-        return this.mEnabled;
     }
 
     public void remove(ProtoTraceable<R> protoTraceable) {
@@ -152,5 +118,39 @@ public class FrameProtoTracer<P, S extends P, T extends P, R> implements Choreog
         if (this.mEnabled) {
             logState();
         }
+    }
+
+    public FrameProtoTracer(ProtoTraceParams<P, S, T, R> protoTraceParams) {
+        TraceBuffer.ProtoProvider<P, S, T> protoProvider = (TraceBuffer.ProtoProvider<P, S, T>) new TraceBuffer.ProtoProvider<P, S, T>() { // from class: com.android.systemui.shared.tracing.FrameProtoTracer.1
+            public byte[] getBytes(P p) {
+                return FrameProtoTracer.this.mParams.getProtoBytes(p);
+            }
+
+            public int getItemSize(P p) {
+                return FrameProtoTracer.this.mParams.getProtoSize(p);
+            }
+
+            public void write(S s, Queue<T> queue, OutputStream outputStream) throws IOException {
+                outputStream.write(FrameProtoTracer.this.mParams.serializeEncapsulatingProto(s, queue));
+            }
+        };
+        this.mProvider = protoProvider;
+        this.mParams = protoTraceParams;
+        this.mBuffer = new TraceBuffer<>(1048576, protoProvider, new Consumer<T>() { // from class: com.android.systemui.shared.tracing.FrameProtoTracer.2
+            @Override // java.util.function.Consumer
+            public void accept(T t) {
+                FrameProtoTracer.this.onProtoDequeued(t);
+            }
+        });
+        this.mTraceFile = protoTraceParams.getTraceFile();
+    }
+
+    @Override // android.view.Choreographer.FrameCallback
+    public void doFrame(long j) {
+        logState();
+    }
+
+    public boolean isEnabled() {
+        return this.mEnabled;
     }
 }

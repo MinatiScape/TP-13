@@ -27,6 +27,49 @@ public final class CalendarItemStyle {
     public final int strokeWidth;
     public final ColorStateList textColor;
 
+    public static CalendarItemStyle create(Context context, int i) {
+        boolean z;
+        if (i != 0) {
+            z = true;
+        } else {
+            z = false;
+        }
+        if (z) {
+            TypedArray obtainStyledAttributes = context.obtainStyledAttributes(i, R$styleable.MaterialCalendarItem);
+            Rect rect = new Rect(obtainStyledAttributes.getDimensionPixelOffset(0, 0), obtainStyledAttributes.getDimensionPixelOffset(2, 0), obtainStyledAttributes.getDimensionPixelOffset(1, 0), obtainStyledAttributes.getDimensionPixelOffset(3, 0));
+            ColorStateList colorStateList = MaterialResources.getColorStateList(context, obtainStyledAttributes, 4);
+            ColorStateList colorStateList2 = MaterialResources.getColorStateList(context, obtainStyledAttributes, 9);
+            ColorStateList colorStateList3 = MaterialResources.getColorStateList(context, obtainStyledAttributes, 7);
+            int dimensionPixelSize = obtainStyledAttributes.getDimensionPixelSize(8, 0);
+            ShapeAppearanceModel shapeAppearanceModel = new ShapeAppearanceModel(ShapeAppearanceModel.builder(context, obtainStyledAttributes.getResourceId(5, 0), obtainStyledAttributes.getResourceId(6, 0), new AbsoluteCornerSize(0)));
+            obtainStyledAttributes.recycle();
+            return new CalendarItemStyle(colorStateList, colorStateList2, colorStateList3, dimensionPixelSize, shapeAppearanceModel, rect);
+        }
+        throw new IllegalArgumentException("Cannot create a CalendarItemStyle with a styleResId of 0");
+    }
+
+    public final void styleItem(TextView textView) {
+        MaterialShapeDrawable materialShapeDrawable = new MaterialShapeDrawable();
+        MaterialShapeDrawable materialShapeDrawable2 = new MaterialShapeDrawable();
+        materialShapeDrawable.setShapeAppearanceModel(this.itemShape);
+        materialShapeDrawable2.setShapeAppearanceModel(this.itemShape);
+        materialShapeDrawable.setFillColor(this.backgroundColor);
+        ColorStateList colorStateList = this.strokeColor;
+        materialShapeDrawable.drawableState.strokeWidth = this.strokeWidth;
+        materialShapeDrawable.invalidateSelf();
+        MaterialShapeDrawable.MaterialShapeDrawableState materialShapeDrawableState = materialShapeDrawable.drawableState;
+        if (materialShapeDrawableState.strokeColor != colorStateList) {
+            materialShapeDrawableState.strokeColor = colorStateList;
+            materialShapeDrawable.onStateChange(materialShapeDrawable.getState());
+        }
+        textView.setTextColor(this.textColor);
+        RippleDrawable rippleDrawable = new RippleDrawable(this.textColor.withAlpha(30), materialShapeDrawable, materialShapeDrawable2);
+        Rect rect = this.insets;
+        InsetDrawable insetDrawable = new InsetDrawable((Drawable) rippleDrawable, rect.left, rect.top, rect.right, rect.bottom);
+        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
+        ViewCompat.Api16Impl.setBackground(textView, insetDrawable);
+    }
+
     public CalendarItemStyle(ColorStateList colorStateList, ColorStateList colorStateList2, ColorStateList colorStateList3, int i, ShapeAppearanceModel shapeAppearanceModel, Rect rect) {
         Preconditions.checkArgumentNonnegative(rect.left);
         Preconditions.checkArgumentNonnegative(rect.top);
@@ -38,33 +81,5 @@ public final class CalendarItemStyle {
         this.strokeColor = colorStateList3;
         this.strokeWidth = i;
         this.itemShape = shapeAppearanceModel;
-    }
-
-    public static CalendarItemStyle create(Context context, int i) {
-        Preconditions.checkArgument(i != 0, "Cannot create a CalendarItemStyle with a styleResId of 0");
-        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(i, R$styleable.MaterialCalendarItem);
-        Rect rect = new Rect(obtainStyledAttributes.getDimensionPixelOffset(0, 0), obtainStyledAttributes.getDimensionPixelOffset(2, 0), obtainStyledAttributes.getDimensionPixelOffset(1, 0), obtainStyledAttributes.getDimensionPixelOffset(3, 0));
-        ColorStateList colorStateList = MaterialResources.getColorStateList(context, obtainStyledAttributes, 4);
-        ColorStateList colorStateList2 = MaterialResources.getColorStateList(context, obtainStyledAttributes, 9);
-        ColorStateList colorStateList3 = MaterialResources.getColorStateList(context, obtainStyledAttributes, 7);
-        int dimensionPixelSize = obtainStyledAttributes.getDimensionPixelSize(8, 0);
-        ShapeAppearanceModel build = ShapeAppearanceModel.builder(context, obtainStyledAttributes.getResourceId(5, 0), obtainStyledAttributes.getResourceId(6, 0), new AbsoluteCornerSize(0)).build();
-        obtainStyledAttributes.recycle();
-        return new CalendarItemStyle(colorStateList, colorStateList2, colorStateList3, dimensionPixelSize, build, rect);
-    }
-
-    public void styleItem(TextView textView) {
-        MaterialShapeDrawable materialShapeDrawable = new MaterialShapeDrawable();
-        MaterialShapeDrawable materialShapeDrawable2 = new MaterialShapeDrawable();
-        materialShapeDrawable.setShapeAppearanceModel(this.itemShape);
-        materialShapeDrawable2.setShapeAppearanceModel(this.itemShape);
-        materialShapeDrawable.setFillColor(this.backgroundColor);
-        materialShapeDrawable.setStroke(this.strokeWidth, this.strokeColor);
-        textView.setTextColor(this.textColor);
-        RippleDrawable rippleDrawable = new RippleDrawable(this.textColor.withAlpha(30), materialShapeDrawable, materialShapeDrawable2);
-        Rect rect = this.insets;
-        InsetDrawable insetDrawable = new InsetDrawable((Drawable) rippleDrawable, rect.left, rect.top, rect.right, rect.bottom);
-        WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-        textView.setBackground(insetDrawable);
     }
 }

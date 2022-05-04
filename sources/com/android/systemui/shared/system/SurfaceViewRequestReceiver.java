@@ -38,7 +38,7 @@ public class SurfaceViewRequestReceiver {
                 size = new Size(surfaceControl.getWidth(), surfaceControl.getHeight());
             }
             this.mSurfaceControlViewHost = new SurfaceControlViewHost(context, ((DisplayManager) context.getSystemService("display")).getDisplay(SurfaceViewRequestUtils.getDisplayId(bundle)), new WindowlessWindowManager(context.getResources().getConfiguration(), surfaceControl, SurfaceViewRequestUtils.getHostToken(bundle)));
-            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams(size.getWidth(), size.getHeight(), 2, 16777216, this.mOpacity);
+            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams(size.getWidth(), size.getHeight(), 2, QuickStepContract.SYSUI_STATE_IMMERSIVE_MODE, this.mOpacity);
             float min = Math.min(surfaceControl.getWidth() / size.getWidth(), surfaceControl.getHeight() / size.getHeight());
             view.setScaleX(min);
             view.setScaleY(min);

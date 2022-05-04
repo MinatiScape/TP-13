@@ -1,6 +1,6 @@
 package com.bumptech.glide.gifdecoder;
 /* loaded from: classes.dex */
-public class GifFrame {
+public final class GifFrame {
     public int bufferFrameStart;
     public int delay;
     public int dispose;

@@ -6,14 +6,14 @@ import com.google.android.gms.common.server.response.FastJsonResponse;
 import com.google.android.gms.internal.zzbkw;
 import com.google.android.gms.internal.zzbly;
 /* loaded from: classes.dex */
-public class FieldCreator implements Parcelable.Creator<FastJsonResponse.Field> {
+public final class FieldCreator implements Parcelable.Creator<FastJsonResponse.Field> {
     @Override // android.os.Parcelable.Creator
-    public FastJsonResponse.Field createFromParcel(Parcel parcel) {
+    public final FastJsonResponse.Field createFromParcel(Parcel parcel) {
         int zza = zzbkw.zza(parcel);
         String str = null;
-        int i = 0;
         String str2 = null;
         zzbly zzblyVar = null;
+        int i = 0;
         int i2 = 0;
         boolean z = false;
         int i3 = 0;
@@ -59,7 +59,7 @@ public class FieldCreator implements Parcelable.Creator<FastJsonResponse.Field> 
     }
 
     @Override // android.os.Parcelable.Creator
-    public FastJsonResponse.Field[] newArray(int i) {
+    public final FastJsonResponse.Field[] newArray(int i) {
         return new FastJsonResponse.Field[i];
     }
 }

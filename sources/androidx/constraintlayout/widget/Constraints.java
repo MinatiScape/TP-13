@@ -5,27 +5,28 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.slice.compat.SliceProviderCompat$2;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 /* loaded from: classes.dex */
-public class Constraints extends ViewGroup {
+public final class Constraints extends ViewGroup {
     public ConstraintSet myConstraintSet;
 
     @Override // android.view.ViewGroup
-    public ViewGroup.LayoutParams generateDefaultLayoutParams() {
-        return new LayoutParams(-2, -2);
-    }
-
-    @Override // android.view.ViewGroup
-    public ViewGroup.LayoutParams generateLayoutParams(AttributeSet attributeSet) {
+    public final ViewGroup.LayoutParams generateLayoutParams(AttributeSet attributeSet) {
         return new LayoutParams(getContext(), attributeSet);
     }
 
     @Override // android.view.ViewGroup, android.view.View
-    public void onLayout(boolean z, int i, int i2, int i3, int i4) {
+    public final void onLayout(boolean z, int i, int i2, int i3, int i4) {
     }
 
     @Override // android.view.ViewGroup
-    public ViewGroup.LayoutParams generateLayoutParams(ViewGroup.LayoutParams layoutParams) {
+    public final ViewGroup.LayoutParams generateDefaultLayoutParams() {
+        return new LayoutParams();
+    }
+
+    @Override // android.view.ViewGroup
+    public final ViewGroup.LayoutParams generateLayoutParams(ViewGroup.LayoutParams layoutParams) {
         return new ConstraintLayout.LayoutParams(layoutParams);
     }
 
@@ -45,8 +46,7 @@ public class Constraints extends ViewGroup {
         public float translationY;
         public float translationZ;
 
-        public LayoutParams(int i, int i2) {
-            super(i, i2);
+        public LayoutParams() {
             this.alpha = 1.0f;
             this.applyElevation = false;
             this.elevation = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
@@ -77,7 +77,7 @@ public class Constraints extends ViewGroup {
             this.translationX = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
             this.translationY = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
             this.translationZ = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
-            TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, R$styleable.ConstraintSet);
+            TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, SliceProviderCompat$2.ConstraintSet);
             int indexCount = obtainStyledAttributes.getIndexCount();
             for (int i = 0; i < indexCount; i++) {
                 int index = obtainStyledAttributes.getIndex(i);

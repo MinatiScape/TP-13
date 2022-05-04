@@ -3,11 +3,11 @@ package com.google.android.material.animation;
 import android.animation.TypeEvaluator;
 import androidx.constraintlayout.solver.widgets.analyzer.DependencyGraph$$ExternalSyntheticOutline0;
 /* loaded from: classes.dex */
-public class ArgbEvaluatorCompat implements TypeEvaluator<Integer> {
+public final class ArgbEvaluatorCompat implements TypeEvaluator<Integer> {
     public static final ArgbEvaluatorCompat instance = new ArgbEvaluatorCompat();
 
     @Override // android.animation.TypeEvaluator
-    public Integer evaluate(float f, Integer num, Integer num2) {
+    public final Integer evaluate(float f, Integer num, Integer num2) {
         int intValue = num.intValue();
         float f2 = ((intValue >> 24) & 255) / 255.0f;
         int intValue2 = num2.intValue();

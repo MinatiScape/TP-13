@@ -7,11 +7,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
+import androidx.cardview.R$style;
+import androidx.transition.PathMotion;
 import com.android.wallpaper.module.Injector;
-import com.android.wallpaper.module.InjectorProvider;
 import com.google.android.apps.wallpaper.backdrop.BackdropAlarmScheduler;
 import com.google.android.apps.wallpaper.backdrop.BackdropPreferences;
-import com.google.android.apps.wallpaper.backdrop.BackdropTaskScheduler;
+import com.google.android.apps.wallpaper.backdrop.JobSchedulerBackdropTaskScheduler;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,14 +21,14 @@ import java.util.Set;
 /* loaded from: classes.dex */
 public class WallpapersBackupAgentHelper extends BackupAgentHelper {
     @Override // android.app.backup.BackupAgent
-    public void onCreate() {
+    public final void onCreate() {
         addHelper("persistent_backup_agent_helper_prefs", new SharedPreferencesBackupHelper(this, "persistent_backup_agent_helper"));
         addHelper("wallpaper_prefs", new SharedPreferencesBackupHelper(this, "wallpaper"));
         addHelper("wallpaper-backdrop_prefs", new SharedPreferencesBackupHelper(this, "wallpaper-backdrop"));
     }
 
     @Override // android.app.backup.BackupAgentHelper, android.app.backup.BackupAgent
-    public void onRestore(BackupDataInput backupDataInput, int i, ParcelFileDescriptor parcelFileDescriptor) throws IOException {
+    public final void onRestore(BackupDataInput backupDataInput, int i, ParcelFileDescriptor parcelFileDescriptor) throws IOException {
         super.onRestore(backupDataInput, i, parcelFileDescriptor);
         SharedPreferences sharedPreferences = getSharedPreferences("persistent_backup_agent_helper", 0);
         HashMap hashMap = new HashMap();
@@ -99,12 +100,16 @@ public class WallpapersBackupAgentHelper extends BackupAgentHelper {
     }
 
     @Override // android.app.backup.BackupAgent
-    public void onRestoreFinished() {
+    public final void onRestoreFinished() {
         Context applicationContext = getApplicationContext();
-        Injector injector = InjectorProvider.getInjector();
+        Injector injector = R$style.getInjector();
         injector.getUserEventLogger(applicationContext).logRestored();
         if (2 == injector.getPreferences(applicationContext).getWallpaperPresentationMode()) {
-            BackdropTaskScheduler.getInstance(applicationContext).scheduleOneOffTask(BackdropPreferences.getInstance(applicationContext).mSharedPrefs.getInt("required_network_state", 1), 0);
+            int i = BackdropPreferences.getInstance(applicationContext).mSharedPrefs.getInt("required_network_state", 1);
+            if (PathMotion.sInstance == null) {
+                PathMotion.sInstance = new JobSchedulerBackdropTaskScheduler(applicationContext);
+            }
+            PathMotion.sInstance.scheduleOneOffTask(i, 0);
             BackdropAlarmScheduler.setOvernightAlarm(applicationContext);
         }
     }

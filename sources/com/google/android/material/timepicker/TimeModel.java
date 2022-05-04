@@ -4,15 +4,15 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import java.util.Arrays;
 /* loaded from: classes.dex */
-public class TimeModel implements Parcelable {
+class TimeModel implements Parcelable {
     public static final Parcelable.Creator<TimeModel> CREATOR = new Parcelable.Creator<TimeModel>() { // from class: com.google.android.material.timepicker.TimeModel.1
         @Override // android.os.Parcelable.Creator
-        public TimeModel createFromParcel(Parcel parcel) {
-            return new TimeModel(parcel);
+        public final TimeModel createFromParcel(Parcel parcel) {
+            return new TimeModel(parcel.readInt(), parcel.readInt(), parcel.readInt(), parcel.readInt());
         }
 
         @Override // android.os.Parcelable.Creator
-        public TimeModel[] newArray(int i) {
+        public final TimeModel[] newArray(int i) {
             return new TimeModel[i];
         }
     };
@@ -22,18 +22,15 @@ public class TimeModel implements Parcelable {
     public int selection;
 
     public TimeModel() {
-        this.hour = 0;
-        this.minute = 0;
-        this.selection = 10;
-        this.format = 0;
+        throw null;
     }
 
     @Override // android.os.Parcelable
-    public int describeContents() {
+    public final int describeContents() {
         return 0;
     }
 
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
@@ -44,26 +41,22 @@ public class TimeModel implements Parcelable {
         return this.hour == timeModel.hour && this.minute == timeModel.minute && this.format == timeModel.format && this.selection == timeModel.selection;
     }
 
-    public int hashCode() {
+    public final int hashCode() {
         return Arrays.hashCode(new Object[]{Integer.valueOf(this.format), Integer.valueOf(this.hour), Integer.valueOf(this.minute), Integer.valueOf(this.selection)});
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
+    public final void writeToParcel(Parcel parcel, int i) {
         parcel.writeInt(this.hour);
         parcel.writeInt(this.minute);
         parcel.writeInt(this.selection);
         parcel.writeInt(this.format);
     }
 
-    public TimeModel(Parcel parcel) {
-        int readInt = parcel.readInt();
-        int readInt2 = parcel.readInt();
-        int readInt3 = parcel.readInt();
-        int readInt4 = parcel.readInt();
-        this.hour = readInt;
-        this.minute = readInt2;
-        this.selection = readInt3;
-        this.format = readInt4;
+    public TimeModel(int i, int i2, int i3, int i4) {
+        this.hour = i;
+        this.minute = i2;
+        this.selection = i3;
+        this.format = i4;
     }
 }

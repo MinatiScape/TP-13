@@ -4,14 +4,15 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.internal.zzbkw;
+/* compiled from: SignInButtonConfigCreator.java */
 /* loaded from: classes.dex */
 public final class zzba implements Parcelable.Creator<zzaz> {
     @Override // android.os.Parcelable.Creator
     public final /* synthetic */ zzaz createFromParcel(Parcel parcel) {
         int zza = zzbkw.zza(parcel);
         int i = 0;
-        Scope[] scopeArr = null;
         int i2 = 0;
+        Scope[] scopeArr = null;
         int i3 = 0;
         while (parcel.dataPosition() < zza) {
             int readInt = parcel.readInt();

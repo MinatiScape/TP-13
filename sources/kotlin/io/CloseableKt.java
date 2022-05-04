@@ -1,8 +1,9 @@
 package kotlin.io;
 
 import java.io.Closeable;
-import kotlin.ResultKt;
+import kotlin.ExceptionsKt;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: Closeable.kt */
 /* loaded from: classes.dex */
 public final class CloseableKt {
     public static final void closeFinally(@Nullable Closeable closeable, @Nullable Throwable th) {
@@ -14,7 +15,7 @@ public final class CloseableKt {
             try {
                 closeable.close();
             } catch (Throwable th2) {
-                ResultKt.addSuppressed(th, th2);
+                ExceptionsKt.addSuppressed(th, th2);
             }
         }
     }

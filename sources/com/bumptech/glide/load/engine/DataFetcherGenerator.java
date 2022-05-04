@@ -8,9 +8,9 @@ public interface DataFetcherGenerator {
 
     /* loaded from: classes.dex */
     public interface FetcherReadyCallback {
-        void onDataFetcherFailed(Key attemptedKey, Exception e, DataFetcher<?> fetcher, DataSource dataSource);
+        void onDataFetcherFailed(Key key, Exception exc, DataFetcher<?> dataFetcher, DataSource dataSource);
 
-        void onDataFetcherReady(Key sourceKey, Object data, DataFetcher<?> fetcher, DataSource dataSource, Key attemptedKey);
+        void onDataFetcherReady(Key key, Object obj, DataFetcher<?> dataFetcher, DataSource dataSource, Key key2);
 
         void reschedule();
     }

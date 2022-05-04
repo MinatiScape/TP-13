@@ -17,7 +17,6 @@ import com.android.systemui.plugins.Plugin;
 import com.android.systemui.plugins.PluginListener;
 import com.android.systemui.shared.plugins.PluginActionManager;
 import com.android.systemui.shared.plugins.PluginManager;
-import com.android.wallpaper.module.WallpaperSetter$$ExternalSyntheticLambda1;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.lang.Thread;
@@ -45,12 +44,6 @@ public class PluginManagerImpl extends BroadcastReceiver implements PluginManage
         private final ClassLoader mBase;
         private final String mPackage;
 
-        public ClassLoaderFilter(ClassLoader classLoader, String str) {
-            super(ClassLoader.getSystemClassLoader());
-            this.mBase = classLoader;
-            this.mPackage = str;
-        }
-
         @Override // java.lang.ClassLoader
         public Class<?> loadClass(String str, boolean z) throws ClassNotFoundException {
             if (!str.startsWith(this.mPackage)) {
@@ -58,12 +51,11 @@ public class PluginManagerImpl extends BroadcastReceiver implements PluginManage
             }
             return this.mBase.loadClass(str);
         }
-    }
 
-    /* loaded from: classes.dex */
-    public static class CrashWhilePluginActiveException extends RuntimeException {
-        public CrashWhilePluginActiveException(Throwable th) {
-            super(th);
+        public ClassLoaderFilter(ClassLoader classLoader, String str) {
+            super(ClassLoader.getSystemClassLoader());
+            this.mBase = classLoader;
+            this.mPackage = str;
         }
     }
 
@@ -88,10 +80,19 @@ public class PluginManagerImpl extends BroadcastReceiver implements PluginManage
             return checkStack(th.getCause()) | z;
         }
 
+        private PluginExceptionHandler(Optional<Thread.UncaughtExceptionHandler> optional) {
+            this.mExceptionHandlerOptional = optional;
+        }
+
         @Override // java.lang.Thread.UncaughtExceptionHandler
         public void uncaughtException(final Thread thread, final Throwable th) {
             if (SystemProperties.getBoolean("plugin.debugging", false)) {
-                this.mExceptionHandlerOptional.ifPresent(new WallpaperSetter$$ExternalSyntheticLambda1(thread, th));
+                this.mExceptionHandlerOptional.ifPresent(new Consumer() { // from class: com.android.systemui.shared.plugins.PluginManagerImpl$PluginExceptionHandler$$ExternalSyntheticLambda0
+                    @Override // java.util.function.Consumer
+                    public final void accept(Object obj) {
+                        ((Thread.UncaughtExceptionHandler) obj).uncaughtException(thread, th);
+                    }
+                });
                 return;
             }
             boolean checkStack = checkStack(th);
@@ -105,72 +106,12 @@ public class PluginManagerImpl extends BroadcastReceiver implements PluginManage
             if (checkStack) {
                 th = new CrashWhilePluginActiveException(th);
             }
-            this.mExceptionHandlerOptional.ifPresent(new Consumer() { // from class: com.android.systemui.shared.plugins.PluginManagerImpl$PluginExceptionHandler$$ExternalSyntheticLambda0
+            this.mExceptionHandlerOptional.ifPresent(new Consumer() { // from class: com.android.systemui.shared.plugins.PluginManagerImpl$PluginExceptionHandler$$ExternalSyntheticLambda1
                 @Override // java.util.function.Consumer
                 public final void accept(Object obj) {
                     ((Thread.UncaughtExceptionHandler) obj).uncaughtException(thread, th);
                 }
             });
-        }
-
-        private PluginExceptionHandler(Optional<Thread.UncaughtExceptionHandler> optional) {
-            this.mExceptionHandlerOptional = optional;
-        }
-    }
-
-    public PluginManagerImpl(Context context, PluginActionManager.Factory factory, boolean z, Optional<Thread.UncaughtExceptionHandler> optional, PluginEnabler pluginEnabler, PluginPrefs pluginPrefs, List<String> list) {
-        ArraySet<String> arraySet = new ArraySet<>();
-        this.mPrivilegedPlugins = arraySet;
-        this.mContext = context;
-        this.mActionManagerFactory = factory;
-        this.mIsDebuggable = z;
-        arraySet.addAll(list);
-        this.mPluginPrefs = pluginPrefs;
-        this.mPluginEnabler = pluginEnabler;
-        Thread.setUncaughtExceptionPreHandler(new PluginExceptionHandler(optional));
-    }
-
-    private boolean clearClassLoader(String str) {
-        return this.mClassLoaders.remove(str) != null;
-    }
-
-    private boolean isPluginPrivileged(ComponentName componentName) {
-        Iterator<String> it = this.mPrivilegedPlugins.iterator();
-        while (it.hasNext()) {
-            String next = it.next();
-            ComponentName unflattenFromString = ComponentName.unflattenFromString(next);
-            if (unflattenFromString != null) {
-                if (unflattenFromString.equals(componentName)) {
-                    return true;
-                }
-            } else if (next.equals(componentName.getPackageName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void startListening() {
-        if (!this.mListening) {
-            this.mListening = true;
-            IntentFilter intentFilter = new IntentFilter("android.intent.action.PACKAGE_ADDED");
-            intentFilter.addAction("android.intent.action.PACKAGE_CHANGED");
-            intentFilter.addAction("android.intent.action.PACKAGE_REPLACED");
-            intentFilter.addAction("android.intent.action.PACKAGE_REMOVED");
-            intentFilter.addDataScheme("package");
-            this.mContext.registerReceiver(this, intentFilter);
-            intentFilter.addAction(PluginManager.PLUGIN_CHANGED);
-            intentFilter.addAction(DISABLE_PLUGIN);
-            intentFilter.addDataScheme("package");
-            this.mContext.registerReceiver(this, intentFilter, PluginActionManager.PLUGIN_PERMISSION, null);
-            this.mContext.registerReceiver(this, new IntentFilter("android.intent.action.USER_UNLOCKED"));
-        }
-    }
-
-    private void stopListening() {
-        if (this.mListening) {
-            this.mListening = false;
-            this.mContext.unregisterReceiver(this);
         }
     }
 
@@ -201,12 +142,72 @@ public class PluginManagerImpl extends BroadcastReceiver implements PluginManage
     }
 
     @Override // com.android.systemui.shared.plugins.PluginManager
-    public String[] getPrivilegedPlugins() {
-        return (String[]) this.mPrivilegedPlugins.toArray(new String[0]);
+    public void removePluginListener(PluginListener<?> pluginListener) {
+        synchronized (this) {
+            if (this.mPluginMap.containsKey(pluginListener)) {
+                this.mPluginMap.remove(pluginListener).destroy();
+                if (this.mPluginMap.size() == 0) {
+                    stopListening();
+                }
+            }
+        }
     }
 
-    public boolean isDebuggable() {
-        return this.mIsDebuggable;
+    private boolean clearClassLoader(String str) {
+        if (this.mClassLoaders.remove(str) != null) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isPluginPrivileged(ComponentName componentName) {
+        Iterator<String> it = this.mPrivilegedPlugins.iterator();
+        while (it.hasNext()) {
+            String next = it.next();
+            ComponentName unflattenFromString = ComponentName.unflattenFromString(next);
+            if (unflattenFromString != null) {
+                if (unflattenFromString.equals(componentName)) {
+                    return true;
+                }
+            } else if (next.equals(componentName.getPackageName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void startListening() {
+        if (!this.mListening) {
+            this.mListening = true;
+            IntentFilter intentFilter = new IntentFilter("android.intent.action.PACKAGE_ADDED");
+            intentFilter.addAction("android.intent.action.PACKAGE_CHANGED");
+            intentFilter.addAction("android.intent.action.PACKAGE_REPLACED");
+            intentFilter.addAction("android.intent.action.PACKAGE_REMOVED");
+            intentFilter.addDataScheme("package");
+            this.mContext.registerReceiver(this, intentFilter);
+            intentFilter.addAction(PluginManager.PLUGIN_CHANGED);
+            intentFilter.addAction(DISABLE_PLUGIN);
+            intentFilter.addDataScheme("package");
+            this.mContext.registerReceiver(this, intentFilter, PluginActionManager.PLUGIN_PERMISSION, null, 2);
+            this.mContext.registerReceiver(this, new IntentFilter("android.intent.action.USER_UNLOCKED"));
+        }
+    }
+
+    private void stopListening() {
+        if (this.mListening) {
+            this.mListening = false;
+            this.mContext.unregisterReceiver(this);
+        }
+    }
+
+    @Override // com.android.systemui.shared.plugins.PluginManager
+    public <T extends Plugin> void addPluginListener(PluginListener<T> pluginListener, Class<T> cls, boolean z) {
+        addPluginListener(PluginManager.Helper.getAction(cls), pluginListener, cls, z);
+    }
+
+    @Override // com.android.systemui.shared.plugins.PluginManager
+    public String[] getPrivilegedPlugins() {
+        return (String[]) this.mPrivilegedPlugins.toArray(new String[0]);
     }
 
     @Override // android.content.BroadcastReceiver
@@ -256,21 +257,16 @@ public class PluginManagerImpl extends BroadcastReceiver implements PluginManage
         }
     }
 
-    @Override // com.android.systemui.shared.plugins.PluginManager
-    public void removePluginListener(PluginListener<?> pluginListener) {
-        synchronized (this) {
-            if (this.mPluginMap.containsKey(pluginListener)) {
-                this.mPluginMap.remove(pluginListener).destroy();
-                if (this.mPluginMap.size() == 0) {
-                    stopListening();
-                }
-            }
-        }
-    }
-
-    @Override // com.android.systemui.shared.plugins.PluginManager
-    public <T extends Plugin> void addPluginListener(PluginListener<T> pluginListener, Class<T> cls, boolean z) {
-        addPluginListener(PluginManager.Helper.getAction(cls), pluginListener, cls, z);
+    public PluginManagerImpl(Context context, PluginActionManager.Factory factory, boolean z, Optional<Thread.UncaughtExceptionHandler> optional, PluginEnabler pluginEnabler, PluginPrefs pluginPrefs, List<String> list) {
+        ArraySet<String> arraySet = new ArraySet<>();
+        this.mPrivilegedPlugins = arraySet;
+        this.mContext = context;
+        this.mActionManagerFactory = factory;
+        this.mIsDebuggable = z;
+        arraySet.addAll(list);
+        this.mPluginPrefs = pluginPrefs;
+        this.mPluginEnabler = pluginEnabler;
+        Thread.setUncaughtExceptionPreHandler(new PluginExceptionHandler(optional));
     }
 
     @Override // com.android.systemui.shared.plugins.PluginManager
@@ -287,5 +283,16 @@ public class PluginManagerImpl extends BroadcastReceiver implements PluginManage
             this.mPluginMap.put(pluginListener, create);
         }
         startListening();
+    }
+
+    /* loaded from: classes.dex */
+    public static class CrashWhilePluginActiveException extends RuntimeException {
+        public CrashWhilePluginActiveException(Throwable th) {
+            super(th);
+        }
+    }
+
+    public boolean isDebuggable() {
+        return this.mIsDebuggable;
     }
 }

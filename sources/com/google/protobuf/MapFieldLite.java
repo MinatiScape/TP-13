@@ -5,20 +5,23 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 /* loaded from: classes.dex */
 public final class MapFieldLite<K, V> extends LinkedHashMap<K, V> {
     public static final MapFieldLite EMPTY_MAP_FIELD;
     private boolean isMutable = true;
 
+    private MapFieldLite() {
+    }
+
+    public final void makeImmutable() {
+        this.isMutable = false;
+    }
+
     static {
         MapFieldLite mapFieldLite = new MapFieldLite();
         EMPTY_MAP_FIELD = mapFieldLite;
         mapFieldLite.isMutable = false;
-    }
-
-    public MapFieldLite() {
     }
 
     public static int calculateHashCodeForObject(Object obj) {
@@ -41,21 +44,10 @@ public final class MapFieldLite<K, V> extends LinkedHashMap<K, V> {
         }
     }
 
-    @Override // java.util.LinkedHashMap, java.util.HashMap, java.util.AbstractMap, java.util.Map
-    public void clear() {
-        ensureMutable();
-        super.clear();
-    }
-
     public final void ensureMutable() {
         if (!this.isMutable) {
             throw new UnsupportedOperationException();
         }
-    }
-
-    @Override // java.util.LinkedHashMap, java.util.HashMap, java.util.AbstractMap, java.util.Map
-    public Set<Map.Entry<K, V>> entrySet() {
-        return isEmpty() ? Collections.emptySet() : super.entrySet();
     }
 
     /* JADX WARN: Removed duplicated region for block: B:30:? A[RETURN, SYNTHETIC] */
@@ -64,7 +56,7 @@ public final class MapFieldLite<K, V> extends LinkedHashMap<K, V> {
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public boolean equals(java.lang.Object r6) {
+    public final boolean equals(java.lang.Object r6) {
         /*
             r5 = this;
             boolean r0 = r6 instanceof java.util.Map
@@ -123,8 +115,26 @@ public final class MapFieldLite<K, V> extends LinkedHashMap<K, V> {
         throw new UnsupportedOperationException("Method not decompiled: com.google.protobuf.MapFieldLite.equals(java.lang.Object):boolean");
     }
 
+    public MapFieldLite(Map<K, V> map) {
+        super(map);
+    }
+
+    @Override // java.util.LinkedHashMap, java.util.HashMap, java.util.AbstractMap, java.util.Map
+    public final void clear() {
+        ensureMutable();
+        super.clear();
+    }
+
+    @Override // java.util.LinkedHashMap, java.util.HashMap, java.util.AbstractMap, java.util.Map
+    public final Set<Map.Entry<K, V>> entrySet() {
+        if (isEmpty()) {
+            return Collections.emptySet();
+        }
+        return super.entrySet();
+    }
+
     @Override // java.util.AbstractMap, java.util.Map
-    public int hashCode() {
+    public final int hashCode() {
         int i = 0;
         for (Map.Entry<K, V> entry : entrySet()) {
             i += calculateHashCodeForObject(entry.getValue()) ^ calculateHashCodeForObject(entry.getKey());
@@ -132,41 +142,40 @@ public final class MapFieldLite<K, V> extends LinkedHashMap<K, V> {
         return i;
     }
 
-    public boolean isMutable() {
-        return this.isMutable;
-    }
-
-    public void makeImmutable() {
-        this.isMutable = false;
+    public final MapFieldLite<K, V> mutableCopy() {
+        if (isEmpty()) {
+            return new MapFieldLite<>();
+        }
+        return new MapFieldLite<>(this);
     }
 
     @Override // java.util.HashMap, java.util.AbstractMap, java.util.Map
-    public V put(K k, V v) {
+    public final V put(K k, V v) {
         ensureMutable();
         Charset charset = Internal.UTF_8;
-        Objects.requireNonNull(k);
-        Objects.requireNonNull(v);
+        k.getClass();
+        v.getClass();
         return (V) super.put(k, v);
     }
 
     @Override // java.util.HashMap, java.util.AbstractMap, java.util.Map
-    public void putAll(Map<? extends K, ? extends V> map) {
+    public final void putAll(Map<? extends K, ? extends V> map) {
         ensureMutable();
         for (K k : map.keySet()) {
             Charset charset = Internal.UTF_8;
-            Objects.requireNonNull(k);
-            Objects.requireNonNull(map.get(k));
+            k.getClass();
+            map.get(k).getClass();
         }
         super.putAll(map);
     }
 
     @Override // java.util.HashMap, java.util.AbstractMap, java.util.Map
-    public V remove(Object obj) {
+    public final V remove(Object obj) {
         ensureMutable();
         return (V) super.remove(obj);
     }
 
-    public MapFieldLite(Map<K, V> map) {
-        super(map);
+    public final boolean isMutable() {
+        return this.isMutable;
     }
 }

@@ -1,54 +1,51 @@
 package com.google.protobuf;
 
-import com.google.protobuf.MapEntryLite;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 /* loaded from: classes.dex */
-public class MapFieldSchemaLite implements MapFieldSchema {
+public final class MapFieldSchemaLite implements MapFieldSchema {
     @Override // com.google.protobuf.MapFieldSchema
-    public Map<?, ?> forMapData(Object obj) {
-        return (MapFieldLite) obj;
+    public final Object toImmutable(Object obj) {
+        ((MapFieldLite) obj).makeImmutable();
+        return obj;
     }
 
     @Override // com.google.protobuf.MapFieldSchema
-    public MapEntryLite.Metadata<?, ?> forMapMetadata(Object obj) {
-        Objects.requireNonNull((MapEntryLite) obj);
-        return null;
+    public final void forMapMetadata(Object obj) {
+        ((MapEntryLite) obj).getClass();
     }
 
     @Override // com.google.protobuf.MapFieldSchema
-    public Map<?, ?> forMutableMapData(Object obj) {
-        return (MapFieldLite) obj;
-    }
-
-    @Override // com.google.protobuf.MapFieldSchema
-    public int getSerializedSize(int i, Object obj, Object obj2) {
+    public final int getSerializedSize(int i, Object obj, Object obj2) {
         MapFieldLite mapFieldLite = (MapFieldLite) obj;
         MapEntryLite mapEntryLite = (MapEntryLite) obj2;
-        int i2 = 0;
-        if (!mapFieldLite.isEmpty()) {
-            for (Map.Entry entry : mapFieldLite.entrySet()) {
-                Object key = entry.getKey();
-                Object value = entry.getValue();
-                Objects.requireNonNull(mapEntryLite);
-                i2 += CodedOutputStream.computeLengthDelimitedFieldSize(MapEntryLite.computeSerializedSize(key, value)) + CodedOutputStream.computeTagSize(i);
-            }
+        if (mapFieldLite.isEmpty()) {
+            return 0;
         }
-        return i2;
+        Iterator it = mapFieldLite.entrySet().iterator();
+        if (!it.hasNext()) {
+            return 0;
+        }
+        Map.Entry entry = (Map.Entry) it.next();
+        entry.getKey();
+        entry.getValue();
+        mapEntryLite.getClass();
+        CodedOutputStream.computeTagSize(i);
+        throw null;
     }
 
     @Override // com.google.protobuf.MapFieldSchema
-    public boolean isImmutable(Object obj) {
+    public final boolean isImmutable(Object obj) {
         return !((MapFieldLite) obj).isMutable();
     }
 
     @Override // com.google.protobuf.MapFieldSchema
-    public Object mergeFrom(Object obj, Object obj2) {
+    public final MapFieldLite mergeFrom(Object obj, Object obj2) {
         MapFieldLite mapFieldLite = (MapFieldLite) obj;
         MapFieldLite mapFieldLite2 = (MapFieldLite) obj2;
         if (!mapFieldLite2.isEmpty()) {
             if (!mapFieldLite.isMutable()) {
-                mapFieldLite = mapFieldLite.isEmpty() ? new MapFieldLite() : new MapFieldLite(mapFieldLite);
+                mapFieldLite = mapFieldLite.mutableCopy();
             }
             mapFieldLite.ensureMutable();
             if (!mapFieldLite2.isEmpty()) {
@@ -59,14 +56,17 @@ public class MapFieldSchemaLite implements MapFieldSchema {
     }
 
     @Override // com.google.protobuf.MapFieldSchema
-    public Object newMapField(Object obj) {
-        MapFieldLite mapFieldLite = MapFieldLite.EMPTY_MAP_FIELD;
-        return mapFieldLite.isEmpty() ? new MapFieldLite() : new MapFieldLite(mapFieldLite);
+    public final MapFieldLite newMapField() {
+        return MapFieldLite.EMPTY_MAP_FIELD.mutableCopy();
     }
 
     @Override // com.google.protobuf.MapFieldSchema
-    public Object toImmutable(Object obj) {
-        ((MapFieldLite) obj).makeImmutable();
-        return obj;
+    public final MapFieldLite forMapData(Object obj) {
+        return (MapFieldLite) obj;
+    }
+
+    @Override // com.google.protobuf.MapFieldSchema
+    public final MapFieldLite forMutableMapData(Object obj) {
+        return (MapFieldLite) obj;
     }
 }

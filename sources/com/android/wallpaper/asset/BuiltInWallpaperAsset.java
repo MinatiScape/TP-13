@@ -14,7 +14,6 @@ import android.os.AsyncTask;
 import android.widget.ImageView;
 import com.android.wallpaper.asset.Asset;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.BaseRequestOptions;
 import com.bumptech.glide.request.RequestOptions;
@@ -38,7 +37,7 @@ public final class BuiltInWallpaperAsset extends Asset {
         }
 
         @Override // android.os.AsyncTask
-        public Bitmap doInBackground(Void[] voidArr) {
+        public final Bitmap doInBackground(Void[] voidArr) {
             WallpaperManager wallpaperManager = WallpaperManager.getInstance(BuiltInWallpaperAsset.this.mContext);
             Drawable builtInDrawable = wallpaperManager.getBuiltInDrawable(this.mWidth, this.mHeight, true, 0.5f, 0.5f);
             wallpaperManager.forgetLoadedWallpaper();
@@ -46,7 +45,7 @@ public final class BuiltInWallpaperAsset extends Asset {
         }
 
         @Override // android.os.AsyncTask
-        public void onPostExecute(Bitmap bitmap) {
+        public final void onPostExecute(Bitmap bitmap) {
             this.mReceiver.onBitmapDecoded(bitmap);
         }
     }
@@ -62,12 +61,12 @@ public final class BuiltInWallpaperAsset extends Asset {
         }
 
         @Override // android.os.AsyncTask
-        public Bitmap doInBackground(Void[] voidArr) {
+        public final Bitmap doInBackground(Void[] voidArr) {
             float f;
-            Point access$100 = BuiltInWallpaperAsset.access$100(BuiltInWallpaperAsset.this);
+            Point point = BuiltInWallpaperAsset.m25$$Nest$mcalculateRawDimensions(BuiltInWallpaperAsset.this);
             Rect rect = this.mRect;
             int i = rect.left;
-            int i2 = access$100.x - rect.right;
+            int i2 = point.x - rect.right;
             float f2 = 0.5f;
             if (i + i2 == 0) {
                 f = 0.5f;
@@ -76,7 +75,7 @@ public final class BuiltInWallpaperAsset extends Asset {
                 f = f3 / (i2 + f3);
             }
             int i3 = rect.top;
-            int i4 = access$100.y - rect.bottom;
+            int i4 = point.y - rect.bottom;
             if (i3 + i4 != 0) {
                 float f4 = i3;
                 f2 = f4 / (i4 + f4);
@@ -85,7 +84,7 @@ public final class BuiltInWallpaperAsset extends Asset {
         }
 
         @Override // android.os.AsyncTask
-        public void onPostExecute(Bitmap bitmap) {
+        public final void onPostExecute(Bitmap bitmap) {
             this.mReceiver.onBitmapDecoded(bitmap);
         }
     }
@@ -99,21 +98,18 @@ public final class BuiltInWallpaperAsset extends Asset {
         }
 
         @Override // android.os.AsyncTask
-        public Point doInBackground(Void[] voidArr) {
-            return BuiltInWallpaperAsset.access$100(BuiltInWallpaperAsset.this);
+        public final Point doInBackground(Void[] voidArr) {
+            return BuiltInWallpaperAsset.m25$$Nest$mcalculateRawDimensions(BuiltInWallpaperAsset.this);
         }
 
         @Override // android.os.AsyncTask
-        public void onPostExecute(Point point) {
+        public final void onPostExecute(Point point) {
             this.mReceiver.onDimensionsDecoded(point);
         }
     }
 
-    public BuiltInWallpaperAsset(Context context) {
-        this.mContext = context.getApplicationContext();
-    }
-
-    public static Point access$100(BuiltInWallpaperAsset builtInWallpaperAsset) {
+    /* renamed from: -$$Nest$mcalculateRawDimensions  reason: not valid java name */
+    public static Point m25$$Nest$mcalculateRawDimensions(BuiltInWallpaperAsset builtInWallpaperAsset) {
         Point point = builtInWallpaperAsset.mDimensions;
         if (point != null) {
             return point;
@@ -125,29 +121,29 @@ public final class BuiltInWallpaperAsset extends Asset {
     }
 
     @Override // com.android.wallpaper.asset.Asset
-    public void decodeBitmap(int i, int i2, Asset.BitmapReceiver bitmapReceiver) {
+    public final void decodeBitmap(int i, int i2, Asset.BitmapReceiver bitmapReceiver) {
         new DecodeBitmapAsyncTask(i, i2, bitmapReceiver).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Void[0]);
     }
 
     @Override // com.android.wallpaper.asset.Asset
-    public void decodeBitmapRegion(Rect rect, int i, int i2, boolean z, Asset.BitmapReceiver bitmapReceiver) {
+    public final void decodeBitmapRegion(Rect rect, int i, int i2, boolean z, Asset.BitmapReceiver bitmapReceiver) {
         new DecodeBitmapRegionAsyncTask(rect, bitmapReceiver).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Void[0]);
     }
 
     @Override // com.android.wallpaper.asset.Asset
-    public void decodeRawDimensions(Activity activity, Asset.DimensionsReceiver dimensionsReceiver) {
+    public final void decodeRawDimensions(Activity activity, Asset.DimensionsReceiver dimensionsReceiver) {
         new DecodeDimensionsAsyncTask(dimensionsReceiver).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Void[0]);
     }
 
     @Override // com.android.wallpaper.asset.Asset
-    public void loadDrawable(Context context, ImageView imageView, int i) {
+    public final void loadDrawable(Activity activity, ImageView imageView, int i) {
         if (this.mBuiltInWallpaperModel == null) {
-            this.mBuiltInWallpaperModel = new WallpaperModel(context.getApplicationContext(), 0);
+            this.mBuiltInWallpaperModel = new WallpaperModel(activity.getApplicationContext());
         }
-        RequestBuilder<Drawable> asDrawable = Glide.with(context).asDrawable();
-        asDrawable.load(this.mBuiltInWallpaperModel);
-        RequestBuilder<Drawable> apply = asDrawable.apply((BaseRequestOptions<?>) RequestOptions.centerCropTransform().placeholder(new ColorDrawable(i)));
-        apply.transition(DrawableTransitionOptions.withCrossFade());
-        apply.into(imageView);
+        Glide.getRetriever(activity).get((Context) activity).asDrawable().loadGeneric(this.mBuiltInWallpaperModel).mo32apply((BaseRequestOptions<?>) RequestOptions.centerCropTransform().placeholder(new ColorDrawable(i))).transition(DrawableTransitionOptions.withCrossFade()).into(imageView);
+    }
+
+    public BuiltInWallpaperAsset(Context context) {
+        this.mContext = context.getApplicationContext();
     }
 }

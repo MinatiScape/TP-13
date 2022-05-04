@@ -3,18 +3,18 @@ package com.android.systemui.flags;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
-import com.android.systemui.flags.Flag;
+import com.android.systemui.flags.ParcelableFlag;
 import kotlin.jvm.internal.DefaultConstructorMarker;
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: Flag.kt */
 /* loaded from: classes.dex */
-public final class LongFlag implements Flag<Long> {
+public final class LongFlag implements ParcelableFlag<Long> {
 
     /* renamed from: default  reason: not valid java name */
     private final long f4default;
     private final int id;
-    private final int resourceOverride;
     @NotNull
     public static final Companion Companion = new Companion(null);
     @NotNull
@@ -35,45 +35,27 @@ public final class LongFlag implements Flag<Long> {
         }
     };
 
-    /* loaded from: classes.dex */
-    public static final class Companion {
-        private Companion() {
-        }
-
-        public /* synthetic */ Companion(DefaultConstructorMarker defaultConstructorMarker) {
-            this();
-        }
-    }
-
     public LongFlag(int i) {
-        this(i, 0L, 0, 6, null);
+        this(i, 0L, 2, null);
     }
 
     public LongFlag(int i, long j) {
-        this(i, j, 0, 4, null);
-    }
-
-    public LongFlag(int i, long j, int i2) {
         this.id = i;
         this.f4default = j;
-        this.resourceOverride = i2;
     }
 
     public /* synthetic */ LongFlag(Parcel parcel, DefaultConstructorMarker defaultConstructorMarker) {
         this(parcel);
     }
 
-    public static /* synthetic */ LongFlag copy$default(LongFlag longFlag, int i, long j, int i2, int i3, Object obj) {
-        if ((i3 & 1) != 0) {
+    public static /* synthetic */ LongFlag copy$default(LongFlag longFlag, int i, long j, int i2, Object obj) {
+        if ((i2 & 1) != 0) {
             i = longFlag.getId();
         }
-        if ((i3 & 2) != 0) {
+        if ((i2 & 2) != 0) {
             j = longFlag.getDefault().longValue();
         }
-        if ((i3 & 4) != 0) {
-            i2 = longFlag.getResourceOverride();
-        }
-        return longFlag.copy(i, j, i2);
+        return longFlag.copy(i, j);
     }
 
     public final int component1() {
@@ -84,18 +66,9 @@ public final class LongFlag implements Flag<Long> {
         return getDefault().longValue();
     }
 
-    public final int component3() {
-        return getResourceOverride();
-    }
-
     @NotNull
-    public final LongFlag copy(int i, long j, int i2) {
-        return new LongFlag(i, j, i2);
-    }
-
-    @Override // com.android.systemui.flags.Flag, android.os.Parcelable
-    public int describeContents() {
-        return Flag.DefaultImpls.describeContents(this);
+    public final LongFlag copy(int i, long j) {
+        return new LongFlag(i, j);
     }
 
     public boolean equals(@Nullable Object obj) {
@@ -106,27 +79,18 @@ public final class LongFlag implements Flag<Long> {
             return false;
         }
         LongFlag longFlag = (LongFlag) obj;
-        return getId() == longFlag.getId() && getDefault().longValue() == longFlag.getDefault().longValue() && getResourceOverride() == longFlag.getResourceOverride();
-    }
-
-    @Override // com.android.systemui.flags.Flag
-    public int getId() {
-        return this.id;
-    }
-
-    @Override // com.android.systemui.flags.Flag
-    public int getResourceOverride() {
-        return this.resourceOverride;
-    }
-
-    @Override // com.android.systemui.flags.Flag
-    public boolean hasResourceOverride() {
-        return Flag.DefaultImpls.hasResourceOverride(this);
+        return getId() == longFlag.getId() && getDefault().longValue() == longFlag.getDefault().longValue();
     }
 
     public int hashCode() {
-        int hashCode = getDefault().hashCode();
-        return Integer.hashCode(getResourceOverride()) + ((hashCode + (Integer.hashCode(getId()) * 31)) * 31);
+        return getDefault().hashCode() + (Integer.hashCode(getId()) * 31);
+    }
+
+    /* JADX WARN: Can't rename method to resolve collision */
+    @Override // com.android.systemui.flags.ParcelableFlag
+    @NotNull
+    public Long getDefault() {
+        return Long.valueOf(this.f4default);
     }
 
     @NotNull
@@ -135,8 +99,6 @@ public final class LongFlag implements Flag<Long> {
         m.append(getId());
         m.append(", default=");
         m.append(getDefault().longValue());
-        m.append(", resourceOverride=");
-        m.append(getResourceOverride());
         m.append(')');
         return m.toString();
     }
@@ -148,18 +110,32 @@ public final class LongFlag implements Flag<Long> {
         parcel.writeLong(getDefault().longValue());
     }
 
-    /* JADX WARN: Can't rename method to resolve collision */
-    @Override // com.android.systemui.flags.Flag
-    @NotNull
-    public Long getDefault() {
-        return Long.valueOf(this.f4default);
+    @Override // com.android.systemui.flags.ParcelableFlag, android.os.Parcelable
+    public int describeContents() {
+        return ParcelableFlag.DefaultImpls.describeContents(this);
     }
 
-    public /* synthetic */ LongFlag(int i, long j, int i2, int i3, DefaultConstructorMarker defaultConstructorMarker) {
-        this(i, (i3 & 2) != 0 ? 0L : j, (i3 & 4) != 0 ? -1 : i2);
+    public /* synthetic */ LongFlag(int i, long j, int i2, DefaultConstructorMarker defaultConstructorMarker) {
+        this(i, (i2 & 2) != 0 ? 0L : j);
     }
 
     private LongFlag(Parcel parcel) {
-        this(parcel.readInt(), parcel.readLong(), 0, 4, null);
+        this(parcel.readInt(), parcel.readLong());
+    }
+
+    /* compiled from: Flag.kt */
+    /* loaded from: classes.dex */
+    public static final class Companion {
+        public /* synthetic */ Companion(DefaultConstructorMarker defaultConstructorMarker) {
+            this();
+        }
+
+        private Companion() {
+        }
+    }
+
+    @Override // com.android.systemui.flags.Flag
+    public int getId() {
+        return this.id;
     }
 }

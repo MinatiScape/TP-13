@@ -3,19 +3,20 @@ package com.google.android.gms.phenotype;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.android.gms.internal.zzbkw;
+/* compiled from: FlagCreator.java */
 /* loaded from: classes.dex */
 public final class zzk implements Parcelable.Creator<Flag> {
     @Override // android.os.Parcelable.Creator
-    public final /* synthetic */ Flag createFromParcel(Parcel parcel) {
+    public final Flag createFromParcel(Parcel parcel) {
         int zza = zzbkw.zza(parcel);
         boolean z = false;
-        String str = null;
-        long j = 0;
-        double d = 0.0d;
         int i = 0;
         int i2 = 0;
+        String str = null;
         String str2 = null;
         byte[] bArr = null;
+        long j = 0;
+        double d = 0.0d;
         while (parcel.dataPosition() < zza) {
             int readInt = parcel.readInt();
             switch (65535 & readInt) {
@@ -29,7 +30,8 @@ public final class zzk implements Parcelable.Creator<Flag> {
                     z = zzbkw.zzc(parcel, readInt);
                     break;
                 case 5:
-                    d = zzbkw.zzn(parcel, readInt);
+                    zzbkw.zza(parcel, readInt, 8);
+                    d = parcel.readDouble();
                     break;
                 case 6:
                     str2 = zzbkw.zzq(parcel, readInt);

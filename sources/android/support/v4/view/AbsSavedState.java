@@ -9,24 +9,24 @@ public abstract class AbsSavedState implements Parcelable {
     };
     public static final Parcelable.Creator<AbsSavedState> CREATOR = new Parcelable.ClassLoaderCreator<AbsSavedState>() { // from class: android.support.v4.view.AbsSavedState.2
         @Override // android.os.Parcelable.Creator
-        public Object createFromParcel(Parcel parcel) {
+        public final Object createFromParcel(Parcel parcel) {
             if (parcel.readParcelable(null) == null) {
                 return AbsSavedState.EMPTY_STATE;
             }
             throw new IllegalStateException("superState must be null");
         }
 
-        @Override // android.os.Parcelable.Creator
-        public Object[] newArray(int i) {
-            return new AbsSavedState[i];
-        }
-
         @Override // android.os.Parcelable.ClassLoaderCreator
-        public AbsSavedState createFromParcel(Parcel parcel, ClassLoader classLoader) {
+        public final AbsSavedState createFromParcel(Parcel parcel, ClassLoader classLoader) {
             if (parcel.readParcelable(classLoader) == null) {
                 return AbsSavedState.EMPTY_STATE;
             }
             throw new IllegalStateException("superState must be null");
+        }
+
+        @Override // android.os.Parcelable.Creator
+        public final Object[] newArray(int i) {
+            return new AbsSavedState[i];
         }
     };
 
@@ -35,17 +35,13 @@ public abstract class AbsSavedState implements Parcelable {
     }
 
     @Override // android.os.Parcelable
-    public int describeContents() {
+    public final int describeContents() {
         return 0;
     }
 
     @Override // android.os.Parcelable
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeParcelable(this.mSuperState, i);
-    }
-
-    public AbsSavedState(AnonymousClass1 r1) {
-        this.mSuperState = null;
     }
 
     public AbsSavedState(Parcel parcel, ClassLoader classLoader) {

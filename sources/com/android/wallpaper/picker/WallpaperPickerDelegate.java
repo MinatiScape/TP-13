@@ -1,17 +1,14 @@
 package com.android.wallpaper.picker;
 
 import android.content.Intent;
-import android.net.Uri;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import com.android.systemui.shared.R;
 import com.android.wallpaper.model.Category;
 import com.android.wallpaper.model.CategoryProvider;
 import com.android.wallpaper.model.CategoryReceiver;
-import com.android.wallpaper.model.ImageWallpaperInfo;
-import com.android.wallpaper.model.InlinePreviewIntentFactory;
 import com.android.wallpaper.module.DefaultCategoryProvider;
 import com.android.wallpaper.module.DefaultPackageStatusNotifier;
-import com.android.wallpaper.module.DefaultWallpaperPersister;
 import com.android.wallpaper.module.Injector;
 import com.android.wallpaper.module.PackageStatusNotifier;
 import com.android.wallpaper.module.WallpaperPersister;
@@ -20,30 +17,65 @@ import com.android.wallpaper.picker.CategorySelectorFragment;
 import com.android.wallpaper.picker.MyPhotosStarter;
 import com.android.wallpaper.picker.PreviewActivity;
 import com.android.wallpaper.picker.ViewOnlyPreviewActivity;
-import com.android.wallpaper.picker.individual.IndividualPickerActivity;
 import com.google.android.apps.wallpaper.module.WallpaperCategoryProvider;
 import com.google.android.apps.wallpaper.module.WallpaperCategoryProvider$$ExternalSyntheticLambda0;
 import com.google.android.apps.wallpaper.module.WallpaperCategoryProvider$$ExternalSyntheticLambda1;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 /* loaded from: classes.dex */
-public class WallpaperPickerDelegate implements MyPhotosStarter {
+public final class WallpaperPickerDelegate implements MyPhotosStarter {
     public final FragmentActivity mActivity;
     public CategoryProvider mCategoryProvider;
     public final WallpapersUiContainer mContainer;
-    public String mDownloadableIntentAction;
-    public PackageStatusNotifier.Listener mDownloadableWallpaperStatusListener;
-    public PackageStatusNotifier.Listener mLiveWallpaperStatusListener;
+    public LivePreviewFragment$$ExternalSyntheticLambda6 mDownloadableWallpaperStatusListener;
+    public WallpaperPickerDelegate$$ExternalSyntheticLambda0 mLiveWallpaperStatusListener;
     public PackageStatusNotifier mPackageStatusNotifier;
     public WallpaperPreferences mPreferences;
-    public PackageStatusNotifier.Listener mThirdPartyStatusListener;
+    public WallpaperPickerDelegate$$ExternalSyntheticLambda1 mThirdPartyStatusListener;
     public WallpaperPersister mWallpaperPersister;
-    public IndividualPickerActivity.IndividualPickerActivityIntentFactory mPickerIntentFactory = new IndividualPickerActivity.IndividualPickerActivityIntentFactory();
-    public InlinePreviewIntentFactory mPreviewIntentFactory = new PreviewActivity.PreviewActivityIntentFactory();
-    public InlinePreviewIntentFactory mViewOnlyPreviewIntentFactory = new ViewOnlyPreviewActivity.ViewOnlyPreviewActivityIntentFactory();
-    public int mFormFactor = 1;
-    public List<MyPhotosStarter.PermissionChangedListener> mPermissionChangedListeners = new ArrayList();
+    public PreviewActivity.PreviewActivityIntentFactory mPreviewIntentFactory = new PreviewActivity.PreviewActivityIntentFactory();
+    public ViewOnlyPreviewActivity.ViewOnlyPreviewActivityIntentFactory mViewOnlyPreviewIntentFactory = new ViewOnlyPreviewActivity.ViewOnlyPreviewActivityIntentFactory();
+    public ArrayList mPermissionChangedListeners = new ArrayList();
+    public String mDownloadableIntentAction = "com.google.pixel.livewallpaper.action.DOWNLOAD_LIVE_WALLPAPER";
+
+    public final CategorySelectorFragment getCategorySelectorFragment() {
+        Fragment findFragmentById = ((CustomizationPickerActivity) this.mContainer).getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (findFragmentById instanceof CategorySelectorFragment) {
+            return (CategorySelectorFragment) findFragmentById;
+        }
+        return null;
+    }
+
+    public final void requestCustomPhotoPicker(final MyPhotosStarter.PermissionChangedListener permissionChangedListener) {
+        boolean z;
+        if (this.mActivity.getPackageManager().checkPermission("android.permission.READ_EXTERNAL_STORAGE", this.mActivity.getPackageName()) == 0) {
+            z = true;
+        } else {
+            z = false;
+        }
+        if (!z) {
+            this.mPermissionChangedListeners.add(new MyPhotosStarter.PermissionChangedListener() { // from class: com.android.wallpaper.picker.WallpaperPickerDelegate.1
+                @Override // com.android.wallpaper.picker.MyPhotosStarter.PermissionChangedListener
+                public final void onPermissionsDenied(boolean z2) {
+                    permissionChangedListener.onPermissionsDenied(z2);
+                }
+
+                @Override // com.android.wallpaper.picker.MyPhotosStarter.PermissionChangedListener
+                public final void onPermissionsGranted() {
+                    permissionChangedListener.onPermissionsGranted();
+                    WallpaperPickerDelegate wallpaperPickerDelegate = WallpaperPickerDelegate.this;
+                    wallpaperPickerDelegate.getClass();
+                    Intent intent = new Intent("android.intent.action.PICK");
+                    intent.setType("image/*");
+                    wallpaperPickerDelegate.mActivity.startActivityForResult(intent, 0);
+                }
+            });
+            this.mActivity.requestPermissions(new String[]{"android.permission.READ_EXTERNAL_STORAGE"}, 3);
+            return;
+        }
+        Intent intent = new Intent("android.intent.action.PICK");
+        intent.setType("image/*");
+        this.mActivity.startActivityForResult(intent, 0);
+    }
 
     public WallpaperPickerDelegate(WallpapersUiContainer wallpapersUiContainer, FragmentActivity fragmentActivity, Injector injector) {
         this.mContainer = wallpapersUiContainer;
@@ -52,20 +84,25 @@ public class WallpaperPickerDelegate implements MyPhotosStarter {
         this.mPreferences = injector.getPreferences(fragmentActivity);
         this.mPackageStatusNotifier = injector.getPackageStatusNotifier(fragmentActivity);
         this.mWallpaperPersister = injector.getWallpaperPersister(fragmentActivity);
-        Objects.requireNonNull(injector.getFormFactorChecker(fragmentActivity));
-        this.mDownloadableIntentAction = injector.getDownloadableIntentAction();
+        injector.getDownloadableIntentAction();
     }
 
-    public void addCategory(Category category, boolean z) {
+    public final void addCategory(Category category, boolean z) {
         CategorySelectorFragment categorySelectorFragment = getCategorySelectorFragment();
         if (categorySelectorFragment != null) {
             if (z && !categorySelectorFragment.mAwaitingCategories) {
                 categorySelectorFragment.mAdapter.notifyItemChanged(categorySelectorFragment.getNumColumns());
-                categorySelectorFragment.mAdapter.mObservable.notifyItemRangeInserted(categorySelectorFragment.getNumColumns(), 1);
+                categorySelectorFragment.mAdapter.mObservable.notifyItemRangeInserted(categorySelectorFragment.getNumColumns());
                 categorySelectorFragment.mAwaitingCategories = true;
             }
             if (categorySelectorFragment.mCategories.indexOf(category) >= 0) {
-                categorySelectorFragment.updateCategory(category);
+                int indexOf = categorySelectorFragment.mCategories.indexOf(category);
+                if (indexOf >= 0) {
+                    categorySelectorFragment.mCategories.remove(indexOf);
+                    categorySelectorFragment.mCategories.add(indexOf, category);
+                    categorySelectorFragment.mAdapter.notifyItemChanged(indexOf + 0);
+                    return;
+                }
                 return;
             }
             int i = category.mPriority;
@@ -76,458 +113,178 @@ public class WallpaperPickerDelegate implements MyPhotosStarter {
             categorySelectorFragment.mCategories.add(i2, category);
             CategorySelectorFragment.CategoryAdapter categoryAdapter = categorySelectorFragment.mAdapter;
             if (categoryAdapter != null) {
-                categoryAdapter.mObservable.notifyItemRangeInserted(i2 + 0, 1);
+                categoryAdapter.mObservable.notifyItemRangeInserted(i2 + 0);
             }
         }
     }
 
-    public void cleanUp() {
-        PackageStatusNotifier packageStatusNotifier = this.mPackageStatusNotifier;
-        if (packageStatusNotifier != null) {
-            ((DefaultPackageStatusNotifier) packageStatusNotifier).removeListener(this.mLiveWallpaperStatusListener);
-            ((DefaultPackageStatusNotifier) this.mPackageStatusNotifier).removeListener(this.mThirdPartyStatusListener);
-            ((DefaultPackageStatusNotifier) this.mPackageStatusNotifier).removeListener(this.mDownloadableWallpaperStatusListener);
-        }
-    }
-
-    public final CategorySelectorFragment getCategorySelectorFragment() {
-        return this.mContainer.getCategorySelectorFragment();
-    }
-
-    public boolean handleActivityResult(int i, int i2, Intent intent) {
-        if (i2 != -1) {
-            return false;
-        }
-        if (i != 0) {
-            if (!(i == 1 || i == 2)) {
-                if (i != 4) {
-                    return false;
-                }
-                ((DefaultWallpaperPersister) this.mWallpaperPersister).onLiveWallpaperSet();
-                populateCategories(true);
-            }
-            return true;
-        }
-        Uri data = intent == null ? null : intent.getData();
-        if (data == null) {
-            return true;
-        }
-        ImageWallpaperInfo imageWallpaperInfo = new ImageWallpaperInfo(data);
-        ((DefaultWallpaperPersister) this.mWallpaperPersister).mWallpaperInfoInPreview = imageWallpaperInfo;
-        imageWallpaperInfo.showPreview(this.mActivity, this.mPreviewIntentFactory, 1);
-        return false;
-    }
-
-    public void initialize(boolean z) {
+    /* JADX WARN: Multi-variable type inference failed */
+    /* JADX WARN: Type inference failed for: r0v0, types: [com.android.wallpaper.picker.WallpaperPickerDelegate$$ExternalSyntheticLambda1] */
+    /* JADX WARN: Type inference failed for: r3v1, types: [com.android.wallpaper.module.PackageStatusNotifier$Listener, com.android.wallpaper.picker.WallpaperPickerDelegate$$ExternalSyntheticLambda0] */
+    public final void initialize(boolean z) {
         populateCategories(z);
-        PackageStatusNotifier.Listener wallpaperPickerDelegate$$ExternalSyntheticLambda0 = new PackageStatusNotifier.Listener(this) { // from class: com.android.wallpaper.picker.WallpaperPickerDelegate$$ExternalSyntheticLambda0
-            public final /* synthetic */ WallpaperPickerDelegate f$0;
-
-            {
-                this.f$0 = this;
-            }
-
+        ?? wallpaperPickerDelegate$$ExternalSyntheticLambda0 = new PackageStatusNotifier.Listener() { // from class: com.android.wallpaper.picker.WallpaperPickerDelegate$$ExternalSyntheticLambda0
             @Override // com.android.wallpaper.module.PackageStatusNotifier.Listener
-            public final void onPackageChanged(final String str, int i) {
-                final Category category;
-                switch (r3) {
-                    case 0:
-                        final WallpaperPickerDelegate wallpaperPickerDelegate = this.f$0;
-                        final String string = wallpaperPickerDelegate.mActivity.getString(R.string.live_wallpaper_collection_id);
-                        final Category category2 = ((DefaultCategoryProvider) wallpaperPickerDelegate.mCategoryProvider).getCategory(string);
-                        if (i != 3 || (category2 != null && category2.containsThirdParty(str))) {
-                            ((DefaultCategoryProvider) wallpaperPickerDelegate.mCategoryProvider).fetchCategories(new CategoryReceiver() { // from class: com.android.wallpaper.picker.WallpaperPickerDelegate.4
-                                @Override // com.android.wallpaper.model.CategoryReceiver
-                                public void doneFetchingCategories() {
-                                    Category category3 = ((DefaultCategoryProvider) WallpaperPickerDelegate.this.mCategoryProvider).getCategory(string);
-                                    if (category3 == null) {
-                                        WallpaperPickerDelegate.this.removeCategory(category2);
-                                    } else if (category2 != null) {
-                                        CategorySelectorFragment categorySelectorFragment = WallpaperPickerDelegate.this.getCategorySelectorFragment();
-                                        if (categorySelectorFragment != null) {
-                                            categorySelectorFragment.updateCategory(category3);
-                                        }
-                                    } else {
-                                        WallpaperPickerDelegate.this.addCategory(category3, false);
-                                    }
-                                }
-
-                                @Override // com.android.wallpaper.model.CategoryReceiver
-                                public void onCategoryReceived(Category category3) {
-                                }
-                            }, true);
-                            return;
+            public final void onPackageChanged(String str, int i) {
+                final WallpaperPickerDelegate wallpaperPickerDelegate = WallpaperPickerDelegate.this;
+                final String string = wallpaperPickerDelegate.mActivity.getString(R.string.live_wallpaper_collection_id);
+                final Category category = ((DefaultCategoryProvider) wallpaperPickerDelegate.mCategoryProvider).getCategory(string);
+                if (i != 3 || (category != null && category.containsThirdParty(str))) {
+                    ((DefaultCategoryProvider) wallpaperPickerDelegate.mCategoryProvider).fetchCategories(new CategoryReceiver() { // from class: com.android.wallpaper.picker.WallpaperPickerDelegate.4
+                        @Override // com.android.wallpaper.model.CategoryReceiver
+                        public final void onCategoryReceived(Category category2) {
                         }
-                        return;
-                    case 1:
-                        final WallpaperPickerDelegate wallpaperPickerDelegate2 = this.f$0;
-                        if (i == 1) {
-                            ((DefaultCategoryProvider) wallpaperPickerDelegate2.mCategoryProvider).fetchCategories(new CategoryReceiver() { // from class: com.android.wallpaper.picker.WallpaperPickerDelegate.2
-                                @Override // com.android.wallpaper.model.CategoryReceiver
-                                public void doneFetchingCategories() {
-                                }
 
-                                @Override // com.android.wallpaper.model.CategoryReceiver
-                                public void onCategoryReceived(Category category3) {
-                                    if (category3.supportsThirdParty() && category3.containsThirdParty(str)) {
-                                        WallpaperPickerDelegate.this.addCategory(category3, false);
-                                    }
+                        @Override // com.android.wallpaper.model.CategoryReceiver
+                        public final void doneFetchingCategories() {
+                            int indexOf;
+                            int indexOf2;
+                            Category category2 = ((DefaultCategoryProvider) WallpaperPickerDelegate.this.mCategoryProvider).getCategory(string);
+                            if (category2 == null) {
+                                WallpaperPickerDelegate wallpaperPickerDelegate2 = WallpaperPickerDelegate.this;
+                                Category category3 = category;
+                                CategorySelectorFragment categorySelectorFragment = wallpaperPickerDelegate2.getCategorySelectorFragment();
+                                if (categorySelectorFragment != null && (indexOf2 = categorySelectorFragment.mCategories.indexOf(category3)) >= 0) {
+                                    categorySelectorFragment.mCategories.remove(indexOf2);
+                                    categorySelectorFragment.mAdapter.mObservable.notifyItemRangeRemoved(indexOf2 + 0);
                                 }
-                            }, true);
-                            return;
-                        } else if (i == 3) {
-                            DefaultCategoryProvider defaultCategoryProvider = (DefaultCategoryProvider) wallpaperPickerDelegate2.mCategoryProvider;
-                            int i2 = 0;
-                            int size = defaultCategoryProvider.mFetchedCategories ? defaultCategoryProvider.mCategories.size() : 0;
-                            while (true) {
-                                if (i2 < size) {
-                                    category = ((DefaultCategoryProvider) wallpaperPickerDelegate2.mCategoryProvider).getCategory(i2);
-                                    if (!category.supportsThirdParty() || !category.containsThirdParty(str)) {
-                                        i2++;
-                                    }
-                                } else {
-                                    category = null;
+                            } else if (category != null) {
+                                CategorySelectorFragment categorySelectorFragment2 = WallpaperPickerDelegate.this.getCategorySelectorFragment();
+                                if (categorySelectorFragment2 != null && (indexOf = categorySelectorFragment2.mCategories.indexOf(category2)) >= 0) {
+                                    categorySelectorFragment2.mCategories.remove(indexOf);
+                                    categorySelectorFragment2.mCategories.add(indexOf, category2);
+                                    categorySelectorFragment2.mAdapter.notifyItemChanged(indexOf + 0);
                                 }
+                            } else {
+                                WallpaperPickerDelegate.this.addCategory(category2, false);
                             }
-                            if (category != null) {
-                                ((DefaultCategoryProvider) wallpaperPickerDelegate2.mCategoryProvider).fetchCategories(new CategoryReceiver() { // from class: com.android.wallpaper.picker.WallpaperPickerDelegate.3
-                                    @Override // com.android.wallpaper.model.CategoryReceiver
-                                    public void doneFetchingCategories() {
-                                        WallpaperPickerDelegate.this.removeCategory(category);
-                                    }
-
-                                    @Override // com.android.wallpaper.model.CategoryReceiver
-                                    public void onCategoryReceived(Category category3) {
-                                    }
-                                }, true);
-                                return;
-                            }
-                            return;
-                        } else {
-                            wallpaperPickerDelegate2.populateCategories(true);
-                            return;
                         }
-                    default:
-                        WallpaperPickerDelegate wallpaperPickerDelegate3 = this.f$0;
-                        Objects.requireNonNull(wallpaperPickerDelegate3);
-                        if (i != 3) {
-                            wallpaperPickerDelegate3.populateCategories(true);
-                            return;
-                        }
-                        return;
+                    }, true);
                 }
             }
         };
         this.mLiveWallpaperStatusListener = wallpaperPickerDelegate$$ExternalSyntheticLambda0;
-        this.mThirdPartyStatusListener = new PackageStatusNotifier.Listener(this) { // from class: com.android.wallpaper.picker.WallpaperPickerDelegate$$ExternalSyntheticLambda0
-            public final /* synthetic */ WallpaperPickerDelegate f$0;
-
-            {
-                this.f$0 = this;
-            }
-
+        this.mThirdPartyStatusListener = new PackageStatusNotifier.Listener() { // from class: com.android.wallpaper.picker.WallpaperPickerDelegate$$ExternalSyntheticLambda1
+            /* JADX WARN: Code restructure failed: missing block: B:22:0x0051, code lost:
+                if (r1 == null) goto L33;
+             */
+            /* JADX WARN: Code restructure failed: missing block: B:23:0x0053, code lost:
+                ((com.android.wallpaper.module.DefaultCategoryProvider) r4.mCategoryProvider).fetchCategories(new com.android.wallpaper.picker.WallpaperPickerDelegate.AnonymousClass3(), true);
+             */
+            /* JADX WARN: Code restructure failed: missing block: B:33:?, code lost:
+                return;
+             */
+            /* JADX WARN: Code restructure failed: missing block: B:34:?, code lost:
+                return;
+             */
             @Override // com.android.wallpaper.module.PackageStatusNotifier.Listener
-            public final void onPackageChanged(final String str, int i) {
-                final Category category;
-                switch (r3) {
-                    case 0:
-                        final WallpaperPickerDelegate wallpaperPickerDelegate = this.f$0;
-                        final String string = wallpaperPickerDelegate.mActivity.getString(R.string.live_wallpaper_collection_id);
-                        final Category category2 = ((DefaultCategoryProvider) wallpaperPickerDelegate.mCategoryProvider).getCategory(string);
-                        if (i != 3 || (category2 != null && category2.containsThirdParty(str))) {
-                            ((DefaultCategoryProvider) wallpaperPickerDelegate.mCategoryProvider).fetchCategories(new CategoryReceiver() { // from class: com.android.wallpaper.picker.WallpaperPickerDelegate.4
-                                @Override // com.android.wallpaper.model.CategoryReceiver
-                                public void doneFetchingCategories() {
-                                    Category category3 = ((DefaultCategoryProvider) WallpaperPickerDelegate.this.mCategoryProvider).getCategory(string);
-                                    if (category3 == null) {
-                                        WallpaperPickerDelegate.this.removeCategory(category2);
-                                    } else if (category2 != null) {
-                                        CategorySelectorFragment categorySelectorFragment = WallpaperPickerDelegate.this.getCategorySelectorFragment();
-                                        if (categorySelectorFragment != null) {
-                                            categorySelectorFragment.updateCategory(category3);
-                                        }
-                                    } else {
-                                        WallpaperPickerDelegate.this.addCategory(category3, false);
-                                    }
-                                }
-
-                                @Override // com.android.wallpaper.model.CategoryReceiver
-                                public void onCategoryReceived(Category category3) {
-                                }
-                            }, true);
-                            return;
-                        }
-                        return;
-                    case 1:
-                        final WallpaperPickerDelegate wallpaperPickerDelegate2 = this.f$0;
-                        if (i == 1) {
-                            ((DefaultCategoryProvider) wallpaperPickerDelegate2.mCategoryProvider).fetchCategories(new CategoryReceiver() { // from class: com.android.wallpaper.picker.WallpaperPickerDelegate.2
-                                @Override // com.android.wallpaper.model.CategoryReceiver
-                                public void doneFetchingCategories() {
-                                }
-
-                                @Override // com.android.wallpaper.model.CategoryReceiver
-                                public void onCategoryReceived(Category category3) {
-                                    if (category3.supportsThirdParty() && category3.containsThirdParty(str)) {
-                                        WallpaperPickerDelegate.this.addCategory(category3, false);
-                                    }
-                                }
-                            }, true);
-                            return;
-                        } else if (i == 3) {
-                            DefaultCategoryProvider defaultCategoryProvider = (DefaultCategoryProvider) wallpaperPickerDelegate2.mCategoryProvider;
-                            int i2 = 0;
-                            int size = defaultCategoryProvider.mFetchedCategories ? defaultCategoryProvider.mCategories.size() : 0;
-                            while (true) {
-                                if (i2 < size) {
-                                    category = ((DefaultCategoryProvider) wallpaperPickerDelegate2.mCategoryProvider).getCategory(i2);
-                                    if (!category.supportsThirdParty() || !category.containsThirdParty(str)) {
-                                        i2++;
-                                    }
-                                } else {
-                                    category = null;
-                                }
-                            }
-                            if (category != null) {
-                                ((DefaultCategoryProvider) wallpaperPickerDelegate2.mCategoryProvider).fetchCategories(new CategoryReceiver() { // from class: com.android.wallpaper.picker.WallpaperPickerDelegate.3
-                                    @Override // com.android.wallpaper.model.CategoryReceiver
-                                    public void doneFetchingCategories() {
-                                        WallpaperPickerDelegate.this.removeCategory(category);
-                                    }
-
-                                    @Override // com.android.wallpaper.model.CategoryReceiver
-                                    public void onCategoryReceived(Category category3) {
-                                    }
-                                }, true);
-                                return;
-                            }
-                            return;
-                        } else {
-                            wallpaperPickerDelegate2.populateCategories(true);
-                            return;
-                        }
-                    default:
-                        WallpaperPickerDelegate wallpaperPickerDelegate3 = this.f$0;
-                        Objects.requireNonNull(wallpaperPickerDelegate3);
-                        if (i != 3) {
-                            wallpaperPickerDelegate3.populateCategories(true);
-                            return;
-                        }
-                        return;
-                }
+            /*
+                Code decompiled incorrectly, please refer to instructions dump.
+                To view partially-correct add '--show-bad-code' argument
+            */
+            public final void onPackageChanged(final java.lang.String r5, int r6) {
+                /*
+                    r4 = this;
+                    com.android.wallpaper.picker.WallpaperPickerDelegate r4 = com.android.wallpaper.picker.WallpaperPickerDelegate.this
+                    r0 = 1
+                    if (r6 != r0) goto L12
+                    com.android.wallpaper.model.CategoryProvider r6 = r4.mCategoryProvider
+                    com.android.wallpaper.picker.WallpaperPickerDelegate$2 r1 = new com.android.wallpaper.picker.WallpaperPickerDelegate$2
+                    r1.<init>()
+                    com.android.wallpaper.module.DefaultCategoryProvider r6 = (com.android.wallpaper.module.DefaultCategoryProvider) r6
+                    r6.fetchCategories(r1, r0)
+                    goto L63
+                L12:
+                    r1 = 3
+                    if (r6 != r1) goto L60
+                    com.android.wallpaper.model.CategoryProvider r6 = r4.mCategoryProvider
+                    com.android.wallpaper.module.DefaultCategoryProvider r6 = (com.android.wallpaper.module.DefaultCategoryProvider) r6
+                    boolean r1 = r6.mFetchedCategories
+                    r2 = 0
+                    if (r1 == 0) goto L25
+                    java.util.ArrayList<com.android.wallpaper.model.Category> r6 = r6.mCategories
+                    int r6 = r6.size()
+                    goto L26
+                L25:
+                    r6 = r2
+                L26:
+                    if (r2 >= r6) goto L50
+                    com.android.wallpaper.model.CategoryProvider r1 = r4.mCategoryProvider
+                    com.android.wallpaper.module.DefaultCategoryProvider r1 = (com.android.wallpaper.module.DefaultCategoryProvider) r1
+                    boolean r3 = r1.mFetchedCategories
+                    if (r3 == 0) goto L48
+                    java.util.ArrayList<com.android.wallpaper.model.Category> r1 = r1.mCategories
+                    java.lang.Object r1 = r1.get(r2)
+                    com.android.wallpaper.model.Category r1 = (com.android.wallpaper.model.Category) r1
+                    boolean r3 = r1.supportsThirdParty()
+                    if (r3 == 0) goto L45
+                    boolean r3 = r1.containsThirdParty(r5)
+                    if (r3 == 0) goto L45
+                    goto L51
+                L45:
+                    int r2 = r2 + 1
+                    goto L26
+                L48:
+                    java.lang.IllegalStateException r4 = new java.lang.IllegalStateException
+                    java.lang.String r5 = "Categories are not available"
+                    r4.<init>(r5)
+                    throw r4
+                L50:
+                    r1 = 0
+                L51:
+                    if (r1 == 0) goto L63
+                    com.android.wallpaper.model.CategoryProvider r5 = r4.mCategoryProvider
+                    com.android.wallpaper.picker.WallpaperPickerDelegate$3 r6 = new com.android.wallpaper.picker.WallpaperPickerDelegate$3
+                    r6.<init>()
+                    com.android.wallpaper.module.DefaultCategoryProvider r5 = (com.android.wallpaper.module.DefaultCategoryProvider) r5
+                    r5.fetchCategories(r6, r0)
+                    goto L63
+                L60:
+                    r4.populateCategories(r0)
+                L63:
+                    return
+                */
+                throw new UnsupportedOperationException("Method not decompiled: com.android.wallpaper.picker.WallpaperPickerDelegate$$ExternalSyntheticLambda1.onPackageChanged(java.lang.String, int):void");
             }
         };
         ((DefaultPackageStatusNotifier) this.mPackageStatusNotifier).addListener(wallpaperPickerDelegate$$ExternalSyntheticLambda0, "android.service.wallpaper.WallpaperService");
         ((DefaultPackageStatusNotifier) this.mPackageStatusNotifier).addListener(this.mThirdPartyStatusListener, "android.intent.action.SET_WALLPAPER");
         String str = this.mDownloadableIntentAction;
         if (str != null) {
-            PackageStatusNotifier.Listener wallpaperPickerDelegate$$ExternalSyntheticLambda02 = new PackageStatusNotifier.Listener(this) { // from class: com.android.wallpaper.picker.WallpaperPickerDelegate$$ExternalSyntheticLambda0
-                public final /* synthetic */ WallpaperPickerDelegate f$0;
-
-                {
-                    this.f$0 = this;
-                }
-
-                @Override // com.android.wallpaper.module.PackageStatusNotifier.Listener
-                public final void onPackageChanged(final String str2, int i) {
-                    final Category category;
-                    switch (r3) {
-                        case 0:
-                            final WallpaperPickerDelegate wallpaperPickerDelegate = this.f$0;
-                            final String string = wallpaperPickerDelegate.mActivity.getString(R.string.live_wallpaper_collection_id);
-                            final Category category2 = ((DefaultCategoryProvider) wallpaperPickerDelegate.mCategoryProvider).getCategory(string);
-                            if (i != 3 || (category2 != null && category2.containsThirdParty(str2))) {
-                                ((DefaultCategoryProvider) wallpaperPickerDelegate.mCategoryProvider).fetchCategories(new CategoryReceiver() { // from class: com.android.wallpaper.picker.WallpaperPickerDelegate.4
-                                    @Override // com.android.wallpaper.model.CategoryReceiver
-                                    public void doneFetchingCategories() {
-                                        Category category3 = ((DefaultCategoryProvider) WallpaperPickerDelegate.this.mCategoryProvider).getCategory(string);
-                                        if (category3 == null) {
-                                            WallpaperPickerDelegate.this.removeCategory(category2);
-                                        } else if (category2 != null) {
-                                            CategorySelectorFragment categorySelectorFragment = WallpaperPickerDelegate.this.getCategorySelectorFragment();
-                                            if (categorySelectorFragment != null) {
-                                                categorySelectorFragment.updateCategory(category3);
-                                            }
-                                        } else {
-                                            WallpaperPickerDelegate.this.addCategory(category3, false);
-                                        }
-                                    }
-
-                                    @Override // com.android.wallpaper.model.CategoryReceiver
-                                    public void onCategoryReceived(Category category3) {
-                                    }
-                                }, true);
-                                return;
-                            }
-                            return;
-                        case 1:
-                            final WallpaperPickerDelegate wallpaperPickerDelegate2 = this.f$0;
-                            if (i == 1) {
-                                ((DefaultCategoryProvider) wallpaperPickerDelegate2.mCategoryProvider).fetchCategories(new CategoryReceiver() { // from class: com.android.wallpaper.picker.WallpaperPickerDelegate.2
-                                    @Override // com.android.wallpaper.model.CategoryReceiver
-                                    public void doneFetchingCategories() {
-                                    }
-
-                                    @Override // com.android.wallpaper.model.CategoryReceiver
-                                    public void onCategoryReceived(Category category3) {
-                                        if (category3.supportsThirdParty() && category3.containsThirdParty(str2)) {
-                                            WallpaperPickerDelegate.this.addCategory(category3, false);
-                                        }
-                                    }
-                                }, true);
-                                return;
-                            } else if (i == 3) {
-                                DefaultCategoryProvider defaultCategoryProvider = (DefaultCategoryProvider) wallpaperPickerDelegate2.mCategoryProvider;
-                                int i2 = 0;
-                                int size = defaultCategoryProvider.mFetchedCategories ? defaultCategoryProvider.mCategories.size() : 0;
-                                while (true) {
-                                    if (i2 < size) {
-                                        category = ((DefaultCategoryProvider) wallpaperPickerDelegate2.mCategoryProvider).getCategory(i2);
-                                        if (!category.supportsThirdParty() || !category.containsThirdParty(str2)) {
-                                            i2++;
-                                        }
-                                    } else {
-                                        category = null;
-                                    }
-                                }
-                                if (category != null) {
-                                    ((DefaultCategoryProvider) wallpaperPickerDelegate2.mCategoryProvider).fetchCategories(new CategoryReceiver() { // from class: com.android.wallpaper.picker.WallpaperPickerDelegate.3
-                                        @Override // com.android.wallpaper.model.CategoryReceiver
-                                        public void doneFetchingCategories() {
-                                            WallpaperPickerDelegate.this.removeCategory(category);
-                                        }
-
-                                        @Override // com.android.wallpaper.model.CategoryReceiver
-                                        public void onCategoryReceived(Category category3) {
-                                        }
-                                    }, true);
-                                    return;
-                                }
-                                return;
-                            } else {
-                                wallpaperPickerDelegate2.populateCategories(true);
-                                return;
-                            }
-                        default:
-                            WallpaperPickerDelegate wallpaperPickerDelegate3 = this.f$0;
-                            Objects.requireNonNull(wallpaperPickerDelegate3);
-                            if (i != 3) {
-                                wallpaperPickerDelegate3.populateCategories(true);
-                                return;
-                            }
-                            return;
-                    }
-                }
-            };
-            this.mDownloadableWallpaperStatusListener = wallpaperPickerDelegate$$ExternalSyntheticLambda02;
-            ((DefaultPackageStatusNotifier) this.mPackageStatusNotifier).addListener(wallpaperPickerDelegate$$ExternalSyntheticLambda02, str);
+            LivePreviewFragment$$ExternalSyntheticLambda6 livePreviewFragment$$ExternalSyntheticLambda6 = new LivePreviewFragment$$ExternalSyntheticLambda6(this);
+            this.mDownloadableWallpaperStatusListener = livePreviewFragment$$ExternalSyntheticLambda6;
+            ((DefaultPackageStatusNotifier) this.mPackageStatusNotifier).addListener(livePreviewFragment$$ExternalSyntheticLambda6, str);
         }
     }
 
-    public boolean isReadExternalStoragePermissionGranted() {
-        return this.mActivity.getPackageManager().checkPermission("android.permission.READ_EXTERNAL_STORAGE", this.mActivity.getPackageName()) == 0;
-    }
-
-    public void onRequestPermissionsResult(int i, String[] strArr, int[] iArr) {
-        if (i == 3 && strArr.length > 0 && strArr[0].equals("android.permission.READ_EXTERNAL_STORAGE") && iArr.length > 0) {
-            if (iArr[0] == 0) {
-                for (MyPhotosStarter.PermissionChangedListener permissionChangedListener : this.mPermissionChangedListeners) {
-                    permissionChangedListener.onPermissionsGranted();
-                }
-            } else if (!this.mActivity.shouldShowRequestPermissionRationale("android.permission.READ_EXTERNAL_STORAGE")) {
-                for (MyPhotosStarter.PermissionChangedListener permissionChangedListener2 : this.mPermissionChangedListeners) {
-                    permissionChangedListener2.onPermissionsDenied(true);
-                }
-            } else {
-                for (MyPhotosStarter.PermissionChangedListener permissionChangedListener3 : this.mPermissionChangedListeners) {
-                    permissionChangedListener3.onPermissionsDenied(false);
-                }
-            }
-        }
-        this.mPermissionChangedListeners.clear();
-    }
-
-    public void populateCategories(boolean z) {
+    public final void populateCategories(boolean z) {
         CategorySelectorFragment categorySelectorFragment = getCategorySelectorFragment();
         if (z && categorySelectorFragment != null) {
             categorySelectorFragment.mCategories.clear();
-            categorySelectorFragment.mAdapter.mObservable.notifyChanged();
+            categorySelectorFragment.mAdapter.notifyDataSetChanged();
         }
         ((DefaultCategoryProvider) this.mCategoryProvider).fetchCategories(new CategoryReceiver() { // from class: com.android.wallpaper.picker.WallpaperPickerDelegate.6
             @Override // com.android.wallpaper.model.CategoryReceiver
-            public void doneFetchingCategories() {
-                WallpaperPickerDelegate wallpaperPickerDelegate = WallpaperPickerDelegate.this;
-                boolean z2 = true;
-                if (wallpaperPickerDelegate.mFormFactor == 1) {
-                    CategorySelectorFragment categorySelectorFragment2 = wallpaperPickerDelegate.getCategorySelectorFragment();
-                    if (categorySelectorFragment2 != null) {
-                        if (categorySelectorFragment2.mAwaitingCategories) {
-                            CategorySelectorFragment.CategoryAdapter categoryAdapter = categorySelectorFragment2.mAdapter;
-                            categoryAdapter.mObservable.notifyItemRangeRemoved(categoryAdapter.getItemCount() - 1, 1);
-                            categorySelectorFragment2.mAwaitingCategories = false;
-                        }
-                        if (((WallpaperCategoryProvider) categorySelectorFragment2.mCategoryProvider).mCategories.stream().filter(WallpaperCategoryProvider$$ExternalSyntheticLambda0.INSTANCE).filter(WallpaperCategoryProvider$$ExternalSyntheticLambda1.INSTANCE).count() < 2) {
-                            z2 = false;
-                        }
-                        categorySelectorFragment2.mIsFeaturedCollectionAvailable = z2;
-                        return;
+            public final void doneFetchingCategories() {
+                CategorySelectorFragment categorySelectorFragment2 = WallpaperPickerDelegate.this.getCategorySelectorFragment();
+                if (categorySelectorFragment2 != null) {
+                    boolean z2 = true;
+                    if (categorySelectorFragment2.mAwaitingCategories) {
+                        CategorySelectorFragment.CategoryAdapter categoryAdapter = categorySelectorFragment2.mAdapter;
+                        categoryAdapter.mObservable.notifyItemRangeRemoved(categoryAdapter.getItemCount() - 1);
+                        categorySelectorFragment2.mAwaitingCategories = false;
                     }
-                    return;
+                    if (((WallpaperCategoryProvider) categorySelectorFragment2.mCategoryProvider).mCategories.stream().filter(WallpaperCategoryProvider$$ExternalSyntheticLambda0.INSTANCE).filter(WallpaperCategoryProvider$$ExternalSyntheticLambda1.INSTANCE).count() < 2) {
+                        z2 = false;
+                    }
+                    categorySelectorFragment2.mIsFeaturedCollectionAvailable = z2;
                 }
-                wallpaperPickerDelegate.mContainer.doneFetchingCategories();
             }
 
             @Override // com.android.wallpaper.model.CategoryReceiver
-            public void onCategoryReceived(Category category) {
+            public final void onCategoryReceived(Category category) {
                 WallpaperPickerDelegate.this.addCategory(category, true);
             }
         }, z);
-    }
-
-    public void removeCategory(Category category) {
-        int indexOf;
-        CategorySelectorFragment categorySelectorFragment = getCategorySelectorFragment();
-        if (categorySelectorFragment != null && (indexOf = categorySelectorFragment.mCategories.indexOf(category)) >= 0) {
-            categorySelectorFragment.mCategories.remove(indexOf);
-            categorySelectorFragment.mAdapter.mObservable.notifyItemRangeRemoved(indexOf + 0, 1);
-        }
-    }
-
-    @Override // com.android.wallpaper.picker.MyPhotosStarter
-    public void requestCustomPhotoPicker(final MyPhotosStarter.PermissionChangedListener permissionChangedListener) {
-        if (!isReadExternalStoragePermissionGranted()) {
-            requestExternalStoragePermission(new MyPhotosStarter.PermissionChangedListener() { // from class: com.android.wallpaper.picker.WallpaperPickerDelegate.1
-                @Override // com.android.wallpaper.picker.MyPhotosStarter.PermissionChangedListener
-                public void onPermissionsDenied(boolean z) {
-                    permissionChangedListener.onPermissionsDenied(z);
-                }
-
-                @Override // com.android.wallpaper.picker.MyPhotosStarter.PermissionChangedListener
-                public void onPermissionsGranted() {
-                    permissionChangedListener.onPermissionsGranted();
-                    WallpaperPickerDelegate wallpaperPickerDelegate = WallpaperPickerDelegate.this;
-                    Objects.requireNonNull(wallpaperPickerDelegate);
-                    Intent intent = new Intent("android.intent.action.PICK");
-                    intent.setType("image/*");
-                    wallpaperPickerDelegate.mActivity.startActivityForResult(intent, 0);
-                }
-            });
-            return;
-        }
-        Intent intent = new Intent("android.intent.action.PICK");
-        intent.setType("image/*");
-        this.mActivity.startActivityForResult(intent, 0);
-    }
-
-    public void requestExternalStoragePermission(MyPhotosStarter.PermissionChangedListener permissionChangedListener) {
-        this.mPermissionChangedListeners.add(permissionChangedListener);
-        this.mActivity.requestPermissions(new String[]{"android.permission.READ_EXTERNAL_STORAGE"}, 3);
-    }
-
-    public void show(String str) {
-        Category category = ((DefaultCategoryProvider) this.mCategoryProvider).getCategory(str);
-        if (category != null) {
-            category.show(this.mActivity, this.mPickerIntentFactory, 0);
-        }
     }
 }

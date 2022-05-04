@@ -1,8 +1,7 @@
 package com.google.android.gms.internal;
 
 import android.os.IInterface;
-import android.os.RemoteException;
+/* compiled from: ISignInCallbacks.java */
 /* loaded from: classes.dex */
 public interface zzelq extends IInterface {
-    void zza(zzelx zzelxVar) throws RemoteException;
 }

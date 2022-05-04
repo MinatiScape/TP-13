@@ -3,14 +3,15 @@ package com.google.android.gms.clearcut;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.android.gms.internal.zzbkw;
+/* compiled from: CollectForDebugParcelableCreator.java */
 /* loaded from: classes.dex */
 public final class zzn implements Parcelable.Creator<CollectForDebugParcelable> {
     @Override // android.os.Parcelable.Creator
     public final /* synthetic */ CollectForDebugParcelable createFromParcel(Parcel parcel) {
         int zza = zzbkw.zza(parcel);
         long j = 0;
-        boolean z = false;
         long j2 = 0;
+        boolean z = false;
         while (parcel.dataPosition() < zza) {
             int readInt = parcel.readInt();
             int i = 65535 & readInt;

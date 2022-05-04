@@ -7,9 +7,30 @@ public interface RequestCoordinator {
 
     boolean canSetImage(Request request);
 
+    RequestCoordinator getRoot();
+
     boolean isAnyResourceSet();
 
     void onRequestFailed(Request request);
 
     void onRequestSuccess(Request request);
+
+    /* loaded from: classes.dex */
+    public enum RequestState {
+        RUNNING(false),
+        PAUSED(false),
+        CLEARED(false),
+        SUCCESS(true),
+        FAILED(true);
+        
+        private final boolean isComplete;
+
+        RequestState(boolean z) {
+            this.isComplete = z;
+        }
+
+        public final boolean isComplete() {
+            return this.isComplete;
+        }
+    }
 }

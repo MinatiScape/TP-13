@@ -7,45 +7,39 @@ import android.app.WallpaperInfo;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewPropertyAnimator;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
+import androidx.activity.ComponentActivity$$ExternalSyntheticLambda2;
+import androidx.appcompat.R$bool;
+import androidx.cardview.R$style;
 import androidx.cardview.widget.CardView;
 import androidx.core.widget.ContentLoadingProgressBar;
-import androidx.core.widget.ContentLoadingProgressBar$$ExternalSyntheticLambda0;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentViewLifecycleOwner;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LifecycleRegistry;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.OnLifecycleEvent;
-import androidx.transition.R$id;
 import com.android.systemui.shared.R;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
-import com.android.wallpaper.asset.Asset;
 import com.android.wallpaper.asset.BitmapCachingAsset;
 import com.android.wallpaper.model.CustomizationSectionController;
 import com.android.wallpaper.module.CurrentWallpaperInfoFactory;
 import com.android.wallpaper.module.DefaultCurrentWallpaperInfoFactory;
-import com.android.wallpaper.module.InjectorProvider;
 import com.android.wallpaper.module.UserEventLogger;
-import com.android.wallpaper.picker.AppbarFragment$$ExternalSyntheticLambda0;
-import com.android.wallpaper.picker.CategoryFragment$$ExternalSyntheticLambda2;
 import com.android.wallpaper.picker.WallpaperSectionView;
 import com.android.wallpaper.picker.WorkspaceSurfaceHolderCallback;
-import com.android.wallpaper.util.DiskBasedLogger$$ExternalSyntheticLambda1;
 import com.android.wallpaper.util.WallpaperConnection;
 import com.android.wallpaper.util.WallpaperSurfaceCallback;
-import com.android.wallpaper.widget.BottomActionBar$$ExternalSyntheticLambda1;
 import com.android.wallpaper.widget.LockScreenPreviewer;
-import java.util.concurrent.CompletableFuture;
+import com.android.wallpaper.widget.LockScreenPreviewer$$ExternalSyntheticLambda1;
+import com.android.wallpaper.widget.LockScreenPreviewer$$ExternalSyntheticLambda2;
+import com.google.android.apps.wallpaper.module.CompositeUserEventLogger;
 /* loaded from: classes.dex */
 public class WallpaperSectionController implements CustomizationSectionController<WallpaperSectionView>, LifecycleObserver {
     public final Activity mActivity;
@@ -73,19 +67,41 @@ public class WallpaperSectionController implements CustomizationSectionControlle
     public WorkspaceSurfaceHolderCallback mWorkspaceSurfaceCallback;
     public final WorkspaceViewModel mWorkspaceViewModel;
 
-    public WallpaperSectionController(Activity activity, LifecycleOwner lifecycleOwner, PermissionRequester permissionRequester, WallpaperColorsViewModel wallpaperColorsViewModel, WorkspaceViewModel workspaceViewModel, CustomizationSectionController.CustomizationSectionNavigationController customizationSectionNavigationController, WallpaperPreviewNavigator wallpaperPreviewNavigator, Bundle bundle) {
-        this.mActivity = activity;
-        this.mLifecycleOwner = lifecycleOwner;
-        this.mPermissionRequester = permissionRequester;
-        this.mAppContext = activity.getApplicationContext();
-        this.mWallpaperColorsViewModel = wallpaperColorsViewModel;
-        this.mWorkspaceViewModel = workspaceViewModel;
-        this.mSectionNavigationController = customizationSectionNavigationController;
-        this.mWallpaperPreviewNavigator = wallpaperPreviewNavigator;
-        this.mSavedInstanceState = bundle;
+    @Override // com.android.wallpaper.model.CustomizationSectionController
+    public final boolean isAvailable(Context context) {
+        return true;
     }
 
-    public static void access$300(WallpaperSectionController wallpaperSectionController, int i) {
+    public final void setupFade(CardView cardView, final ContentLoadingProgressBar contentLoadingProgressBar, int i) {
+        cardView.setAlpha(HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
+        long j = i;
+        cardView.animate().alpha(1.0f).setDuration(j).setListener(new Animator.AnimatorListener() { // from class: com.android.wallpaper.model.WallpaperSectionController.3
+            @Override // android.animation.Animator.AnimatorListener
+            public final void onAnimationRepeat(Animator animator) {
+            }
+
+            @Override // android.animation.Animator.AnimatorListener
+            public final void onAnimationCancel(Animator animator) {
+                contentLoadingProgressBar.hide();
+                WallpaperSectionController.m26$$Nest$msetWallpaperPreviewsVisibility(WallpaperSectionController.this, 0);
+            }
+
+            @Override // android.animation.Animator.AnimatorListener
+            public final void onAnimationEnd(Animator animator) {
+                contentLoadingProgressBar.hide();
+                WallpaperSectionController.m26$$Nest$msetWallpaperPreviewsVisibility(WallpaperSectionController.this, 0);
+            }
+
+            @Override // android.animation.Animator.AnimatorListener
+            public final void onAnimationStart(Animator animator) {
+                WallpaperSectionController.m26$$Nest$msetWallpaperPreviewsVisibility(WallpaperSectionController.this, 4);
+            }
+        });
+        contentLoadingProgressBar.animate().alpha(1.0f).setDuration(i * 2).setStartDelay(j).withStartAction(new ComponentActivity$$ExternalSyntheticLambda2(contentLoadingProgressBar, 2)).withEndAction(new LockScreenPreviewer$$ExternalSyntheticLambda1(contentLoadingProgressBar, 2));
+    }
+
+    /* renamed from: -$$Nest$msetWallpaperPreviewsVisibility  reason: not valid java name */
+    public static void m26$$Nest$msetWallpaperPreviewsVisibility(WallpaperSectionController wallpaperSectionController, int i) {
         SurfaceView surfaceView = wallpaperSectionController.mHomeWallpaperSurface;
         if (surfaceView != null) {
             surfaceView.setVisibility(i);
@@ -104,90 +120,50 @@ public class WallpaperSectionController implements CustomizationSectionControlle
         }
     }
 
-    @Override // com.android.wallpaper.model.CustomizationSectionController
-    public WallpaperSectionView createView(Context context) {
-        WallpaperSectionView wallpaperSectionView = (WallpaperSectionView) LayoutInflater.from(context).inflate(R.layout.wallpaper_section_view, (ViewGroup) null);
-        CardView cardView = (CardView) wallpaperSectionView.findViewById(R.id.home_preview);
-        this.mHomePreviewCard = cardView;
-        cardView.setContentDescription(this.mAppContext.getString(R.string.wallpaper_preview_card_content_description));
-        this.mWorkspaceSurface = (SurfaceView) this.mHomePreviewCard.findViewById(R.id.workspace_surface);
-        this.mHomePreviewProgress = (ContentLoadingProgressBar) this.mHomePreviewCard.findViewById(R.id.wallpaper_preview_spinner);
-        this.mWorkspaceSurfaceCallback = new WorkspaceSurfaceHolderCallback(this.mWorkspaceSurface, this.mAppContext, false);
-        this.mHomeWallpaperSurface = (SurfaceView) this.mHomePreviewCard.findViewById(R.id.wallpaper_surface);
-        CompletableFuture completedFuture = CompletableFuture.completedFuture(Integer.valueOf(R$id.getColorAttr(this.mActivity, 16844080)));
-        this.mHomeWallpaperSurfaceCallback = new WallpaperSurfaceCallback(this.mActivity, this.mHomePreviewCard, this.mHomeWallpaperSurface, completedFuture, new WallpaperSectionController$$ExternalSyntheticLambda1(this, 0));
-        CardView cardView2 = (CardView) wallpaperSectionView.findViewById(R.id.lock_preview);
-        this.mLockscreenPreviewCard = cardView2;
-        cardView2.setContentDescription(this.mAppContext.getString(R.string.lockscreen_wallpaper_preview_card_content_description));
-        this.mLockscreenPreviewProgress = (ContentLoadingProgressBar) this.mLockscreenPreviewCard.findViewById(R.id.wallpaper_preview_spinner);
-        this.mLockscreenPreviewCard.findViewById(R.id.workspace_surface).setVisibility(8);
-        SurfaceView surfaceView = (SurfaceView) this.mLockscreenPreviewCard.findViewById(R.id.wallpaper_surface);
-        this.mLockWallpaperSurface = surfaceView;
-        this.mLockWallpaperSurfaceCallback = new WallpaperSurfaceCallback(this.mActivity, this.mLockscreenPreviewCard, surfaceView, completedFuture, new WallpaperSectionController$$ExternalSyntheticLambda1(this, 1));
-        ViewGroup viewGroup = (ViewGroup) this.mLockscreenPreviewCard.findViewById(R.id.lock_screen_preview_container);
-        this.mLockPreviewContainer = viewGroup;
-        viewGroup.setVisibility(4);
-        this.mLockScreenPreviewer = new LockScreenPreviewer(this.mLifecycleOwner.getLifecycle(), context, this.mLockPreviewContainer);
-        if (isPermissionGranted(this.mAppContext, "android.permission.READ_WALLPAPER_INTERNAL") || isPermissionGranted(this.mAppContext, "android.permission.READ_EXTERNAL_STORAGE")) {
-            showCurrentWallpaper(wallpaperSectionView, true);
-        } else {
-            showCurrentWallpaper(wallpaperSectionView, false);
-            ((Button) wallpaperSectionView.findViewById(R.id.permission_needed_allow_access_button)).setOnClickListener(new BottomActionBar$$ExternalSyntheticLambda1(this, wallpaperSectionView));
-            Resources resources = this.mAppContext.getResources();
-            ((TextView) wallpaperSectionView.findViewById(R.id.permission_needed_explanation)).setText(resources.getString(R.string.permission_needed_explanation, resources.getString(R.string.app_name)));
-        }
-        int integer = this.mAppContext.getResources().getInteger(17694720);
-        setupFade(this.mHomePreviewCard, this.mHomePreviewProgress, integer, true);
-        setupFade(this.mLockscreenPreviewCard, this.mLockscreenPreviewProgress, integer, true);
-        this.mLifecycleOwner.getLifecycle().addObserver(this);
-        this.mHomeWallpaperSurface.getHolder().addCallback(this.mHomeWallpaperSurfaceCallback);
-        this.mHomeWallpaperSurface.setZOrderMediaOverlay(true);
-        this.mLockWallpaperSurface.getHolder().addCallback(this.mLockWallpaperSurfaceCallback);
-        this.mLockWallpaperSurface.setZOrderMediaOverlay(true);
-        this.mWorkspaceSurface.setZOrderMediaOverlay(true);
-        this.mWorkspaceSurface.getHolder().addCallback(this.mWorkspaceSurfaceCallback);
-        wallpaperSectionView.findViewById(R.id.wallpaper_picker_entry).setOnClickListener(new AppbarFragment$$ExternalSyntheticLambda0(this));
-        ((MutableLiveData) this.mWorkspaceViewModel.updateWorkspace$delegate.getValue()).observe(this.mLifecycleOwner, new WallpaperSectionController$$ExternalSyntheticLambda1(this, 2));
-        return wallpaperSectionView;
-    }
-
     public final boolean isActivityAlive() {
-        return !this.mActivity.isDestroyed() && !this.mActivity.isFinishing();
-    }
-
-    @Override // com.android.wallpaper.model.CustomizationSectionController
-    public boolean isAvailable(Context context) {
+        if (this.mActivity.isDestroyed() || this.mActivity.isFinishing()) {
+            return false;
+        }
         return true;
     }
 
-    public final boolean isPermissionGranted(Context context, String str) {
-        return context.getPackageManager().checkPermission(str, context.getPackageName()) == 0;
-    }
-
-    public final Asset maybeLoadThumbnail(WallpaperInfo wallpaperInfo, WallpaperSurfaceCallback wallpaperSurfaceCallback) {
+    public final void maybeLoadThumbnail(WallpaperInfo wallpaperInfo, WallpaperSurfaceCallback wallpaperSurfaceCallback) {
         ImageView imageView = wallpaperSurfaceCallback.mHomeImageWallpaper;
         Context context = this.mAppContext;
         BitmapCachingAsset bitmapCachingAsset = new BitmapCachingAsset(context, wallpaperInfo.getThumbAsset(context));
         if (imageView != null && imageView.getDrawable() == null) {
             Activity activity = this.mActivity;
-            bitmapCachingAsset.mOriginalAsset.loadPreviewImage(activity, imageView, R$id.getColorAttr(activity, 16844080));
+            bitmapCachingAsset.loadPreviewImage(activity, imageView, R$bool.getColorAttr(activity, 16844080));
         }
-        return bitmapCachingAsset;
     }
 
     public final void onHomeWallpaperColorsChanged(WallpaperColors wallpaperColors) {
-        if (wallpaperColors == null || !wallpaperColors.equals(this.mWallpaperColorsViewModel.getHomeWallpaperColors().getValue())) {
-            this.mWallpaperColorsViewModel.getHomeWallpaperColors().setValue(wallpaperColors);
+        if (wallpaperColors != null) {
+            Object obj = ((MutableLiveData) this.mWallpaperColorsViewModel.homeWallpaperColors$delegate.getValue()).mData;
+            if (obj == LiveData.NOT_SET) {
+                obj = null;
+            }
+            if (wallpaperColors.equals(obj)) {
+                return;
+            }
         }
+        ((MutableLiveData) this.mWallpaperColorsViewModel.homeWallpaperColors$delegate.getValue()).setValue(wallpaperColors);
     }
 
     public final void onLockWallpaperColorsChanged(WallpaperColors wallpaperColors) {
-        if (wallpaperColors == null || !wallpaperColors.equals(this.mWallpaperColorsViewModel.getLockWallpaperColors().getValue())) {
-            this.mWallpaperColorsViewModel.getLockWallpaperColors().setValue(wallpaperColors);
-            LockScreenPreviewer lockScreenPreviewer = this.mLockScreenPreviewer;
-            if (lockScreenPreviewer != null) {
-                lockScreenPreviewer.setColor(wallpaperColors);
+        if (wallpaperColors != null) {
+            Object obj = ((MutableLiveData) this.mWallpaperColorsViewModel.lockWallpaperColors$delegate.getValue()).mData;
+            if (obj == LiveData.NOT_SET) {
+                obj = null;
             }
+            if (wallpaperColors.equals(obj)) {
+                return;
+            }
+        }
+        ((MutableLiveData) this.mWallpaperColorsViewModel.lockWallpaperColors$delegate.getValue()).setValue(wallpaperColors);
+        LockScreenPreviewer lockScreenPreviewer = this.mLockScreenPreviewer;
+        if (lockScreenPreviewer != null) {
+            lockScreenPreviewer.setColor(wallpaperColors);
         }
     }
 
@@ -195,20 +171,31 @@ public class WallpaperSectionController implements CustomizationSectionControlle
     public void onPause() {
         WallpaperConnection wallpaperConnection = this.mWallpaperConnection;
         if (wallpaperConnection != null) {
-            wallpaperConnection.mIsVisible = false;
-            wallpaperConnection.setEngineVisibility(false);
+            wallpaperConnection.setVisibility(false);
         }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public void onResume() {
-        ((DefaultCurrentWallpaperInfoFactory) InjectorProvider.getInjector().getCurrentWallpaperFactory(this.mAppContext)).createCurrentWallpaperInfos(new CurrentWallpaperInfoFactory.WallpaperInfoCallback() { // from class: com.android.wallpaper.model.WallpaperSectionController$$ExternalSyntheticLambda0
+        boolean z;
+        if (this.mSavedInstanceState == null) {
+            z = true;
+        } else {
+            z = false;
+        }
+        ((DefaultCurrentWallpaperInfoFactory) R$style.getInjector().getCurrentWallpaperFactory(this.mAppContext)).createCurrentWallpaperInfos(new CurrentWallpaperInfoFactory.WallpaperInfoCallback() { // from class: com.android.wallpaper.model.WallpaperSectionController$$ExternalSyntheticLambda4
             @Override // com.android.wallpaper.module.CurrentWallpaperInfoFactory.WallpaperInfoCallback
-            public final void onWallpaperInfoCreated(WallpaperInfo wallpaperInfo, WallpaperInfo wallpaperInfo2, int i) {
+            public final void onWallpaperInfoCreated(WallpaperInfo wallpaperInfo, WallpaperInfo wallpaperInfo2) {
+                WallpaperInfo wallpaperInfo3;
                 WallpaperSectionController wallpaperSectionController = WallpaperSectionController.this;
                 if (wallpaperSectionController.isActivityAlive()) {
                     wallpaperSectionController.mHomePreviewWallpaperInfo = wallpaperInfo;
-                    wallpaperSectionController.mLockPreviewWallpaperInfo = wallpaperInfo2 == null ? wallpaperInfo : wallpaperInfo2;
+                    if (wallpaperInfo2 == null) {
+                        wallpaperInfo3 = wallpaperInfo;
+                    } else {
+                        wallpaperInfo3 = wallpaperInfo2;
+                    }
+                    wallpaperSectionController.mLockPreviewWallpaperInfo = wallpaperInfo3;
                     wallpaperInfo.computePlaceholderColor(wallpaperSectionController.mAppContext);
                     if (wallpaperInfo2 != null) {
                         wallpaperInfo2.computePlaceholderColor(wallpaperSectionController.mAppContext);
@@ -224,11 +211,10 @@ public class WallpaperSectionController implements CustomizationSectionControlle
                     wallpaperSectionController.onLockWallpaperColorsChanged(wallpaperColors);
                 }
             }
-        }, this.mSavedInstanceState == null);
+        }, z);
         WallpaperConnection wallpaperConnection = this.mWallpaperConnection;
         if (wallpaperConnection != null) {
-            wallpaperConnection.mIsVisible = true;
-            wallpaperConnection.setEngineVisibility(true);
+            wallpaperConnection.setVisibility(true);
         }
     }
 
@@ -242,7 +228,7 @@ public class WallpaperSectionController implements CustomizationSectionControlle
     }
 
     @Override // com.android.wallpaper.model.CustomizationSectionController
-    public void onTransitionOut() {
+    public final void onTransitionOut() {
         SurfaceView surfaceView = this.mHomeWallpaperSurface;
         if (surfaceView != null) {
             surfaceView.setUseAlpha();
@@ -265,7 +251,7 @@ public class WallpaperSectionController implements CustomizationSectionControlle
     }
 
     @Override // com.android.wallpaper.model.CustomizationSectionController
-    public void release() {
+    public final void release() {
         LockScreenPreviewer lockScreenPreviewer = this.mLockScreenPreviewer;
         if (lockScreenPreviewer != null) {
             lockScreenPreviewer.release();
@@ -283,59 +269,20 @@ public class WallpaperSectionController implements CustomizationSectionControlle
         if (workspaceSurfaceHolderCallback != null) {
             workspaceSurfaceHolderCallback.cleanUp();
         }
-        LifecycleRegistry lifecycleRegistry = (LifecycleRegistry) this.mLifecycleOwner.getLifecycle();
-        lifecycleRegistry.enforceMainThreadIfNeeded("removeObserver");
-        lifecycleRegistry.mObserverMap.remove(this);
+        this.mLifecycleOwner.getLifecycle().removeObserver(this);
     }
 
-    public final void setupFade(CardView cardView, final ContentLoadingProgressBar contentLoadingProgressBar, int i, boolean z) {
-        float f = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
-        cardView.setAlpha(z ? 0.0f : 1.0f);
-        long j = i;
-        cardView.animate().alpha(z ? 1.0f : 0.0f).setDuration(j).setListener(new Animator.AnimatorListener() { // from class: com.android.wallpaper.model.WallpaperSectionController.3
-            @Override // android.animation.Animator.AnimatorListener
-            public void onAnimationCancel(Animator animator) {
-                contentLoadingProgressBar.hide();
-                WallpaperSectionController.access$300(WallpaperSectionController.this, 0);
-            }
-
-            @Override // android.animation.Animator.AnimatorListener
-            public void onAnimationEnd(Animator animator) {
-                contentLoadingProgressBar.hide();
-                WallpaperSectionController.access$300(WallpaperSectionController.this, 0);
-            }
-
-            @Override // android.animation.Animator.AnimatorListener
-            public void onAnimationRepeat(Animator animator) {
-            }
-
-            @Override // android.animation.Animator.AnimatorListener
-            public void onAnimationStart(Animator animator) {
-                WallpaperSectionController.access$300(WallpaperSectionController.this, 4);
-            }
-        });
-        ViewPropertyAnimator animate = contentLoadingProgressBar.animate();
-        if (z) {
-            f = 1.0f;
-        }
-        animate.alpha(f).setDuration(i * 2).setStartDelay(j).withStartAction(new ContentLoadingProgressBar$$ExternalSyntheticLambda0(contentLoadingProgressBar, 4)).withEndAction(new ContentLoadingProgressBar$$ExternalSyntheticLambda0(contentLoadingProgressBar, 5));
-    }
-
-    public final void showCurrentWallpaper(View view, boolean z) {
-        int i = 0;
-        view.findViewById(R.id.home_preview).setVisibility(z ? 0 : 8);
-        view.findViewById(R.id.lock_preview).setVisibility(z ? 0 : 8);
-        View findViewById = view.findViewById(R.id.permission_needed);
-        if (z) {
-            i = 8;
-        }
-        findViewById.setVisibility(i);
-    }
-
-    public final void updatePreview(WallpaperInfo wallpaperInfo, boolean z) {
+    public final void updatePreview(final WallpaperInfo wallpaperInfo, final boolean z) {
+        WallpaperSurfaceCallback wallpaperSurfaceCallback;
+        CardView cardView;
         if (wallpaperInfo != null && isActivityAlive()) {
-            UserEventLogger userEventLogger = InjectorProvider.getInjector().getUserEventLogger(this.mAppContext);
-            maybeLoadThumbnail(wallpaperInfo, z ? this.mHomeWallpaperSurfaceCallback : this.mLockWallpaperSurfaceCallback);
+            final CompositeUserEventLogger userEventLogger = R$style.getInjector().getUserEventLogger(this.mAppContext);
+            if (z) {
+                wallpaperSurfaceCallback = this.mHomeWallpaperSurfaceCallback;
+            } else {
+                wallpaperSurfaceCallback = this.mLockWallpaperSurfaceCallback;
+            }
+            maybeLoadThumbnail(wallpaperInfo, wallpaperSurfaceCallback);
             if (z) {
                 WallpaperConnection wallpaperConnection = this.mWallpaperConnection;
                 SurfaceView surfaceView = null;
@@ -350,7 +297,7 @@ public class WallpaperSectionController implements CustomizationSectionControlle
                     Activity activity = this.mActivity;
                     WallpaperConnection.WallpaperConnectionListener wallpaperConnectionListener = new WallpaperConnection.WallpaperConnectionListener() { // from class: com.android.wallpaper.model.WallpaperSectionController.2
                         @Override // com.android.wallpaper.util.WallpaperConnection.WallpaperConnectionListener
-                        public void onWallpaperColorsChanged(WallpaperColors wallpaperColors, int i) {
+                        public final void onWallpaperColorsChanged(WallpaperColors wallpaperColors, int i) {
                             LockScreenPreviewer lockScreenPreviewer;
                             if (z2 && (lockScreenPreviewer = WallpaperSectionController.this.mLockScreenPreviewer) != null) {
                                 lockScreenPreviewer.setColor(wallpaperColors);
@@ -365,12 +312,78 @@ public class WallpaperSectionController implements CustomizationSectionControlle
                     }
                     WallpaperConnection wallpaperConnection2 = new WallpaperConnection(className, activity, wallpaperConnectionListener, surfaceView2, surfaceView);
                     this.mWallpaperConnection = wallpaperConnection2;
-                    wallpaperConnection2.mIsVisible = true;
-                    wallpaperConnection2.setEngineVisibility(true);
-                    this.mHomeWallpaperSurface.post(new DiskBasedLogger$$ExternalSyntheticLambda1(this));
+                    wallpaperConnection2.setVisibility(true);
+                    this.mHomeWallpaperSurface.post(new LockScreenPreviewer$$ExternalSyntheticLambda2(this, 2));
                 }
             }
-            (z ? this.mHomePreviewCard : this.mLockscreenPreviewCard).setOnClickListener(new CategoryFragment$$ExternalSyntheticLambda2(this, wallpaperInfo, z, userEventLogger));
+            if (z) {
+                cardView = this.mHomePreviewCard;
+            } else {
+                cardView = this.mLockscreenPreviewCard;
+            }
+            cardView.setOnClickListener(new View.OnClickListener() { // from class: com.android.wallpaper.model.WallpaperSectionController$$ExternalSyntheticLambda2
+                @Override // android.view.View.OnClickListener
+                public final void onClick(View view) {
+                    WallpaperSectionController wallpaperSectionController = WallpaperSectionController.this;
+                    WallpaperInfo wallpaperInfo2 = wallpaperInfo;
+                    boolean z3 = z;
+                    UserEventLogger userEventLogger2 = userEventLogger;
+                    wallpaperSectionController.mWallpaperPreviewNavigator.showViewOnlyPreview(wallpaperInfo2, z3);
+                    userEventLogger2.logCurrentWallpaperPreviewed();
+                }
+            });
         }
+    }
+
+    public WallpaperSectionController(FragmentActivity fragmentActivity, FragmentViewLifecycleOwner fragmentViewLifecycleOwner, PermissionRequester permissionRequester, WallpaperColorsViewModel wallpaperColorsViewModel, WorkspaceViewModel workspaceViewModel, CustomizationSectionController.CustomizationSectionNavigationController customizationSectionNavigationController, WallpaperPreviewNavigator wallpaperPreviewNavigator, Bundle bundle) {
+        this.mActivity = fragmentActivity;
+        this.mLifecycleOwner = fragmentViewLifecycleOwner;
+        this.mPermissionRequester = permissionRequester;
+        this.mAppContext = fragmentActivity.getApplicationContext();
+        this.mWallpaperColorsViewModel = wallpaperColorsViewModel;
+        this.mWorkspaceViewModel = workspaceViewModel;
+        this.mSectionNavigationController = customizationSectionNavigationController;
+        this.mWallpaperPreviewNavigator = wallpaperPreviewNavigator;
+        this.mSavedInstanceState = bundle;
+    }
+
+    public static void showCurrentWallpaper(View view, boolean z) {
+        int i;
+        int i2;
+        View findViewById = view.findViewById(R.id.home_preview);
+        int i3 = 0;
+        if (z) {
+            i = 0;
+        } else {
+            i = 8;
+        }
+        findViewById.setVisibility(i);
+        View findViewById2 = view.findViewById(R.id.lock_preview);
+        if (z) {
+            i2 = 0;
+        } else {
+            i2 = 8;
+        }
+        findViewById2.setVisibility(i2);
+        View findViewById3 = view.findViewById(R.id.permission_needed);
+        if (z) {
+            i3 = 8;
+        }
+        findViewById3.setVisibility(i3);
+    }
+
+    /* JADX WARN: Removed duplicated region for block: B:15:0x011a  */
+    /* JADX WARN: Removed duplicated region for block: B:16:0x011e  */
+    @Override // com.android.wallpaper.model.CustomizationSectionController
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+        To view partially-correct add '--show-bad-code' argument
+    */
+    public final com.android.wallpaper.picker.WallpaperSectionView createView(android.content.Context r14) {
+        /*
+            Method dump skipped, instructions count: 461
+            To view this dump add '--comments-level debug' option
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.android.wallpaper.model.WallpaperSectionController.createView(android.content.Context):com.android.wallpaper.picker.SectionView");
     }
 }

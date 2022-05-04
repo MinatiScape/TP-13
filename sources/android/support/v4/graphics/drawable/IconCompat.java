@@ -14,6 +14,17 @@ public class IconCompat extends CustomVersionedParcelable {
     public static final PorterDuff.Mode DEFAULT_TINT_MODE = PorterDuff.Mode.SRC_IN;
     public PorterDuff.Mode mTintMode = DEFAULT_TINT_MODE;
 
+    public final String toString() {
+        StringBuilder sb = new StringBuilder("Icon(typ=");
+        sb.append("UNKNOWN");
+        if (this.mTintMode != DEFAULT_TINT_MODE) {
+            sb.append(" mode=");
+            sb.append(this.mTintMode);
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+
     public static Bitmap createLegacyIconFromAdaptiveIcon(Bitmap bitmap, boolean z) {
         int min = (int) (Math.min(bitmap.getWidth(), bitmap.getHeight()) * 0.6666667f);
         Bitmap createBitmap = Bitmap.createBitmap(min, min, Bitmap.Config.ARGB_8888);
@@ -41,16 +52,5 @@ public class IconCompat extends CustomVersionedParcelable {
         canvas.drawCircle(f2, f2, f3, paint);
         canvas.setBitmap(null);
         return createBitmap;
-    }
-
-    public String toString() {
-        StringBuilder sb = new StringBuilder("Icon(typ=");
-        sb.append("UNKNOWN");
-        if (this.mTintMode != DEFAULT_TINT_MODE) {
-            sb.append(" mode=");
-            sb.append(this.mTintMode);
-        }
-        sb.append(")");
-        return sb.toString();
     }
 }

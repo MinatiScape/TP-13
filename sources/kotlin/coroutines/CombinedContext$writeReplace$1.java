@@ -6,6 +6,7 @@ import kotlin.jvm.functions.Function2;
 import kotlin.jvm.internal.Intrinsics;
 import kotlin.jvm.internal.Lambda;
 import kotlin.jvm.internal.Ref$IntRef;
+/* compiled from: CoroutineContextImpl.kt */
 /* loaded from: classes.dex */
 public final class CombinedContext$writeReplace$1 extends Lambda implements Function2<Unit, CoroutineContext.Element, Unit> {
     public final /* synthetic */ CoroutineContext[] $elements;
@@ -19,9 +20,10 @@ public final class CombinedContext$writeReplace$1 extends Lambda implements Func
     }
 
     @Override // kotlin.jvm.functions.Function2
-    public Unit invoke(Unit unit, CoroutineContext.Element element) {
+    public final Unit invoke(Unit unit, CoroutineContext.Element element) {
+        Unit noName_0 = unit;
         CoroutineContext.Element element2 = element;
-        Intrinsics.checkNotNullParameter(unit, "<anonymous parameter 0>");
+        Intrinsics.checkNotNullParameter(noName_0, "$noName_0");
         Intrinsics.checkNotNullParameter(element2, "element");
         CoroutineContext[] coroutineContextArr = this.$elements;
         Ref$IntRef ref$IntRef = this.$index;

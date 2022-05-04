@@ -16,11 +16,11 @@ import androidx.constraintlayout.solver.widgets.ConstraintWidget;
 import androidx.constraintlayout.solver.widgets.ConstraintWidgetContainer;
 import androidx.constraintlayout.solver.widgets.Guideline;
 import androidx.constraintlayout.solver.widgets.analyzer.BasicMeasure;
+import androidx.slice.compat.SliceProviderCompat$2;
 import com.android.systemui.shared.system.QuickStepContract;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public class ConstraintLayout extends ViewGroup {
     public static final /* synthetic */ int $r8$clinit = 0;
@@ -37,392 +37,9 @@ public class ConstraintLayout extends ViewGroup {
     public int mConstraintSetId = -1;
     public HashMap<String, Integer> mDesignIds = new HashMap<>();
     public SparseArray<ConstraintWidget> mTempMapIdToWidget = new SparseArray<>();
-    public Measurer mMeasurer = new Measurer(this, this);
+    public Measurer mMeasurer = new Measurer(this);
     public int mOnMeasureWidthMeasureSpec = 0;
     public int mOnMeasureHeightMeasureSpec = 0;
-
-    /* loaded from: classes.dex */
-    public class Measurer implements BasicMeasure.Measurer {
-        public ConstraintLayout layout;
-
-        public Measurer(ConstraintLayout constraintLayout, ConstraintLayout constraintLayout2) {
-            this.layout = constraintLayout2;
-        }
-
-        /* JADX WARN: Removed duplicated region for block: B:108:0x016f  */
-        /* JADX WARN: Removed duplicated region for block: B:114:0x018b  */
-        /* JADX WARN: Removed duplicated region for block: B:116:0x0191  */
-        /* JADX WARN: Removed duplicated region for block: B:119:0x019a  */
-        /* JADX WARN: Removed duplicated region for block: B:120:0x019f  */
-        /* JADX WARN: Removed duplicated region for block: B:123:0x01a4  */
-        /* JADX WARN: Removed duplicated region for block: B:126:0x01ac  */
-        /* JADX WARN: Removed duplicated region for block: B:127:0x01b1  */
-        /* JADX WARN: Removed duplicated region for block: B:130:0x01b6  */
-        /* JADX WARN: Removed duplicated region for block: B:133:0x01be A[ADDED_TO_REGION] */
-        /* JADX WARN: Removed duplicated region for block: B:136:0x01c9 A[ADDED_TO_REGION] */
-        /* JADX WARN: Removed duplicated region for block: B:139:0x01d3 A[ADDED_TO_REGION] */
-        /* JADX WARN: Removed duplicated region for block: B:142:0x01d9  */
-        /* JADX WARN: Removed duplicated region for block: B:144:0x01df  */
-        /* JADX WARN: Removed duplicated region for block: B:148:0x01f5  */
-        /* JADX WARN: Removed duplicated region for block: B:149:0x01f7  */
-        /* JADX WARN: Removed duplicated region for block: B:152:0x01fc  */
-        /* JADX WARN: Removed duplicated region for block: B:158:0x020a  */
-        /* JADX WARN: Removed duplicated region for block: B:160:0x020d  */
-        /* JADX WARN: Removed duplicated region for block: B:41:0x00aa  */
-        /* JADX WARN: Removed duplicated region for block: B:68:0x010f  */
-        /* JADX WARN: Removed duplicated region for block: B:72:0x0119  */
-        /* JADX WARN: Removed duplicated region for block: B:73:0x011b  */
-        /* JADX WARN: Removed duplicated region for block: B:75:0x011e  */
-        /* JADX WARN: Removed duplicated region for block: B:76:0x0120  */
-        /* JADX WARN: Removed duplicated region for block: B:79:0x0124 A[ADDED_TO_REGION] */
-        /* JADX WARN: Removed duplicated region for block: B:83:0x012c A[ADDED_TO_REGION] */
-        /* JADX WARN: Removed duplicated region for block: B:88:0x0135  */
-        /* JADX WARN: Removed duplicated region for block: B:93:0x0140  */
-        /* JADX WARN: Removed duplicated region for block: B:99:0x0159 A[ADDED_TO_REGION] */
-        @android.annotation.SuppressLint({"WrongCall"})
-        /*
-            Code decompiled incorrectly, please refer to instructions dump.
-            To view partially-correct add '--show-bad-code' argument
-        */
-        public final void measure(androidx.constraintlayout.solver.widgets.ConstraintWidget r18, androidx.constraintlayout.solver.widgets.analyzer.BasicMeasure.Measure r19) {
-            /*
-                Method dump skipped, instructions count: 544
-                To view this dump add '--comments-level debug' option
-            */
-            throw new UnsupportedOperationException("Method not decompiled: androidx.constraintlayout.widget.ConstraintLayout.Measurer.measure(androidx.constraintlayout.solver.widgets.ConstraintWidget, androidx.constraintlayout.solver.widgets.analyzer.BasicMeasure$Measure):void");
-        }
-    }
-
-    public ConstraintLayout(Context context) {
-        super(context);
-        init(null, 0, 0);
-    }
-
-    @Override // android.view.ViewGroup
-    public void addView(View view, int i, ViewGroup.LayoutParams layoutParams) {
-        super.addView(view, i, layoutParams);
-    }
-
-    @Override // android.view.ViewGroup
-    public boolean checkLayoutParams(ViewGroup.LayoutParams layoutParams) {
-        return layoutParams instanceof LayoutParams;
-    }
-
-    @Override // android.view.ViewGroup, android.view.View
-    public void dispatchDraw(Canvas canvas) {
-        Object tag;
-        int size;
-        ArrayList<ConstraintHelper> arrayList = this.mConstraintHelpers;
-        if (arrayList != null && (size = arrayList.size()) > 0) {
-            for (int i = 0; i < size; i++) {
-                Objects.requireNonNull(this.mConstraintHelpers.get(i));
-            }
-        }
-        super.dispatchDraw(canvas);
-        if (isInEditMode()) {
-            int childCount = getChildCount();
-            float width = getWidth();
-            float height = getHeight();
-            for (int i2 = 0; i2 < childCount; i2++) {
-                View childAt = getChildAt(i2);
-                if (!(childAt.getVisibility() == 8 || (tag = childAt.getTag()) == null || !(tag instanceof String))) {
-                    String[] split = ((String) tag).split(",");
-                    if (split.length == 4) {
-                        int parseInt = Integer.parseInt(split[0]);
-                        int parseInt2 = Integer.parseInt(split[1]);
-                        int parseInt3 = Integer.parseInt(split[2]);
-                        int i3 = (int) ((parseInt / 1080.0f) * width);
-                        int i4 = (int) ((parseInt2 / 1920.0f) * height);
-                        Paint paint = new Paint();
-                        paint.setColor(-65536);
-                        float f = i3;
-                        float f2 = i4;
-                        float f3 = i3 + ((int) ((parseInt3 / 1080.0f) * width));
-                        canvas.drawLine(f, f2, f3, f2, paint);
-                        float parseInt4 = i4 + ((int) ((Integer.parseInt(split[3]) / 1920.0f) * height));
-                        canvas.drawLine(f3, f2, f3, parseInt4, paint);
-                        canvas.drawLine(f3, parseInt4, f, parseInt4, paint);
-                        canvas.drawLine(f, parseInt4, f, f2, paint);
-                        paint.setColor(-16711936);
-                        canvas.drawLine(f, f2, f3, parseInt4, paint);
-                        canvas.drawLine(f, parseInt4, f3, f2, paint);
-                    }
-                }
-            }
-        }
-    }
-
-    @Override // android.view.View
-    public void forceLayout() {
-        this.mDirtyHierarchy = true;
-        super.forceLayout();
-    }
-
-    @Override // android.view.ViewGroup
-    public ViewGroup.LayoutParams generateLayoutParams(AttributeSet attributeSet) {
-        return new LayoutParams(getContext(), attributeSet);
-    }
-
-    public Object getDesignInformation(int i, Object obj) {
-        if (i != 0 || !(obj instanceof String)) {
-            return null;
-        }
-        String str = (String) obj;
-        HashMap<String, Integer> hashMap = this.mDesignIds;
-        if (hashMap == null || !hashMap.containsKey(str)) {
-            return null;
-        }
-        return this.mDesignIds.get(str);
-    }
-
-    public final int getPaddingWidth() {
-        int paddingRight = getPaddingRight() + getPaddingLeft();
-        int paddingEnd = getPaddingEnd() + getPaddingStart();
-        return paddingEnd > 0 ? paddingEnd : paddingRight;
-    }
-
-    public View getViewById(int i) {
-        return this.mChildrenByIds.get(i);
-    }
-
-    public final ConstraintWidget getViewWidget(View view) {
-        if (view == this) {
-            return this.mLayoutWidget;
-        }
-        if (view == null) {
-            return null;
-        }
-        return ((LayoutParams) view.getLayoutParams()).widget;
-    }
-
-    public final void init(AttributeSet attributeSet, int i, int i2) {
-        ConstraintWidgetContainer constraintWidgetContainer = this.mLayoutWidget;
-        constraintWidgetContainer.mCompanionWidget = this;
-        Measurer measurer = this.mMeasurer;
-        constraintWidgetContainer.mMeasurer = measurer;
-        constraintWidgetContainer.mDependencyGraph.mMeasurer = measurer;
-        this.mChildrenByIds.put(getId(), this);
-        this.mConstraintSet = null;
-        if (attributeSet != null) {
-            TypedArray obtainStyledAttributes = getContext().obtainStyledAttributes(attributeSet, R$styleable.ConstraintLayout_Layout, i, i2);
-            int indexCount = obtainStyledAttributes.getIndexCount();
-            for (int i3 = 0; i3 < indexCount; i3++) {
-                int index = obtainStyledAttributes.getIndex(i3);
-                if (index == 9) {
-                    this.mMinWidth = obtainStyledAttributes.getDimensionPixelOffset(index, this.mMinWidth);
-                } else if (index == 10) {
-                    this.mMinHeight = obtainStyledAttributes.getDimensionPixelOffset(index, this.mMinHeight);
-                } else if (index == 7) {
-                    this.mMaxWidth = obtainStyledAttributes.getDimensionPixelOffset(index, this.mMaxWidth);
-                } else if (index == 8) {
-                    this.mMaxHeight = obtainStyledAttributes.getDimensionPixelOffset(index, this.mMaxHeight);
-                } else if (index == 89) {
-                    this.mOptimizationLevel = obtainStyledAttributes.getInt(index, this.mOptimizationLevel);
-                } else if (index == 38) {
-                    int resourceId = obtainStyledAttributes.getResourceId(index, 0);
-                    if (resourceId != 0) {
-                        try {
-                            new ConstraintLayoutStates(getContext(), this, resourceId);
-                        } catch (Resources.NotFoundException unused) {
-                        }
-                    }
-                } else if (index == 18) {
-                    int resourceId2 = obtainStyledAttributes.getResourceId(index, 0);
-                    try {
-                        ConstraintSet constraintSet = new ConstraintSet();
-                        this.mConstraintSet = constraintSet;
-                        constraintSet.load(getContext(), resourceId2);
-                    } catch (Resources.NotFoundException unused2) {
-                        this.mConstraintSet = null;
-                    }
-                    this.mConstraintSetId = resourceId2;
-                }
-            }
-            obtainStyledAttributes.recycle();
-        }
-        this.mLayoutWidget.mOptimizationLevel = this.mOptimizationLevel;
-    }
-
-    public boolean isRtl() {
-        return ((getContext().getApplicationInfo().flags & QuickStepContract.SYSUI_STATE_BACK_DISABLED) != 0) && 1 == getLayoutDirection();
-    }
-
-    @Override // android.view.ViewGroup, android.view.View
-    public void onLayout(boolean z, int i, int i2, int i3, int i4) {
-        View view;
-        int childCount = getChildCount();
-        boolean isInEditMode = isInEditMode();
-        for (int i5 = 0; i5 < childCount; i5++) {
-            View childAt = getChildAt(i5);
-            LayoutParams layoutParams = (LayoutParams) childAt.getLayoutParams();
-            ConstraintWidget constraintWidget = layoutParams.widget;
-            if ((childAt.getVisibility() != 8 || layoutParams.isGuideline || layoutParams.isHelper || isInEditMode) && !layoutParams.isInPlaceholder) {
-                int x = constraintWidget.getX();
-                int y = constraintWidget.getY();
-                int width = constraintWidget.getWidth() + x;
-                int height = constraintWidget.getHeight() + y;
-                childAt.layout(x, y, width, height);
-                if ((childAt instanceof Placeholder) && (view = ((Placeholder) childAt).mContent) != null) {
-                    view.setVisibility(0);
-                    view.layout(x, y, width, height);
-                }
-            }
-        }
-        int size = this.mConstraintHelpers.size();
-        if (size > 0) {
-            for (int i6 = 0; i6 < size; i6++) {
-                Objects.requireNonNull(this.mConstraintHelpers.get(i6));
-            }
-        }
-    }
-
-    /* JADX WARN: Removed duplicated region for block: B:108:0x01f8 A[ADDED_TO_REGION] */
-    /* JADX WARN: Removed duplicated region for block: B:114:0x0203  */
-    /* JADX WARN: Removed duplicated region for block: B:222:0x049f  */
-    /* JADX WARN: Removed duplicated region for block: B:228:0x04d2  */
-    /* JADX WARN: Removed duplicated region for block: B:233:0x04de  */
-    /* JADX WARN: Removed duplicated region for block: B:269:0x059f  */
-    /* JADX WARN: Removed duplicated region for block: B:271:0x05a4  */
-    /* JADX WARN: Removed duplicated region for block: B:364:0x0784  */
-    /* JADX WARN: Removed duplicated region for block: B:368:0x07cd  */
-    /* JADX WARN: Removed duplicated region for block: B:370:0x07d0  */
-    /* JADX WARN: Removed duplicated region for block: B:42:0x00e3  */
-    /* JADX WARN: Removed duplicated region for block: B:51:0x0101  */
-    /* JADX WARN: Removed duplicated region for block: B:59:0x0114  */
-    /* JADX WARN: Removed duplicated region for block: B:65:0x017f  */
-    /* JADX WARN: Removed duplicated region for block: B:66:0x0181  */
-    /* JADX WARN: Removed duplicated region for block: B:68:0x0184  */
-    /* JADX WARN: Removed duplicated region for block: B:76:0x0194  */
-    @Override // android.view.View
-    /*
-        Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
-    */
-    public void onMeasure(int r27, int r28) {
-        /*
-            Method dump skipped, instructions count: 2005
-            To view this dump add '--comments-level debug' option
-        */
-        throw new UnsupportedOperationException("Method not decompiled: androidx.constraintlayout.widget.ConstraintLayout.onMeasure(int, int):void");
-    }
-
-    @Override // android.view.ViewGroup
-    public void onViewAdded(View view) {
-        super.onViewAdded(view);
-        ConstraintWidget viewWidget = getViewWidget(view);
-        if ((view instanceof Guideline) && !(viewWidget instanceof Guideline)) {
-            LayoutParams layoutParams = (LayoutParams) view.getLayoutParams();
-            Guideline guideline = new Guideline();
-            layoutParams.widget = guideline;
-            layoutParams.isGuideline = true;
-            guideline.setOrientation(layoutParams.orientation);
-        }
-        if (view instanceof ConstraintHelper) {
-            ConstraintHelper constraintHelper = (ConstraintHelper) view;
-            constraintHelper.validateParams();
-            ((LayoutParams) view.getLayoutParams()).isHelper = true;
-            if (!this.mConstraintHelpers.contains(constraintHelper)) {
-                this.mConstraintHelpers.add(constraintHelper);
-            }
-        }
-        this.mChildrenByIds.put(view.getId(), view);
-        this.mDirtyHierarchy = true;
-    }
-
-    @Override // android.view.ViewGroup
-    public void onViewRemoved(View view) {
-        super.onViewRemoved(view);
-        this.mChildrenByIds.remove(view.getId());
-        ConstraintWidget viewWidget = getViewWidget(view);
-        this.mLayoutWidget.mChildren.remove(viewWidget);
-        viewWidget.mParent = null;
-        this.mConstraintHelpers.remove(view);
-        this.mDirtyHierarchy = true;
-    }
-
-    @Override // android.view.ViewGroup, android.view.ViewManager
-    public void removeView(View view) {
-        super.removeView(view);
-    }
-
-    @Override // android.view.View, android.view.ViewParent
-    public void requestLayout() {
-        this.mDirtyHierarchy = true;
-        super.requestLayout();
-    }
-
-    public void setDesignInformation(int i, Object obj, Object obj2) {
-        if (i == 0 && (obj instanceof String) && (obj2 instanceof Integer)) {
-            if (this.mDesignIds == null) {
-                this.mDesignIds = new HashMap<>();
-            }
-            String str = (String) obj;
-            int indexOf = str.indexOf("/");
-            if (indexOf != -1) {
-                str = str.substring(indexOf + 1);
-            }
-            this.mDesignIds.put(str, Integer.valueOf(((Integer) obj2).intValue()));
-        }
-    }
-
-    @Override // android.view.View
-    public void setId(int i) {
-        this.mChildrenByIds.remove(getId());
-        super.setId(i);
-        this.mChildrenByIds.put(getId(), this);
-    }
-
-    @Override // android.view.ViewGroup
-    public boolean shouldDelayChildPressedState() {
-        return false;
-    }
-
-    /* JADX WARN: Removed duplicated region for block: B:160:0x036a  */
-    /* JADX WARN: Removed duplicated region for block: B:163:0x0381  */
-    /* JADX WARN: Removed duplicated region for block: B:170:0x039e  */
-    /* JADX WARN: Removed duplicated region for block: B:173:0x03b7  */
-    /* JADX WARN: Removed duplicated region for block: B:180:0x03d9  */
-    /* JADX WARN: Removed duplicated region for block: B:183:0x03f2  */
-    /* JADX WARN: Removed duplicated region for block: B:190:0x0414  */
-    /* JADX WARN: Removed duplicated region for block: B:198:0x0463  */
-    /* JADX WARN: Removed duplicated region for block: B:201:0x046d  */
-    /*
-        Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
-    */
-    public final boolean updateHierarchy() {
-        /*
-            Method dump skipped, instructions count: 1561
-            To view this dump add '--comments-level debug' option
-        */
-        throw new UnsupportedOperationException("Method not decompiled: androidx.constraintlayout.widget.ConstraintLayout.updateHierarchy():boolean");
-    }
-
-    @Override // android.view.ViewGroup
-    public LayoutParams generateDefaultLayoutParams() {
-        return new LayoutParams(-2, -2);
-    }
-
-    @Override // android.view.ViewGroup
-    public ViewGroup.LayoutParams generateLayoutParams(ViewGroup.LayoutParams layoutParams) {
-        return new LayoutParams(layoutParams);
-    }
-
-    public ConstraintLayout(Context context, AttributeSet attributeSet) {
-        super(context, attributeSet);
-        init(attributeSet, 0, 0);
-    }
-
-    public ConstraintLayout(Context context, AttributeSet attributeSet, int i) {
-        super(context, attributeSet, i);
-        init(attributeSet, i, 0);
-    }
-
-    @TargetApi(21)
-    public ConstraintLayout(Context context, AttributeSet attributeSet, int i, int i2) {
-        super(context, attributeSet, i, i2);
-        init(attributeSet, i, i2);
-    }
 
     /* loaded from: classes.dex */
     public static class LayoutParams extends ViewGroup.MarginLayoutParams {
@@ -616,7 +233,7 @@ public class ConstraintLayout extends ViewGroup {
             this.resolveGoneRightMargin = -1;
             this.resolvedHorizontalBias = 0.5f;
             this.widget = new ConstraintWidget();
-            TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, R$styleable.ConstraintLayout_Layout);
+            TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, SliceProviderCompat$2.ConstraintLayout_Layout);
             int indexCount = obtainStyledAttributes.getIndexCount();
             for (int i2 = 0; i2 < indexCount; i2++) {
                 int index = obtainStyledAttributes.getIndex(i2);
@@ -958,28 +575,7 @@ public class ConstraintLayout extends ViewGroup {
             validate();
         }
 
-        /* JADX WARN: Removed duplicated region for block: B:17:0x004c  */
-        /* JADX WARN: Removed duplicated region for block: B:20:0x0053  */
-        /* JADX WARN: Removed duplicated region for block: B:23:0x005a  */
-        /* JADX WARN: Removed duplicated region for block: B:26:0x0060  */
-        /* JADX WARN: Removed duplicated region for block: B:29:0x0066  */
-        /* JADX WARN: Removed duplicated region for block: B:36:0x0078  */
-        /* JADX WARN: Removed duplicated region for block: B:37:0x0080  */
-        @Override // android.view.ViewGroup.MarginLayoutParams, android.view.ViewGroup.LayoutParams
-        @android.annotation.TargetApi(17)
-        /*
-            Code decompiled incorrectly, please refer to instructions dump.
-            To view partially-correct add '--show-bad-code' argument
-        */
-        public void resolveLayoutDirection(int r10) {
-            /*
-                Method dump skipped, instructions count: 257
-                To view this dump add '--comments-level debug' option
-            */
-            throw new UnsupportedOperationException("Method not decompiled: androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.resolveLayoutDirection(int):void");
-        }
-
-        public void validate() {
+        public final void validate() {
             this.isGuideline = false;
             this.horizontalDimensionFixed = true;
             this.verticalDimensionFixed = true;
@@ -1022,8 +618,29 @@ public class ConstraintLayout extends ViewGroup {
             }
         }
 
-        public LayoutParams(int i, int i2) {
-            super(i, i2);
+        /* JADX WARN: Removed duplicated region for block: B:17:0x0048  */
+        /* JADX WARN: Removed duplicated region for block: B:20:0x004f  */
+        /* JADX WARN: Removed duplicated region for block: B:23:0x0056  */
+        /* JADX WARN: Removed duplicated region for block: B:26:0x005c  */
+        /* JADX WARN: Removed duplicated region for block: B:29:0x0062  */
+        /* JADX WARN: Removed duplicated region for block: B:36:0x0074  */
+        /* JADX WARN: Removed duplicated region for block: B:37:0x007c  */
+        @Override // android.view.ViewGroup.MarginLayoutParams, android.view.ViewGroup.LayoutParams
+        @android.annotation.TargetApi(17)
+        /*
+            Code decompiled incorrectly, please refer to instructions dump.
+            To view partially-correct add '--show-bad-code' argument
+        */
+        public final void resolveLayoutDirection(int r10) {
+            /*
+                Method dump skipped, instructions count: 253
+                To view this dump add '--comments-level debug' option
+            */
+            throw new UnsupportedOperationException("Method not decompiled: androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.resolveLayoutDirection(int):void");
+        }
+
+        public LayoutParams() {
+            super(-2, -2);
             this.guideBegin = -1;
             this.guideEnd = -1;
             this.guidePercent = -1.0f;
@@ -1151,5 +768,383 @@ public class ConstraintLayout extends ViewGroup {
             this.resolvedHorizontalBias = 0.5f;
             this.widget = new ConstraintWidget();
         }
+    }
+
+    /* loaded from: classes.dex */
+    public class Measurer implements BasicMeasure.Measurer {
+        public ConstraintLayout layout;
+
+        /* JADX WARN: Removed duplicated region for block: B:105:0x0172  */
+        /* JADX WARN: Removed duplicated region for block: B:111:0x018e  */
+        /* JADX WARN: Removed duplicated region for block: B:113:0x0194  */
+        /* JADX WARN: Removed duplicated region for block: B:116:0x019d  */
+        /* JADX WARN: Removed duplicated region for block: B:117:0x01a2  */
+        /* JADX WARN: Removed duplicated region for block: B:120:0x01a7  */
+        /* JADX WARN: Removed duplicated region for block: B:123:0x01af  */
+        /* JADX WARN: Removed duplicated region for block: B:124:0x01b4  */
+        /* JADX WARN: Removed duplicated region for block: B:127:0x01b9  */
+        /* JADX WARN: Removed duplicated region for block: B:130:0x01c1 A[ADDED_TO_REGION] */
+        /* JADX WARN: Removed duplicated region for block: B:133:0x01cc A[ADDED_TO_REGION] */
+        /* JADX WARN: Removed duplicated region for block: B:136:0x01d6 A[ADDED_TO_REGION] */
+        /* JADX WARN: Removed duplicated region for block: B:139:0x01dc  */
+        /* JADX WARN: Removed duplicated region for block: B:141:0x01e2  */
+        /* JADX WARN: Removed duplicated region for block: B:145:0x01f8  */
+        /* JADX WARN: Removed duplicated region for block: B:146:0x01fa  */
+        /* JADX WARN: Removed duplicated region for block: B:149:0x01ff  */
+        /* JADX WARN: Removed duplicated region for block: B:155:0x020d  */
+        /* JADX WARN: Removed duplicated region for block: B:157:0x0210  */
+        /* JADX WARN: Removed duplicated region for block: B:38:0x00aa  */
+        /* JADX WARN: Removed duplicated region for block: B:65:0x0110  */
+        /* JADX WARN: Removed duplicated region for block: B:69:0x011b  */
+        /* JADX WARN: Removed duplicated region for block: B:70:0x011d  */
+        /* JADX WARN: Removed duplicated region for block: B:72:0x0120  */
+        /* JADX WARN: Removed duplicated region for block: B:73:0x0122  */
+        /* JADX WARN: Removed duplicated region for block: B:76:0x0127 A[ADDED_TO_REGION] */
+        /* JADX WARN: Removed duplicated region for block: B:80:0x012f A[ADDED_TO_REGION] */
+        /* JADX WARN: Removed duplicated region for block: B:85:0x0138  */
+        /* JADX WARN: Removed duplicated region for block: B:90:0x0143  */
+        /* JADX WARN: Removed duplicated region for block: B:96:0x015c A[ADDED_TO_REGION] */
+        @android.annotation.SuppressLint({"WrongCall"})
+        /*
+            Code decompiled incorrectly, please refer to instructions dump.
+            To view partially-correct add '--show-bad-code' argument
+        */
+        public final void measure(androidx.constraintlayout.solver.widgets.ConstraintWidget r18, androidx.constraintlayout.solver.widgets.analyzer.BasicMeasure.Measure r19) {
+            /*
+                Method dump skipped, instructions count: 547
+                To view this dump add '--comments-level debug' option
+            */
+            throw new UnsupportedOperationException("Method not decompiled: androidx.constraintlayout.widget.ConstraintLayout.Measurer.measure(androidx.constraintlayout.solver.widgets.ConstraintWidget, androidx.constraintlayout.solver.widgets.analyzer.BasicMeasure$Measure):void");
+        }
+
+        public Measurer(ConstraintLayout constraintLayout) {
+            this.layout = constraintLayout;
+        }
+    }
+
+    public ConstraintLayout(Context context) {
+        super(context);
+        init(null, 0, 0);
+    }
+
+    @Override // android.view.View
+    public final void forceLayout() {
+        this.mDirtyHierarchy = true;
+        super.forceLayout();
+    }
+
+    @Override // android.view.ViewGroup
+    public final ViewGroup.LayoutParams generateLayoutParams(AttributeSet attributeSet) {
+        return new LayoutParams(getContext(), attributeSet);
+    }
+
+    @Override // android.view.View, android.view.ViewParent
+    public final void requestLayout() {
+        this.mDirtyHierarchy = true;
+        super.requestLayout();
+    }
+
+    @Override // android.view.ViewGroup
+    public final boolean shouldDelayChildPressedState() {
+        return false;
+    }
+
+    @Override // android.view.ViewGroup, android.view.View
+    public final void dispatchDraw(Canvas canvas) {
+        Object tag;
+        int size;
+        ArrayList<ConstraintHelper> arrayList = this.mConstraintHelpers;
+        if (arrayList != null && (size = arrayList.size()) > 0) {
+            for (int i = 0; i < size; i++) {
+                this.mConstraintHelpers.get(i).getClass();
+            }
+        }
+        super.dispatchDraw(canvas);
+        if (isInEditMode()) {
+            int childCount = getChildCount();
+            float width = getWidth();
+            float height = getHeight();
+            for (int i2 = 0; i2 < childCount; i2++) {
+                View childAt = getChildAt(i2);
+                if (!(childAt.getVisibility() == 8 || (tag = childAt.getTag()) == null || !(tag instanceof String))) {
+                    String[] split = ((String) tag).split(",");
+                    if (split.length == 4) {
+                        int parseInt = Integer.parseInt(split[0]);
+                        int parseInt2 = Integer.parseInt(split[1]);
+                        int parseInt3 = Integer.parseInt(split[2]);
+                        int i3 = (int) ((parseInt / 1080.0f) * width);
+                        int i4 = (int) ((parseInt2 / 1920.0f) * height);
+                        Paint paint = new Paint();
+                        paint.setColor(-65536);
+                        float f = i3;
+                        float f2 = i4;
+                        float f3 = i3 + ((int) ((parseInt3 / 1080.0f) * width));
+                        canvas.drawLine(f, f2, f3, f2, paint);
+                        float parseInt4 = i4 + ((int) ((Integer.parseInt(split[3]) / 1920.0f) * height));
+                        canvas.drawLine(f3, f2, f3, parseInt4, paint);
+                        canvas.drawLine(f3, parseInt4, f, parseInt4, paint);
+                        canvas.drawLine(f, parseInt4, f, f2, paint);
+                        paint.setColor(-16711936);
+                        canvas.drawLine(f, f2, f3, parseInt4, paint);
+                        canvas.drawLine(f, parseInt4, f3, f2, paint);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override // android.view.ViewGroup
+    public final ViewGroup.LayoutParams generateDefaultLayoutParams() {
+        return new LayoutParams();
+    }
+
+    @Override // android.view.ViewGroup
+    public final ViewGroup.LayoutParams generateLayoutParams(ViewGroup.LayoutParams layoutParams) {
+        return new LayoutParams(layoutParams);
+    }
+
+    public final ConstraintWidget getViewWidget(View view) {
+        if (view == this) {
+            return this.mLayoutWidget;
+        }
+        if (view == null) {
+            return null;
+        }
+        return ((LayoutParams) view.getLayoutParams()).widget;
+    }
+
+    public final void init(AttributeSet attributeSet, int i, int i2) {
+        ConstraintWidgetContainer constraintWidgetContainer = this.mLayoutWidget;
+        constraintWidgetContainer.mCompanionWidget = this;
+        Measurer measurer = this.mMeasurer;
+        constraintWidgetContainer.mMeasurer = measurer;
+        constraintWidgetContainer.mDependencyGraph.mMeasurer = measurer;
+        this.mChildrenByIds.put(getId(), this);
+        this.mConstraintSet = null;
+        if (attributeSet != null) {
+            TypedArray obtainStyledAttributes = getContext().obtainStyledAttributes(attributeSet, SliceProviderCompat$2.ConstraintLayout_Layout, i, i2);
+            int indexCount = obtainStyledAttributes.getIndexCount();
+            for (int i3 = 0; i3 < indexCount; i3++) {
+                int index = obtainStyledAttributes.getIndex(i3);
+                if (index == 9) {
+                    this.mMinWidth = obtainStyledAttributes.getDimensionPixelOffset(index, this.mMinWidth);
+                } else if (index == 10) {
+                    this.mMinHeight = obtainStyledAttributes.getDimensionPixelOffset(index, this.mMinHeight);
+                } else if (index == 7) {
+                    this.mMaxWidth = obtainStyledAttributes.getDimensionPixelOffset(index, this.mMaxWidth);
+                } else if (index == 8) {
+                    this.mMaxHeight = obtainStyledAttributes.getDimensionPixelOffset(index, this.mMaxHeight);
+                } else if (index == 89) {
+                    this.mOptimizationLevel = obtainStyledAttributes.getInt(index, this.mOptimizationLevel);
+                } else if (index == 38) {
+                    int resourceId = obtainStyledAttributes.getResourceId(index, 0);
+                    if (resourceId != 0) {
+                        try {
+                            new ConstraintLayoutStates(getContext(), resourceId);
+                        } catch (Resources.NotFoundException unused) {
+                        }
+                    }
+                } else if (index == 18) {
+                    int resourceId2 = obtainStyledAttributes.getResourceId(index, 0);
+                    try {
+                        ConstraintSet constraintSet = new ConstraintSet();
+                        this.mConstraintSet = constraintSet;
+                        constraintSet.load(getContext(), resourceId2);
+                    } catch (Resources.NotFoundException unused2) {
+                        this.mConstraintSet = null;
+                    }
+                    this.mConstraintSetId = resourceId2;
+                }
+            }
+            obtainStyledAttributes.recycle();
+        }
+        this.mLayoutWidget.mOptimizationLevel = this.mOptimizationLevel;
+    }
+
+    /* JADX WARN: Removed duplicated region for block: B:115:0x021e A[ADDED_TO_REGION] */
+    /* JADX WARN: Removed duplicated region for block: B:121:0x0229  */
+    /* JADX WARN: Removed duplicated region for block: B:231:0x04d1  */
+    /* JADX WARN: Removed duplicated region for block: B:237:0x0504  */
+    /* JADX WARN: Removed duplicated region for block: B:242:0x0510  */
+    /* JADX WARN: Removed duplicated region for block: B:277:0x05cd  */
+    /* JADX WARN: Removed duplicated region for block: B:278:0x05d5  */
+    /* JADX WARN: Removed duplicated region for block: B:27:0x00b5  */
+    /* JADX WARN: Removed duplicated region for block: B:280:0x05db  */
+    /* JADX WARN: Removed duplicated region for block: B:34:0x00d3  */
+    /* JADX WARN: Removed duplicated region for block: B:373:0x07d0  */
+    /* JADX WARN: Removed duplicated region for block: B:377:0x0819  */
+    /* JADX WARN: Removed duplicated region for block: B:379:0x081c  */
+    /* JADX WARN: Removed duplicated region for block: B:42:0x00e9  */
+    /* JADX WARN: Removed duplicated region for block: B:51:0x010e  */
+    /* JADX WARN: Removed duplicated region for block: B:58:0x0123  */
+    /* JADX WARN: Removed duplicated region for block: B:64:0x0163  */
+    /* JADX WARN: Removed duplicated region for block: B:65:0x0167  */
+    /* JADX WARN: Removed duplicated region for block: B:68:0x0170  */
+    /* JADX WARN: Removed duplicated region for block: B:69:0x0173  */
+    /* JADX WARN: Removed duplicated region for block: B:72:0x019a  */
+    /* JADX WARN: Removed duplicated region for block: B:73:0x019c  */
+    /* JADX WARN: Removed duplicated region for block: B:75:0x019f  */
+    /* JADX WARN: Removed duplicated region for block: B:83:0x01af  */
+    @Override // android.view.View
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+        To view partially-correct add '--show-bad-code' argument
+    */
+    public void onMeasure(int r28, int r29) {
+        /*
+            Method dump skipped, instructions count: 2081
+            To view this dump add '--comments-level debug' option
+        */
+        throw new UnsupportedOperationException("Method not decompiled: androidx.constraintlayout.widget.ConstraintLayout.onMeasure(int, int):void");
+    }
+
+    public final void setDesignInformation(String str, Integer num) {
+        if ((str instanceof String) && (num instanceof Integer)) {
+            if (this.mDesignIds == null) {
+                this.mDesignIds = new HashMap<>();
+            }
+            int indexOf = str.indexOf("/");
+            if (indexOf != -1) {
+                str = str.substring(indexOf + 1);
+            }
+            this.mDesignIds.put(str, Integer.valueOf(num.intValue()));
+        }
+    }
+
+    @Override // android.view.View
+    public final void setId(int i) {
+        this.mChildrenByIds.remove(getId());
+        super.setId(i);
+        this.mChildrenByIds.put(getId(), this);
+    }
+
+    /* JADX WARN: Removed duplicated region for block: B:206:0x04ad  */
+    /* JADX WARN: Removed duplicated region for block: B:209:0x04b5  */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+        To view partially-correct add '--show-bad-code' argument
+    */
+    public final boolean updateHierarchy() {
+        /*
+            Method dump skipped, instructions count: 1624
+            To view this dump add '--comments-level debug' option
+        */
+        throw new UnsupportedOperationException("Method not decompiled: androidx.constraintlayout.widget.ConstraintLayout.updateHierarchy():boolean");
+    }
+
+    public final int getPaddingWidth() {
+        int paddingRight = getPaddingRight() + getPaddingLeft();
+        int paddingEnd = getPaddingEnd() + getPaddingStart();
+        if (paddingEnd > 0) {
+            return paddingEnd;
+        }
+        return paddingRight;
+    }
+
+    public final boolean isRtl() {
+        boolean z;
+        if ((getContext().getApplicationInfo().flags & QuickStepContract.SYSUI_STATE_BACK_DISABLED) != 0) {
+            z = true;
+        } else {
+            z = false;
+        }
+        if (!z || 1 != getLayoutDirection()) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override // android.view.ViewGroup, android.view.View
+    public void onLayout(boolean z, int i, int i2, int i3, int i4) {
+        View view;
+        int childCount = getChildCount();
+        boolean isInEditMode = isInEditMode();
+        for (int i5 = 0; i5 < childCount; i5++) {
+            View childAt = getChildAt(i5);
+            LayoutParams layoutParams = (LayoutParams) childAt.getLayoutParams();
+            ConstraintWidget constraintWidget = layoutParams.widget;
+            if ((childAt.getVisibility() != 8 || layoutParams.isGuideline || layoutParams.isHelper || isInEditMode) && !layoutParams.isInPlaceholder) {
+                int x = constraintWidget.getX();
+                int y = constraintWidget.getY();
+                int width = constraintWidget.getWidth() + x;
+                int height = constraintWidget.getHeight() + y;
+                childAt.layout(x, y, width, height);
+                if ((childAt instanceof Placeholder) && (view = ((Placeholder) childAt).mContent) != null) {
+                    view.setVisibility(0);
+                    view.layout(x, y, width, height);
+                }
+            }
+        }
+        int size = this.mConstraintHelpers.size();
+        if (size > 0) {
+            for (int i6 = 0; i6 < size; i6++) {
+                this.mConstraintHelpers.get(i6).getClass();
+            }
+        }
+    }
+
+    @Override // android.view.ViewGroup
+    public final void onViewAdded(View view) {
+        super.onViewAdded(view);
+        ConstraintWidget viewWidget = getViewWidget(view);
+        if ((view instanceof Guideline) && !(viewWidget instanceof Guideline)) {
+            LayoutParams layoutParams = (LayoutParams) view.getLayoutParams();
+            Guideline guideline = new Guideline();
+            layoutParams.widget = guideline;
+            layoutParams.isGuideline = true;
+            guideline.setOrientation(layoutParams.orientation);
+        }
+        if (view instanceof ConstraintHelper) {
+            ConstraintHelper constraintHelper = (ConstraintHelper) view;
+            constraintHelper.validateParams();
+            ((LayoutParams) view.getLayoutParams()).isHelper = true;
+            if (!this.mConstraintHelpers.contains(constraintHelper)) {
+                this.mConstraintHelpers.add(constraintHelper);
+            }
+        }
+        this.mChildrenByIds.put(view.getId(), view);
+        this.mDirtyHierarchy = true;
+    }
+
+    @Override // android.view.ViewGroup
+    public void onViewRemoved(View view) {
+        super.onViewRemoved(view);
+        this.mChildrenByIds.remove(view.getId());
+        ConstraintWidget viewWidget = getViewWidget(view);
+        this.mLayoutWidget.mChildren.remove(viewWidget);
+        viewWidget.mParent = null;
+        this.mConstraintHelpers.remove(view);
+        this.mDirtyHierarchy = true;
+    }
+
+    public ConstraintLayout(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet);
+        init(attributeSet, 0, 0);
+    }
+
+    public ConstraintLayout(Context context, AttributeSet attributeSet, int i) {
+        super(context, attributeSet, i);
+        init(attributeSet, i, 0);
+    }
+
+    @TargetApi(21)
+    public ConstraintLayout(Context context, AttributeSet attributeSet, int i, int i2) {
+        super(context, attributeSet, i, i2);
+        init(attributeSet, i, i2);
+    }
+
+    @Override // android.view.ViewGroup
+    public void addView(View view, int i, ViewGroup.LayoutParams layoutParams) {
+        super.addView(view, i, layoutParams);
+    }
+
+    @Override // android.view.ViewGroup
+    public final boolean checkLayoutParams(ViewGroup.LayoutParams layoutParams) {
+        return layoutParams instanceof LayoutParams;
+    }
+
+    @Override // android.view.ViewGroup, android.view.ViewManager
+    public final void removeView(View view) {
+        super.removeView(view);
     }
 }

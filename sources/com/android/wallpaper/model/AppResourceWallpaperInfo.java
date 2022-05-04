@@ -18,12 +18,12 @@ import java.util.List;
 public class AppResourceWallpaperInfo extends WallpaperInfo {
     public static final Parcelable.Creator<AppResourceWallpaperInfo> CREATOR = new Parcelable.Creator<AppResourceWallpaperInfo>() { // from class: com.android.wallpaper.model.AppResourceWallpaperInfo.1
         @Override // android.os.Parcelable.Creator
-        public AppResourceWallpaperInfo createFromParcel(Parcel parcel) {
-            return new AppResourceWallpaperInfo(parcel, null);
+        public final AppResourceWallpaperInfo createFromParcel(Parcel parcel) {
+            return new AppResourceWallpaperInfo(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public AppResourceWallpaperInfo[] newArray(int i) {
+        public final AppResourceWallpaperInfo[] newArray(int i) {
             return new AppResourceWallpaperInfo[i];
         }
     };
@@ -40,7 +40,28 @@ public class AppResourceWallpaperInfo extends WallpaperInfo {
         this.mFullRes = i2;
     }
 
-    public static List<WallpaperInfo> getAll(Context context, ApplicationInfo applicationInfo, int i) {
+    public final boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof AppResourceWallpaperInfo)) {
+            return false;
+        }
+        AppResourceWallpaperInfo appResourceWallpaperInfo = (AppResourceWallpaperInfo) obj;
+        return this.mPackageName.equals(appResourceWallpaperInfo.mPackageName) && this.mThumbRes == appResourceWallpaperInfo.mThumbRes && this.mFullRes == appResourceWallpaperInfo.mFullRes;
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final List<String> getAttributions(Context context) {
+        return Arrays.asList(context.getResources().getString(R.string.on_device_wallpaper_title));
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final int getBackupPermission() {
+        return 0;
+    }
+
+    public static ArrayList getAll(Context context, ApplicationInfo applicationInfo, int i) {
         String[] stringArray;
         ArrayList arrayList = new ArrayList();
         try {
@@ -58,79 +79,63 @@ public class AppResourceWallpaperInfo extends WallpaperInfo {
         return arrayList;
     }
 
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (!(obj instanceof AppResourceWallpaperInfo)) {
-            return false;
-        }
-        AppResourceWallpaperInfo appResourceWallpaperInfo = (AppResourceWallpaperInfo) obj;
-        return this.mPackageName.equals(appResourceWallpaperInfo.mPackageName) && this.mThumbRes == appResourceWallpaperInfo.mThumbRes && this.mFullRes == appResourceWallpaperInfo.mFullRes;
-    }
-
     @Override // com.android.wallpaper.model.WallpaperInfo
-    public Asset getAsset(Context context) {
+    public final Asset getAsset(Context context) {
         if (this.mAsset == null) {
-            this.mAsset = new ResourceAsset(getPackageResources(context), this.mFullRes);
+            Resources resources = this.mResources;
+            if (resources == null) {
+                try {
+                    this.mResources = context.getPackageManager().getResourcesForApplication(this.mPackageName);
+                } catch (PackageManager.NameNotFoundException unused) {
+                    Log.e("AppResource", "Could not get app resources");
+                }
+                resources = this.mResources;
+            }
+            this.mAsset = new ResourceAsset(resources, this.mFullRes);
         }
         return this.mAsset;
     }
 
     @Override // com.android.wallpaper.model.WallpaperInfo
-    public List<String> getAttributions(Context context) {
-        return Arrays.asList(context.getResources().getString(R.string.on_device_wallpaper_title));
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public int getBackupPermission() {
-        return 0;
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public String getCollectionId(Context context) {
-        return context.getString(R.string.on_device_wallpaper_collection_id);
-    }
-
-    public final Resources getPackageResources(Context context) {
-        Resources resources = this.mResources;
-        if (resources != null) {
-            return resources;
-        }
-        try {
-            this.mResources = context.getPackageManager().getResourcesForApplication(this.mPackageName);
-        } catch (PackageManager.NameNotFoundException unused) {
-            Log.e("AppResource", "Could not get app resources");
-        }
-        return this.mResources;
-    }
-
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public Asset getThumbAsset(Context context) {
+    public final Asset getThumbAsset(Context context) {
         if (this.mThumbAsset == null) {
-            this.mThumbAsset = new ResourceAsset(getPackageResources(context), this.mThumbRes);
+            Resources resources = this.mResources;
+            if (resources == null) {
+                try {
+                    this.mResources = context.getPackageManager().getResourcesForApplication(this.mPackageName);
+                } catch (PackageManager.NameNotFoundException unused) {
+                    Log.e("AppResource", "Could not get app resources");
+                }
+                resources = this.mResources;
+            }
+            this.mThumbAsset = new ResourceAsset(resources, this.mThumbRes);
         }
         return this.mThumbAsset;
     }
 
-    public int hashCode() {
+    public final int hashCode() {
         return ((((this.mPackageName.hashCode() + 527) * 31) + this.mThumbRes) * 31) + this.mFullRes;
     }
 
-    @Override // com.android.wallpaper.model.WallpaperInfo
-    public void showPreview(Activity activity, InlinePreviewIntentFactory inlinePreviewIntentFactory, int i) {
-        activity.startActivityForResult(inlinePreviewIntentFactory.newIntent(activity, this), i);
-    }
-
     @Override // com.android.wallpaper.model.WallpaperInfo, android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
+    public final void writeToParcel(Parcel parcel, int i) {
         parcel.writeInt(this.mPlaceholderColor);
         parcel.writeString(this.mPackageName);
         parcel.writeInt(this.mThumbRes);
         parcel.writeInt(this.mFullRes);
     }
 
-    public AppResourceWallpaperInfo(Parcel parcel, AnonymousClass1 r2) {
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final String getCollectionId(Context context) {
+        return context.getString(R.string.on_device_wallpaper_collection_id);
+    }
+
+    @Override // com.android.wallpaper.model.WallpaperInfo
+    public final void showPreview(Activity activity, InlinePreviewIntentFactory inlinePreviewIntentFactory, int i) {
+        activity.startActivityForResult(inlinePreviewIntentFactory.newIntent(activity, this), i);
+    }
+
+    public AppResourceWallpaperInfo(Parcel parcel) {
         super(parcel);
         this.mPackageName = parcel.readString();
         this.mThumbRes = parcel.readInt();

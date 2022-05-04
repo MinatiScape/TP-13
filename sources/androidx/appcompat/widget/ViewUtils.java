@@ -8,7 +8,7 @@ import androidx.core.view.ViewPropertyAnimatorCompat;
 import java.lang.reflect.Method;
 import java.util.WeakHashMap;
 /* loaded from: classes.dex */
-public class ViewUtils {
+public final class ViewUtils {
     public static Method sComputeFitSystemWindowsMethod;
 
     static {
@@ -23,19 +23,11 @@ public class ViewUtils {
         }
     }
 
-    public static void computeFitSystemWindows(View view, Rect rect, Rect rect2) {
-        Method method = sComputeFitSystemWindowsMethod;
-        if (method != null) {
-            try {
-                method.invoke(view, rect, rect2);
-            } catch (Exception e) {
-                Log.d("ViewUtils", "Could not invoke computeFitSystemWindows", e);
-            }
-        }
-    }
-
     public static boolean isLayoutRtl(View view) {
         WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-        return view.getLayoutDirection() == 1;
+        if (ViewCompat.Api17Impl.getLayoutDirection(view) == 1) {
+            return true;
+        }
+        return false;
     }
 }

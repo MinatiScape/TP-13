@@ -7,31 +7,33 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.ViewPropertyAnimatorCompat;
 import java.util.WeakHashMap;
 /* loaded from: classes.dex */
-public class ViewUtils {
-    public static final Property<View, Float> TRANSITION_ALPHA = new Property<View, Float>(Float.class, "translationAlpha") { // from class: androidx.transition.ViewUtils.1
+public final class ViewUtils {
+    public static final ViewUtilsApi29 IMPL = new ViewUtilsApi29();
+    public static final AnonymousClass1 TRANSITION_ALPHA = new Property<View, Float>() { // from class: androidx.transition.ViewUtils.1
         @Override // android.util.Property
-        public Float get(View view) {
+        public final Float get(View view) {
             return Float.valueOf(view.getTransitionAlpha());
         }
 
         @Override // android.util.Property
-        public void set(View view, Float f) {
+        public final void set(View view, Float f) {
             view.setTransitionAlpha(f.floatValue());
         }
     };
 
+    /* JADX WARN: Type inference failed for: r0v1, types: [androidx.transition.ViewUtils$1] */
     static {
-        new Property<View, Rect>(Rect.class, "clipBounds") { // from class: androidx.transition.ViewUtils.2
+        new Property<View, Rect>(Rect.class) { // from class: androidx.transition.ViewUtils.2
             @Override // android.util.Property
-            public Rect get(View view) {
+            public final Rect get(View view) {
                 WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-                return view.getClipBounds();
+                return ViewCompat.Api18Impl.getClipBounds(view);
             }
 
             @Override // android.util.Property
-            public void set(View view, Rect rect) {
+            public final void set(View view, Rect rect) {
                 WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-                view.setClipBounds(rect);
+                ViewCompat.Api18Impl.setClipBounds(view, rect);
             }
         };
     }

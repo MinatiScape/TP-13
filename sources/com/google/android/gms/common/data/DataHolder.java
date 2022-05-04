@@ -5,13 +5,12 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
-import androidx.slice.view.R$layout;
+import androidx.core.R$id;
 import com.google.android.gms.common.annotation.KeepName;
 import com.google.android.gms.internal.zzbkv;
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
 @KeepName
 /* loaded from: classes.dex */
 public final class DataHolder extends zzbkv implements Closeable {
@@ -25,20 +24,6 @@ public final class DataHolder extends zzbkv implements Closeable {
     public int[] zzg;
     public boolean zzi = false;
     public boolean zzj = true;
-
-    static {
-        Objects.requireNonNull(new String[0], "null reference");
-        new ArrayList();
-        new HashMap();
-    }
-
-    public DataHolder(int i, String[] strArr, CursorWindow[] cursorWindowArr, int i2, Bundle bundle) {
-        this.zza = i;
-        this.zzb = strArr;
-        this.zzd = cursorWindowArr;
-        this.zze = i2;
-        this.zzf = bundle;
-    }
 
     @Override // java.io.Closeable, java.lang.AutoCloseable
     public final void close() {
@@ -56,6 +41,11 @@ public final class DataHolder extends zzbkv implements Closeable {
                 }
             }
         }
+    }
+
+    static {
+        new ArrayList();
+        new HashMap();
     }
 
     public final void finalize() throws Throwable {
@@ -82,19 +72,27 @@ public final class DataHolder extends zzbkv implements Closeable {
 
     @Override // android.os.Parcelable
     public final void writeToParcel(Parcel parcel, int i) {
-        int zzb = R$layout.zzb(parcel, 20293);
-        R$layout.zza(parcel, 1, this.zzb, false);
-        R$layout.zza(parcel, 2, this.zzd, i);
+        int zzb = R$id.zzb(parcel, 20293);
+        R$id.zza(parcel, 1, this.zzb);
+        R$id.zza(parcel, 2, this.zzd, i);
         int i2 = this.zze;
-        R$layout.zzb(parcel, 3, 4);
+        R$id.zzb(parcel, 3, 4);
         parcel.writeInt(i2);
-        R$layout.zza(parcel, 4, this.zzf, false);
+        R$id.zza(parcel, 4, this.zzf);
         int i3 = this.zza;
-        R$layout.zzb(parcel, 1000, 4);
+        R$id.zzb(parcel, 1000, 4);
         parcel.writeInt(i3);
-        R$layout.zzc(parcel, zzb);
+        R$id.zzc(parcel, zzb);
         if ((i & 1) != 0) {
             close();
         }
+    }
+
+    public DataHolder(int i, String[] strArr, CursorWindow[] cursorWindowArr, int i2, Bundle bundle) {
+        this.zza = i;
+        this.zzb = strArr;
+        this.zzd = cursorWindowArr;
+        this.zze = i2;
+        this.zzf = bundle;
     }
 }

@@ -8,13 +8,14 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.internal.zzbkw;
 import java.util.ArrayList;
 import java.util.HashMap;
+/* compiled from: GoogleSignInOptionsCreator.java */
 /* loaded from: classes.dex */
 public final class zze implements Parcelable.Creator<GoogleSignInOptions> {
     @Override // android.os.Parcelable.Creator
     public final GoogleSignInOptions createFromParcel(Parcel parcel) {
         int zza = zzbkw.zza(parcel);
-        int i = 0;
         ArrayList<zzo> arrayList = null;
+        int i = 0;
         boolean z = false;
         boolean z2 = false;
         boolean z3 = false;

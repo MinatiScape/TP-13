@@ -3,7 +3,6 @@ package com.google.android.gms.clearcut;
 import android.os.Parcel;
 import android.os.Parcelable;
 import androidx.core.R$id;
-import androidx.slice.view.R$layout;
 import com.google.android.gms.clearcut.ClearcutLogger;
 import com.google.android.gms.clearcut.internal.PlayLoggerContext;
 import com.google.android.gms.internal.zzbkv;
@@ -25,7 +24,7 @@ public class LogEventParcelable extends zzbkv {
     public PlayLoggerContext playLoggerContext;
     public int[] testCodes;
 
-    public LogEventParcelable(PlayLoggerContext playLoggerContext, zzgsv zzgsvVar, ClearcutLogger.MessageProducer messageProducer, ClearcutLogger.MessageProducer messageProducer2, int[] iArr, String[] strArr, int[] iArr2, byte[][] bArr, ExperimentTokens[] experimentTokensArr, boolean z) {
+    public LogEventParcelable(PlayLoggerContext playLoggerContext, zzgsv zzgsvVar, ClearcutLogger.MessageProducer messageProducer, int[] iArr, int[] iArr2, boolean z) {
         this.playLoggerContext = playLoggerContext;
         this.logEvent = zzgsvVar;
         this.extensionProducer = messageProducer;
@@ -38,7 +37,7 @@ public class LogEventParcelable extends zzbkv {
         this.addPhenotypeExperimentTokens = z;
     }
 
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
@@ -51,16 +50,22 @@ public class LogEventParcelable extends zzbkv {
         return false;
     }
 
-    public int hashCode() {
+    public final int hashCode() {
         return Arrays.hashCode(new Object[]{this.playLoggerContext, this.logEventBytes, this.testCodes, this.mendelPackages, this.logEvent, this.extensionProducer, this.clientVisualElementsProducer, this.experimentIds, this.experimentTokens, this.experimentTokensParcelables, Boolean.valueOf(this.addPhenotypeExperimentTokens)});
     }
 
-    public String toString() {
+    public final String toString() {
+        String str;
         StringBuilder sb = new StringBuilder("LogEventParcelable[");
         sb.append(this.playLoggerContext);
         sb.append(", LogEventBytes: ");
         byte[] bArr = this.logEventBytes;
-        sb.append(bArr == null ? null : new String(bArr));
+        if (bArr == null) {
+            str = null;
+        } else {
+            str = new String(bArr);
+        }
+        sb.append(str);
         sb.append(", TestCodes: ");
         sb.append(Arrays.toString(this.testCodes));
         sb.append(", MendelPackages: ");
@@ -84,19 +89,19 @@ public class LogEventParcelable extends zzbkv {
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
-        int zzb = R$layout.zzb(parcel, 20293);
-        R$layout.zza(parcel, 2, this.playLoggerContext, i, false);
-        R$layout.zza(parcel, 3, this.logEventBytes, false);
-        R$layout.zza(parcel, 4, this.testCodes, false);
-        R$layout.zza(parcel, 5, this.mendelPackages, false);
-        R$layout.zza(parcel, 6, this.experimentIds, false);
-        R$layout.zza(parcel, 7, this.experimentTokens);
+    public final void writeToParcel(Parcel parcel, int i) {
+        int zzb = R$id.zzb(parcel, 20293);
+        R$id.zza(parcel, 2, this.playLoggerContext, i);
+        R$id.zza(parcel, 3, this.logEventBytes);
+        R$id.zza(parcel, 4, this.testCodes);
+        R$id.zza(parcel, 5, this.mendelPackages);
+        R$id.zza(parcel, 6, this.experimentIds);
+        R$id.zza(parcel, 7, this.experimentTokens);
         boolean z = this.addPhenotypeExperimentTokens;
-        R$layout.zzb(parcel, 8, 4);
+        R$id.zzb(parcel, 8, 4);
         parcel.writeInt(z ? 1 : 0);
-        R$layout.zza(parcel, 9, this.experimentTokensParcelables, i);
-        R$layout.zzc(parcel, zzb);
+        R$id.zza(parcel, 9, this.experimentTokensParcelables, i);
+        R$id.zzc(parcel, zzb);
     }
 
     public LogEventParcelable(PlayLoggerContext playLoggerContext, byte[] bArr, int[] iArr, String[] strArr, int[] iArr2, byte[][] bArr2, boolean z, ExperimentTokens[] experimentTokensArr) {

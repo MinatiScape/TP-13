@@ -1,46 +1,12 @@
 package com.google.android.gms.internal;
 
 import java.io.IOException;
+/* compiled from: CountersProto.java */
 /* loaded from: classes.dex */
 public final class zzgsz extends zzgrt<zzgsz> {
     public static volatile zzgsz[] zzc;
     public long zza = 0;
     public zzgsy[] zzb;
-
-    public zzgsz() {
-        if (zzgsy.zzc == null) {
-            synchronized (zzgrx.zzb) {
-                if (zzgsy.zzc == null) {
-                    zzgsy.zzc = new zzgsy[0];
-                }
-            }
-        }
-        this.zzb = zzgsy.zzc;
-        this.zzay = null;
-        this.zzaz = -1;
-    }
-
-    @Override // com.google.android.gms.internal.zzgrt, com.google.android.gms.internal.zzgrz
-    public final int computeSerializedSize() {
-        super.computeSerializedSize();
-        int i = 0;
-        int zzb = this.zza != 0 ? zzgrr.zzb(1) + 8 + 0 : 0;
-        zzgsy[] zzgsyVarArr = this.zzb;
-        if (zzgsyVarArr != null && zzgsyVarArr.length > 0) {
-            while (true) {
-                zzgsy[] zzgsyVarArr2 = this.zzb;
-                if (i >= zzgsyVarArr2.length) {
-                    break;
-                }
-                zzgsy zzgsyVar = zzgsyVarArr2[i];
-                if (zzgsyVar != null) {
-                    zzb += zzgrr.zzb(3, zzgsyVar);
-                }
-                i++;
-            }
-        }
-        return zzb;
-    }
 
     public final boolean equals(Object obj) {
         if (obj == this) {
@@ -72,11 +38,11 @@ public final class zzgsz extends zzgrt<zzgsz> {
         return zza + i;
     }
 
-    @Override // com.google.android.gms.internal.zzgrt, com.google.android.gms.internal.zzgrz
+    @Override // com.google.android.gms.internal.zzgrt
     public final void writeTo(zzgrr zzgrrVar) throws IOException {
         long j = this.zza;
         if (j != 0) {
-            zzgrrVar.zzc(9);
+            zzgrrVar.zzc(1, 1);
             if (zzgrrVar.zza.remaining() >= 8) {
                 zzgrrVar.zza.putLong(j);
             } else {
@@ -99,5 +65,45 @@ public final class zzgsz extends zzgrt<zzgsz> {
             }
         }
         super.writeTo(zzgrrVar);
+    }
+
+    public zzgsz() {
+        if (zzgsy.zzc == null) {
+            synchronized (zzgrx.zzb) {
+                if (zzgsy.zzc == null) {
+                    zzgsy.zzc = new zzgsy[0];
+                }
+            }
+        }
+        this.zzb = zzgsy.zzc;
+        this.zzay = null;
+        this.zzaz = -1;
+    }
+
+    @Override // com.google.android.gms.internal.zzgrt, com.google.android.gms.internal.zzgrz
+    public final int computeSerializedSize() {
+        int i;
+        super.computeSerializedSize();
+        int i2 = 0;
+        if (this.zza != 0) {
+            i = zzgrr.zzb(1) + 8 + 0;
+        } else {
+            i = 0;
+        }
+        zzgsy[] zzgsyVarArr = this.zzb;
+        if (zzgsyVarArr != null && zzgsyVarArr.length > 0) {
+            while (true) {
+                zzgsy[] zzgsyVarArr2 = this.zzb;
+                if (i2 >= zzgsyVarArr2.length) {
+                    break;
+                }
+                zzgsy zzgsyVar = zzgsyVarArr2[i2];
+                if (zzgsyVar != null) {
+                    i += zzgrr.zzb(3, zzgsyVar);
+                }
+                i2++;
+            }
+        }
+        return i;
     }
 }

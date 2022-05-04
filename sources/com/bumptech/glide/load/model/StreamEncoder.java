@@ -9,21 +9,22 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 /* loaded from: classes.dex */
-public class StreamEncoder implements Encoder<InputStream> {
-    public final ArrayPool byteArrayPool;
+public final class StreamEncoder implements Encoder {
+    public final Object byteArrayPool;
 
-    public StreamEncoder(ArrayPool byteArrayPool) {
-        this.byteArrayPool = byteArrayPool;
+    public /* synthetic */ StreamEncoder() {
+        this.byteArrayPool = new ArrayList();
     }
 
     @Override // com.bumptech.glide.load.Encoder
-    public boolean encode(InputStream data, File file, Options options) {
+    public final boolean encode(Object obj, File file, Options options) {
         Throwable th;
         FileOutputStream fileOutputStream;
         IOException e;
-        InputStream inputStream = data;
-        byte[] bArr = (byte[]) this.byteArrayPool.get(QuickStepContract.SYSUI_STATE_ONE_HANDED_ACTIVE, byte[].class);
+        InputStream inputStream = (InputStream) obj;
+        byte[] bArr = (byte[]) ((ArrayPool) this.byteArrayPool).get(QuickStepContract.SYSUI_STATE_ONE_HANDED_ACTIVE, byte[].class);
         boolean z = false;
         FileOutputStream fileOutputStream2 = null;
         try {
@@ -46,7 +47,7 @@ public class StreamEncoder implements Encoder<InputStream> {
                             if (fileOutputStream2 != null) {
                                 fileOutputStream2.close();
                             }
-                            this.byteArrayPool.put(bArr);
+                            ((ArrayPool) this.byteArrayPool).put(bArr);
                             return z;
                         } catch (Throwable th2) {
                             th = th2;
@@ -56,23 +57,23 @@ public class StreamEncoder implements Encoder<InputStream> {
                                 } catch (IOException unused) {
                                 }
                             }
-                            this.byteArrayPool.put(bArr);
+                            ((ArrayPool) this.byteArrayPool).put(bArr);
                             throw th;
                         }
                     }
                     fileOutputStream.close();
                     z = true;
                     fileOutputStream.close();
-                } catch (IOException unused2) {
+                } catch (Throwable th3) {
+                    th = th3;
+                    fileOutputStream = null;
                 }
             } catch (IOException e3) {
                 e = e3;
             }
-            this.byteArrayPool.put(bArr);
-            return z;
-        } catch (Throwable th3) {
-            th = th3;
-            fileOutputStream = fileOutputStream2;
+        } catch (IOException unused2) {
         }
+        ((ArrayPool) this.byteArrayPool).put(bArr);
+        return z;
     }
 }

@@ -7,25 +7,29 @@ import androidx.core.util.Pair;
 import androidx.slice.SliceItemHolder;
 import androidx.slice.compat.SliceProviderCompat$2;
 import androidx.versionedparcelable.VersionedParcel;
+import androidx.versionedparcelable.VersionedParcelable;
 import java.util.Arrays;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public final class SliceItemParcelizer {
-    public static SliceItem read(VersionedParcel parcel) {
+    public static SliceItem read(VersionedParcel versionedParcel) {
         Object obj;
         SliceItem sliceItem = new SliceItem();
-        sliceItem.mHints = (String[]) parcel.readArray(sliceItem.mHints, 1);
-        sliceItem.mFormat = parcel.readString(sliceItem.mFormat, 2);
-        sliceItem.mSubType = parcel.readString(sliceItem.mSubType, 3);
-        SliceItemHolder sliceItemHolder = (SliceItemHolder) parcel.readVersionedParcelable(sliceItem.mHolder, 4);
+        sliceItem.mHints = (String[]) versionedParcel.readArray(sliceItem.mHints, 1);
+        sliceItem.mFormat = versionedParcel.readString(sliceItem.mFormat, 2);
+        sliceItem.mSubType = versionedParcel.readString(sliceItem.mSubType, 3);
+        VersionedParcelable versionedParcelable = sliceItem.mHolder;
+        if (versionedParcel.readField(4)) {
+            versionedParcelable = versionedParcel.readVersionedParcelable();
+        }
+        SliceItemHolder sliceItemHolder = (SliceItemHolder) versionedParcelable;
         sliceItem.mHolder = sliceItemHolder;
         if (sliceItemHolder != null) {
             String str = sliceItem.mFormat;
-            SliceItemHolder.HolderHandler holderHandler = SliceItemHolder.sHandler;
-            if (holderHandler != null) {
-                ((SliceProviderCompat$2) holderHandler).handle(sliceItemHolder, str);
+            SliceProviderCompat$2 sliceProviderCompat$2 = SliceItemHolder.sHandler;
+            if (sliceProviderCompat$2 != null) {
+                sliceProviderCompat$2.handle(sliceItemHolder);
             }
-            Objects.requireNonNull(str);
+            str.getClass();
             str.hashCode();
             char c = 65535;
             switch (str.hashCode()) {
@@ -139,25 +143,22 @@ public final class SliceItemParcelizer {
         return sliceItem;
     }
 
-    public static void write(SliceItem obj, VersionedParcel parcel) {
-        Objects.requireNonNull(parcel);
-        Objects.requireNonNull(obj);
-        obj.mHolder = new SliceItemHolder(obj.mFormat, obj.mObj, false);
-        if (!Arrays.equals(Slice.NO_HINTS, obj.mHints)) {
-            parcel.writeArray(obj.mHints, 1);
+    public static void write(SliceItem sliceItem, VersionedParcel versionedParcel) {
+        versionedParcel.getClass();
+        sliceItem.getClass();
+        sliceItem.mHolder = new SliceItemHolder(sliceItem.mFormat, sliceItem.mObj);
+        if (!Arrays.equals(Slice.NO_HINTS, sliceItem.mHints)) {
+            versionedParcel.writeArray(sliceItem.mHints, 1);
         }
-        if (!"text".equals(obj.mFormat)) {
-            String str = obj.mFormat;
-            parcel.setOutputField(2);
-            parcel.writeString(str);
+        if (!"text".equals(sliceItem.mFormat)) {
+            versionedParcel.writeString(sliceItem.mFormat, 2);
         }
-        String str2 = obj.mSubType;
-        if (str2 != null) {
-            parcel.setOutputField(3);
-            parcel.writeString(str2);
+        String str = sliceItem.mSubType;
+        if (str != null) {
+            versionedParcel.writeString(str, 3);
         }
-        SliceItemHolder sliceItemHolder = obj.mHolder;
-        parcel.setOutputField(4);
-        parcel.writeVersionedParcelable(sliceItemHolder);
+        SliceItemHolder sliceItemHolder = sliceItem.mHolder;
+        versionedParcel.setOutputField(4);
+        versionedParcel.writeVersionedParcelable(sliceItemHolder);
     }
 }

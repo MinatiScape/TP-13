@@ -3,15 +3,15 @@ package com.google.protobuf;
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 import java.nio.charset.Charset;
 /* loaded from: classes.dex */
-public final class ManifestSchemaFactory implements SchemaFactory {
-    public static final MessageInfoFactory EMPTY_FACTORY = new MessageInfoFactory() { // from class: com.google.protobuf.ManifestSchemaFactory.1
+public final class ManifestSchemaFactory {
+    public static final AnonymousClass1 EMPTY_FACTORY = new MessageInfoFactory() { // from class: com.google.protobuf.ManifestSchemaFactory.1
         @Override // com.google.protobuf.MessageInfoFactory
-        public boolean isSupported(Class<?> cls) {
+        public final boolean isSupported(Class<?> cls) {
             return false;
         }
 
         @Override // com.google.protobuf.MessageInfoFactory
-        public MessageInfo messageInfoFor(Class<?> cls) {
+        public final MessageInfo messageInfoFor(Class<?> cls) {
             throw new IllegalStateException("This should never be called.");
         }
     };
@@ -21,12 +21,8 @@ public final class ManifestSchemaFactory implements SchemaFactory {
     public static class CompositeMessageInfoFactory implements MessageInfoFactory {
         public MessageInfoFactory[] factories;
 
-        public CompositeMessageInfoFactory(MessageInfoFactory... messageInfoFactoryArr) {
-            this.factories = messageInfoFactoryArr;
-        }
-
         @Override // com.google.protobuf.MessageInfoFactory
-        public boolean isSupported(Class<?> cls) {
+        public final boolean isSupported(Class<?> cls) {
             for (MessageInfoFactory messageInfoFactory : this.factories) {
                 if (messageInfoFactory.isSupported(cls)) {
                     return true;
@@ -36,7 +32,7 @@ public final class ManifestSchemaFactory implements SchemaFactory {
         }
 
         @Override // com.google.protobuf.MessageInfoFactory
-        public MessageInfo messageInfoFor(Class<?> cls) {
+        public final MessageInfo messageInfoFor(Class<?> cls) {
             MessageInfoFactory[] messageInfoFactoryArr;
             for (MessageInfoFactory messageInfoFactory : this.factories) {
                 if (messageInfoFactory.isSupported(cls)) {
@@ -46,6 +42,10 @@ public final class ManifestSchemaFactory implements SchemaFactory {
             StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("No factory is available for message type: ");
             m.append(cls.getName());
             throw new UnsupportedOperationException(m.toString());
+        }
+
+        public CompositeMessageInfoFactory(MessageInfoFactory... messageInfoFactoryArr) {
+            this.factories = messageInfoFactoryArr;
         }
     }
 

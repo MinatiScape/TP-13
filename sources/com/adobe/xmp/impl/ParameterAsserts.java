@@ -2,7 +2,7 @@ package com.adobe.xmp.impl;
 
 import com.adobe.xmp.XMPException;
 /* loaded from: classes.dex */
-public class ParameterAsserts {
+public final class ParameterAsserts {
     public static void assertNotNull(Object param) throws XMPException {
         if (param == null) {
             throw new XMPException("Parameter must not be null", 4);

@@ -1,38 +1,38 @@
 package com.google.common.base;
 
-import androidx.viewpager2.widget.FakeDrag$$ExternalSyntheticOutline0;
+import com.adobe.xmp.impl.XMPNode$$ExternalSyntheticOutline0;
 /* loaded from: classes.dex */
-public final class Present<T> extends Optional<T> {
+final class Present<T> extends Optional<T> {
     private static final long serialVersionUID = 0;
     private final T reference;
 
-    public Present(T reference) {
-        this.reference = reference;
+    @Override // com.google.common.base.Optional
+    public final T or(T defaultValue) {
+        throw null;
     }
 
-    public boolean equals(Object object) {
+    public final boolean equals(Object object) {
         if (object instanceof Present) {
             return this.reference.equals(((Present) object).reference);
         }
         return false;
     }
 
-    @Override // com.google.common.base.Optional
-    public T get() {
-        return this.reference;
-    }
-
-    public int hashCode() {
+    public final int hashCode() {
         return this.reference.hashCode() + 1502476572;
     }
 
-    @Override // com.google.common.base.Optional
-    public T or(T defaultValue) {
-        return this.reference;
+    public final String toString() {
+        String valueOf = String.valueOf(this.reference);
+        return XMPNode$$ExternalSyntheticOutline0.m(valueOf.length() + 13, "Optional.of(", valueOf, ")");
     }
 
-    public String toString() {
-        String valueOf = String.valueOf(this.reference);
-        return FakeDrag$$ExternalSyntheticOutline0.m(valueOf.length() + 13, "Optional.of(", valueOf, ")");
+    public Present(T reference) {
+        this.reference = reference;
+    }
+
+    @Override // com.google.common.base.Optional
+    public final T get() {
+        return this.reference;
     }
 }

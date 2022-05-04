@@ -1,12 +1,13 @@
 package com.bumptech.glide.load.engine;
 
+import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 import com.bumptech.glide.Registry;
-import com.bumptech.glide.Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline1;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.Transformation;
 import com.bumptech.glide.load.data.DataFetcher;
 import com.bumptech.glide.load.engine.DataFetcherGenerator;
+import com.bumptech.glide.load.engine.Engine;
 import com.bumptech.glide.load.model.ModelLoader;
 import com.bumptech.glide.load.model.ModelLoaderRegistry;
 import com.bumptech.glide.provider.ModelToResourceClassCache;
@@ -17,7 +18,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 /* loaded from: classes.dex */
-public class ResourceCacheGenerator implements DataFetcherGenerator, DataFetcher.DataCallback<Object> {
+public final class ResourceCacheGenerator implements DataFetcherGenerator, DataFetcher.DataCallback<Object> {
     public File cacheFile;
     public final DataFetcherGenerator.FetcherReadyCallback cb;
     public ResourceCacheKey currentKey;
@@ -29,13 +30,8 @@ public class ResourceCacheGenerator implements DataFetcherGenerator, DataFetcher
     public int sourceIdIndex;
     public Key sourceKey;
 
-    public ResourceCacheGenerator(DecodeHelper<?> helper, DataFetcherGenerator.FetcherReadyCallback cb) {
-        this.helper = helper;
-        this.cb = cb;
-    }
-
     @Override // com.bumptech.glide.load.engine.DataFetcherGenerator
-    public void cancel() {
+    public final void cancel() {
         ModelLoader.LoadData<?> loadData = this.loadData;
         if (loadData != null) {
             loadData.fetcher.cancel();
@@ -43,20 +39,23 @@ public class ResourceCacheGenerator implements DataFetcherGenerator, DataFetcher
     }
 
     @Override // com.bumptech.glide.load.data.DataFetcher.DataCallback
-    public void onDataReady(Object data) {
-        this.cb.onDataFetcherReady(this.sourceKey, data, this.loadData.fetcher, DataSource.RESOURCE_DISK_CACHE, this.currentKey);
+    public final void onDataReady(Object obj) {
+        this.cb.onDataFetcherReady(this.sourceKey, obj, this.loadData.fetcher, DataSource.RESOURCE_DISK_CACHE, this.currentKey);
     }
 
     @Override // com.bumptech.glide.load.data.DataFetcher.DataCallback
-    public void onLoadFailed(Exception e) {
-        this.cb.onDataFetcherFailed(this.currentKey, e, this.loadData.fetcher, DataSource.RESOURCE_DISK_CACHE);
+    public final void onLoadFailed(Exception exc) {
+        this.cb.onDataFetcherFailed(this.currentKey, exc, this.loadData.fetcher, DataSource.RESOURCE_DISK_CACHE);
     }
 
     @Override // com.bumptech.glide.load.engine.DataFetcherGenerator
-    public boolean startNext() {
+    public final boolean startNext() {
         List<Class<?>> orDefault;
-        List<Class<?>> dataClasses;
-        List<Key> cacheKeys = this.helper.getCacheKeys();
+        boolean z;
+        boolean z2;
+        boolean z3;
+        ArrayList dataClasses;
+        ArrayList cacheKeys = this.helper.getCacheKeys();
         if (cacheKeys.isEmpty()) {
             return false;
         }
@@ -85,12 +84,12 @@ public class ResourceCacheGenerator implements DataFetcherGenerator, DataFetcher
             synchronized (modelLoaderRegistry) {
                 dataClasses = modelLoaderRegistry.multiModelLoaderFactory.getDataClasses(cls);
             }
-            Iterator it = ((ArrayList) dataClasses).iterator();
+            Iterator it = dataClasses.iterator();
             while (it.hasNext()) {
-                Iterator it2 = ((ArrayList) registry.decoderRegistry.getResourceClasses((Class) it.next(), cls2)).iterator();
+                Iterator it2 = registry.decoderRegistry.getResourceClasses((Class) it.next(), cls2).iterator();
                 while (it2.hasNext()) {
                     Class cls4 = (Class) it2.next();
-                    if (!((ArrayList) registry.transcoderRegistry.getTranscodeClasses(cls4, cls3)).isEmpty() && !arrayList2.contains(cls4)) {
+                    if (!registry.transcoderRegistry.getTranscodeClasses(cls4, cls3).isEmpty() && !arrayList2.contains(cls4)) {
                         arrayList2.add(cls4);
                     }
                 }
@@ -107,10 +106,20 @@ public class ResourceCacheGenerator implements DataFetcherGenerator, DataFetcher
                 List<ModelLoader<File, ?>> list = this.modelLoaders;
                 if (list != null) {
                     if (this.modelLoaderIndex < list.size()) {
+                        z = true;
+                    } else {
+                        z = false;
+                    }
+                    if (z) {
                         this.loadData = null;
-                        boolean z = false;
-                        while (!z) {
-                            if (!(this.modelLoaderIndex < this.modelLoaders.size())) {
+                        boolean z4 = false;
+                        while (!z4) {
+                            if (this.modelLoaderIndex < this.modelLoaders.size()) {
+                                z2 = true;
+                            } else {
+                                z2 = false;
+                            }
+                            if (!z2) {
                                 break;
                             }
                             List<ModelLoader<File, ?>> list2 = this.modelLoaders;
@@ -119,12 +128,19 @@ public class ResourceCacheGenerator implements DataFetcherGenerator, DataFetcher
                             File file = this.cacheFile;
                             DecodeHelper<?> decodeHelper2 = this.helper;
                             this.loadData = list2.get(i).buildLoadData(file, decodeHelper2.width, decodeHelper2.height, decodeHelper2.options);
-                            if (this.loadData != null && this.helper.hasLoadPath(this.loadData.fetcher.getDataClass())) {
-                                this.loadData.fetcher.loadData(this.helper.priority, this);
-                                z = true;
+                            if (this.loadData != null) {
+                                if (this.helper.getLoadPath(this.loadData.fetcher.getDataClass()) != null) {
+                                    z3 = true;
+                                } else {
+                                    z3 = false;
+                                }
+                                if (z3) {
+                                    this.loadData.fetcher.loadData(this.helper.priority, this);
+                                    z4 = true;
+                                }
                             }
                         }
-                        return z;
+                        return z4;
                     }
                 }
                 int i2 = this.resourceClassIndex + 1;
@@ -137,12 +153,12 @@ public class ResourceCacheGenerator implements DataFetcherGenerator, DataFetcher
                     }
                     this.resourceClassIndex = 0;
                 }
-                Key key = cacheKeys.get(this.sourceIdIndex);
+                Key key = (Key) cacheKeys.get(this.sourceIdIndex);
                 Class<?> cls5 = arrayList.get(this.resourceClassIndex);
                 Transformation<Z> transformation = this.helper.getTransformation(cls5);
                 DecodeHelper<?> decodeHelper3 = this.helper;
                 this.currentKey = new ResourceCacheKey(decodeHelper3.glideContext.arrayPool, key, decodeHelper3.signature, decodeHelper3.width, decodeHelper3.height, transformation, cls5, decodeHelper3.options);
-                File file2 = decodeHelper3.getDiskCache().get(this.currentKey);
+                File file2 = ((Engine.LazyDiskCacheProvider) decodeHelper3.diskCacheProvider).getDiskCache().get(this.currentKey);
                 this.cacheFile = file2;
                 if (file2 != null) {
                     this.sourceKey = key;
@@ -153,9 +169,16 @@ public class ResourceCacheGenerator implements DataFetcherGenerator, DataFetcher
         } else if (File.class.equals(this.helper.transcodeClass)) {
             return false;
         } else {
-            String valueOf = String.valueOf(this.helper.model.getClass());
-            String valueOf2 = String.valueOf(this.helper.transcodeClass);
-            throw new IllegalStateException(Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline1.m(valueOf2.length() + valueOf.length() + 38, "Failed to find any load path from ", valueOf, " to ", valueOf2));
+            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Failed to find any load path from ");
+            m.append(this.helper.model.getClass());
+            m.append(" to ");
+            m.append(this.helper.transcodeClass);
+            throw new IllegalStateException(m.toString());
         }
+    }
+
+    public ResourceCacheGenerator(DecodeHelper<?> decodeHelper, DataFetcherGenerator.FetcherReadyCallback fetcherReadyCallback) {
+        this.helper = decodeHelper;
+        this.cb = fetcherReadyCallback;
     }
 }

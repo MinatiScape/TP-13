@@ -6,53 +6,52 @@ import java.util.ConcurrentModificationException;
 import java.util.Map;
 import java.util.Set;
 /* loaded from: classes.dex */
-public class ArrayMap<K, V> extends SimpleArrayMap<K, V> implements Map<K, V> {
-    public MapCollections<K, V> mCollections;
+public final class ArrayMap<K, V> extends SimpleArrayMap<K, V> implements Map<K, V> {
+    public AnonymousClass1 mCollections;
 
     /* renamed from: android.support.v4.util.ArrayMap$1  reason: invalid class name */
     /* loaded from: classes.dex */
-    public class AnonymousClass1 extends MapCollections<K, V> {
+    public final class AnonymousClass1 extends MapCollections<Object, Object> {
         public AnonymousClass1() {
         }
 
         @Override // android.support.v4.util.MapCollections
-        public Object colGetEntry(int i, int i2) {
+        public final Object colGetEntry(int i, int i2) {
             return ArrayMap.this.mArray[(i << 1) + i2];
         }
 
         @Override // android.support.v4.util.MapCollections
-        public int colIndexOfKey(Object obj) {
-            return ArrayMap.this.indexOfKey(obj);
+        public final void colRemoveAt(int i) {
+            ArrayMap.this.removeAt(i);
         }
     }
 
     @Override // java.util.Map
-    public Set<Map.Entry<K, V>> entrySet() {
-        MapCollections<K, V> collection = getCollection();
-        if (collection.mEntrySet == null) {
-            collection.mEntrySet = new MapCollections.EntrySet();
-        }
-        return collection.mEntrySet;
-    }
-
-    public final MapCollections<K, V> getCollection() {
+    public final Set<Map.Entry<K, V>> entrySet() {
         if (this.mCollections == null) {
             this.mCollections = new AnonymousClass1();
         }
-        return this.mCollections;
-    }
-
-    @Override // java.util.Map
-    public Set<K> keySet() {
-        MapCollections<K, V> collection = getCollection();
-        if (collection.mKeySet == null) {
-            collection.mKeySet = new MapCollections.KeySet();
+        AnonymousClass1 r1 = this.mCollections;
+        if (r1.mEntrySet == null) {
+            r1.mEntrySet = new MapCollections.EntrySet();
         }
-        return collection.mKeySet;
+        return r1.mEntrySet;
     }
 
     @Override // java.util.Map
-    public void putAll(Map<? extends K, ? extends V> map) {
+    public final Set<K> keySet() {
+        if (this.mCollections == null) {
+            this.mCollections = new AnonymousClass1();
+        }
+        AnonymousClass1 r1 = this.mCollections;
+        if (r1.mKeySet == null) {
+            r1.mKeySet = new MapCollections.KeySet();
+        }
+        return r1.mKeySet;
+    }
+
+    @Override // java.util.Map
+    public final void putAll(Map<? extends K, ? extends V> map) {
         int size = map.size() + this.mSize;
         int i = this.mSize;
         int[] iArr = this.mHashes;
@@ -75,11 +74,14 @@ public class ArrayMap<K, V> extends SimpleArrayMap<K, V> implements Map<K, V> {
     }
 
     @Override // java.util.Map
-    public Collection<V> values() {
-        MapCollections<K, V> collection = getCollection();
-        if (collection.mValues == null) {
-            collection.mValues = new MapCollections.ValuesCollection();
+    public final Collection<V> values() {
+        if (this.mCollections == null) {
+            this.mCollections = new AnonymousClass1();
         }
-        return collection.mValues;
+        AnonymousClass1 r1 = this.mCollections;
+        if (r1.mValues == null) {
+            r1.mValues = new MapCollections.ValuesCollection();
+        }
+        return r1.mValues;
     }
 }

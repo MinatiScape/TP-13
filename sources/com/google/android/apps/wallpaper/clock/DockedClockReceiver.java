@@ -7,7 +7,7 @@ import android.provider.Settings;
 /* loaded from: classes.dex */
 public class DockedClockReceiver extends BroadcastReceiver {
     @Override // android.content.BroadcastReceiver
-    public void onReceive(Context context, Intent intent) {
+    public final void onReceive(Context context, Intent intent) {
         if ("com.google.android.apps.wallpaper.SET_DOCKED_CLOCK_FACE".equals(intent.getAction())) {
             Settings.Secure.putString(context.getContentResolver(), "docked_clock_face", intent.getStringExtra("clock_face_name"));
         }

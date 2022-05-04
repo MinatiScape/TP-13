@@ -2,7 +2,6 @@ package com.bumptech.glide.manager;
 
 import android.app.Activity;
 import android.app.Application;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -11,45 +10,39 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import androidx.cardview.R$styleable;
 import androidx.fragment.app.BackStackRecord;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManagerImpl;
+import androidx.slice.SliceSpecs;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.load.resource.bitmap.HardwareConfigState;
+import com.bumptech.glide.manager.RequestManagerFragment;
+import com.bumptech.glide.manager.SupportRequestManagerFragment;
 import com.bumptech.glide.util.Util;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 /* loaded from: classes.dex */
-public class RequestManagerRetriever implements Handler.Callback {
-    public static final RequestManagerFactory DEFAULT_FACTORY = new AnonymousClass1();
+public final class RequestManagerRetriever implements Handler.Callback {
+    public static final AnonymousClass1 DEFAULT_FACTORY = new RequestManagerFactory() { // from class: com.bumptech.glide.manager.RequestManagerRetriever.1
+    };
     public static final String FRAGMENT_TAG = "com.bumptech.glide.manager";
     public volatile RequestManager applicationManager;
     public final RequestManagerFactory factory;
+    public final SliceSpecs frameWaiter;
     public final Handler handler;
     public final Map<FragmentManager, RequestManagerFragment> pendingRequestManagerFragments = new HashMap();
     public final Map<androidx.fragment.app.FragmentManager, SupportRequestManagerFragment> pendingSupportRequestManagerFragments = new HashMap();
-
-    /* renamed from: com.bumptech.glide.manager.RequestManagerRetriever$1  reason: invalid class name */
-    /* loaded from: classes.dex */
-    public class AnonymousClass1 implements RequestManagerFactory {
-        public RequestManager build(Glide glide, Lifecycle lifecycle, RequestManagerTreeNode requestManagerTreeNode, Context context) {
-            return new RequestManager(glide, lifecycle, requestManagerTreeNode, context);
-        }
-    }
 
     /* loaded from: classes.dex */
     public interface RequestManagerFactory {
     }
 
-    public RequestManagerRetriever(RequestManagerFactory factory) {
-        new Bundle();
-        this.factory = factory == null ? DEFAULT_FACTORY : factory;
-        this.handler = new Handler(Looper.getMainLooper(), this);
-    }
-
-    public RequestManager get(Context context) {
+    public final RequestManager get(Context context) {
         if (context != null) {
-            if (Util.isOnMainThread() && !(context instanceof Application)) {
+            char[] cArr = Util.HEX_CHAR_ARRAY;
+            if ((Looper.myLooper() == Looper.getMainLooper()) && !(context instanceof Application)) {
                 if (context instanceof FragmentActivity) {
                     return get((FragmentActivity) context);
                 }
@@ -57,14 +50,22 @@ public class RequestManagerRetriever implements Handler.Callback {
                     return get((Activity) context);
                 }
                 if (context instanceof ContextWrapper) {
-                    return get(((ContextWrapper) context).getBaseContext());
+                    ContextWrapper contextWrapper = (ContextWrapper) context;
+                    if (contextWrapper.getBaseContext().getApplicationContext() != null) {
+                        return get(contextWrapper.getBaseContext());
+                    }
                 }
             }
             if (this.applicationManager == null) {
                 synchronized (this) {
                     if (this.applicationManager == null) {
                         Glide glide = Glide.get(context.getApplicationContext());
-                        this.applicationManager = ((AnonymousClass1) this.factory).build(glide, new ApplicationLifecycle(), new EmptyRequestManagerTreeNode(), context.getApplicationContext());
+                        RequestManagerFactory requestManagerFactory = this.factory;
+                        ApplicationLifecycle applicationLifecycle = new ApplicationLifecycle();
+                        R$styleable r$styleable = new R$styleable();
+                        Context applicationContext = context.getApplicationContext();
+                        ((AnonymousClass1) requestManagerFactory).getClass();
+                        this.applicationManager = new RequestManager(glide, applicationLifecycle, r$styleable, applicationContext);
                     }
                 }
             }
@@ -73,46 +74,54 @@ public class RequestManagerRetriever implements Handler.Callback {
         throw new IllegalArgumentException("You cannot start a load on a null Context");
     }
 
-    public final RequestManagerFragment getRequestManagerFragment(final FragmentManager fm, Fragment parentHint, boolean isParentVisible) {
-        RequestManagerFragment requestManagerFragment = (RequestManagerFragment) fm.findFragmentByTag(FRAGMENT_TAG);
-        if (requestManagerFragment == null && (requestManagerFragment = this.pendingRequestManagerFragments.get(fm)) == null) {
-            requestManagerFragment = new RequestManagerFragment(new ActivityFragmentLifecycle());
-            requestManagerFragment.parentFragmentHint = parentHint;
-            if (!(parentHint == null || parentHint.getActivity() == null)) {
-                requestManagerFragment.registerFragmentWithRoot(parentHint.getActivity());
-            }
-            if (isParentVisible) {
-                requestManagerFragment.lifecycle.onStart();
-            }
-            this.pendingRequestManagerFragments.put(fm, requestManagerFragment);
-            fm.beginTransaction().add(requestManagerFragment, FRAGMENT_TAG).commitAllowingStateLoss();
-            this.handler.obtainMessage(1, fm).sendToTarget();
+    public static Activity findActivity(Context context) {
+        if (context instanceof Activity) {
+            return (Activity) context;
         }
-        return requestManagerFragment;
+        if (context instanceof ContextWrapper) {
+            return findActivity(((ContextWrapper) context).getBaseContext());
+        }
+        return null;
     }
 
-    public final SupportRequestManagerFragment getSupportRequestManagerFragment(final androidx.fragment.app.FragmentManager fm, androidx.fragment.app.Fragment parentHint, boolean isParentVisible) {
-        SupportRequestManagerFragment supportRequestManagerFragment = (SupportRequestManagerFragment) fm.findFragmentByTag(FRAGMENT_TAG);
-        if (supportRequestManagerFragment == null && (supportRequestManagerFragment = this.pendingSupportRequestManagerFragments.get(fm)) == null) {
-            supportRequestManagerFragment = new SupportRequestManagerFragment();
-            supportRequestManagerFragment.parentFragmentHint = parentHint;
-            if (!(parentHint == null || parentHint.getActivity() == null)) {
-                supportRequestManagerFragment.registerFragmentWithRoot(parentHint.getActivity());
-            }
-            if (isParentVisible) {
-                supportRequestManagerFragment.lifecycle.onStart();
-            }
-            this.pendingSupportRequestManagerFragments.put(fm, supportRequestManagerFragment);
-            BackStackRecord backStackRecord = new BackStackRecord(fm);
-            backStackRecord.doAddOp(0, supportRequestManagerFragment, FRAGMENT_TAG, 1);
-            backStackRecord.commitAllowingStateLoss();
-            this.handler.obtainMessage(2, fm).sendToTarget();
+    public final RequestManagerFragment getRequestManagerFragment(FragmentManager fragmentManager) {
+        RequestManagerFragment requestManagerFragment = (RequestManagerFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG);
+        if (requestManagerFragment != null) {
+            return requestManagerFragment;
         }
-        return supportRequestManagerFragment;
+        RequestManagerFragment requestManagerFragment2 = this.pendingRequestManagerFragments.get(fragmentManager);
+        if (requestManagerFragment2 != null) {
+            return requestManagerFragment2;
+        }
+        RequestManagerFragment requestManagerFragment3 = new RequestManagerFragment();
+        requestManagerFragment3.parentFragmentHint = null;
+        this.pendingRequestManagerFragments.put(fragmentManager, requestManagerFragment3);
+        fragmentManager.beginTransaction().add(requestManagerFragment3, FRAGMENT_TAG).commitAllowingStateLoss();
+        this.handler.obtainMessage(1, fragmentManager).sendToTarget();
+        return requestManagerFragment3;
+    }
+
+    public final SupportRequestManagerFragment getSupportRequestManagerFragment(androidx.fragment.app.FragmentManager fragmentManager) {
+        SupportRequestManagerFragment supportRequestManagerFragment = (SupportRequestManagerFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG);
+        if (supportRequestManagerFragment != null) {
+            return supportRequestManagerFragment;
+        }
+        SupportRequestManagerFragment supportRequestManagerFragment2 = this.pendingSupportRequestManagerFragments.get(fragmentManager);
+        if (supportRequestManagerFragment2 != null) {
+            return supportRequestManagerFragment2;
+        }
+        SupportRequestManagerFragment supportRequestManagerFragment3 = new SupportRequestManagerFragment();
+        supportRequestManagerFragment3.parentFragmentHint = null;
+        this.pendingSupportRequestManagerFragments.put(fragmentManager, supportRequestManagerFragment3);
+        BackStackRecord backStackRecord = new BackStackRecord(fragmentManager);
+        backStackRecord.doAddOp(0, supportRequestManagerFragment3, FRAGMENT_TAG, 1);
+        backStackRecord.commitInternal(true);
+        this.handler.obtainMessage(2, fragmentManager).sendToTarget();
+        return supportRequestManagerFragment3;
     }
 
     @Override // android.os.Handler.Callback
-    public boolean handleMessage(Message message) {
+    public final boolean handleMessage(Message message) {
         Object obj;
         Object obj2;
         Object obj3;
@@ -126,57 +135,80 @@ public class RequestManagerRetriever implements Handler.Callback {
             z = false;
             obj = null;
             if (z && obj4 == null && Log.isLoggable("RMRetriever", 5)) {
-                String valueOf = String.valueOf(obj);
-                StringBuilder sb = new StringBuilder(valueOf.length() + 61);
-                sb.append("Failed to remove expected request manager fragment, manager: ");
-                sb.append(valueOf);
-                Log.w("RMRetriever", sb.toString());
+                Log.w("RMRetriever", "Failed to remove expected request manager fragment, manager: " + obj);
             }
             return z;
         } else {
             obj3 = (androidx.fragment.app.FragmentManager) message.obj;
             obj2 = this.pendingSupportRequestManagerFragments.remove(obj3);
         }
-        obj = obj3;
+        Object obj5 = obj3;
         obj4 = obj2;
+        obj = obj5;
         if (z) {
-            String valueOf2 = String.valueOf(obj);
-            StringBuilder sb2 = new StringBuilder(valueOf2.length() + 61);
-            sb2.append("Failed to remove expected request manager fragment, manager: ");
-            sb2.append(valueOf2);
-            Log.w("RMRetriever", sb2.toString());
+            Log.w("RMRetriever", "Failed to remove expected request manager fragment, manager: " + obj);
         }
         return z;
     }
 
-    public RequestManager get(FragmentActivity activity) {
-        if (Util.isOnBackgroundThread()) {
-            return get(activity.getApplicationContext());
+    public RequestManagerRetriever(RequestManagerFactory requestManagerFactory) {
+        new Bundle();
+        this.factory = requestManagerFactory == null ? DEFAULT_FACTORY : requestManagerFactory;
+        this.handler = new Handler(Looper.getMainLooper(), this);
+        int i = HardwareConfigState.MIN_HARDWARE_DIMENSION_O;
+        this.frameWaiter = new SliceSpecs();
+    }
+
+    public final RequestManager get(FragmentActivity fragmentActivity) {
+        char[] cArr = Util.HEX_CHAR_ARRAY;
+        boolean z = false;
+        if (!(Looper.myLooper() == Looper.getMainLooper())) {
+            return get(fragmentActivity.getApplicationContext());
         }
-        if (!activity.isDestroyed()) {
-            SupportRequestManagerFragment supportRequestManagerFragment = getSupportRequestManagerFragment(activity.getSupportFragmentManager(), null, !activity.isFinishing());
+        if (!fragmentActivity.isDestroyed()) {
+            this.frameWaiter.getClass();
+            FragmentManagerImpl supportFragmentManager = fragmentActivity.getSupportFragmentManager();
+            Activity findActivity = findActivity(fragmentActivity);
+            if (findActivity == null || !findActivity.isFinishing()) {
+                z = true;
+            }
+            SupportRequestManagerFragment supportRequestManagerFragment = getSupportRequestManagerFragment(supportFragmentManager);
             RequestManager requestManager = supportRequestManagerFragment.requestManager;
             if (requestManager != null) {
                 return requestManager;
             }
-            Glide glide = Glide.get(activity);
+            Glide glide = Glide.get(fragmentActivity);
             RequestManagerFactory requestManagerFactory = this.factory;
             ActivityFragmentLifecycle activityFragmentLifecycle = supportRequestManagerFragment.lifecycle;
-            RequestManagerTreeNode requestManagerTreeNode = supportRequestManagerFragment.requestManagerTreeNode;
-            Objects.requireNonNull((AnonymousClass1) requestManagerFactory);
-            RequestManager requestManager2 = new RequestManager(glide, activityFragmentLifecycle, requestManagerTreeNode, activity);
+            SupportRequestManagerFragment.SupportFragmentRequestManagerTreeNode supportFragmentRequestManagerTreeNode = supportRequestManagerFragment.requestManagerTreeNode;
+            ((AnonymousClass1) requestManagerFactory).getClass();
+            RequestManager requestManager2 = new RequestManager(glide, activityFragmentLifecycle, supportFragmentRequestManagerTreeNode, fragmentActivity);
+            if (z) {
+                requestManager2.onStart();
+            }
             supportRequestManagerFragment.requestManager = requestManager2;
             return requestManager2;
         }
         throw new IllegalArgumentException("You cannot start a load for a destroyed activity");
     }
 
-    public RequestManager get(Activity activity) {
-        if (Util.isOnBackgroundThread()) {
+    public final RequestManager get(Activity activity) {
+        char[] cArr = Util.HEX_CHAR_ARRAY;
+        boolean z = false;
+        if (!(Looper.myLooper() == Looper.getMainLooper())) {
             return get(activity.getApplicationContext());
         }
+        if (activity instanceof FragmentActivity) {
+            return get((FragmentActivity) activity);
+        }
         if (!activity.isDestroyed()) {
-            RequestManagerFragment requestManagerFragment = getRequestManagerFragment(activity.getFragmentManager(), null, !activity.isFinishing());
+            this.frameWaiter.getClass();
+            FragmentManager fragmentManager = activity.getFragmentManager();
+            Activity findActivity = findActivity(activity);
+            if (findActivity == null || !findActivity.isFinishing()) {
+                z = true;
+            }
+            RequestManagerFragment requestManagerFragment = getRequestManagerFragment(fragmentManager);
             RequestManager requestManager = requestManagerFragment.requestManager;
             if (requestManager != null) {
                 return requestManager;
@@ -184,9 +216,12 @@ public class RequestManagerRetriever implements Handler.Callback {
             Glide glide = Glide.get(activity);
             RequestManagerFactory requestManagerFactory = this.factory;
             ActivityFragmentLifecycle activityFragmentLifecycle = requestManagerFragment.lifecycle;
-            RequestManagerTreeNode requestManagerTreeNode = requestManagerFragment.requestManagerTreeNode;
-            Objects.requireNonNull((AnonymousClass1) requestManagerFactory);
-            RequestManager requestManager2 = new RequestManager(glide, activityFragmentLifecycle, requestManagerTreeNode, activity);
+            RequestManagerFragment.FragmentRequestManagerTreeNode fragmentRequestManagerTreeNode = requestManagerFragment.requestManagerTreeNode;
+            ((AnonymousClass1) requestManagerFactory).getClass();
+            RequestManager requestManager2 = new RequestManager(glide, activityFragmentLifecycle, fragmentRequestManagerTreeNode, activity);
+            if (z) {
+                requestManager2.onStart();
+            }
             requestManagerFragment.requestManager = requestManager2;
             return requestManager2;
         }

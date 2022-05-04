@@ -3,10 +3,10 @@ package kotlinx.coroutines.internal;
 import java.lang.reflect.Constructor;
 import kotlin.Result;
 import kotlin.ResultKt;
-import kotlin.TypeCastException;
 import kotlin.jvm.functions.Function1;
 import kotlin.jvm.internal.Intrinsics;
 import kotlin.jvm.internal.Lambda;
+/* compiled from: ExceptionsConstuctor.kt */
 /* loaded from: classes.dex */
 public final class ExceptionsConstuctorKt$createConstructor$$inlined$safeCtor$1 extends Lambda implements Function1<Throwable, Throwable> {
     public final /* synthetic */ Constructor $constructor$inlined;
@@ -18,11 +18,11 @@ public final class ExceptionsConstuctorKt$createConstructor$$inlined$safeCtor$1 
     }
 
     @Override // kotlin.jvm.functions.Function1
-    public Throwable invoke(Throwable th) {
+    public final Throwable invoke(Throwable th) {
         Object obj;
         Object newInstance;
         Throwable e = th;
-        Intrinsics.checkParameterIsNotNull(e, "e");
+        Intrinsics.checkNotNullParameter(e, "e");
         try {
             newInstance = this.$constructor$inlined.newInstance(e.getMessage(), e);
         } catch (Throwable th2) {
@@ -35,6 +35,6 @@ public final class ExceptionsConstuctorKt$createConstructor$$inlined$safeCtor$1 
             }
             return (Throwable) obj;
         }
-        throw new TypeCastException("null cannot be cast to non-null type kotlin.Throwable");
+        throw new NullPointerException("null cannot be cast to non-null type kotlin.Throwable");
     }
 }

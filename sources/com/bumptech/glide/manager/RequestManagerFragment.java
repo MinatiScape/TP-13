@@ -4,21 +4,17 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Fragment;
 import android.util.Log;
-import com.adobe.xmp.XMPPathFactory$$ExternalSyntheticOutline0;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline1;
 import com.bumptech.glide.RequestManager;
 import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
 @Deprecated
 /* loaded from: classes.dex */
-public class RequestManagerFragment extends Fragment {
-    public final Set<RequestManagerFragment> childRequestManagerFragments;
+public final class RequestManagerFragment extends Fragment {
+    public final HashSet childRequestManagerFragments;
     public final ActivityFragmentLifecycle lifecycle;
     public Fragment parentFragmentHint;
     public RequestManager requestManager;
-    public final RequestManagerTreeNode requestManagerTreeNode;
+    public final FragmentRequestManagerTreeNode requestManagerTreeNode;
     public RequestManagerFragment rootRequestManagerFragment;
 
     /* loaded from: classes.dex */
@@ -26,10 +22,8 @@ public class RequestManagerFragment extends Fragment {
         public FragmentRequestManagerTreeNode() {
         }
 
-        public String toString() {
-            String obj = super.toString();
-            String valueOf = String.valueOf(RequestManagerFragment.this);
-            return Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline1.m(valueOf.length() + XMPPathFactory$$ExternalSyntheticOutline0.m(obj, 11), obj, "{fragment=", valueOf, "}");
+        public final String toString() {
+            return super.toString() + "{fragment=" + RequestManagerFragment.this + "}";
         }
     }
 
@@ -37,8 +31,44 @@ public class RequestManagerFragment extends Fragment {
         this(new ActivityFragmentLifecycle());
     }
 
+    @SuppressLint({"ValidFragment"})
+    public RequestManagerFragment(ActivityFragmentLifecycle activityFragmentLifecycle) {
+        this.requestManagerTreeNode = new FragmentRequestManagerTreeNode();
+        this.childRequestManagerFragments = new HashSet();
+        this.lifecycle = activityFragmentLifecycle;
+    }
+
+    public final void registerFragmentWithRoot(Activity activity) {
+        RequestManagerFragment requestManagerFragment = this.rootRequestManagerFragment;
+        if (requestManagerFragment != null) {
+            requestManagerFragment.childRequestManagerFragments.remove(this);
+            this.rootRequestManagerFragment = null;
+        }
+        RequestManagerRetriever requestManagerRetriever = Glide.get(activity).requestManagerRetriever;
+        requestManagerRetriever.getClass();
+        RequestManagerFragment requestManagerFragment2 = requestManagerRetriever.getRequestManagerFragment(activity.getFragmentManager());
+        this.rootRequestManagerFragment = requestManagerFragment2;
+        if (!equals(requestManagerFragment2)) {
+            this.rootRequestManagerFragment.childRequestManagerFragments.add(this);
+        }
+    }
+
     @Override // android.app.Fragment
-    public void onAttach(Activity activity) {
+    public final String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString());
+        sb.append("{parent=");
+        Fragment parentFragment = getParentFragment();
+        if (parentFragment == null) {
+            parentFragment = this.parentFragmentHint;
+        }
+        sb.append(parentFragment);
+        sb.append("}");
+        return sb.toString();
+    }
+
+    @Override // android.app.Fragment
+    public final void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
             registerFragmentWithRoot(activity);
@@ -50,53 +80,9 @@ public class RequestManagerFragment extends Fragment {
     }
 
     @Override // android.app.Fragment
-    public void onDestroy() {
+    public final void onDestroy() {
         super.onDestroy();
         this.lifecycle.onDestroy();
-        unregisterFragmentWithRoot();
-    }
-
-    @Override // android.app.Fragment
-    public void onDetach() {
-        super.onDetach();
-        unregisterFragmentWithRoot();
-    }
-
-    @Override // android.app.Fragment
-    public void onStart() {
-        super.onStart();
-        this.lifecycle.onStart();
-    }
-
-    @Override // android.app.Fragment
-    public void onStop() {
-        super.onStop();
-        this.lifecycle.onStop();
-    }
-
-    public final void registerFragmentWithRoot(Activity activity) {
-        unregisterFragmentWithRoot();
-        RequestManagerRetriever requestManagerRetriever = Glide.get(activity).requestManagerRetriever;
-        Objects.requireNonNull(requestManagerRetriever);
-        RequestManagerFragment requestManagerFragment = requestManagerRetriever.getRequestManagerFragment(activity.getFragmentManager(), null, !activity.isFinishing());
-        this.rootRequestManagerFragment = requestManagerFragment;
-        if (!equals(requestManagerFragment)) {
-            this.rootRequestManagerFragment.childRequestManagerFragments.add(this);
-        }
-    }
-
-    @Override // android.app.Fragment
-    public String toString() {
-        String fragment = super.toString();
-        Fragment parentFragment = getParentFragment();
-        if (parentFragment == null) {
-            parentFragment = this.parentFragmentHint;
-        }
-        String valueOf = String.valueOf(parentFragment);
-        return Registry$NoModelLoaderAvailableException$$ExternalSyntheticOutline1.m(valueOf.length() + XMPPathFactory$$ExternalSyntheticOutline0.m(fragment, 9), fragment, "{parent=", valueOf, "}");
-    }
-
-    public final void unregisterFragmentWithRoot() {
         RequestManagerFragment requestManagerFragment = this.rootRequestManagerFragment;
         if (requestManagerFragment != null) {
             requestManagerFragment.childRequestManagerFragments.remove(this);
@@ -104,10 +90,25 @@ public class RequestManagerFragment extends Fragment {
         }
     }
 
-    @SuppressLint({"ValidFragment"})
-    public RequestManagerFragment(ActivityFragmentLifecycle lifecycle) {
-        this.requestManagerTreeNode = new FragmentRequestManagerTreeNode();
-        this.childRequestManagerFragments = new HashSet();
-        this.lifecycle = lifecycle;
+    @Override // android.app.Fragment
+    public final void onDetach() {
+        super.onDetach();
+        RequestManagerFragment requestManagerFragment = this.rootRequestManagerFragment;
+        if (requestManagerFragment != null) {
+            requestManagerFragment.childRequestManagerFragments.remove(this);
+            this.rootRequestManagerFragment = null;
+        }
+    }
+
+    @Override // android.app.Fragment
+    public final void onStart() {
+        super.onStart();
+        this.lifecycle.onStart();
+    }
+
+    @Override // android.app.Fragment
+    public final void onStop() {
+        super.onStop();
+        this.lifecycle.onStop();
     }
 }

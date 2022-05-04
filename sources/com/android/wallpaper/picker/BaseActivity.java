@@ -5,13 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 public class BaseActivity extends AppCompatActivity implements FragmentTransactionChecker {
     public boolean mIsSafeToCommitFragmentTransaction;
 
-    @Override // com.android.wallpaper.picker.FragmentTransactionChecker
-    public boolean isSafeToCommitFragmentTransaction() {
-        return this.mIsSafeToCommitFragmentTransaction;
-    }
-
     @Override // androidx.fragment.app.FragmentActivity, android.app.Activity
-    public void onPause() {
+    public final void onPause() {
         super.onPause();
         this.mIsSafeToCommitFragmentTransaction = false;
     }
@@ -20,5 +15,10 @@ public class BaseActivity extends AppCompatActivity implements FragmentTransacti
     public void onResume() {
         super.onResume();
         this.mIsSafeToCommitFragmentTransaction = true;
+    }
+
+    @Override // com.android.wallpaper.picker.FragmentTransactionChecker
+    public final boolean isSafeToCommitFragmentTransaction() {
+        return this.mIsSafeToCommitFragmentTransaction;
     }
 }

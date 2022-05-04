@@ -5,25 +5,25 @@ import android.util.FloatProperty;
 public abstract class FloatPropertyCompat<T> {
     public final String mPropertyName;
 
-    public FloatPropertyCompat(String name) {
-        this.mPropertyName = name;
-    }
+    public abstract float getValue(T t);
 
-    public static <T> FloatPropertyCompat<T> createFloatPropertyCompat(final FloatProperty<T> property) {
-        return new FloatPropertyCompat<T>(property.getName()) { // from class: androidx.dynamicanimation.animation.FloatPropertyCompat.1
+    public abstract void setValue(T t, float f);
+
+    public static <T> FloatPropertyCompat<T> createFloatPropertyCompat(final FloatProperty<T> floatProperty) {
+        return new FloatPropertyCompat<T>(floatProperty.getName()) { // from class: androidx.dynamicanimation.animation.FloatPropertyCompat.1
             @Override // androidx.dynamicanimation.animation.FloatPropertyCompat
-            public float getValue(T object) {
-                return ((Float) property.get(object)).floatValue();
+            public final float getValue(T t) {
+                return ((Float) floatProperty.get(t)).floatValue();
             }
 
             @Override // androidx.dynamicanimation.animation.FloatPropertyCompat
-            public void setValue(T object, float value) {
-                property.setValue(object, value);
+            public final void setValue(T t, float f) {
+                floatProperty.setValue(t, f);
             }
         };
     }
 
-    public abstract float getValue(T object);
-
-    public abstract void setValue(T object, float value);
+    public FloatPropertyCompat(String str) {
+        this.mPropertyName = str;
+    }
 }

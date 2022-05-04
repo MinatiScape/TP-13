@@ -3,33 +3,31 @@ package androidx.lifecycle;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 /* loaded from: classes.dex */
 public abstract class ViewModel {
-    public final Map<String, Object> mBagOfTags = new HashMap();
+    public final HashMap mBagOfTags = new HashMap();
     public volatile boolean mCleared = false;
 
     public void onCleared() {
     }
 
-    public <T> T setTagIfAbsent(String str, T t) {
-        Object obj;
+    public final void setTagIfAbsent(Object obj) {
+        Object obj2;
         synchronized (this.mBagOfTags) {
-            obj = this.mBagOfTags.get(str);
-            if (obj == null) {
-                this.mBagOfTags.put(str, t);
+            obj2 = this.mBagOfTags.get("androidx.lifecycle.savedstate.vm.tag");
+            if (obj2 == null) {
+                this.mBagOfTags.put("androidx.lifecycle.savedstate.vm.tag", obj);
             }
         }
-        if (obj != null) {
-            t = obj;
+        if (obj2 != null) {
+            obj = obj2;
         }
-        if (this.mCleared && (t instanceof Closeable)) {
+        if (this.mCleared && (obj instanceof Closeable)) {
             try {
-                ((Closeable) t).close();
+                ((Closeable) obj).close();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        return t;
     }
 }

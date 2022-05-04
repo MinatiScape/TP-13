@@ -1,9 +1,9 @@
 package androidx.appcompat.view;
 
-import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import androidx.appcompat.view.menu.MenuBuilder;
 /* loaded from: classes.dex */
 public abstract class ActionMode {
     public Object mTag;
@@ -13,18 +13,18 @@ public abstract class ActionMode {
     public interface Callback {
         boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem);
 
-        boolean onCreateActionMode(ActionMode actionMode, Menu menu);
+        boolean onCreateActionMode(ActionMode actionMode, MenuBuilder menuBuilder);
 
         void onDestroyActionMode(ActionMode actionMode);
 
-        boolean onPrepareActionMode(ActionMode actionMode, Menu menu);
+        boolean onPrepareActionMode(ActionMode actionMode, MenuBuilder menuBuilder);
     }
 
     public abstract void finish();
 
     public abstract View getCustomView();
 
-    public abstract Menu getMenu();
+    public abstract MenuBuilder getMenu();
 
     public abstract MenuInflater getMenuInflater();
 

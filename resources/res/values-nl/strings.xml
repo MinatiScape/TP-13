@@ -4,7 +4,7 @@
     <string name="abc_action_bar_up_description">Omhoog navigeren</string>
     <string name="abc_action_menu_overflow_description">Meer opties</string>
     <string name="abc_action_mode_done">Klaar</string>
-    <string name="abc_activity_chooser_view_see_all">Alles weergeven</string>
+    <string name="abc_activity_chooser_view_see_all">Alles tonen</string>
     <string name="abc_activitychooserview_choose_application">Een app selecteren</string>
     <string name="abc_capital_off">UIT</string>
     <string name="abc_capital_on">AAN</string>
@@ -28,16 +28,15 @@
     <string name="abc_shareactionprovider_share_with_application">Delen met %s</string>
     <string name="abc_slice_error">Kan geen verbinding maken</string>
     <string name="abc_slice_more">Meer</string>
-    <string name="abc_slice_more_content">+ %1$d</string>
+    <string name="abc_slice_more_content">+ %1$d</string>
     <string name="abc_slice_permission_allow">Toestaan</string>
-    <string name="abc_slice_permission_checkbox">%1$s toestaan om segmenten van apps weer te geven</string>
     <string name="abc_slice_permission_deny">Weigeren</string>
     <string name="abc_slice_permission_text_1">- Deze kan informatie lezen van %1$s</string>
     <string name="abc_slice_permission_text_2">- Deze kan acties uitvoeren in %1$s</string>
-    <string name="abc_slice_permission_title">%1$s toestaan om segmenten van %2$s weer te geven?</string>
-    <string name="abc_slice_show_more">Meer weergeven</string>
-    <string name="abc_slice_updated">Geüpdatet: %1$s</string>
-    <string name="abc_slices_permission_request">%1$s wil segmenten van %2$s weergeven</string>
+    <string name="abc_slice_permission_title">%1$s toestaan om segmenten van %2$s te tonen?</string>
+    <string name="abc_slice_show_more">Meer tonen</string>
+    <string name="abc_slice_updated">%1$s geüpdatet</string>
+    <string name="abc_slices_permission_request">%1$s wil segmenten van %2$s tonen</string>
     <string name="abc_toolbar_collapse_description">Samenvouwen</string>
     <string name="accessibility_custom_color_title">Aangepaste kleur</string>
     <string name="accessibility_custom_font_title">Aangepast lettertype</string>
@@ -72,6 +71,7 @@
     <string name="center_wallpaper_position">Midden</string>
     <string name="character_counter_content_description">%1$d van %2$d tekens opgegeven</string>
     <string name="character_counter_overflowed_content_description">Tekenlimiet heeft %1$d van %2$d overschreden</string>
+    <string name="cinematic_effects_toogle">3D-achtergronden</string>
     <string name="clear_text_end_icon_content_description">Tekst wissen</string>
     <string name="clock_preview_content_description">Voorbeeld van %1$s-klok bekijken</string>
     <string name="clock_title">Klok</string>
@@ -117,6 +117,8 @@
     <string name="delete_live_wallpaper">Verwijderen</string>
     <string name="delete_wallpaper_confirmation">Wil je deze achtergrond verwijderen van je telefoon?</string>
     <string name="edit_custom_theme_lbl">Tik om te bewerken</string>
+    <string name="effect_error_dialog_body">We kunnen de effecten niet toepassen.\nProbeer het met een andere foto.</string>
+    <string name="effect_error_dialog_title">O jee.</string>
     <string name="error_icon_content_description">Fout</string>
     <string name="expand_button_title">Geavanceerd</string>
     <string name="explore">Bekijken</string>
@@ -199,6 +201,7 @@
     <string name="mtrl_picker_toggle_to_day_selection">Tik om naar dagselectie te schakelen</string>
     <string name="mtrl_picker_toggle_to_text_input_mode">Overschakelen naar tekstinvoermodus</string>
     <string name="mtrl_picker_toggle_to_year_selection">Tik om naar jaarselectie te schakelen</string>
+    <string name="my_photos">Mijn foto\'s</string>
     <string name="my_photos_category_title">Mijn foto\'s</string>
     <string name="my_photos_generic_wallpaper_title">Mijn foto</string>
     <string name="name_component_title">Je stijl een naam geven</string>
@@ -215,7 +218,7 @@
     <string name="option_applied_previewed_description">%1$s, wordt momenteel toegepast en bekeken</string>
     <string name="option_change_applied_previewed_description">%1$s, wijzigen wat je hebt geselecteerd en waarvan je een voorbeeld wilt bekijken</string>
     <string name="option_previewed_description">%1$s, wordt momenteel bekeken</string>
-    <string name="password_toggle_content_description">Wachtwoord weergeven</string>
+    <string name="password_toggle_content_description">Wachtwoord tonen</string>
     <string name="permission_needed_allow_access_button_label">Toegang toestaan</string>
     <string name="permission_needed_explanation">%1$s heeft toegang nodig tot de opslag van je apparaat om de huidige achtergrond hier weer te geven.</string>
     <string name="permission_needed_explanation_go_to_settings">Achtergronden heeft toegang nodig tot de opslag van je apparaat om de huidige achtergrond hier weer te geven.\n\nAls je deze instelling wilt wijzigen, ga je naar het gedeelte Rechten in de app-informatie van Achtergronden.</string>
@@ -244,6 +247,8 @@
     <string name="set_wallpaper_lock_screen_destination">Vergrendelscherm</string>
     <string name="set_wallpaper_progress_message">Achtergrond instellen…</string>
     <string name="settings_button_label">Instellingen</string>
+    <string name="settings_snackbar_description">Zet het recht voor bestanden en media aan in de instellingen.</string>
+    <string name="settings_snackbar_enable">Aanzetten</string>
     <string name="shape_component_title">Vorm kiezen</string>
     <string name="shape_preview_content_description">Vormvoorbeeld</string>
     <string name="show_ui_preview_text">Voorbeeld van UI tonen</string>
@@ -261,6 +266,7 @@
     <string name="style_info_description">Voorbeeld van lettertypen, iconen, app-vormen en kleuren</string>
     <string name="summary_collapsed_preference_list">%1$s, %2$s</string>
     <string name="tab_customize">Aanpassen</string>
+    <string name="tab_effects">Effecten</string>
     <string name="tab_info">Informatie</string>
     <string name="theme_description">Lettertype: %1$s, pictogrammen: %2$s, vorm: %3$s, kleur: %4$s</string>
     <string name="theme_preview_card_content_description">Stijlvoorbeeld</string>
@@ -280,6 +286,8 @@
     <string name="wallpaper_destination_both">Start- en vergrendelscherm</string>
     <string name="wallpaper_disabled_by_administrator_message">Het instellen van een achtergrond is uitgezet door je apparaatbeheerder</string>
     <string name="wallpaper_disabled_message">Het instellen van een achtergrond is uitgezet op dit apparaat</string>
+    <string name="wallpaper_effects_subtitle">Maak van je foto een 3D-achtergrond die beweegt als je telefoon beweegt</string>
+    <string name="wallpaper_effects_title">3D-achtergronden</string>
     <string name="wallpaper_picker_entry_title">Achtergrond wijzigen</string>
     <string name="wallpaper_preview_card_content_description">Achtergrondvoorbeeld</string>
     <string name="wallpaper_set_successfully_message">Achtergrond is ingesteld</string>

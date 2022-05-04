@@ -1,13 +1,17 @@
 package kotlin.coroutines.jvm.internal;
 
 import java.lang.reflect.Method;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+/* compiled from: DebugMetadata.kt */
 /* loaded from: classes.dex */
 public final class ModuleNameRetriever {
     @Nullable
     public static Cache cache;
+    @NotNull
     public static final Cache notOnJava9 = new Cache(null, null, null);
 
+    /* compiled from: DebugMetadata.kt */
     /* loaded from: classes.dex */
     public static final class Cache {
         @Nullable

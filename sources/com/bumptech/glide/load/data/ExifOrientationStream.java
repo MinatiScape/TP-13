@@ -1,6 +1,5 @@
 package com.bumptech.glide.load.data;
 
-import androidx.fragment.R$id$$ExternalSyntheticOutline0;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,26 +10,13 @@ public final class ExifOrientationStream extends FilterInputStream {
     public final byte orientation;
     public int position;
 
-    public ExifOrientationStream(InputStream in, int orientation) {
-        super(in);
-        if (orientation < -1 || orientation > 8) {
-            throw new IllegalArgumentException(R$id$$ExternalSyntheticOutline0.m(43, "Cannot add invalid orientation: ", orientation));
-        }
-        this.orientation = (byte) orientation;
-    }
-
     @Override // java.io.FilterInputStream, java.io.InputStream
-    public void mark(int readLimit) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override // java.io.FilterInputStream, java.io.InputStream
-    public boolean markSupported() {
+    public final boolean markSupported() {
         return false;
     }
 
     @Override // java.io.FilterInputStream, java.io.InputStream
-    public int read() throws IOException {
+    public final int read() throws IOException {
         int i;
         int i2;
         int i3 = this.position;
@@ -48,13 +34,26 @@ public final class ExifOrientationStream extends FilterInputStream {
     }
 
     @Override // java.io.FilterInputStream, java.io.InputStream
-    public void reset() throws IOException {
+    public final void mark(int i) {
         throw new UnsupportedOperationException();
     }
 
     @Override // java.io.FilterInputStream, java.io.InputStream
-    public long skip(long byteCount) throws IOException {
-        long skip = super.skip(byteCount);
+    public final void reset() throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    public ExifOrientationStream(InputStream inputStream, int i) {
+        super(inputStream);
+        if (i < -1 || i > 8) {
+            throw new IllegalArgumentException("Cannot add invalid orientation: " + i);
+        }
+        this.orientation = (byte) i;
+    }
+
+    @Override // java.io.FilterInputStream, java.io.InputStream
+    public final long skip(long j) throws IOException {
+        long skip = super.skip(j);
         if (skip > 0) {
             this.position = (int) (this.position + skip);
         }
@@ -62,25 +61,25 @@ public final class ExifOrientationStream extends FilterInputStream {
     }
 
     @Override // java.io.FilterInputStream, java.io.InputStream
-    public int read(byte[] buffer, int byteOffset, int byteCount) throws IOException {
-        int i;
-        int i2 = this.position;
-        int i3 = ORIENTATION_POSITION;
-        if (i2 > i3) {
-            i = super.read(buffer, byteOffset, byteCount);
-        } else if (i2 == i3) {
-            buffer[byteOffset] = this.orientation;
-            i = 1;
-        } else if (i2 < 2) {
-            i = super.read(buffer, byteOffset, 2 - i2);
+    public final int read(byte[] bArr, int i, int i2) throws IOException {
+        int i3;
+        int i4 = this.position;
+        int i5 = ORIENTATION_POSITION;
+        if (i4 > i5) {
+            i3 = super.read(bArr, i, i2);
+        } else if (i4 == i5) {
+            bArr[i] = this.orientation;
+            i3 = 1;
+        } else if (i4 < 2) {
+            i3 = super.read(bArr, i, 2 - i4);
         } else {
-            int min = Math.min(i3 - i2, byteCount);
-            System.arraycopy(EXIF_SEGMENT, this.position - 2, buffer, byteOffset, min);
-            i = min;
+            int min = Math.min(i5 - i4, i2);
+            System.arraycopy(EXIF_SEGMENT, this.position - 2, bArr, i, min);
+            i3 = min;
         }
-        if (i > 0) {
-            this.position += i;
+        if (i3 > 0) {
+            this.position += i3;
         }
-        return i;
+        return i3;
     }
 }

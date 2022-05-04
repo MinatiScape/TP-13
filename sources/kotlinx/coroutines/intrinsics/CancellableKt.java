@@ -2,20 +2,19 @@ package kotlinx.coroutines.intrinsics;
 
 import kotlin.ResultKt;
 import kotlin.Unit;
-import kotlin.coroutines.Continuation;
 import kotlin.coroutines.intrinsics.IntrinsicsKt__IntrinsicsKt;
 import kotlin.jvm.functions.Function2;
-import kotlin.jvm.internal.Intrinsics;
-import kotlinx.coroutines.DispatchedKt;
-import org.jetbrains.annotations.NotNull;
+import kotlinx.coroutines.AbstractCoroutine;
+import kotlinx.coroutines.internal.DispatchedContinuationKt;
+/* compiled from: Cancellable.kt */
 /* loaded from: classes.dex */
 public final class CancellableKt {
-    public static final <R, T> void startCoroutineCancellable(@NotNull Function2<? super R, ? super Continuation<? super T>, ? extends Object> startCoroutineCancellable, R r, @NotNull Continuation<? super T> continuation) {
-        Intrinsics.checkParameterIsNotNull(startCoroutineCancellable, "$this$startCoroutineCancellable");
+    public static void startCoroutineCancellable$default(Function2 function2, AbstractCoroutine abstractCoroutine, AbstractCoroutine abstractCoroutine2) {
         try {
-            DispatchedKt.resumeCancellable(IntrinsicsKt__IntrinsicsKt.intercepted(IntrinsicsKt__IntrinsicsKt.createCoroutineUnintercepted(startCoroutineCancellable, r, continuation)), Unit.INSTANCE);
+            DispatchedContinuationKt.resumeCancellableWith(IntrinsicsKt__IntrinsicsKt.intercepted(IntrinsicsKt__IntrinsicsKt.createCoroutineUnintercepted(function2, abstractCoroutine, abstractCoroutine2)), Unit.INSTANCE, null);
         } catch (Throwable th) {
-            continuation.resumeWith(ResultKt.createFailure(th));
+            abstractCoroutine2.resumeWith(ResultKt.createFailure(th));
+            throw th;
         }
     }
 }

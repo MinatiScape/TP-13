@@ -1,6 +1,5 @@
 package com.google.protobuf;
 
-import com.android.systemui.shared.system.QuickStepContract;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 import com.google.protobuf.ArrayDecoders;
 import com.google.protobuf.FieldSet;
@@ -13,8 +12,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.logging.Logger;
 import sun.misc.Unsafe;
 /* loaded from: classes.dex */
 public final class MessageSchema<T> implements Schema<T> {
@@ -40,7 +37,6 @@ public final class MessageSchema<T> implements Schema<T> {
 
     static {
         Unsafe unsafe;
-        Logger logger = UnsafeUtil.logger;
         try {
             unsafe = (Unsafe) AccessController.doPrivileged(new UnsafeUtil.AnonymousClass1());
         } catch (Throwable unused) {
@@ -49,24 +45,324 @@ public final class MessageSchema<T> implements Schema<T> {
         UNSAFE = unsafe;
     }
 
-    public MessageSchema(int[] iArr, Object[] objArr, int i, int i2, MessageLite messageLite, boolean z, boolean z2, int[] iArr2, int i3, int i4, NewInstanceSchema newInstanceSchema, ListFieldSchema listFieldSchema, UnknownFieldSchema<?, ?> unknownFieldSchema, ExtensionSchema<?> extensionSchema, MapFieldSchema mapFieldSchema) {
-        this.buffer = iArr;
-        this.objects = objArr;
-        this.minFieldNumber = i;
-        this.maxFieldNumber = i2;
-        this.lite = messageLite instanceof GeneratedMessageLite;
-        this.proto3 = z;
-        this.hasExtensions = extensionSchema != null && extensionSchema.hasExtensions(messageLite);
-        this.useCachedSizeField = z2;
-        this.intArray = iArr2;
-        this.checkInitializedCount = i3;
-        this.repeatedFieldOffsetStart = i4;
-        this.newInstanceSchema = newInstanceSchema;
-        this.listFieldSchema = listFieldSchema;
-        this.unknownFieldSchema = unknownFieldSchema;
-        this.extensionSchema = extensionSchema;
-        this.defaultInstance = messageLite;
-        this.mapFieldSchema = mapFieldSchema;
+    /* JADX WARN: Multi-variable type inference failed */
+    @Override // com.google.protobuf.Schema
+    public final boolean isInitialized(T t) {
+        int i;
+        boolean z;
+        boolean z2;
+        int i2 = -1;
+        int i3 = 0;
+        int i4 = 0;
+        while (true) {
+            boolean z3 = true;
+            if (i3 >= this.checkInitializedCount) {
+                return !this.hasExtensions || this.extensionSchema.getExtensions(t).isInitialized();
+            }
+            int i5 = this.intArray[i3];
+            int i6 = this.buffer[i5];
+            int typeAndOffsetAt = typeAndOffsetAt(i5);
+            if (!this.proto3) {
+                int i7 = this.buffer[i5 + 2];
+                int i8 = i7 & 1048575;
+                i = 1 << (i7 >>> 20);
+                if (i8 != i2) {
+                    i4 = UNSAFE.getInt(t, i8);
+                    i2 = i8;
+                }
+            } else {
+                i = 0;
+            }
+            if ((268435456 & typeAndOffsetAt) != 0) {
+                z = true;
+            } else {
+                z = false;
+            }
+            if (z) {
+                if (this.proto3) {
+                    z2 = isFieldPresent(t, i5);
+                } else if ((i4 & i) != 0) {
+                    z2 = true;
+                } else {
+                    z2 = false;
+                }
+                if (!z2) {
+                    return false;
+                }
+            }
+            int i9 = (267386880 & typeAndOffsetAt) >>> 20;
+            if (i9 == 9 || i9 == 17) {
+                if (this.proto3) {
+                    z3 = isFieldPresent(t, i5);
+                } else if ((i4 & i) == 0) {
+                    z3 = false;
+                }
+                if (z3 && !getMessageFieldSchema(i5).isInitialized(UnsafeUtil.getObject(t, typeAndOffsetAt & 1048575))) {
+                    return false;
+                }
+            } else {
+                if (i9 != 27) {
+                    if (i9 == 60 || i9 == 68) {
+                        if (isOneofPresent(t, i6, i5) && !getMessageFieldSchema(i5).isInitialized(UnsafeUtil.getObject(t, typeAndOffsetAt & 1048575))) {
+                            return false;
+                        }
+                    } else if (i9 != 49) {
+                        if (i9 == 50 && !this.mapFieldSchema.forMapData(UnsafeUtil.getObject(t, typeAndOffsetAt & 1048575)).isEmpty()) {
+                            this.mapFieldSchema.forMapMetadata(getMapFieldDefaultEntry(i5));
+                            throw null;
+                        }
+                    }
+                }
+                List list = (List) UnsafeUtil.getObject(t, typeAndOffsetAt & 1048575);
+                if (!list.isEmpty()) {
+                    Schema messageFieldSchema = getMessageFieldSchema(i5);
+                    int i10 = 0;
+                    while (true) {
+                        if (i10 >= list.size()) {
+                            break;
+                        } else if (!messageFieldSchema.isInitialized(list.get(i10))) {
+                            z3 = false;
+                            break;
+                        } else {
+                            i10++;
+                        }
+                    }
+                }
+                if (!z3) {
+                    return false;
+                }
+            }
+            i3++;
+        }
+    }
+
+    @Override // com.google.protobuf.Schema
+    public final void mergeFrom(T t, T t2) {
+        t2.getClass();
+        for (int i = 0; i < this.buffer.length; i += 3) {
+            int typeAndOffsetAt = typeAndOffsetAt(i);
+            long j = 1048575 & typeAndOffsetAt;
+            int i2 = this.buffer[i];
+            switch ((typeAndOffsetAt & 267386880) >>> 20) {
+                case 0:
+                    if (isFieldPresent(t2, i)) {
+                        UnsafeUtil.putDouble(t, j, UnsafeUtil.getDouble(t2, j));
+                        setFieldPresent(t, i);
+                        break;
+                    } else {
+                        break;
+                    }
+                case 1:
+                    if (isFieldPresent(t2, i)) {
+                        UnsafeUtil.MEMORY_ACCESSOR.unsafe.putFloat(t, j, UnsafeUtil.getFloat(t2, j));
+                        setFieldPresent(t, i);
+                        break;
+                    } else {
+                        break;
+                    }
+                case 2:
+                    if (isFieldPresent(t2, i)) {
+                        UnsafeUtil.putLong(t, j, UnsafeUtil.getLong(t2, j));
+                        setFieldPresent(t, i);
+                        break;
+                    } else {
+                        break;
+                    }
+                case 3:
+                    if (isFieldPresent(t2, i)) {
+                        UnsafeUtil.putLong(t, j, UnsafeUtil.getLong(t2, j));
+                        setFieldPresent(t, i);
+                        break;
+                    } else {
+                        break;
+                    }
+                case 4:
+                    if (isFieldPresent(t2, i)) {
+                        UnsafeUtil.putInt(t, j, UnsafeUtil.getInt(t2, j));
+                        setFieldPresent(t, i);
+                        break;
+                    } else {
+                        break;
+                    }
+                case 5:
+                    if (isFieldPresent(t2, i)) {
+                        UnsafeUtil.putLong(t, j, UnsafeUtil.getLong(t2, j));
+                        setFieldPresent(t, i);
+                        break;
+                    } else {
+                        break;
+                    }
+                case 6:
+                    if (isFieldPresent(t2, i)) {
+                        UnsafeUtil.putInt(t, j, UnsafeUtil.getInt(t2, j));
+                        setFieldPresent(t, i);
+                        break;
+                    } else {
+                        break;
+                    }
+                case 7:
+                    if (isFieldPresent(t2, i)) {
+                        UnsafeUtil.MEMORY_ACCESSOR.unsafe.putBoolean(t, j, UnsafeUtil.getBoolean(t2, j));
+                        setFieldPresent(t, i);
+                        break;
+                    } else {
+                        break;
+                    }
+                case 8:
+                    if (isFieldPresent(t2, i)) {
+                        UnsafeUtil.putObject(t, j, UnsafeUtil.getObject(t2, j));
+                        setFieldPresent(t, i);
+                        break;
+                    } else {
+                        break;
+                    }
+                case 9:
+                    mergeMessage(t, t2, i);
+                    break;
+                case 10:
+                    if (isFieldPresent(t2, i)) {
+                        UnsafeUtil.putObject(t, j, UnsafeUtil.getObject(t2, j));
+                        setFieldPresent(t, i);
+                        break;
+                    } else {
+                        break;
+                    }
+                case 11:
+                    if (isFieldPresent(t2, i)) {
+                        UnsafeUtil.putInt(t, j, UnsafeUtil.getInt(t2, j));
+                        setFieldPresent(t, i);
+                        break;
+                    } else {
+                        break;
+                    }
+                case 12:
+                    if (isFieldPresent(t2, i)) {
+                        UnsafeUtil.putInt(t, j, UnsafeUtil.getInt(t2, j));
+                        setFieldPresent(t, i);
+                        break;
+                    } else {
+                        break;
+                    }
+                case 13:
+                    if (isFieldPresent(t2, i)) {
+                        UnsafeUtil.putInt(t, j, UnsafeUtil.getInt(t2, j));
+                        setFieldPresent(t, i);
+                        break;
+                    } else {
+                        break;
+                    }
+                case 14:
+                    if (isFieldPresent(t2, i)) {
+                        UnsafeUtil.putLong(t, j, UnsafeUtil.getLong(t2, j));
+                        setFieldPresent(t, i);
+                        break;
+                    } else {
+                        break;
+                    }
+                case 15:
+                    if (isFieldPresent(t2, i)) {
+                        UnsafeUtil.putInt(t, j, UnsafeUtil.getInt(t2, j));
+                        setFieldPresent(t, i);
+                        break;
+                    } else {
+                        break;
+                    }
+                case 16:
+                    if (isFieldPresent(t2, i)) {
+                        UnsafeUtil.putLong(t, j, UnsafeUtil.getLong(t2, j));
+                        setFieldPresent(t, i);
+                        break;
+                    } else {
+                        break;
+                    }
+                case 17:
+                    mergeMessage(t, t2, i);
+                    break;
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                    this.listFieldSchema.mergeListsAt(t, t2, j);
+                    break;
+                case 50:
+                    MapFieldSchema mapFieldSchema = this.mapFieldSchema;
+                    Class<?> cls = SchemaUtil.GENERATED_MESSAGE_CLASS;
+                    UnsafeUtil.putObject(t, j, mapFieldSchema.mergeFrom(UnsafeUtil.getObject(t, j), UnsafeUtil.getObject(t2, j)));
+                    break;
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                case 56:
+                case 57:
+                case 58:
+                case 59:
+                    if (isOneofPresent(t2, i2, i)) {
+                        UnsafeUtil.putObject(t, j, UnsafeUtil.getObject(t2, j));
+                        setOneofPresent(t, i2, i);
+                        break;
+                    } else {
+                        break;
+                    }
+                case 60:
+                    mergeOneofMessage(t, t2, i);
+                    break;
+                case 61:
+                case 62:
+                case 63:
+                case 64:
+                case 65:
+                case 66:
+                case 67:
+                    if (isOneofPresent(t2, i2, i)) {
+                        UnsafeUtil.putObject(t, j, UnsafeUtil.getObject(t2, j));
+                        setOneofPresent(t, i2, i);
+                        break;
+                    } else {
+                        break;
+                    }
+                case 68:
+                    mergeOneofMessage(t, t2, i);
+                    break;
+            }
+        }
+        if (!this.proto3) {
+            UnknownFieldSchema<?, ?> unknownFieldSchema = this.unknownFieldSchema;
+            Class<?> cls2 = SchemaUtil.GENERATED_MESSAGE_CLASS;
+            unknownFieldSchema.setToMessage(t, unknownFieldSchema.merge(unknownFieldSchema.getFromMessage(t), unknownFieldSchema.getFromMessage(t2)));
+            if (this.hasExtensions) {
+                SchemaUtil.mergeExtensions(this.extensionSchema, t, t2);
+            }
+        }
     }
 
     public static UnknownFieldSetLite getMutableUnknownFields(Object obj) {
@@ -75,683 +371,123 @@ public final class MessageSchema<T> implements Schema<T> {
         if (unknownFieldSetLite != UnknownFieldSetLite.DEFAULT_INSTANCE) {
             return unknownFieldSetLite;
         }
-        UnknownFieldSetLite newInstance = UnknownFieldSetLite.newInstance();
-        generatedMessageLite.unknownFields = newInstance;
-        return newInstance;
+        UnknownFieldSetLite unknownFieldSetLite2 = new UnknownFieldSetLite();
+        generatedMessageLite.unknownFields = unknownFieldSetLite2;
+        return unknownFieldSetLite2;
     }
 
-    public static List<?> listAt(Object obj, long j) {
-        return (List) UnsafeUtil.getObject(obj, j);
+    /* JADX WARN: Removed duplicated region for block: B:127:0x0296  */
+    /* JADX WARN: Removed duplicated region for block: B:128:0x0299  */
+    /* JADX WARN: Removed duplicated region for block: B:131:0x02b0  */
+    /* JADX WARN: Removed duplicated region for block: B:132:0x02b3  */
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+        To view partially-correct add '--show-bad-code' argument
+    */
+    public static com.google.protobuf.MessageSchema newSchema(com.google.protobuf.MessageInfo r35, com.google.protobuf.NewInstanceSchema r36, com.google.protobuf.ListFieldSchema r37, com.google.protobuf.UnknownFieldSchema r38, com.google.protobuf.ExtensionSchema r39, com.google.protobuf.MapFieldSchema r40) {
+        /*
+            Method dump skipped, instructions count: 1081
+            To view this dump add '--comments-level debug' option
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.google.protobuf.MessageSchema.newSchema(com.google.protobuf.MessageInfo, com.google.protobuf.NewInstanceSchema, com.google.protobuf.ListFieldSchema, com.google.protobuf.UnknownFieldSchema, com.google.protobuf.ExtensionSchema, com.google.protobuf.MapFieldSchema):com.google.protobuf.MessageSchema");
     }
 
-    public static MessageSchema newSchema(MessageInfo messageInfo, NewInstanceSchema newInstanceSchema, ListFieldSchema listFieldSchema, UnknownFieldSchema unknownFieldSchema, ExtensionSchema extensionSchema, MapFieldSchema mapFieldSchema) {
-        int i;
-        int i2;
-        int[] iArr;
-        int i3;
-        int i4;
-        int i5;
-        int i6;
-        int i7;
-        int i8;
-        int i9;
-        boolean z;
-        int i10;
-        int i11;
-        int i12;
-        int i13;
-        RawMessageInfo rawMessageInfo;
-        int i14;
-        int i15;
-        int[] iArr2;
-        String str;
-        int i16;
-        int i17;
-        int i18;
-        int i19;
-        int objectFieldOffset;
-        Field field;
-        char charAt;
-        int i20;
-        int i21;
-        int i22;
-        Field field2;
-        Field field3;
-        int i23;
-        char charAt2;
-        int i24;
-        char charAt3;
-        int i25;
-        char charAt4;
-        int i26;
-        int i27;
-        int i28;
-        char charAt5;
-        int i29;
-        char charAt6;
-        int i30;
-        char charAt7;
-        int i31;
-        char charAt8;
-        int i32;
-        char charAt9;
-        int i33;
-        char charAt10;
-        int i34;
-        char charAt11;
-        int i35;
-        char charAt12;
-        int i36;
-        char charAt13;
-        char charAt14;
-        if (messageInfo instanceof RawMessageInfo) {
-            RawMessageInfo rawMessageInfo2 = (RawMessageInfo) messageInfo;
-            int i37 = 0;
-            boolean z2 = (rawMessageInfo2.flags & 1) == 1 ? true : true;
-            String str2 = rawMessageInfo2.info;
-            int length = str2.length();
-            int charAt15 = str2.charAt(0);
-            if (charAt15 >= 55296) {
-                int i38 = charAt15 & 8191;
-                int i39 = 1;
-                int i40 = 13;
-                while (true) {
-                    i = i39 + 1;
-                    charAt14 = str2.charAt(i39);
-                    if (charAt14 < 55296) {
-                        break;
-                    }
-                    i38 |= (charAt14 & 8191) << i40;
-                    i40 += 13;
-                    i39 = i;
-                }
-                charAt15 = i38 | (charAt14 << i40);
-            } else {
-                i = 1;
-            }
-            int i41 = i + 1;
-            int charAt16 = str2.charAt(i);
-            if (charAt16 >= 55296) {
-                int i42 = charAt16 & 8191;
-                int i43 = 13;
-                while (true) {
-                    i36 = i41 + 1;
-                    charAt13 = str2.charAt(i41);
-                    if (charAt13 < 55296) {
-                        break;
-                    }
-                    i42 |= (charAt13 & 8191) << i43;
-                    i43 += 13;
-                    i41 = i36;
-                }
-                charAt16 = i42 | (charAt13 << i43);
-                i41 = i36;
-            }
-            if (charAt16 == 0) {
-                i7 = 0;
-                i6 = 0;
-                i4 = 0;
-                i3 = 0;
-                i2 = 0;
-                iArr = EMPTY_INT_ARRAY;
-                i5 = 0;
-            } else {
-                int i44 = i41 + 1;
-                int charAt17 = str2.charAt(i41);
-                if (charAt17 >= 55296) {
-                    int i45 = charAt17 & 8191;
-                    int i46 = 13;
-                    while (true) {
-                        i35 = i44 + 1;
-                        charAt12 = str2.charAt(i44);
-                        if (charAt12 < 55296) {
-                            break;
-                        }
-                        i45 |= (charAt12 & 8191) << i46;
-                        i46 += 13;
-                        i44 = i35;
-                    }
-                    charAt17 = i45 | (charAt12 << i46);
-                    i44 = i35;
-                }
-                int i47 = i44 + 1;
-                int charAt18 = str2.charAt(i44);
-                if (charAt18 >= 55296) {
-                    int i48 = charAt18 & 8191;
-                    int i49 = 13;
-                    while (true) {
-                        i34 = i47 + 1;
-                        charAt11 = str2.charAt(i47);
-                        if (charAt11 < 55296) {
-                            break;
-                        }
-                        i48 |= (charAt11 & 8191) << i49;
-                        i49 += 13;
-                        i47 = i34;
-                    }
-                    charAt18 = i48 | (charAt11 << i49);
-                    i47 = i34;
-                }
-                int i50 = i47 + 1;
-                int charAt19 = str2.charAt(i47);
-                if (charAt19 >= 55296) {
-                    int i51 = charAt19 & 8191;
-                    int i52 = 13;
-                    while (true) {
-                        i33 = i50 + 1;
-                        charAt10 = str2.charAt(i50);
-                        if (charAt10 < 55296) {
-                            break;
-                        }
-                        i51 |= (charAt10 & 8191) << i52;
-                        i52 += 13;
-                        i50 = i33;
-                    }
-                    charAt19 = i51 | (charAt10 << i52);
-                    i50 = i33;
-                }
-                int i53 = i50 + 1;
-                i3 = str2.charAt(i50);
-                if (i3 >= 55296) {
-                    int i54 = i3 & 8191;
-                    int i55 = 13;
-                    while (true) {
-                        i32 = i53 + 1;
-                        charAt9 = str2.charAt(i53);
-                        if (charAt9 < 55296) {
-                            break;
-                        }
-                        i54 |= (charAt9 & 8191) << i55;
-                        i55 += 13;
-                        i53 = i32;
-                    }
-                    i3 = i54 | (charAt9 << i55);
-                    i53 = i32;
-                }
-                int i56 = i53 + 1;
-                int charAt20 = str2.charAt(i53);
-                if (charAt20 >= 55296) {
-                    int i57 = charAt20 & 8191;
-                    int i58 = 13;
-                    while (true) {
-                        i31 = i56 + 1;
-                        charAt8 = str2.charAt(i56);
-                        if (charAt8 < 55296) {
-                            break;
-                        }
-                        i57 |= (charAt8 & 8191) << i58;
-                        i58 += 13;
-                        i56 = i31;
-                    }
-                    charAt20 = i57 | (charAt8 << i58);
-                    i56 = i31;
-                }
-                int i59 = i56 + 1;
-                int charAt21 = str2.charAt(i56);
-                if (charAt21 >= 55296) {
-                    int i60 = charAt21 & 8191;
-                    int i61 = i59;
-                    int i62 = 13;
-                    while (true) {
-                        i30 = i61 + 1;
-                        charAt7 = str2.charAt(i61);
-                        if (charAt7 < 55296) {
-                            break;
-                        }
-                        i60 |= (charAt7 & 8191) << i62;
-                        i62 += 13;
-                        i61 = i30;
-                    }
-                    charAt21 = i60 | (charAt7 << i62);
-                    i26 = i30;
-                } else {
-                    i26 = i59;
-                }
-                int i63 = i26 + 1;
-                int charAt22 = str2.charAt(i26);
-                if (charAt22 >= 55296) {
-                    int i64 = charAt22 & 8191;
-                    int i65 = i63;
-                    int i66 = 13;
-                    while (true) {
-                        i29 = i65 + 1;
-                        charAt6 = str2.charAt(i65);
-                        if (charAt6 < 55296) {
-                            break;
-                        }
-                        i64 |= (charAt6 & 8191) << i66;
-                        i66 += 13;
-                        i65 = i29;
-                    }
-                    charAt22 = i64 | (charAt6 << i66);
-                    i27 = i29;
-                } else {
-                    i27 = i63;
-                }
-                int i67 = i27 + 1;
-                int charAt23 = str2.charAt(i27);
-                if (charAt23 >= 55296) {
-                    int i68 = charAt23 & 8191;
-                    int i69 = i67;
-                    int i70 = 13;
-                    while (true) {
-                        i28 = i69 + 1;
-                        charAt5 = str2.charAt(i69);
-                        if (charAt5 < 55296) {
-                            break;
-                        }
-                        i68 |= (charAt5 & 8191) << i70;
-                        i70 += 13;
-                        i69 = i28;
-                    }
-                    charAt23 = i68 | (charAt5 << i70);
-                    i67 = i28;
-                }
-                i37 = (charAt17 * 2) + charAt18;
-                i5 = charAt20;
-                iArr = new int[charAt23 + charAt21 + charAt22];
-                i7 = charAt17;
-                i41 = i67;
-                i4 = charAt21;
-                i2 = charAt23;
-                i6 = charAt19;
-            }
-            Unsafe unsafe = UNSAFE;
-            Object[] objArr = rawMessageInfo2.objects;
-            int i71 = i37;
-            Class<?> cls = rawMessageInfo2.defaultInstance.getClass();
-            int i72 = i41;
-            int[] iArr3 = new int[i5 * 3];
-            Object[] objArr2 = new Object[i5 * 2];
-            int i73 = i2 + i4;
-            int i74 = i2;
-            int i75 = i73;
-            int i76 = 0;
-            int i77 = 0;
-            while (i72 < length) {
-                int i78 = i72 + 1;
-                int charAt24 = str2.charAt(i72);
-                length = length;
-                if (charAt24 >= 55296) {
-                    int i79 = charAt24 & 8191;
-                    int i80 = i78;
-                    int i81 = 13;
-                    while (true) {
-                        i25 = i80 + 1;
-                        charAt4 = str2.charAt(i80);
-                        i8 = i2;
-                        if (charAt4 < 55296) {
-                            break;
-                        }
-                        i79 |= (charAt4 & 8191) << i81;
-                        i81 += 13;
-                        i80 = i25;
-                        i2 = i8;
-                    }
-                    charAt24 = i79 | (charAt4 << i81);
-                    i9 = i25;
-                } else {
-                    i8 = i2;
-                    i9 = i78;
-                }
-                int i82 = i9 + 1;
-                int charAt25 = str2.charAt(i9);
-                if (charAt25 >= 55296) {
-                    int i83 = charAt25 & 8191;
-                    int i84 = i82;
-                    int i85 = 13;
-                    while (true) {
-                        i24 = i84 + 1;
-                        charAt3 = str2.charAt(i84);
-                        z = z2;
-                        if (charAt3 < 55296) {
-                            break;
-                        }
-                        i83 |= (charAt3 & 8191) << i85;
-                        i85 += 13;
-                        i84 = i24;
-                        z2 = z;
-                    }
-                    charAt25 = i83 | (charAt3 << i85);
-                    i10 = i24;
-                } else {
-                    z = z2;
-                    i10 = i82;
-                }
-                int i86 = charAt25 & 255;
-                i3 = i3;
-                if ((charAt25 & QuickStepContract.SYSUI_STATE_SEARCH_DISABLED) != 0) {
-                    i76++;
-                    iArr[i76] = i77;
-                }
-                if (i86 >= 51) {
-                    int i87 = i10 + 1;
-                    int charAt26 = str2.charAt(i10);
-                    char c = 55296;
-                    if (charAt26 >= 55296) {
-                        int i88 = charAt26 & 8191;
-                        int i89 = 13;
-                        int i90 = i87;
-                        while (true) {
-                            i23 = i90 + 1;
-                            charAt2 = str2.charAt(i90);
-                            if (charAt2 < c) {
-                                break;
-                            }
-                            i88 |= (charAt2 & 8191) << i89;
-                            i89 += 13;
-                            i90 = i23;
-                            c = 55296;
-                        }
-                        charAt26 = i88 | (charAt2 << i89);
-                        i21 = i23;
-                    } else {
-                        i21 = i87;
-                    }
-                    i12 = i21;
-                    int i91 = i86 - 51;
-                    i11 = i6;
-                    if (i91 == 9 || i91 == 17) {
-                        i22 = 2;
-                        i71++;
-                        objArr2[((i77 / 3) * 2) + 1] = objArr[i71];
-                    } else {
-                        if (i91 == 12 && (charAt15 & 1) == 1) {
-                            i71++;
-                            objArr2[((i77 / 3) * 2) + 1] = objArr[i71];
-                        }
-                        i22 = 2;
-                    }
-                    int i92 = charAt26 * i22;
-                    Object obj = objArr[i92];
-                    if (obj instanceof Field) {
-                        field2 = (Field) obj;
-                    } else {
-                        field2 = reflectField(cls, (String) obj);
-                        objArr[i92] = field2;
-                    }
-                    iArr2 = iArr3;
-                    i16 = (int) unsafe.objectFieldOffset(field2);
-                    int i93 = i92 + 1;
-                    Object obj2 = objArr[i93];
-                    if (obj2 instanceof Field) {
-                        field3 = (Field) obj2;
-                    } else {
-                        field3 = reflectField(cls, (String) obj2);
-                        objArr[i93] = field3;
-                    }
-                    i18 = (int) unsafe.objectFieldOffset(field3);
-                    str = str2;
-                    i14 = charAt15;
-                    i17 = i71;
-                    i15 = 0;
-                    rawMessageInfo = rawMessageInfo2;
-                    i13 = charAt25;
-                } else {
-                    i11 = i6;
-                    iArr2 = iArr3;
-                    int i94 = i71 + 1;
-                    Field reflectField = reflectField(cls, (String) objArr[i71]);
-                    rawMessageInfo = rawMessageInfo2;
-                    if (i86 == 9 || i86 == 17) {
-                        i13 = charAt25;
-                        objArr2[((i77 / 3) * 2) + 1] = reflectField.getType();
-                    } else {
-                        if (i86 == 27 || i86 == 49) {
-                            i13 = charAt25;
-                            i20 = i94 + 1;
-                            objArr2[((i77 / 3) * 2) + 1] = objArr[i94];
-                        } else if (i86 == 12 || i86 == 30 || i86 == 44) {
-                            i13 = charAt25;
-                            if ((charAt15 & 1) == 1) {
-                                i20 = i94 + 1;
-                                objArr2[((i77 / 3) * 2) + 1] = objArr[i94];
-                            }
-                        } else if (i86 == 50) {
-                            i74++;
-                            iArr[i74] = i77;
-                            int i95 = (i77 / 3) * 2;
-                            int i96 = i94 + 1;
-                            objArr2[i95] = objArr[i94];
-                            if ((charAt25 & QuickStepContract.SYSUI_STATE_QUICK_SETTINGS_EXPANDED) != 0) {
-                                i96++;
-                                objArr2[i95 + 1] = objArr[i96];
-                            }
-                            i19 = charAt15;
-                            i94 = i96;
-                            i13 = charAt25;
-                            objectFieldOffset = (int) unsafe.objectFieldOffset(reflectField);
-                            if ((i19 & 1) == 1 || i86 > 17) {
-                                i14 = i19;
-                                str = str2;
-                                i12 = i10;
-                                i18 = 0;
-                                i15 = 0;
-                            } else {
-                                int i97 = i10 + 1;
-                                int charAt27 = str2.charAt(i10);
-                                if (charAt27 >= 55296) {
-                                    int i98 = charAt27 & 8191;
-                                    int i99 = 13;
-                                    while (true) {
-                                        i12 = i97 + 1;
-                                        charAt = str2.charAt(i97);
-                                        if (charAt < 55296) {
-                                            break;
-                                        }
-                                        i98 |= (charAt & 8191) << i99;
-                                        i99 += 13;
-                                        i97 = i12;
-                                    }
-                                    charAt27 = i98 | (charAt << i99);
-                                } else {
-                                    i12 = i97;
-                                }
-                                int i100 = (charAt27 / 32) + (i7 * 2);
-                                Object obj3 = objArr[i100];
-                                if (obj3 instanceof Field) {
-                                    field = (Field) obj3;
-                                } else {
-                                    field = reflectField(cls, (String) obj3);
-                                    objArr[i100] = field;
-                                }
-                                i14 = i19;
-                                str = str2;
-                                i18 = (int) unsafe.objectFieldOffset(field);
-                                i15 = charAt27 % 32;
-                            }
-                            if (i86 >= 18 && i86 <= 49) {
-                                i75++;
-                                iArr[i75] = objectFieldOffset;
-                            }
-                            i17 = i94;
-                            i16 = objectFieldOffset;
-                        } else {
-                            i13 = charAt25;
-                        }
-                        i94 = i20;
-                    }
-                    i19 = charAt15;
-                    objectFieldOffset = (int) unsafe.objectFieldOffset(reflectField);
-                    if ((i19 & 1) == 1) {
-                    }
-                    i14 = i19;
-                    str = str2;
-                    i12 = i10;
-                    i18 = 0;
-                    i15 = 0;
-                    if (i86 >= 18) {
-                        i75++;
-                        iArr[i75] = objectFieldOffset;
-                    }
-                    i17 = i94;
-                    i16 = objectFieldOffset;
-                }
-                int i101 = i77 + 1;
-                iArr2[i77] = charAt24;
-                int i102 = i101 + 1;
-                i71 = i17;
-                int i103 = i13;
-                iArr2[i101] = ((i103 & QuickStepContract.SYSUI_STATE_STATUS_BAR_KEYGUARD_SHOWING_OCCLUDED) != 0 ? 536870912 : 0) | ((i103 & 256) != 0 ? 268435456 : 0) | (i86 << 20) | i16;
-                i77 = i102 + 1;
-                iArr2[i102] = i18 | (i15 << 20);
-                charAt15 = i14;
-                rawMessageInfo2 = rawMessageInfo;
-                i2 = i8;
-                z2 = z;
-                i72 = i12;
-                i6 = i11;
-                str2 = str;
-                iArr3 = iArr2;
-            }
-            return new MessageSchema(iArr3, objArr2, i6, i3, rawMessageInfo2.defaultInstance, z2, false, iArr, i2, i73, newInstanceSchema, listFieldSchema, unknownFieldSchema, extensionSchema, mapFieldSchema);
+    public static void writeString(int i, Object obj, CodedOutputStreamWriter codedOutputStreamWriter) throws IOException {
+        if (obj instanceof String) {
+            codedOutputStreamWriter.output.writeString(i, (String) obj);
+            return;
         }
-        StructuralMessageInfo structuralMessageInfo = (StructuralMessageInfo) messageInfo;
-        throw null;
+        codedOutputStreamWriter.writeBytes(i, (ByteString) obj);
     }
 
-    public static long offset(int i) {
-        return i & 1048575;
-    }
-
-    public static <T> boolean oneofBooleanAt(T t, long j) {
-        return ((Boolean) UnsafeUtil.getObject(t, j)).booleanValue();
-    }
-
-    public static <T> double oneofDoubleAt(T t, long j) {
-        return ((Double) UnsafeUtil.getObject(t, j)).doubleValue();
-    }
-
-    public static <T> float oneofFloatAt(T t, long j) {
-        return ((Float) UnsafeUtil.getObject(t, j)).floatValue();
-    }
-
-    public static <T> int oneofIntAt(T t, long j) {
-        return ((Integer) UnsafeUtil.getObject(t, j)).intValue();
-    }
-
-    public static <T> long oneofLongAt(T t, long j) {
-        return ((Long) UnsafeUtil.getObject(t, j)).longValue();
-    }
-
-    public static Field reflectField(Class<?> cls, String str) {
-        Field[] declaredFields;
-        try {
-            return cls.getDeclaredField(str);
-        } catch (NoSuchFieldException unused) {
-            for (Field field : cls.getDeclaredFields()) {
-                if (str.equals(field.getName())) {
-                    return field;
-                }
-            }
-            throw new RuntimeException("Field " + str + " for " + cls.getName() + " not found. Known fields are " + Arrays.toString(declaredFields));
-        }
-    }
-
-    public static int type(int i) {
-        return (i & 267386880) >>> 20;
-    }
-
-    public final boolean arePresentForEquals(T t, T t2, int i) {
-        return isFieldPresent(t, i) == isFieldPresent(t2, i);
-    }
-
-    /* JADX WARN: Code restructure failed: missing block: B:13:0x0041, code lost:
-        if (com.google.protobuf.SchemaUtil.safeEquals(com.google.protobuf.UnsafeUtil.getObject(r10, r5), com.google.protobuf.UnsafeUtil.getObject(r11, r5)) != false) goto L89;
+    /* JADX WARN: Code restructure failed: missing block: B:13:0x003f, code lost:
+        if (com.google.protobuf.SchemaUtil.safeEquals(com.google.protobuf.UnsafeUtil.getObject(r10, r6), com.google.protobuf.UnsafeUtil.getObject(r11, r6)) != false) goto L89;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:19:0x0073, code lost:
-        if (com.google.protobuf.SchemaUtil.safeEquals(com.google.protobuf.UnsafeUtil.getObject(r10, r5), com.google.protobuf.UnsafeUtil.getObject(r11, r5)) != false) goto L89;
+    /* JADX WARN: Code restructure failed: missing block: B:19:0x0071, code lost:
+        if (com.google.protobuf.SchemaUtil.safeEquals(com.google.protobuf.UnsafeUtil.getObject(r10, r6), com.google.protobuf.UnsafeUtil.getObject(r11, r6)) != false) goto L89;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:23:0x0087, code lost:
-        if (com.google.protobuf.UnsafeUtil.getLong(r10, r5) == com.google.protobuf.UnsafeUtil.getLong(r11, r5)) goto L89;
+    /* JADX WARN: Code restructure failed: missing block: B:23:0x0085, code lost:
+        if (com.google.protobuf.UnsafeUtil.getLong(r10, r6) == com.google.protobuf.UnsafeUtil.getLong(r11, r6)) goto L89;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:27:0x0099, code lost:
-        if (com.google.protobuf.UnsafeUtil.getInt(r10, r5) == com.google.protobuf.UnsafeUtil.getInt(r11, r5)) goto L89;
+    /* JADX WARN: Code restructure failed: missing block: B:27:0x0097, code lost:
+        if (com.google.protobuf.UnsafeUtil.getInt(r10, r6) == com.google.protobuf.UnsafeUtil.getInt(r11, r6)) goto L89;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:31:0x00ad, code lost:
-        if (com.google.protobuf.UnsafeUtil.getLong(r10, r5) == com.google.protobuf.UnsafeUtil.getLong(r11, r5)) goto L89;
+    /* JADX WARN: Code restructure failed: missing block: B:31:0x00ab, code lost:
+        if (com.google.protobuf.UnsafeUtil.getLong(r10, r6) == com.google.protobuf.UnsafeUtil.getLong(r11, r6)) goto L89;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:35:0x00bf, code lost:
-        if (com.google.protobuf.UnsafeUtil.getInt(r10, r5) == com.google.protobuf.UnsafeUtil.getInt(r11, r5)) goto L89;
+    /* JADX WARN: Code restructure failed: missing block: B:35:0x00bd, code lost:
+        if (com.google.protobuf.UnsafeUtil.getInt(r10, r6) == com.google.protobuf.UnsafeUtil.getInt(r11, r6)) goto L89;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:39:0x00d1, code lost:
-        if (com.google.protobuf.UnsafeUtil.getInt(r10, r5) == com.google.protobuf.UnsafeUtil.getInt(r11, r5)) goto L89;
+    /* JADX WARN: Code restructure failed: missing block: B:39:0x00cf, code lost:
+        if (com.google.protobuf.UnsafeUtil.getInt(r10, r6) == com.google.protobuf.UnsafeUtil.getInt(r11, r6)) goto L89;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:43:0x00e3, code lost:
-        if (com.google.protobuf.UnsafeUtil.getInt(r10, r5) == com.google.protobuf.UnsafeUtil.getInt(r11, r5)) goto L89;
+    /* JADX WARN: Code restructure failed: missing block: B:43:0x00e1, code lost:
+        if (com.google.protobuf.UnsafeUtil.getInt(r10, r6) == com.google.protobuf.UnsafeUtil.getInt(r11, r6)) goto L89;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:47:0x00f9, code lost:
-        if (com.google.protobuf.SchemaUtil.safeEquals(com.google.protobuf.UnsafeUtil.getObject(r10, r5), com.google.protobuf.UnsafeUtil.getObject(r11, r5)) != false) goto L89;
+    /* JADX WARN: Code restructure failed: missing block: B:47:0x00f7, code lost:
+        if (com.google.protobuf.SchemaUtil.safeEquals(com.google.protobuf.UnsafeUtil.getObject(r10, r6), com.google.protobuf.UnsafeUtil.getObject(r11, r6)) != false) goto L89;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:51:0x010f, code lost:
-        if (com.google.protobuf.SchemaUtil.safeEquals(com.google.protobuf.UnsafeUtil.getObject(r10, r5), com.google.protobuf.UnsafeUtil.getObject(r11, r5)) != false) goto L89;
+    /* JADX WARN: Code restructure failed: missing block: B:51:0x010d, code lost:
+        if (com.google.protobuf.SchemaUtil.safeEquals(com.google.protobuf.UnsafeUtil.getObject(r10, r6), com.google.protobuf.UnsafeUtil.getObject(r11, r6)) != false) goto L89;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:55:0x0125, code lost:
-        if (com.google.protobuf.SchemaUtil.safeEquals(com.google.protobuf.UnsafeUtil.getObject(r10, r5), com.google.protobuf.UnsafeUtil.getObject(r11, r5)) != false) goto L89;
+    /* JADX WARN: Code restructure failed: missing block: B:55:0x0123, code lost:
+        if (com.google.protobuf.SchemaUtil.safeEquals(com.google.protobuf.UnsafeUtil.getObject(r10, r6), com.google.protobuf.UnsafeUtil.getObject(r11, r6)) != false) goto L89;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:59:0x0137, code lost:
-        if (com.google.protobuf.UnsafeUtil.getBoolean(r10, r5) == com.google.protobuf.UnsafeUtil.getBoolean(r11, r5)) goto L89;
+    /* JADX WARN: Code restructure failed: missing block: B:59:0x0135, code lost:
+        if (com.google.protobuf.UnsafeUtil.getBoolean(r10, r6) == com.google.protobuf.UnsafeUtil.getBoolean(r11, r6)) goto L89;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:63:0x0149, code lost:
-        if (com.google.protobuf.UnsafeUtil.getInt(r10, r5) == com.google.protobuf.UnsafeUtil.getInt(r11, r5)) goto L89;
+    /* JADX WARN: Code restructure failed: missing block: B:63:0x0147, code lost:
+        if (com.google.protobuf.UnsafeUtil.getInt(r10, r6) == com.google.protobuf.UnsafeUtil.getInt(r11, r6)) goto L89;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:67:0x015d, code lost:
-        if (com.google.protobuf.UnsafeUtil.getLong(r10, r5) == com.google.protobuf.UnsafeUtil.getLong(r11, r5)) goto L89;
+    /* JADX WARN: Code restructure failed: missing block: B:67:0x015b, code lost:
+        if (com.google.protobuf.UnsafeUtil.getLong(r10, r6) == com.google.protobuf.UnsafeUtil.getLong(r11, r6)) goto L89;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:71:0x016f, code lost:
-        if (com.google.protobuf.UnsafeUtil.getInt(r10, r5) == com.google.protobuf.UnsafeUtil.getInt(r11, r5)) goto L89;
+    /* JADX WARN: Code restructure failed: missing block: B:71:0x016d, code lost:
+        if (com.google.protobuf.UnsafeUtil.getInt(r10, r6) == com.google.protobuf.UnsafeUtil.getInt(r11, r6)) goto L89;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:75:0x0182, code lost:
-        if (com.google.protobuf.UnsafeUtil.getLong(r10, r5) == com.google.protobuf.UnsafeUtil.getLong(r11, r5)) goto L89;
+    /* JADX WARN: Code restructure failed: missing block: B:75:0x0180, code lost:
+        if (com.google.protobuf.UnsafeUtil.getLong(r10, r6) == com.google.protobuf.UnsafeUtil.getLong(r11, r6)) goto L89;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:79:0x0195, code lost:
-        if (com.google.protobuf.UnsafeUtil.getLong(r10, r5) == com.google.protobuf.UnsafeUtil.getLong(r11, r5)) goto L89;
+    /* JADX WARN: Code restructure failed: missing block: B:79:0x0193, code lost:
+        if (com.google.protobuf.UnsafeUtil.getLong(r10, r6) == com.google.protobuf.UnsafeUtil.getLong(r11, r6)) goto L89;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:83:0x01ae, code lost:
-        if (java.lang.Float.floatToIntBits(com.google.protobuf.UnsafeUtil.getFloat(r10, r5)) == java.lang.Float.floatToIntBits(com.google.protobuf.UnsafeUtil.getFloat(r11, r5))) goto L89;
+    /* JADX WARN: Code restructure failed: missing block: B:83:0x01ac, code lost:
+        if (java.lang.Float.floatToIntBits(com.google.protobuf.UnsafeUtil.getFloat(r10, r6)) == java.lang.Float.floatToIntBits(com.google.protobuf.UnsafeUtil.getFloat(r11, r6))) goto L89;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:87:0x01c9, code lost:
-        if (java.lang.Double.doubleToLongBits(com.google.protobuf.UnsafeUtil.getDouble(r10, r5)) == java.lang.Double.doubleToLongBits(com.google.protobuf.UnsafeUtil.getDouble(r11, r5))) goto L89;
+    /* JADX WARN: Code restructure failed: missing block: B:87:0x01c7, code lost:
+        if (java.lang.Double.doubleToLongBits(com.google.protobuf.UnsafeUtil.getDouble(r10, r6)) == java.lang.Double.doubleToLongBits(com.google.protobuf.UnsafeUtil.getDouble(r11, r6))) goto L89;
      */
     @Override // com.google.protobuf.Schema
     /*
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public boolean equals(T r10, T r11) {
+    public final boolean equals(T r10, T r11) {
         /*
-            Method dump skipped, instructions count: 652
+            Method dump skipped, instructions count: 650
             To view this dump add '--comments-level debug' option
         */
         throw new UnsupportedOperationException("Method not decompiled: com.google.protobuf.MessageSchema.equals(java.lang.Object, java.lang.Object):boolean");
     }
 
-    public final <UT, UB> UB filterMapUnknownEnumValues(Object obj, int i, UB ub, UnknownFieldSchema<UT, UB> unknownFieldSchema) {
-        int[] iArr = this.buffer;
-        int i2 = iArr[i];
-        Object object = UnsafeUtil.getObject(obj, offset(iArr[i + 1]));
-        if (object == null) {
-            return ub;
-        }
-        int i3 = (i / 3) * 2;
-        Internal.EnumVerifier enumVerifier = (Internal.EnumVerifier) this.objects[i3 + 1];
-        if (enumVerifier == null) {
-            return ub;
-        }
-        Map<?, ?> forMutableMapData = this.mapFieldSchema.forMutableMapData(object);
-        this.mapFieldSchema.forMapMetadata(this.objects[i3]);
-        for (Map.Entry<?, ?> entry : forMutableMapData.entrySet()) {
-            if (!enumVerifier.isInRange(((Integer) entry.getValue()).intValue())) {
-                if (ub == null) {
-                    unknownFieldSchema.newBuilder();
+    public final void filterMapUnknownEnumValues(Object obj, int i, Object obj2, UnknownFieldSchema unknownFieldSchema) {
+        Internal.EnumVerifier enumFieldVerifier;
+        int i2 = this.buffer[i];
+        Object object = UnsafeUtil.getObject(obj, typeAndOffsetAt(i) & 1048575);
+        if (!(object == null || (enumFieldVerifier = getEnumFieldVerifier(i)) == null)) {
+            MapFieldLite forMutableMapData = this.mapFieldSchema.forMutableMapData(object);
+            this.mapFieldSchema.forMapMetadata(getMapFieldDefaultEntry(i));
+            for (Map.Entry entry : forMutableMapData.entrySet()) {
+                if (!enumFieldVerifier.isInRange(((Integer) entry.getValue()).intValue())) {
+                    if (obj2 == null) {
+                        unknownFieldSchema.newBuilder();
+                    }
+                    entry.getKey();
+                    entry.getValue();
+                    throw null;
                 }
-                entry.getKey();
-                entry.getValue();
-                Objects.requireNonNull(null);
-                throw null;
             }
         }
-        return ub;
     }
 
     public final Internal.EnumVerifier getEnumFieldVerifier(int i) {
@@ -769,599 +505,687 @@ public final class MessageSchema<T> implements Schema<T> {
         if (schema != null) {
             return schema;
         }
-        Schema<T> schemaFor = Protobuf.INSTANCE.schemaFor((Class) ((Class) objArr[i2 + 1]));
+        Schema<T> schemaFor = Protobuf.INSTANCE.schemaFor((Class) objArr[i2 + 1]);
         this.objects[i2] = schemaFor;
         return schemaFor;
     }
 
+    /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
     @Override // com.google.protobuf.Schema
-    public int getSerializedSize(T t) {
+    public final int getSerializedSize(T t) {
         int i;
         int i2;
+        char c;
         int i3;
-        boolean z;
+        int computeTagSize;
+        int computeTagSize2;
+        int computeTagSize3;
+        int computeUInt64SizeNoTag;
+        int computeTagSize4;
+        int computeInt32SizeNoTag;
         int i4;
-        int computeInt64Size;
         int i5;
         int i6;
+        int computeTagSize5;
+        int computeTagSize6;
+        int computeTagSize7;
+        int computeUInt64SizeNoTag2;
+        int computeTagSize8;
+        int computeInt32SizeNoTag2;
         int i7;
-        int computeSFixed64Size;
         int i8;
+        int computeTagSize9;
+        int computeTagSize10;
+        int computeTagSize11;
+        int computeUInt64SizeNoTag3;
+        int computeTagSize12;
+        int computeInt32SizeNoTag3;
         int i9;
         int i10;
         int i11;
-        int i12;
-        int i13;
-        int i14;
-        int i15;
-        int i16;
-        int i17 = 1;
-        int i18 = 1048575;
+        int computeTagSize13;
+        int computeTagSize14;
+        int computeTagSize15;
+        int computeUInt64SizeNoTag4;
+        int computeTagSize16;
+        int computeInt32SizeNoTag4;
+        int i12 = 267386880;
         if (this.proto3) {
             Unsafe unsafe = UNSAFE;
-            int i19 = 0;
-            for (int i20 = 0; i20 < this.buffer.length; i20 += 3) {
-                int typeAndOffsetAt = typeAndOffsetAt(i20);
-                int type = type(typeAndOffsetAt);
-                int i21 = this.buffer[i20];
-                long offset = offset(typeAndOffsetAt);
-                int i22 = (type < FieldType.DOUBLE_LIST_PACKED.id() || type > FieldType.SINT64_LIST_PACKED.id()) ? 0 : this.buffer[i20 + 2] & 1048575;
-                switch (type) {
+            int i13 = 0;
+            for (int i14 = 0; i14 < this.buffer.length; i14 += 3) {
+                int typeAndOffsetAt = typeAndOffsetAt(i14);
+                int i15 = (typeAndOffsetAt & 267386880) >>> 20;
+                int i16 = this.buffer[i14];
+                long j = typeAndOffsetAt & 1048575;
+                if (i15 < FieldType.DOUBLE_LIST_PACKED.id() || i15 > FieldType.SINT64_LIST_PACKED.id()) {
+                    i7 = 0;
+                } else {
+                    i7 = this.buffer[i14 + 2] & 1048575;
+                }
+                switch (i15) {
                     case 0:
-                        if (isFieldPresent(t, i20)) {
-                            i13 = CodedOutputStream.computeDoubleSize(i21, 0.0d);
-                            i12 = i13;
-                            i19 += i12;
+                        if (isFieldPresent(t, i14)) {
+                            computeTagSize9 = CodedOutputStream.computeTagSize(i16);
+                            i8 = computeTagSize9 + 8;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 1:
-                        if (isFieldPresent(t, i20)) {
-                            i12 = CodedOutputStream.computeFloatSize(i21, HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
-                            i19 += i12;
+                        if (isFieldPresent(t, i14)) {
+                            computeTagSize10 = CodedOutputStream.computeTagSize(i16);
+                            i8 = computeTagSize10 + 4;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 2:
-                        if (isFieldPresent(t, i20)) {
-                            i12 = CodedOutputStream.computeInt64Size(i21, UnsafeUtil.getLong(t, offset));
-                            i19 += i12;
+                        if (isFieldPresent(t, i14)) {
+                            long j2 = UnsafeUtil.getLong(t, j);
+                            computeTagSize11 = CodedOutputStream.computeTagSize(i16);
+                            computeUInt64SizeNoTag3 = CodedOutputStream.computeUInt64SizeNoTag(j2);
+                            i8 = computeUInt64SizeNoTag3 + computeTagSize11;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 3:
-                        if (isFieldPresent(t, i20)) {
-                            i12 = CodedOutputStream.computeUInt64Size(i21, UnsafeUtil.getLong(t, offset));
-                            i19 += i12;
+                        if (isFieldPresent(t, i14)) {
+                            long j3 = UnsafeUtil.getLong(t, j);
+                            computeTagSize11 = CodedOutputStream.computeTagSize(i16);
+                            computeUInt64SizeNoTag3 = CodedOutputStream.computeUInt64SizeNoTag(j3);
+                            i8 = computeUInt64SizeNoTag3 + computeTagSize11;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 4:
-                        if (isFieldPresent(t, i20)) {
-                            i12 = CodedOutputStream.computeInt32Size(i21, UnsafeUtil.getInt(t, offset));
-                            i19 += i12;
+                        if (isFieldPresent(t, i14)) {
+                            int i17 = UnsafeUtil.getInt(t, j);
+                            computeTagSize12 = CodedOutputStream.computeTagSize(i16);
+                            computeInt32SizeNoTag3 = CodedOutputStream.computeInt32SizeNoTag(i17);
+                            i8 = computeTagSize12 + computeInt32SizeNoTag3;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 5:
-                        if (isFieldPresent(t, i20)) {
-                            i12 = CodedOutputStream.computeFixed64Size(i21, 0L);
-                            i19 += i12;
+                        if (isFieldPresent(t, i14)) {
+                            i8 = CodedOutputStream.computeFixed64Size(i16);
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 6:
-                        if (isFieldPresent(t, i20)) {
-                            i12 = CodedOutputStream.computeFixed32Size(i21, 0);
-                            i19 += i12;
+                        if (isFieldPresent(t, i14)) {
+                            i8 = CodedOutputStream.computeFixed32Size(i16);
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 7:
-                        if (isFieldPresent(t, i20)) {
-                            i12 = CodedOutputStream.computeBoolSize(i21, true);
-                            i19 += i12;
+                        if (isFieldPresent(t, i14)) {
+                            i8 = CodedOutputStream.computeTagSize(i16) + 1;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 8:
-                        if (isFieldPresent(t, i20)) {
-                            Object object = UnsafeUtil.getObject(t, offset);
-                            if (object instanceof ByteString) {
-                                i12 = CodedOutputStream.computeBytesSize(i21, (ByteString) object);
-                            } else {
-                                i12 = CodedOutputStream.computeStringSize(i21, (String) object);
-                            }
-                            i19 += i12;
+                        if (!isFieldPresent(t, i14)) {
                             break;
                         } else {
-                            break;
+                            Object object = UnsafeUtil.getObject(t, j);
+                            if (object instanceof ByteString) {
+                                i8 = CodedOutputStream.computeBytesSize(i16, (ByteString) object);
+                                i13 += i8;
+                                break;
+                            } else {
+                                computeTagSize12 = CodedOutputStream.computeTagSize(i16);
+                                computeInt32SizeNoTag3 = CodedOutputStream.computeStringSizeNoTag((String) object);
+                                i8 = computeTagSize12 + computeInt32SizeNoTag3;
+                                i13 += i8;
+                            }
                         }
                     case 9:
-                        if (isFieldPresent(t, i20)) {
-                            i12 = SchemaUtil.computeSizeMessage(i21, UnsafeUtil.getObject(t, offset), getMessageFieldSchema(i20));
-                            i19 += i12;
+                        if (isFieldPresent(t, i14)) {
+                            i8 = SchemaUtil.computeSizeMessage(i16, UnsafeUtil.getObject(t, j), getMessageFieldSchema(i14));
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 10:
-                        if (isFieldPresent(t, i20)) {
-                            i12 = CodedOutputStream.computeBytesSize(i21, (ByteString) UnsafeUtil.getObject(t, offset));
-                            i19 += i12;
+                        if (isFieldPresent(t, i14)) {
+                            i8 = CodedOutputStream.computeBytesSize(i16, (ByteString) UnsafeUtil.getObject(t, j));
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 11:
-                        if (isFieldPresent(t, i20)) {
-                            i12 = CodedOutputStream.computeUInt32Size(i21, UnsafeUtil.getInt(t, offset));
-                            i19 += i12;
+                        if (isFieldPresent(t, i14)) {
+                            i8 = CodedOutputStream.computeUInt32Size(i16, UnsafeUtil.getInt(t, j));
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 12:
-                        if (isFieldPresent(t, i20)) {
-                            i12 = CodedOutputStream.computeEnumSize(i21, UnsafeUtil.getInt(t, offset));
-                            i19 += i12;
+                        if (isFieldPresent(t, i14)) {
+                            int i18 = UnsafeUtil.getInt(t, j);
+                            computeTagSize12 = CodedOutputStream.computeTagSize(i16);
+                            computeInt32SizeNoTag3 = CodedOutputStream.computeInt32SizeNoTag(i18);
+                            i8 = computeTagSize12 + computeInt32SizeNoTag3;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 13:
-                        if (isFieldPresent(t, i20)) {
-                            i12 = CodedOutputStream.computeSFixed32Size(i21, 0);
-                            i19 += i12;
+                        if (isFieldPresent(t, i14)) {
+                            computeTagSize10 = CodedOutputStream.computeTagSize(i16);
+                            i8 = computeTagSize10 + 4;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 14:
-                        if (isFieldPresent(t, i20)) {
-                            i12 = CodedOutputStream.computeSFixed64Size(i21, 0L);
-                            i19 += i12;
+                        if (isFieldPresent(t, i14)) {
+                            computeTagSize9 = CodedOutputStream.computeTagSize(i16);
+                            i8 = computeTagSize9 + 8;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 15:
-                        if (isFieldPresent(t, i20)) {
-                            i12 = CodedOutputStream.computeSInt32Size(i21, UnsafeUtil.getInt(t, offset));
-                            i19 += i12;
+                        if (isFieldPresent(t, i14)) {
+                            int i19 = UnsafeUtil.getInt(t, j);
+                            computeTagSize12 = CodedOutputStream.computeTagSize(i16);
+                            computeInt32SizeNoTag3 = CodedOutputStream.computeUInt32SizeNoTag((i19 >> 31) ^ (i19 << 1));
+                            i8 = computeTagSize12 + computeInt32SizeNoTag3;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 16:
-                        if (isFieldPresent(t, i20)) {
-                            i12 = CodedOutputStream.computeSInt64Size(i21, UnsafeUtil.getLong(t, offset));
-                            i19 += i12;
+                        if (isFieldPresent(t, i14)) {
+                            long j4 = UnsafeUtil.getLong(t, j);
+                            computeTagSize11 = CodedOutputStream.computeTagSize(i16);
+                            computeUInt64SizeNoTag3 = CodedOutputStream.computeUInt64SizeNoTag((j4 >> 63) ^ (j4 << 1));
+                            i8 = computeUInt64SizeNoTag3 + computeTagSize11;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 17:
-                        if (isFieldPresent(t, i20)) {
-                            i12 = CodedOutputStream.computeGroupSize(i21, (MessageLite) UnsafeUtil.getObject(t, offset), getMessageFieldSchema(i20));
-                            i19 += i12;
+                        if (isFieldPresent(t, i14)) {
+                            i8 = CodedOutputStream.computeGroupSize(i16, (MessageLite) UnsafeUtil.getObject(t, j), getMessageFieldSchema(i14));
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 18:
-                        i12 = SchemaUtil.computeSizeFixed64List(i21, listAt(t, offset), false);
-                        i19 += i12;
+                        i8 = SchemaUtil.computeSizeFixed64List(i16, listAt(t, j));
+                        i13 += i8;
                         break;
                     case 19:
-                        i12 = SchemaUtil.computeSizeFixed32List(i21, listAt(t, offset), false);
-                        i19 += i12;
+                        i8 = SchemaUtil.computeSizeFixed32List(i16, listAt(t, j));
+                        i13 += i8;
                         break;
                     case 20:
-                        i12 = SchemaUtil.computeSizeInt64List(i21, listAt(t, offset), false);
-                        i19 += i12;
+                        i8 = SchemaUtil.computeSizeInt64List(i16, listAt(t, j));
+                        i13 += i8;
                         break;
                     case 21:
-                        i12 = SchemaUtil.computeSizeUInt64List(i21, listAt(t, offset), false);
-                        i19 += i12;
+                        i8 = SchemaUtil.computeSizeUInt64List(i16, listAt(t, j));
+                        i13 += i8;
                         break;
                     case 22:
-                        i12 = SchemaUtil.computeSizeInt32List(i21, listAt(t, offset), false);
-                        i19 += i12;
+                        i8 = SchemaUtil.computeSizeInt32List(i16, listAt(t, j));
+                        i13 += i8;
                         break;
                     case 23:
-                        i12 = SchemaUtil.computeSizeFixed64List(i21, listAt(t, offset), false);
-                        i19 += i12;
+                        i8 = SchemaUtil.computeSizeFixed64List(i16, listAt(t, j));
+                        i13 += i8;
                         break;
                     case 24:
-                        i12 = SchemaUtil.computeSizeFixed32List(i21, listAt(t, offset), false);
-                        i19 += i12;
+                        i8 = SchemaUtil.computeSizeFixed32List(i16, listAt(t, j));
+                        i13 += i8;
                         break;
                     case 25:
-                        i12 = SchemaUtil.computeSizeBoolList(i21, listAt(t, offset), false);
-                        i19 += i12;
-                        break;
+                        List<?> listAt = listAt(t, j);
+                        Class<?> cls = SchemaUtil.GENERATED_MESSAGE_CLASS;
+                        int size = listAt.size();
+                        if (size != 0) {
+                            i8 = (CodedOutputStream.computeTagSize(i16) + 1) * size;
+                            i13 += i8;
+                            break;
+                        }
+                        i8 = 0;
+                        i13 += i8;
                     case 26:
-                        i12 = SchemaUtil.computeSizeStringList(i21, listAt(t, offset));
-                        i19 += i12;
+                        i8 = SchemaUtil.computeSizeStringList(i16, listAt(t, j));
+                        i13 += i8;
                         break;
                     case 27:
-                        i12 = SchemaUtil.computeSizeMessageList(i21, listAt(t, offset), getMessageFieldSchema(i20));
-                        i19 += i12;
+                        i8 = SchemaUtil.computeSizeMessageList(i16, listAt(t, j), getMessageFieldSchema(i14));
+                        i13 += i8;
                         break;
                     case 28:
-                        i12 = SchemaUtil.computeSizeByteStringList(i21, listAt(t, offset));
-                        i19 += i12;
+                        i8 = SchemaUtil.computeSizeByteStringList(i16, listAt(t, j));
+                        i13 += i8;
                         break;
                     case 29:
-                        i12 = SchemaUtil.computeSizeUInt32List(i21, listAt(t, offset), false);
-                        i19 += i12;
+                        i8 = SchemaUtil.computeSizeUInt32List(i16, listAt(t, j));
+                        i13 += i8;
                         break;
                     case 30:
-                        i12 = SchemaUtil.computeSizeEnumList(i21, listAt(t, offset), false);
-                        i19 += i12;
+                        i8 = SchemaUtil.computeSizeEnumList(i16, listAt(t, j));
+                        i13 += i8;
                         break;
                     case 31:
-                        i12 = SchemaUtil.computeSizeFixed32List(i21, listAt(t, offset), false);
-                        i19 += i12;
+                        i8 = SchemaUtil.computeSizeFixed32List(i16, listAt(t, j));
+                        i13 += i8;
                         break;
                     case 32:
-                        i12 = SchemaUtil.computeSizeFixed64List(i21, listAt(t, offset), false);
-                        i19 += i12;
+                        i8 = SchemaUtil.computeSizeFixed64List(i16, listAt(t, j));
+                        i13 += i8;
                         break;
                     case 33:
-                        i12 = SchemaUtil.computeSizeSInt32List(i21, listAt(t, offset), false);
-                        i19 += i12;
+                        i8 = SchemaUtil.computeSizeSInt32List(i16, listAt(t, j));
+                        i13 += i8;
                         break;
                     case 34:
-                        i12 = SchemaUtil.computeSizeSInt64List(i21, listAt(t, offset), false);
-                        i19 += i12;
+                        i8 = SchemaUtil.computeSizeSInt64List(i16, listAt(t, j));
+                        i13 += i8;
                         break;
                     case 35:
-                        i16 = SchemaUtil.computeSizeFixed64ListNoTag((List) unsafe.getObject(t, offset));
-                        if (i16 <= 0) {
+                        i11 = SchemaUtil.computeSizeFixed64ListNoTag((List) unsafe.getObject(t, j));
+                        if (i11 <= 0) {
                             break;
                         } else {
                             if (this.useCachedSizeField) {
-                                unsafe.putInt(t, i22, i16);
+                                unsafe.putInt(t, i7, i11);
                             }
-                            i15 = CodedOutputStream.computeTagSize(i21);
-                            i14 = CodedOutputStream.computeUInt32SizeNoTag(i16);
-                            i19 += i14 + i15 + i16;
+                            i10 = CodedOutputStream.computeTagSize(i16);
+                            i9 = CodedOutputStream.computeUInt32SizeNoTag(i11);
+                            i13 += i9 + i10 + i11;
                             break;
                         }
                     case 36:
-                        i16 = SchemaUtil.computeSizeFixed32ListNoTag((List) unsafe.getObject(t, offset));
-                        if (i16 <= 0) {
+                        i11 = SchemaUtil.computeSizeFixed32ListNoTag((List) unsafe.getObject(t, j));
+                        if (i11 <= 0) {
                             break;
                         } else {
                             if (this.useCachedSizeField) {
-                                unsafe.putInt(t, i22, i16);
+                                unsafe.putInt(t, i7, i11);
                             }
-                            i15 = CodedOutputStream.computeTagSize(i21);
-                            i14 = CodedOutputStream.computeUInt32SizeNoTag(i16);
-                            i19 += i14 + i15 + i16;
+                            i10 = CodedOutputStream.computeTagSize(i16);
+                            i9 = CodedOutputStream.computeUInt32SizeNoTag(i11);
+                            i13 += i9 + i10 + i11;
                             break;
                         }
                     case 37:
-                        i16 = SchemaUtil.computeSizeInt64ListNoTag((List) unsafe.getObject(t, offset));
-                        if (i16 <= 0) {
+                        i11 = SchemaUtil.computeSizeInt64ListNoTag((List) unsafe.getObject(t, j));
+                        if (i11 <= 0) {
                             break;
                         } else {
                             if (this.useCachedSizeField) {
-                                unsafe.putInt(t, i22, i16);
+                                unsafe.putInt(t, i7, i11);
                             }
-                            i15 = CodedOutputStream.computeTagSize(i21);
-                            i14 = CodedOutputStream.computeUInt32SizeNoTag(i16);
-                            i19 += i14 + i15 + i16;
+                            i10 = CodedOutputStream.computeTagSize(i16);
+                            i9 = CodedOutputStream.computeUInt32SizeNoTag(i11);
+                            i13 += i9 + i10 + i11;
                             break;
                         }
                     case 38:
-                        i16 = SchemaUtil.computeSizeUInt64ListNoTag((List) unsafe.getObject(t, offset));
-                        if (i16 <= 0) {
+                        i11 = SchemaUtil.computeSizeUInt64ListNoTag((List) unsafe.getObject(t, j));
+                        if (i11 <= 0) {
                             break;
                         } else {
                             if (this.useCachedSizeField) {
-                                unsafe.putInt(t, i22, i16);
+                                unsafe.putInt(t, i7, i11);
                             }
-                            i15 = CodedOutputStream.computeTagSize(i21);
-                            i14 = CodedOutputStream.computeUInt32SizeNoTag(i16);
-                            i19 += i14 + i15 + i16;
+                            i10 = CodedOutputStream.computeTagSize(i16);
+                            i9 = CodedOutputStream.computeUInt32SizeNoTag(i11);
+                            i13 += i9 + i10 + i11;
                             break;
                         }
                     case 39:
-                        i16 = SchemaUtil.computeSizeInt32ListNoTag((List) unsafe.getObject(t, offset));
-                        if (i16 <= 0) {
+                        i11 = SchemaUtil.computeSizeInt32ListNoTag((List) unsafe.getObject(t, j));
+                        if (i11 <= 0) {
                             break;
                         } else {
                             if (this.useCachedSizeField) {
-                                unsafe.putInt(t, i22, i16);
+                                unsafe.putInt(t, i7, i11);
                             }
-                            i15 = CodedOutputStream.computeTagSize(i21);
-                            i14 = CodedOutputStream.computeUInt32SizeNoTag(i16);
-                            i19 += i14 + i15 + i16;
+                            i10 = CodedOutputStream.computeTagSize(i16);
+                            i9 = CodedOutputStream.computeUInt32SizeNoTag(i11);
+                            i13 += i9 + i10 + i11;
                             break;
                         }
                     case 40:
-                        i16 = SchemaUtil.computeSizeFixed64ListNoTag((List) unsafe.getObject(t, offset));
-                        if (i16 <= 0) {
+                        i11 = SchemaUtil.computeSizeFixed64ListNoTag((List) unsafe.getObject(t, j));
+                        if (i11 <= 0) {
                             break;
                         } else {
                             if (this.useCachedSizeField) {
-                                unsafe.putInt(t, i22, i16);
+                                unsafe.putInt(t, i7, i11);
                             }
-                            i15 = CodedOutputStream.computeTagSize(i21);
-                            i14 = CodedOutputStream.computeUInt32SizeNoTag(i16);
-                            i19 += i14 + i15 + i16;
+                            i10 = CodedOutputStream.computeTagSize(i16);
+                            i9 = CodedOutputStream.computeUInt32SizeNoTag(i11);
+                            i13 += i9 + i10 + i11;
                             break;
                         }
                     case 41:
-                        i16 = SchemaUtil.computeSizeFixed32ListNoTag((List) unsafe.getObject(t, offset));
-                        if (i16 <= 0) {
+                        i11 = SchemaUtil.computeSizeFixed32ListNoTag((List) unsafe.getObject(t, j));
+                        if (i11 <= 0) {
                             break;
                         } else {
                             if (this.useCachedSizeField) {
-                                unsafe.putInt(t, i22, i16);
+                                unsafe.putInt(t, i7, i11);
                             }
-                            i15 = CodedOutputStream.computeTagSize(i21);
-                            i14 = CodedOutputStream.computeUInt32SizeNoTag(i16);
-                            i19 += i14 + i15 + i16;
+                            i10 = CodedOutputStream.computeTagSize(i16);
+                            i9 = CodedOutputStream.computeUInt32SizeNoTag(i11);
+                            i13 += i9 + i10 + i11;
                             break;
                         }
                     case 42:
-                        Class<?> cls = SchemaUtil.GENERATED_MESSAGE_CLASS;
-                        i16 = ((List) unsafe.getObject(t, offset)).size();
-                        if (i16 <= 0) {
+                        Class<?> cls2 = SchemaUtil.GENERATED_MESSAGE_CLASS;
+                        i11 = ((List) unsafe.getObject(t, j)).size();
+                        if (i11 <= 0) {
                             break;
                         } else {
                             if (this.useCachedSizeField) {
-                                unsafe.putInt(t, i22, i16);
+                                unsafe.putInt(t, i7, i11);
                             }
-                            i15 = CodedOutputStream.computeTagSize(i21);
-                            i14 = CodedOutputStream.computeUInt32SizeNoTag(i16);
-                            i19 += i14 + i15 + i16;
+                            i10 = CodedOutputStream.computeTagSize(i16);
+                            i9 = CodedOutputStream.computeUInt32SizeNoTag(i11);
+                            i13 += i9 + i10 + i11;
                             break;
                         }
                     case 43:
-                        i16 = SchemaUtil.computeSizeUInt32ListNoTag((List) unsafe.getObject(t, offset));
-                        if (i16 <= 0) {
+                        i11 = SchemaUtil.computeSizeUInt32ListNoTag((List) unsafe.getObject(t, j));
+                        if (i11 <= 0) {
                             break;
                         } else {
                             if (this.useCachedSizeField) {
-                                unsafe.putInt(t, i22, i16);
+                                unsafe.putInt(t, i7, i11);
                             }
-                            i15 = CodedOutputStream.computeTagSize(i21);
-                            i14 = CodedOutputStream.computeUInt32SizeNoTag(i16);
-                            i19 += i14 + i15 + i16;
+                            i10 = CodedOutputStream.computeTagSize(i16);
+                            i9 = CodedOutputStream.computeUInt32SizeNoTag(i11);
+                            i13 += i9 + i10 + i11;
                             break;
                         }
                     case 44:
-                        i16 = SchemaUtil.computeSizeEnumListNoTag((List) unsafe.getObject(t, offset));
-                        if (i16 <= 0) {
+                        i11 = SchemaUtil.computeSizeEnumListNoTag((List) unsafe.getObject(t, j));
+                        if (i11 <= 0) {
                             break;
                         } else {
                             if (this.useCachedSizeField) {
-                                unsafe.putInt(t, i22, i16);
+                                unsafe.putInt(t, i7, i11);
                             }
-                            i15 = CodedOutputStream.computeTagSize(i21);
-                            i14 = CodedOutputStream.computeUInt32SizeNoTag(i16);
-                            i19 += i14 + i15 + i16;
+                            i10 = CodedOutputStream.computeTagSize(i16);
+                            i9 = CodedOutputStream.computeUInt32SizeNoTag(i11);
+                            i13 += i9 + i10 + i11;
                             break;
                         }
                     case 45:
-                        i16 = SchemaUtil.computeSizeFixed32ListNoTag((List) unsafe.getObject(t, offset));
-                        if (i16 <= 0) {
+                        i11 = SchemaUtil.computeSizeFixed32ListNoTag((List) unsafe.getObject(t, j));
+                        if (i11 <= 0) {
                             break;
                         } else {
                             if (this.useCachedSizeField) {
-                                unsafe.putInt(t, i22, i16);
+                                unsafe.putInt(t, i7, i11);
                             }
-                            i15 = CodedOutputStream.computeTagSize(i21);
-                            i14 = CodedOutputStream.computeUInt32SizeNoTag(i16);
-                            i19 += i14 + i15 + i16;
+                            i10 = CodedOutputStream.computeTagSize(i16);
+                            i9 = CodedOutputStream.computeUInt32SizeNoTag(i11);
+                            i13 += i9 + i10 + i11;
                             break;
                         }
                     case 46:
-                        i16 = SchemaUtil.computeSizeFixed64ListNoTag((List) unsafe.getObject(t, offset));
-                        if (i16 <= 0) {
+                        i11 = SchemaUtil.computeSizeFixed64ListNoTag((List) unsafe.getObject(t, j));
+                        if (i11 <= 0) {
                             break;
                         } else {
                             if (this.useCachedSizeField) {
-                                unsafe.putInt(t, i22, i16);
+                                unsafe.putInt(t, i7, i11);
                             }
-                            i15 = CodedOutputStream.computeTagSize(i21);
-                            i14 = CodedOutputStream.computeUInt32SizeNoTag(i16);
-                            i19 += i14 + i15 + i16;
+                            i10 = CodedOutputStream.computeTagSize(i16);
+                            i9 = CodedOutputStream.computeUInt32SizeNoTag(i11);
+                            i13 += i9 + i10 + i11;
                             break;
                         }
                     case 47:
-                        i16 = SchemaUtil.computeSizeSInt32ListNoTag((List) unsafe.getObject(t, offset));
-                        if (i16 <= 0) {
+                        i11 = SchemaUtil.computeSizeSInt32ListNoTag((List) unsafe.getObject(t, j));
+                        if (i11 <= 0) {
                             break;
                         } else {
                             if (this.useCachedSizeField) {
-                                unsafe.putInt(t, i22, i16);
+                                unsafe.putInt(t, i7, i11);
                             }
-                            i15 = CodedOutputStream.computeTagSize(i21);
-                            i14 = CodedOutputStream.computeUInt32SizeNoTag(i16);
-                            i19 += i14 + i15 + i16;
+                            i10 = CodedOutputStream.computeTagSize(i16);
+                            i9 = CodedOutputStream.computeUInt32SizeNoTag(i11);
+                            i13 += i9 + i10 + i11;
                             break;
                         }
                     case 48:
-                        i16 = SchemaUtil.computeSizeSInt64ListNoTag((List) unsafe.getObject(t, offset));
-                        if (i16 <= 0) {
+                        i11 = SchemaUtil.computeSizeSInt64ListNoTag((List) unsafe.getObject(t, j));
+                        if (i11 <= 0) {
                             break;
                         } else {
                             if (this.useCachedSizeField) {
-                                unsafe.putInt(t, i22, i16);
+                                unsafe.putInt(t, i7, i11);
                             }
-                            i15 = CodedOutputStream.computeTagSize(i21);
-                            i14 = CodedOutputStream.computeUInt32SizeNoTag(i16);
-                            i19 += i14 + i15 + i16;
+                            i10 = CodedOutputStream.computeTagSize(i16);
+                            i9 = CodedOutputStream.computeUInt32SizeNoTag(i11);
+                            i13 += i9 + i10 + i11;
                             break;
                         }
                     case 49:
-                        i12 = SchemaUtil.computeSizeGroupList(i21, listAt(t, offset), getMessageFieldSchema(i20));
-                        i19 += i12;
-                        break;
+                        List<?> listAt2 = listAt(t, j);
+                        Schema messageFieldSchema = getMessageFieldSchema(i14);
+                        Class<?> cls3 = SchemaUtil.GENERATED_MESSAGE_CLASS;
+                        int size2 = listAt2.size();
+                        if (size2 != 0) {
+                            int i20 = 0;
+                            for (int i21 = 0; i21 < size2; i21++) {
+                                i20 += CodedOutputStream.computeGroupSize(i16, (MessageLite) listAt2.get(i21), messageFieldSchema);
+                            }
+                            i8 = i20;
+                            i13 += i8;
+                            break;
+                        }
+                        i8 = 0;
+                        i13 += i8;
                     case 50:
-                        i12 = this.mapFieldSchema.getSerializedSize(i21, UnsafeUtil.getObject(t, offset), getMapFieldDefaultEntry(i20));
-                        i19 += i12;
+                        i8 = this.mapFieldSchema.getSerializedSize(i16, UnsafeUtil.getObject(t, j), getMapFieldDefaultEntry(i14));
+                        i13 += i8;
                         break;
                     case 51:
-                        if (isOneofPresent(t, i21, i20)) {
-                            i13 = CodedOutputStream.computeDoubleSize(i21, 0.0d);
-                            i12 = i13;
-                            i19 += i12;
+                        if (isOneofPresent(t, i16, i14)) {
+                            computeTagSize13 = CodedOutputStream.computeTagSize(i16);
+                            i8 = computeTagSize13 + 8;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 52:
-                        if (isOneofPresent(t, i21, i20)) {
-                            i12 = CodedOutputStream.computeFloatSize(i21, HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
-                            i19 += i12;
+                        if (isOneofPresent(t, i16, i14)) {
+                            computeTagSize14 = CodedOutputStream.computeTagSize(i16);
+                            i8 = computeTagSize14 + 4;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 53:
-                        if (isOneofPresent(t, i21, i20)) {
-                            i12 = CodedOutputStream.computeInt64Size(i21, oneofLongAt(t, offset));
-                            i19 += i12;
+                        if (isOneofPresent(t, i16, i14)) {
+                            long oneofLongAt = oneofLongAt(t, j);
+                            computeTagSize15 = CodedOutputStream.computeTagSize(i16);
+                            computeUInt64SizeNoTag4 = CodedOutputStream.computeUInt64SizeNoTag(oneofLongAt);
+                            i8 = computeUInt64SizeNoTag4 + computeTagSize15;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 54:
-                        if (isOneofPresent(t, i21, i20)) {
-                            i12 = CodedOutputStream.computeUInt64Size(i21, oneofLongAt(t, offset));
-                            i19 += i12;
+                        if (isOneofPresent(t, i16, i14)) {
+                            long oneofLongAt2 = oneofLongAt(t, j);
+                            computeTagSize15 = CodedOutputStream.computeTagSize(i16);
+                            computeUInt64SizeNoTag4 = CodedOutputStream.computeUInt64SizeNoTag(oneofLongAt2);
+                            i8 = computeUInt64SizeNoTag4 + computeTagSize15;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 55:
-                        if (isOneofPresent(t, i21, i20)) {
-                            i12 = CodedOutputStream.computeInt32Size(i21, oneofIntAt(t, offset));
-                            i19 += i12;
+                        if (isOneofPresent(t, i16, i14)) {
+                            int oneofIntAt = oneofIntAt(t, j);
+                            computeTagSize16 = CodedOutputStream.computeTagSize(i16);
+                            computeInt32SizeNoTag4 = CodedOutputStream.computeInt32SizeNoTag(oneofIntAt);
+                            i8 = computeInt32SizeNoTag4 + computeTagSize16;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 56:
-                        if (isOneofPresent(t, i21, i20)) {
-                            i12 = CodedOutputStream.computeFixed64Size(i21, 0L);
-                            i19 += i12;
+                        if (isOneofPresent(t, i16, i14)) {
+                            i8 = CodedOutputStream.computeFixed64Size(i16);
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 57:
-                        if (isOneofPresent(t, i21, i20)) {
-                            i12 = CodedOutputStream.computeFixed32Size(i21, 0);
-                            i19 += i12;
+                        if (isOneofPresent(t, i16, i14)) {
+                            i8 = CodedOutputStream.computeFixed32Size(i16);
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 58:
-                        if (isOneofPresent(t, i21, i20)) {
-                            i12 = CodedOutputStream.computeBoolSize(i21, true);
-                            i19 += i12;
+                        if (isOneofPresent(t, i16, i14)) {
+                            i8 = CodedOutputStream.computeTagSize(i16) + 1;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 59:
-                        if (isOneofPresent(t, i21, i20)) {
-                            Object object2 = UnsafeUtil.getObject(t, offset);
-                            if (object2 instanceof ByteString) {
-                                i12 = CodedOutputStream.computeBytesSize(i21, (ByteString) object2);
-                            } else {
-                                i12 = CodedOutputStream.computeStringSize(i21, (String) object2);
-                            }
-                            i19 += i12;
+                        if (!isOneofPresent(t, i16, i14)) {
                             break;
                         } else {
-                            break;
+                            Object object2 = UnsafeUtil.getObject(t, j);
+                            if (object2 instanceof ByteString) {
+                                i8 = CodedOutputStream.computeBytesSize(i16, (ByteString) object2);
+                                i13 += i8;
+                                break;
+                            } else {
+                                computeTagSize16 = CodedOutputStream.computeTagSize(i16);
+                                computeInt32SizeNoTag4 = CodedOutputStream.computeStringSizeNoTag((String) object2);
+                                i8 = computeInt32SizeNoTag4 + computeTagSize16;
+                                i13 += i8;
+                            }
                         }
                     case 60:
-                        if (isOneofPresent(t, i21, i20)) {
-                            i12 = SchemaUtil.computeSizeMessage(i21, UnsafeUtil.getObject(t, offset), getMessageFieldSchema(i20));
-                            i19 += i12;
+                        if (isOneofPresent(t, i16, i14)) {
+                            i8 = SchemaUtil.computeSizeMessage(i16, UnsafeUtil.getObject(t, j), getMessageFieldSchema(i14));
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 61:
-                        if (isOneofPresent(t, i21, i20)) {
-                            i12 = CodedOutputStream.computeBytesSize(i21, (ByteString) UnsafeUtil.getObject(t, offset));
-                            i19 += i12;
+                        if (isOneofPresent(t, i16, i14)) {
+                            i8 = CodedOutputStream.computeBytesSize(i16, (ByteString) UnsafeUtil.getObject(t, j));
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 62:
-                        if (isOneofPresent(t, i21, i20)) {
-                            i12 = CodedOutputStream.computeUInt32Size(i21, oneofIntAt(t, offset));
-                            i19 += i12;
+                        if (isOneofPresent(t, i16, i14)) {
+                            i8 = CodedOutputStream.computeUInt32Size(i16, oneofIntAt(t, j));
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 63:
-                        if (isOneofPresent(t, i21, i20)) {
-                            i12 = CodedOutputStream.computeEnumSize(i21, oneofIntAt(t, offset));
-                            i19 += i12;
+                        if (isOneofPresent(t, i16, i14)) {
+                            int oneofIntAt2 = oneofIntAt(t, j);
+                            computeTagSize16 = CodedOutputStream.computeTagSize(i16);
+                            computeInt32SizeNoTag4 = CodedOutputStream.computeInt32SizeNoTag(oneofIntAt2);
+                            i8 = computeInt32SizeNoTag4 + computeTagSize16;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 64:
-                        if (isOneofPresent(t, i21, i20)) {
-                            i12 = CodedOutputStream.computeSFixed32Size(i21, 0);
-                            i19 += i12;
+                        if (isOneofPresent(t, i16, i14)) {
+                            computeTagSize14 = CodedOutputStream.computeTagSize(i16);
+                            i8 = computeTagSize14 + 4;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 65:
-                        if (isOneofPresent(t, i21, i20)) {
-                            i12 = CodedOutputStream.computeSFixed64Size(i21, 0L);
-                            i19 += i12;
+                        if (isOneofPresent(t, i16, i14)) {
+                            computeTagSize13 = CodedOutputStream.computeTagSize(i16);
+                            i8 = computeTagSize13 + 8;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 66:
-                        if (isOneofPresent(t, i21, i20)) {
-                            i12 = CodedOutputStream.computeSInt32Size(i21, oneofIntAt(t, offset));
-                            i19 += i12;
+                        if (isOneofPresent(t, i16, i14)) {
+                            int oneofIntAt3 = oneofIntAt(t, j);
+                            computeTagSize16 = CodedOutputStream.computeTagSize(i16);
+                            computeInt32SizeNoTag4 = CodedOutputStream.computeUInt32SizeNoTag((oneofIntAt3 >> 31) ^ (oneofIntAt3 << 1));
+                            i8 = computeInt32SizeNoTag4 + computeTagSize16;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 67:
-                        if (isOneofPresent(t, i21, i20)) {
-                            i12 = CodedOutputStream.computeSInt64Size(i21, oneofLongAt(t, offset));
-                            i19 += i12;
+                        if (isOneofPresent(t, i16, i14)) {
+                            long oneofLongAt3 = oneofLongAt(t, j);
+                            computeTagSize15 = CodedOutputStream.computeTagSize(i16);
+                            computeUInt64SizeNoTag4 = CodedOutputStream.computeUInt64SizeNoTag((oneofLongAt3 >> 63) ^ (oneofLongAt3 << 1));
+                            i8 = computeUInt64SizeNoTag4 + computeTagSize15;
+                            i13 += i8;
                             break;
                         } else {
                             break;
                         }
                     case 68:
-                        if (isOneofPresent(t, i21, i20)) {
-                            i12 = CodedOutputStream.computeGroupSize(i21, (MessageLite) UnsafeUtil.getObject(t, offset), getMessageFieldSchema(i20));
-                            i19 += i12;
+                        if (isOneofPresent(t, i16, i14)) {
+                            i8 = CodedOutputStream.computeGroupSize(i16, (MessageLite) UnsafeUtil.getObject(t, j), getMessageFieldSchema(i14));
+                            i13 += i8;
                             break;
                         } else {
                             break;
@@ -1369,1394 +1193,868 @@ public final class MessageSchema<T> implements Schema<T> {
                 }
             }
             UnknownFieldSchema<?, ?> unknownFieldSchema = this.unknownFieldSchema;
-            return unknownFieldSchema.getSerializedSize(unknownFieldSchema.getFromMessage(t)) + i19;
+            return unknownFieldSchema.getSerializedSize(unknownFieldSchema.getFromMessage(t)) + i13;
         }
         Unsafe unsafe2 = UNSAFE;
-        int i23 = -1;
+        int i22 = -1;
+        int i23 = 0;
         int i24 = 0;
         int i25 = 0;
-        int i26 = 0;
-        while (i24 < this.buffer.length) {
-            int typeAndOffsetAt2 = typeAndOffsetAt(i24);
-            int i27 = this.buffer[i24];
-            int type2 = type(typeAndOffsetAt2);
-            if (type2 <= 17) {
-                i3 = this.buffer[i24 + 2];
-                int i28 = i3 & i18;
-                i = i17 << (i3 >>> 20);
-                if (i28 != i23) {
-                    i26 = unsafe2.getInt(t, i28);
-                    i23 = i28;
-                    i2 = i25;
-                    i3 = i3;
-                } else {
-                    i2 = i25;
+        while (i23 < this.buffer.length) {
+            int typeAndOffsetAt2 = typeAndOffsetAt(i23);
+            int[] iArr = this.buffer;
+            int i26 = iArr[i23];
+            int i27 = (typeAndOffsetAt2 & i12) >>> 20;
+            if (i27 <= 17) {
+                i2 = iArr[i23 + 2];
+                int i28 = i2 & 1048575;
+                i = 1 << (i2 >>> 20);
+                if (i28 != i22) {
+                    i25 = unsafe2.getInt(t, i28);
+                    i22 = i28;
                 }
             } else {
-                i3 = (!this.useCachedSizeField || type2 < FieldType.DOUBLE_LIST_PACKED.id() || type2 > FieldType.SINT64_LIST_PACKED.id()) ? 0 : this.buffer[i24 + 2] & i18;
-                i2 = i25;
+                if (!this.useCachedSizeField || i27 < FieldType.DOUBLE_LIST_PACKED.id() || i27 > FieldType.SINT64_LIST_PACKED.id()) {
+                    i2 = 0;
+                } else {
+                    i2 = this.buffer[i23 + 2] & 1048575;
+                }
                 i = 0;
             }
-            long offset2 = offset(typeAndOffsetAt2);
-            switch (type2) {
+            long j5 = typeAndOffsetAt2 & 1048575;
+            switch (i27) {
                 case 0:
-                    z = false;
-                    if ((i26 & i) != 0) {
-                        i4 = CodedOutputStream.computeDoubleSize(i27, 0.0d);
-                        i25 = i4 + i2;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
-                    }
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
-                case 1:
-                    if ((i26 & i) != 0) {
-                        z = false;
-                        i4 = CodedOutputStream.computeFloatSize(i27, HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
-                        i25 = i4 + i2;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                    c = '?';
+                    if ((i25 & i) != 0) {
+                        computeTagSize = CodedOutputStream.computeTagSize(i26);
+                        i3 = computeTagSize + 8;
+                        i24 += i3;
+                        break;
                     } else {
-                        z = false;
-                        i25 = i2;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                        break;
+                    }
+                case 1:
+                    c = '?';
+                    if ((i25 & i) != 0) {
+                        computeTagSize2 = CodedOutputStream.computeTagSize(i26);
+                        i3 = computeTagSize2 + 4;
+                        i24 += i3;
+                        break;
+                    } else {
+                        break;
                     }
                 case 2:
-                    if ((i26 & i) != 0) {
-                        computeInt64Size = CodedOutputStream.computeInt64Size(i27, unsafe2.getLong(t, offset2));
-                        i4 = computeInt64Size;
-                        z = false;
-                        i25 = i4 + i2;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
-                    }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
-                case 3:
-                    if ((i26 & i) != 0) {
-                        computeInt64Size = CodedOutputStream.computeUInt64Size(i27, unsafe2.getLong(t, offset2));
-                        i4 = computeInt64Size;
-                        z = false;
-                        i25 = i4 + i2;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
-                    }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
-                case 4:
-                    if ((i26 & i) != 0) {
-                        computeInt64Size = CodedOutputStream.computeInt32Size(i27, unsafe2.getInt(t, offset2));
-                        i4 = computeInt64Size;
-                        z = false;
-                        i25 = i4 + i2;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
-                    }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
-                case 5:
-                    if ((i26 & i) != 0) {
-                        computeInt64Size = CodedOutputStream.computeFixed64Size(i27, 0L);
-                        i4 = computeInt64Size;
-                        z = false;
-                        i25 = i4 + i2;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
-                    }
-                    i25 = i2;
-                    z = false;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
-                case 6:
-                    if ((i26 & i) != 0) {
-                        i4 = CodedOutputStream.computeFixed32Size(i27, 0);
-                        z = false;
-                        i25 = i4 + i2;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                    c = '?';
+                    if ((i25 & i) != 0) {
+                        long j6 = unsafe2.getLong(t, j5);
+                        computeTagSize3 = CodedOutputStream.computeTagSize(i26);
+                        computeUInt64SizeNoTag = CodedOutputStream.computeUInt64SizeNoTag(j6);
+                        i3 = computeUInt64SizeNoTag + computeTagSize3;
+                        i24 += i3;
+                        break;
                     } else {
-                        i25 = i2;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                        break;
+                    }
+                case 3:
+                    c = '?';
+                    if ((i25 & i) != 0) {
+                        long j7 = unsafe2.getLong(t, j5);
+                        computeTagSize3 = CodedOutputStream.computeTagSize(i26);
+                        computeUInt64SizeNoTag = CodedOutputStream.computeUInt64SizeNoTag(j7);
+                        i3 = computeUInt64SizeNoTag + computeTagSize3;
+                        i24 += i3;
+                        break;
+                    } else {
+                        break;
+                    }
+                case 4:
+                    c = '?';
+                    if ((i25 & i) != 0) {
+                        int i29 = unsafe2.getInt(t, j5);
+                        computeTagSize4 = CodedOutputStream.computeTagSize(i26);
+                        computeInt32SizeNoTag = CodedOutputStream.computeInt32SizeNoTag(i29);
+                        i3 = computeInt32SizeNoTag + computeTagSize4;
+                        i24 += i3;
+                        break;
+                    } else {
+                        break;
+                    }
+                case 5:
+                    c = '?';
+                    if ((i25 & i) != 0) {
+                        i3 = CodedOutputStream.computeFixed64Size(i26);
+                        i24 += i3;
+                        break;
+                    } else {
+                        break;
+                    }
+                case 6:
+                    c = '?';
+                    if ((i25 & i) != 0) {
+                        i3 = CodedOutputStream.computeFixed32Size(i26);
+                        i24 += i3;
+                        break;
+                    } else {
+                        break;
                     }
                 case 7:
-                    if ((i26 & i) != 0) {
-                        i5 = CodedOutputStream.computeBoolSize(i27, true);
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                    c = '?';
+                    if ((i25 & i) != 0) {
+                        i3 = CodedOutputStream.computeTagSize(i26) + 1;
+                        i24 += i3;
+                        break;
+                    } else {
+                        break;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
                 case 8:
-                    if ((i26 & i) != 0) {
-                        Object object3 = unsafe2.getObject(t, offset2);
+                    c = '?';
+                    if ((i25 & i) == 0) {
+                        break;
+                    } else {
+                        Object object3 = unsafe2.getObject(t, j5);
                         if (object3 instanceof ByteString) {
-                            i6 = CodedOutputStream.computeBytesSize(i27, (ByteString) object3);
+                            i3 = CodedOutputStream.computeBytesSize(i26, (ByteString) object3);
+                            i24 += i3;
+                            break;
                         } else {
-                            i6 = CodedOutputStream.computeStringSize(i27, (String) object3);
+                            computeTagSize4 = CodedOutputStream.computeTagSize(i26);
+                            computeInt32SizeNoTag = CodedOutputStream.computeStringSizeNoTag((String) object3);
+                            i3 = computeInt32SizeNoTag + computeTagSize4;
+                            i24 += i3;
                         }
-                        i25 = i6 + i2;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
                 case 9:
-                    if ((i26 & i) != 0) {
-                        i5 = SchemaUtil.computeSizeMessage(i27, unsafe2.getObject(t, offset2), getMessageFieldSchema(i24));
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                    c = '?';
+                    if ((i25 & i) != 0) {
+                        i3 = SchemaUtil.computeSizeMessage(i26, unsafe2.getObject(t, j5), getMessageFieldSchema(i23));
+                        i24 += i3;
+                        break;
+                    } else {
+                        break;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
                 case 10:
-                    if ((i26 & i) != 0) {
-                        i5 = CodedOutputStream.computeBytesSize(i27, (ByteString) unsafe2.getObject(t, offset2));
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                    c = '?';
+                    if ((i25 & i) != 0) {
+                        i3 = CodedOutputStream.computeBytesSize(i26, (ByteString) unsafe2.getObject(t, j5));
+                        i24 += i3;
+                        break;
+                    } else {
+                        break;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
                 case 11:
-                    if ((i26 & i) != 0) {
-                        i5 = CodedOutputStream.computeUInt32Size(i27, unsafe2.getInt(t, offset2));
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                    c = '?';
+                    if ((i25 & i) != 0) {
+                        i3 = CodedOutputStream.computeUInt32Size(i26, unsafe2.getInt(t, j5));
+                        i24 += i3;
+                        break;
+                    } else {
+                        break;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
                 case 12:
-                    if ((i26 & i) != 0) {
-                        i5 = CodedOutputStream.computeEnumSize(i27, unsafe2.getInt(t, offset2));
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                    c = '?';
+                    if ((i25 & i) != 0) {
+                        int i30 = unsafe2.getInt(t, j5);
+                        computeTagSize4 = CodedOutputStream.computeTagSize(i26);
+                        computeInt32SizeNoTag = CodedOutputStream.computeInt32SizeNoTag(i30);
+                        i3 = computeInt32SizeNoTag + computeTagSize4;
+                        i24 += i3;
+                        break;
+                    } else {
+                        break;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
                 case 13:
-                    if ((i26 & i) != 0) {
-                        i7 = CodedOutputStream.computeSFixed32Size(i27, 0);
-                        i25 = i2 + i7;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                    c = '?';
+                    if ((i25 & i) != 0) {
+                        computeTagSize2 = CodedOutputStream.computeTagSize(i26);
+                        i3 = computeTagSize2 + 4;
+                        i24 += i3;
+                        break;
+                    } else {
+                        break;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
                 case 14:
-                    if ((i26 & i) != 0) {
-                        computeSFixed64Size = CodedOutputStream.computeSFixed64Size(i27, 0L);
-                        i5 = computeSFixed64Size;
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                    c = '?';
+                    if ((i25 & i) != 0) {
+                        computeTagSize = CodedOutputStream.computeTagSize(i26);
+                        i3 = computeTagSize + 8;
+                        i24 += i3;
+                        break;
+                    } else {
+                        break;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
                 case 15:
-                    if ((i26 & i) != 0) {
-                        i5 = CodedOutputStream.computeSInt32Size(i27, unsafe2.getInt(t, offset2));
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                    c = '?';
+                    if ((i25 & i) != 0) {
+                        int i31 = unsafe2.getInt(t, j5);
+                        computeTagSize4 = CodedOutputStream.computeTagSize(i26);
+                        computeInt32SizeNoTag = CodedOutputStream.computeUInt32SizeNoTag((i31 >> 31) ^ (i31 << 1));
+                        i3 = computeInt32SizeNoTag + computeTagSize4;
+                        i24 += i3;
+                        break;
+                    } else {
+                        break;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
                 case 16:
-                    if ((i26 & i) != 0) {
-                        i5 = CodedOutputStream.computeSInt64Size(i27, unsafe2.getLong(t, offset2));
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                    if ((i25 & i) != 0) {
+                        long j8 = unsafe2.getLong(t, j5);
+                        computeTagSize3 = CodedOutputStream.computeTagSize(i26);
+                        c = '?';
+                        computeUInt64SizeNoTag = CodedOutputStream.computeUInt64SizeNoTag((j8 >> 63) ^ (j8 << 1));
+                        i3 = computeUInt64SizeNoTag + computeTagSize3;
+                        i24 += i3;
+                        break;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 17:
-                    if ((i26 & i) != 0) {
-                        i5 = CodedOutputStream.computeGroupSize(i27, (MessageLite) unsafe2.getObject(t, offset2), getMessageFieldSchema(i24));
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                    if ((i25 & i) != 0) {
+                        i3 = CodedOutputStream.computeGroupSize(i26, (MessageLite) unsafe2.getObject(t, j5), getMessageFieldSchema(i23));
+                        c = '?';
+                        i24 += i3;
+                        break;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 18:
-                    computeSFixed64Size = SchemaUtil.computeSizeFixed64List(i27, (List) unsafe2.getObject(t, offset2), false);
-                    i5 = computeSFixed64Size;
-                    i25 = i2 + i5;
-                    z = false;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    i3 = SchemaUtil.computeSizeFixed64List(i26, (List) unsafe2.getObject(t, j5));
+                    c = '?';
+                    i24 += i3;
+                    break;
                 case 19:
-                    i8 = SchemaUtil.computeSizeFixed32List(i27, (List) unsafe2.getObject(t, offset2), false);
-                    i25 = i2 + i8;
-                    z = false;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    i3 = SchemaUtil.computeSizeFixed32List(i26, (List) unsafe2.getObject(t, j5));
+                    c = '?';
+                    i24 += i3;
+                    break;
                 case 20:
-                    i8 = SchemaUtil.computeSizeInt64List(i27, (List) unsafe2.getObject(t, offset2), false);
-                    i25 = i2 + i8;
-                    z = false;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    i3 = SchemaUtil.computeSizeInt64List(i26, (List) unsafe2.getObject(t, j5));
+                    c = '?';
+                    i24 += i3;
+                    break;
                 case 21:
-                    i8 = SchemaUtil.computeSizeUInt64List(i27, (List) unsafe2.getObject(t, offset2), false);
-                    i25 = i2 + i8;
-                    z = false;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    i3 = SchemaUtil.computeSizeUInt64List(i26, (List) unsafe2.getObject(t, j5));
+                    c = '?';
+                    i24 += i3;
+                    break;
                 case 22:
-                    i8 = SchemaUtil.computeSizeInt32List(i27, (List) unsafe2.getObject(t, offset2), false);
-                    i25 = i2 + i8;
-                    z = false;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    i3 = SchemaUtil.computeSizeInt32List(i26, (List) unsafe2.getObject(t, j5));
+                    c = '?';
+                    i24 += i3;
+                    break;
                 case 23:
-                    i8 = SchemaUtil.computeSizeFixed64List(i27, (List) unsafe2.getObject(t, offset2), false);
-                    i25 = i2 + i8;
-                    z = false;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    i3 = SchemaUtil.computeSizeFixed64List(i26, (List) unsafe2.getObject(t, j5));
+                    c = '?';
+                    i24 += i3;
+                    break;
                 case 24:
-                    i8 = SchemaUtil.computeSizeFixed32List(i27, (List) unsafe2.getObject(t, offset2), false);
-                    i25 = i2 + i8;
-                    z = false;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    i3 = SchemaUtil.computeSizeFixed32List(i26, (List) unsafe2.getObject(t, j5));
+                    c = '?';
+                    i24 += i3;
+                    break;
                 case 25:
-                    i8 = SchemaUtil.computeSizeBoolList(i27, (List) unsafe2.getObject(t, offset2), false);
-                    i25 = i2 + i8;
-                    z = false;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    Class<?> cls4 = SchemaUtil.GENERATED_MESSAGE_CLASS;
+                    int size3 = ((List) unsafe2.getObject(t, j5)).size();
+                    if (size3 != 0) {
+                        i3 = (CodedOutputStream.computeTagSize(i26) + 1) * size3;
+                        c = '?';
+                        i24 += i3;
+                        break;
+                    }
+                    i3 = 0;
+                    c = '?';
+                    i24 += i3;
                 case 26:
-                    i5 = SchemaUtil.computeSizeStringList(i27, (List) unsafe2.getObject(t, offset2));
-                    i25 = i2 + i5;
-                    z = false;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    i3 = SchemaUtil.computeSizeStringList(i26, (List) unsafe2.getObject(t, j5));
+                    c = '?';
+                    i24 += i3;
+                    break;
                 case 27:
-                    i5 = SchemaUtil.computeSizeMessageList(i27, (List) unsafe2.getObject(t, offset2), getMessageFieldSchema(i24));
-                    i25 = i2 + i5;
-                    z = false;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    i3 = SchemaUtil.computeSizeMessageList(i26, (List) unsafe2.getObject(t, j5), getMessageFieldSchema(i23));
+                    c = '?';
+                    i24 += i3;
+                    break;
                 case 28:
-                    i5 = SchemaUtil.computeSizeByteStringList(i27, (List) unsafe2.getObject(t, offset2));
-                    i25 = i2 + i5;
-                    z = false;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    i3 = SchemaUtil.computeSizeByteStringList(i26, (List) unsafe2.getObject(t, j5));
+                    c = '?';
+                    i24 += i3;
+                    break;
                 case 29:
-                    computeSFixed64Size = SchemaUtil.computeSizeUInt32List(i27, (List) unsafe2.getObject(t, offset2), false);
-                    i5 = computeSFixed64Size;
-                    i25 = i2 + i5;
-                    z = false;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    i3 = SchemaUtil.computeSizeUInt32List(i26, (List) unsafe2.getObject(t, j5));
+                    c = '?';
+                    i24 += i3;
+                    break;
                 case 30:
-                    i8 = SchemaUtil.computeSizeEnumList(i27, (List) unsafe2.getObject(t, offset2), false);
-                    i25 = i2 + i8;
-                    z = false;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    i3 = SchemaUtil.computeSizeEnumList(i26, (List) unsafe2.getObject(t, j5));
+                    c = '?';
+                    i24 += i3;
+                    break;
                 case 31:
-                    i8 = SchemaUtil.computeSizeFixed32List(i27, (List) unsafe2.getObject(t, offset2), false);
-                    i25 = i2 + i8;
-                    z = false;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    i3 = SchemaUtil.computeSizeFixed32List(i26, (List) unsafe2.getObject(t, j5));
+                    c = '?';
+                    i24 += i3;
+                    break;
                 case 32:
-                    i8 = SchemaUtil.computeSizeFixed64List(i27, (List) unsafe2.getObject(t, offset2), false);
-                    i25 = i2 + i8;
-                    z = false;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    i3 = SchemaUtil.computeSizeFixed64List(i26, (List) unsafe2.getObject(t, j5));
+                    c = '?';
+                    i24 += i3;
+                    break;
                 case 33:
-                    i8 = SchemaUtil.computeSizeSInt32List(i27, (List) unsafe2.getObject(t, offset2), false);
-                    i25 = i2 + i8;
-                    z = false;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    i3 = SchemaUtil.computeSizeSInt32List(i26, (List) unsafe2.getObject(t, j5));
+                    c = '?';
+                    i24 += i3;
+                    break;
                 case 34:
-                    i8 = SchemaUtil.computeSizeSInt64List(i27, (List) unsafe2.getObject(t, offset2), false);
-                    i25 = i2 + i8;
-                    z = false;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    i3 = SchemaUtil.computeSizeSInt64List(i26, (List) unsafe2.getObject(t, j5));
+                    c = '?';
+                    i24 += i3;
+                    break;
                 case 35:
-                    i9 = SchemaUtil.computeSizeFixed64ListNoTag((List) unsafe2.getObject(t, offset2));
-                    if (i9 > 0) {
+                    i6 = SchemaUtil.computeSizeFixed64ListNoTag((List) unsafe2.getObject(t, j5));
+                    if (i6 > 0) {
                         if (this.useCachedSizeField) {
-                            unsafe2.putInt(t, i3, i9);
+                            unsafe2.putInt(t, i2, i6);
                         }
-                        i11 = CodedOutputStream.computeTagSize(i27);
-                        i10 = CodedOutputStream.computeUInt32SizeNoTag(i9);
-                        i6 = i10 + i11 + i9;
-                        i25 = i6 + i2;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                        i5 = CodedOutputStream.computeTagSize(i26);
+                        i4 = CodedOutputStream.computeUInt32SizeNoTag(i6);
+                        i24 = i4 + i5 + i6 + i24;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 36:
-                    i9 = SchemaUtil.computeSizeFixed32ListNoTag((List) unsafe2.getObject(t, offset2));
-                    if (i9 > 0) {
+                    i6 = SchemaUtil.computeSizeFixed32ListNoTag((List) unsafe2.getObject(t, j5));
+                    if (i6 > 0) {
                         if (this.useCachedSizeField) {
-                            unsafe2.putInt(t, i3, i9);
+                            unsafe2.putInt(t, i2, i6);
                         }
-                        i11 = CodedOutputStream.computeTagSize(i27);
-                        i10 = CodedOutputStream.computeUInt32SizeNoTag(i9);
-                        i6 = i10 + i11 + i9;
-                        i25 = i6 + i2;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                        i5 = CodedOutputStream.computeTagSize(i26);
+                        i4 = CodedOutputStream.computeUInt32SizeNoTag(i6);
+                        i24 = i4 + i5 + i6 + i24;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 37:
-                    i9 = SchemaUtil.computeSizeInt64ListNoTag((List) unsafe2.getObject(t, offset2));
-                    if (i9 > 0) {
+                    i6 = SchemaUtil.computeSizeInt64ListNoTag((List) unsafe2.getObject(t, j5));
+                    if (i6 > 0) {
                         if (this.useCachedSizeField) {
-                            unsafe2.putInt(t, i3, i9);
+                            unsafe2.putInt(t, i2, i6);
                         }
-                        i11 = CodedOutputStream.computeTagSize(i27);
-                        i10 = CodedOutputStream.computeUInt32SizeNoTag(i9);
-                        i6 = i10 + i11 + i9;
-                        i25 = i6 + i2;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                        i5 = CodedOutputStream.computeTagSize(i26);
+                        i4 = CodedOutputStream.computeUInt32SizeNoTag(i6);
+                        i24 = i4 + i5 + i6 + i24;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 38:
-                    i9 = SchemaUtil.computeSizeUInt64ListNoTag((List) unsafe2.getObject(t, offset2));
-                    if (i9 > 0) {
+                    i6 = SchemaUtil.computeSizeUInt64ListNoTag((List) unsafe2.getObject(t, j5));
+                    if (i6 > 0) {
                         if (this.useCachedSizeField) {
-                            unsafe2.putInt(t, i3, i9);
+                            unsafe2.putInt(t, i2, i6);
                         }
-                        i11 = CodedOutputStream.computeTagSize(i27);
-                        i10 = CodedOutputStream.computeUInt32SizeNoTag(i9);
-                        i6 = i10 + i11 + i9;
-                        i25 = i6 + i2;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                        i5 = CodedOutputStream.computeTagSize(i26);
+                        i4 = CodedOutputStream.computeUInt32SizeNoTag(i6);
+                        i24 = i4 + i5 + i6 + i24;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 39:
-                    i9 = SchemaUtil.computeSizeInt32ListNoTag((List) unsafe2.getObject(t, offset2));
-                    if (i9 > 0) {
+                    i6 = SchemaUtil.computeSizeInt32ListNoTag((List) unsafe2.getObject(t, j5));
+                    if (i6 > 0) {
                         if (this.useCachedSizeField) {
-                            unsafe2.putInt(t, i3, i9);
+                            unsafe2.putInt(t, i2, i6);
                         }
-                        i11 = CodedOutputStream.computeTagSize(i27);
-                        i10 = CodedOutputStream.computeUInt32SizeNoTag(i9);
-                        i6 = i10 + i11 + i9;
-                        i25 = i6 + i2;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                        i5 = CodedOutputStream.computeTagSize(i26);
+                        i4 = CodedOutputStream.computeUInt32SizeNoTag(i6);
+                        i24 = i4 + i5 + i6 + i24;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 40:
-                    i9 = SchemaUtil.computeSizeFixed64ListNoTag((List) unsafe2.getObject(t, offset2));
-                    if (i9 > 0) {
+                    i6 = SchemaUtil.computeSizeFixed64ListNoTag((List) unsafe2.getObject(t, j5));
+                    if (i6 > 0) {
                         if (this.useCachedSizeField) {
-                            unsafe2.putInt(t, i3, i9);
+                            unsafe2.putInt(t, i2, i6);
                         }
-                        i11 = CodedOutputStream.computeTagSize(i27);
-                        i10 = CodedOutputStream.computeUInt32SizeNoTag(i9);
-                        i6 = i10 + i11 + i9;
-                        i25 = i6 + i2;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                        i5 = CodedOutputStream.computeTagSize(i26);
+                        i4 = CodedOutputStream.computeUInt32SizeNoTag(i6);
+                        i24 = i4 + i5 + i6 + i24;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 41:
-                    i9 = SchemaUtil.computeSizeFixed32ListNoTag((List) unsafe2.getObject(t, offset2));
-                    if (i9 > 0) {
+                    i6 = SchemaUtil.computeSizeFixed32ListNoTag((List) unsafe2.getObject(t, j5));
+                    if (i6 > 0) {
                         if (this.useCachedSizeField) {
-                            unsafe2.putInt(t, i3, i9);
+                            unsafe2.putInt(t, i2, i6);
                         }
-                        i11 = CodedOutputStream.computeTagSize(i27);
-                        i10 = CodedOutputStream.computeUInt32SizeNoTag(i9);
-                        i6 = i10 + i11 + i9;
-                        i25 = i6 + i2;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                        i5 = CodedOutputStream.computeTagSize(i26);
+                        i4 = CodedOutputStream.computeUInt32SizeNoTag(i6);
+                        i24 = i4 + i5 + i6 + i24;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 42:
-                    Class<?> cls2 = SchemaUtil.GENERATED_MESSAGE_CLASS;
-                    i9 = ((List) unsafe2.getObject(t, offset2)).size();
-                    if (i9 > 0) {
+                    Class<?> cls5 = SchemaUtil.GENERATED_MESSAGE_CLASS;
+                    i6 = ((List) unsafe2.getObject(t, j5)).size();
+                    if (i6 > 0) {
                         if (this.useCachedSizeField) {
-                            unsafe2.putInt(t, i3, i9);
+                            unsafe2.putInt(t, i2, i6);
                         }
-                        i11 = CodedOutputStream.computeTagSize(i27);
-                        i10 = CodedOutputStream.computeUInt32SizeNoTag(i9);
-                        i6 = i10 + i11 + i9;
-                        i25 = i6 + i2;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                        i5 = CodedOutputStream.computeTagSize(i26);
+                        i4 = CodedOutputStream.computeUInt32SizeNoTag(i6);
+                        i24 = i4 + i5 + i6 + i24;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 43:
-                    i9 = SchemaUtil.computeSizeUInt32ListNoTag((List) unsafe2.getObject(t, offset2));
-                    if (i9 > 0) {
+                    i6 = SchemaUtil.computeSizeUInt32ListNoTag((List) unsafe2.getObject(t, j5));
+                    if (i6 > 0) {
                         if (this.useCachedSizeField) {
-                            unsafe2.putInt(t, i3, i9);
+                            unsafe2.putInt(t, i2, i6);
                         }
-                        i11 = CodedOutputStream.computeTagSize(i27);
-                        i10 = CodedOutputStream.computeUInt32SizeNoTag(i9);
-                        i6 = i10 + i11 + i9;
-                        i25 = i6 + i2;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                        i5 = CodedOutputStream.computeTagSize(i26);
+                        i4 = CodedOutputStream.computeUInt32SizeNoTag(i6);
+                        i24 = i4 + i5 + i6 + i24;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 44:
-                    i9 = SchemaUtil.computeSizeEnumListNoTag((List) unsafe2.getObject(t, offset2));
-                    if (i9 > 0) {
+                    i6 = SchemaUtil.computeSizeEnumListNoTag((List) unsafe2.getObject(t, j5));
+                    if (i6 > 0) {
                         if (this.useCachedSizeField) {
-                            unsafe2.putInt(t, i3, i9);
+                            unsafe2.putInt(t, i2, i6);
                         }
-                        i11 = CodedOutputStream.computeTagSize(i27);
-                        i10 = CodedOutputStream.computeUInt32SizeNoTag(i9);
-                        i6 = i10 + i11 + i9;
-                        i25 = i6 + i2;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                        i5 = CodedOutputStream.computeTagSize(i26);
+                        i4 = CodedOutputStream.computeUInt32SizeNoTag(i6);
+                        i24 = i4 + i5 + i6 + i24;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 45:
-                    i9 = SchemaUtil.computeSizeFixed32ListNoTag((List) unsafe2.getObject(t, offset2));
-                    if (i9 > 0) {
+                    i6 = SchemaUtil.computeSizeFixed32ListNoTag((List) unsafe2.getObject(t, j5));
+                    if (i6 > 0) {
                         if (this.useCachedSizeField) {
-                            unsafe2.putInt(t, i3, i9);
+                            unsafe2.putInt(t, i2, i6);
                         }
-                        i11 = CodedOutputStream.computeTagSize(i27);
-                        i10 = CodedOutputStream.computeUInt32SizeNoTag(i9);
-                        i6 = i10 + i11 + i9;
-                        i25 = i6 + i2;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                        i5 = CodedOutputStream.computeTagSize(i26);
+                        i4 = CodedOutputStream.computeUInt32SizeNoTag(i6);
+                        i24 = i4 + i5 + i6 + i24;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 46:
-                    i9 = SchemaUtil.computeSizeFixed64ListNoTag((List) unsafe2.getObject(t, offset2));
-                    if (i9 > 0) {
+                    i6 = SchemaUtil.computeSizeFixed64ListNoTag((List) unsafe2.getObject(t, j5));
+                    if (i6 > 0) {
                         if (this.useCachedSizeField) {
-                            unsafe2.putInt(t, i3, i9);
+                            unsafe2.putInt(t, i2, i6);
                         }
-                        i11 = CodedOutputStream.computeTagSize(i27);
-                        i10 = CodedOutputStream.computeUInt32SizeNoTag(i9);
-                        i6 = i10 + i11 + i9;
-                        i25 = i6 + i2;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                        i5 = CodedOutputStream.computeTagSize(i26);
+                        i4 = CodedOutputStream.computeUInt32SizeNoTag(i6);
+                        i24 = i4 + i5 + i6 + i24;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 47:
-                    i9 = SchemaUtil.computeSizeSInt32ListNoTag((List) unsafe2.getObject(t, offset2));
-                    if (i9 > 0) {
+                    i6 = SchemaUtil.computeSizeSInt32ListNoTag((List) unsafe2.getObject(t, j5));
+                    if (i6 > 0) {
                         if (this.useCachedSizeField) {
-                            unsafe2.putInt(t, i3, i9);
+                            unsafe2.putInt(t, i2, i6);
                         }
-                        i11 = CodedOutputStream.computeTagSize(i27);
-                        i10 = CodedOutputStream.computeUInt32SizeNoTag(i9);
-                        i6 = i10 + i11 + i9;
-                        i25 = i6 + i2;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                        i5 = CodedOutputStream.computeTagSize(i26);
+                        i4 = CodedOutputStream.computeUInt32SizeNoTag(i6);
+                        i24 = i4 + i5 + i6 + i24;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 48:
-                    i9 = SchemaUtil.computeSizeSInt64ListNoTag((List) unsafe2.getObject(t, offset2));
-                    if (i9 > 0) {
+                    i6 = SchemaUtil.computeSizeSInt64ListNoTag((List) unsafe2.getObject(t, j5));
+                    if (i6 > 0) {
                         if (this.useCachedSizeField) {
-                            unsafe2.putInt(t, i3, i9);
+                            unsafe2.putInt(t, i2, i6);
                         }
-                        i11 = CodedOutputStream.computeTagSize(i27);
-                        i10 = CodedOutputStream.computeUInt32SizeNoTag(i9);
-                        i6 = i10 + i11 + i9;
-                        i25 = i6 + i2;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                        i5 = CodedOutputStream.computeTagSize(i26);
+                        i4 = CodedOutputStream.computeUInt32SizeNoTag(i6);
+                        i24 = i4 + i5 + i6 + i24;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 49:
-                    i5 = SchemaUtil.computeSizeGroupList(i27, (List) unsafe2.getObject(t, offset2), getMessageFieldSchema(i24));
-                    i25 = i2 + i5;
-                    z = false;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
-                case 50:
-                    i5 = this.mapFieldSchema.getSerializedSize(i27, unsafe2.getObject(t, offset2), getMapFieldDefaultEntry(i24));
-                    i25 = i2 + i5;
-                    z = false;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
-                case 51:
-                    if (isOneofPresent(t, i27, i24)) {
-                        i5 = CodedOutputStream.computeDoubleSize(i27, 0.0d);
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
-                    }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
-                case 52:
-                    if (isOneofPresent(t, i27, i24)) {
-                        i5 = CodedOutputStream.computeFloatSize(i27, HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
-                    }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
-                case 53:
-                    if (isOneofPresent(t, i27, i24)) {
-                        i5 = CodedOutputStream.computeInt64Size(i27, oneofLongAt(t, offset2));
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
-                    }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
-                case 54:
-                    if (isOneofPresent(t, i27, i24)) {
-                        i5 = CodedOutputStream.computeUInt64Size(i27, oneofLongAt(t, offset2));
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
-                    }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
-                case 55:
-                    if (isOneofPresent(t, i27, i24)) {
-                        i5 = CodedOutputStream.computeInt32Size(i27, oneofIntAt(t, offset2));
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
-                    }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
-                case 56:
-                    if (isOneofPresent(t, i27, i24)) {
-                        i5 = CodedOutputStream.computeFixed64Size(i27, 0L);
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
-                    }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
-                case 57:
-                    if (isOneofPresent(t, i27, i24)) {
-                        i7 = CodedOutputStream.computeFixed32Size(i27, 0);
-                        i25 = i2 + i7;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
-                    }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
-                case 58:
-                    if (isOneofPresent(t, i27, i24)) {
-                        i5 = CodedOutputStream.computeBoolSize(i27, true);
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
-                    }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
-                case 59:
-                    if (isOneofPresent(t, i27, i24)) {
-                        Object object4 = unsafe2.getObject(t, offset2);
-                        if (object4 instanceof ByteString) {
-                            i6 = CodedOutputStream.computeBytesSize(i27, (ByteString) object4);
-                        } else {
-                            i6 = CodedOutputStream.computeStringSize(i27, (String) object4);
+                    List list = (List) unsafe2.getObject(t, j5);
+                    Schema messageFieldSchema2 = getMessageFieldSchema(i23);
+                    Class<?> cls6 = SchemaUtil.GENERATED_MESSAGE_CLASS;
+                    int size4 = list.size();
+                    if (size4 != 0) {
+                        int i32 = 0;
+                        for (int i33 = 0; i33 < size4; i33++) {
+                            i32 += CodedOutputStream.computeGroupSize(i26, (MessageLite) list.get(i33), messageFieldSchema2);
                         }
-                        i25 = i6 + i2;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                        i3 = i32;
+                        c = '?';
+                        i24 += i3;
+                        break;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    i3 = 0;
+                    c = '?';
+                    i24 += i3;
+                case 50:
+                    i3 = this.mapFieldSchema.getSerializedSize(i26, unsafe2.getObject(t, j5), getMapFieldDefaultEntry(i23));
+                    c = '?';
+                    i24 += i3;
+                    break;
+                case 51:
+                    if (isOneofPresent(t, i26, i23)) {
+                        computeTagSize5 = CodedOutputStream.computeTagSize(i26);
+                        i3 = computeTagSize5 + 8;
+                        c = '?';
+                        i24 += i3;
+                        break;
+                    }
+                    c = '?';
+                    break;
+                case 52:
+                    if (isOneofPresent(t, i26, i23)) {
+                        computeTagSize6 = CodedOutputStream.computeTagSize(i26);
+                        i3 = computeTagSize6 + 4;
+                        c = '?';
+                        i24 += i3;
+                        break;
+                    }
+                    c = '?';
+                    break;
+                case 53:
+                    if (isOneofPresent(t, i26, i23)) {
+                        long oneofLongAt4 = oneofLongAt(t, j5);
+                        computeTagSize7 = CodedOutputStream.computeTagSize(i26);
+                        computeUInt64SizeNoTag2 = CodedOutputStream.computeUInt64SizeNoTag(oneofLongAt4);
+                        i3 = computeUInt64SizeNoTag2 + computeTagSize7;
+                        c = '?';
+                        i24 += i3;
+                        break;
+                    }
+                    c = '?';
+                    break;
+                case 54:
+                    if (isOneofPresent(t, i26, i23)) {
+                        long oneofLongAt5 = oneofLongAt(t, j5);
+                        computeTagSize7 = CodedOutputStream.computeTagSize(i26);
+                        computeUInt64SizeNoTag2 = CodedOutputStream.computeUInt64SizeNoTag(oneofLongAt5);
+                        i3 = computeUInt64SizeNoTag2 + computeTagSize7;
+                        c = '?';
+                        i24 += i3;
+                        break;
+                    }
+                    c = '?';
+                    break;
+                case 55:
+                    if (isOneofPresent(t, i26, i23)) {
+                        int oneofIntAt4 = oneofIntAt(t, j5);
+                        computeTagSize8 = CodedOutputStream.computeTagSize(i26);
+                        computeInt32SizeNoTag2 = CodedOutputStream.computeInt32SizeNoTag(oneofIntAt4);
+                        i3 = computeInt32SizeNoTag2 + computeTagSize8;
+                        c = '?';
+                        i24 += i3;
+                        break;
+                    }
+                    c = '?';
+                    break;
+                case 56:
+                    if (isOneofPresent(t, i26, i23)) {
+                        i3 = CodedOutputStream.computeFixed64Size(i26);
+                        c = '?';
+                        i24 += i3;
+                        break;
+                    }
+                    c = '?';
+                    break;
+                case 57:
+                    if (isOneofPresent(t, i26, i23)) {
+                        i3 = CodedOutputStream.computeFixed32Size(i26);
+                        c = '?';
+                        i24 += i3;
+                        break;
+                    }
+                    c = '?';
+                    break;
+                case 58:
+                    if (isOneofPresent(t, i26, i23)) {
+                        i3 = CodedOutputStream.computeTagSize(i26) + 1;
+                        c = '?';
+                        i24 += i3;
+                        break;
+                    }
+                    c = '?';
+                    break;
+                case 59:
+                    if (isOneofPresent(t, i26, i23)) {
+                        Object object4 = unsafe2.getObject(t, j5);
+                        if (object4 instanceof ByteString) {
+                            i3 = CodedOutputStream.computeBytesSize(i26, (ByteString) object4);
+                        } else {
+                            i3 = CodedOutputStream.computeStringSizeNoTag((String) object4) + CodedOutputStream.computeTagSize(i26);
+                        }
+                        c = '?';
+                        i24 += i3;
+                        break;
+                    }
+                    c = '?';
+                    break;
                 case 60:
-                    if (isOneofPresent(t, i27, i24)) {
-                        i5 = SchemaUtil.computeSizeMessage(i27, unsafe2.getObject(t, offset2), getMessageFieldSchema(i24));
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                    if (isOneofPresent(t, i26, i23)) {
+                        i3 = SchemaUtil.computeSizeMessage(i26, unsafe2.getObject(t, j5), getMessageFieldSchema(i23));
+                        c = '?';
+                        i24 += i3;
+                        break;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 61:
-                    if (isOneofPresent(t, i27, i24)) {
-                        i5 = CodedOutputStream.computeBytesSize(i27, (ByteString) unsafe2.getObject(t, offset2));
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                    if (isOneofPresent(t, i26, i23)) {
+                        i3 = CodedOutputStream.computeBytesSize(i26, (ByteString) unsafe2.getObject(t, j5));
+                        c = '?';
+                        i24 += i3;
+                        break;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 62:
-                    if (isOneofPresent(t, i27, i24)) {
-                        i5 = CodedOutputStream.computeUInt32Size(i27, oneofIntAt(t, offset2));
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                    if (isOneofPresent(t, i26, i23)) {
+                        i3 = CodedOutputStream.computeUInt32Size(i26, oneofIntAt(t, j5));
+                        c = '?';
+                        i24 += i3;
+                        break;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 63:
-                    if (isOneofPresent(t, i27, i24)) {
-                        i5 = CodedOutputStream.computeEnumSize(i27, oneofIntAt(t, offset2));
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                    if (isOneofPresent(t, i26, i23)) {
+                        int oneofIntAt5 = oneofIntAt(t, j5);
+                        computeTagSize8 = CodedOutputStream.computeTagSize(i26);
+                        computeInt32SizeNoTag2 = CodedOutputStream.computeInt32SizeNoTag(oneofIntAt5);
+                        i3 = computeInt32SizeNoTag2 + computeTagSize8;
+                        c = '?';
+                        i24 += i3;
+                        break;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 64:
-                    if (isOneofPresent(t, i27, i24)) {
-                        i7 = CodedOutputStream.computeSFixed32Size(i27, 0);
-                        i25 = i2 + i7;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                    if (isOneofPresent(t, i26, i23)) {
+                        computeTagSize6 = CodedOutputStream.computeTagSize(i26);
+                        i3 = computeTagSize6 + 4;
+                        c = '?';
+                        i24 += i3;
+                        break;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 65:
-                    if (isOneofPresent(t, i27, i24)) {
-                        i5 = CodedOutputStream.computeSFixed64Size(i27, 0L);
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                    if (isOneofPresent(t, i26, i23)) {
+                        computeTagSize5 = CodedOutputStream.computeTagSize(i26);
+                        i3 = computeTagSize5 + 8;
+                        c = '?';
+                        i24 += i3;
+                        break;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 66:
-                    if (isOneofPresent(t, i27, i24)) {
-                        i5 = CodedOutputStream.computeSInt32Size(i27, oneofIntAt(t, offset2));
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                    if (isOneofPresent(t, i26, i23)) {
+                        int oneofIntAt6 = oneofIntAt(t, j5);
+                        computeTagSize8 = CodedOutputStream.computeTagSize(i26);
+                        computeInt32SizeNoTag2 = CodedOutputStream.computeUInt32SizeNoTag((oneofIntAt6 >> 31) ^ (oneofIntAt6 << 1));
+                        i3 = computeInt32SizeNoTag2 + computeTagSize8;
+                        c = '?';
+                        i24 += i3;
+                        break;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 67:
-                    if (isOneofPresent(t, i27, i24)) {
-                        i5 = CodedOutputStream.computeSInt64Size(i27, oneofLongAt(t, offset2));
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                    if (isOneofPresent(t, i26, i23)) {
+                        long oneofLongAt6 = oneofLongAt(t, j5);
+                        computeTagSize7 = CodedOutputStream.computeTagSize(i26);
+                        computeUInt64SizeNoTag2 = CodedOutputStream.computeUInt64SizeNoTag((oneofLongAt6 >> 63) ^ (oneofLongAt6 << 1));
+                        i3 = computeUInt64SizeNoTag2 + computeTagSize7;
+                        c = '?';
+                        i24 += i3;
+                        break;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 case 68:
-                    if (isOneofPresent(t, i27, i24)) {
-                        i5 = CodedOutputStream.computeGroupSize(i27, (MessageLite) unsafe2.getObject(t, offset2), getMessageFieldSchema(i24));
-                        i25 = i2 + i5;
-                        z = false;
-                        i24 += 3;
-                        i17 = 1;
-                        i18 = 1048575;
+                    if (isOneofPresent(t, i26, i23)) {
+                        i3 = CodedOutputStream.computeGroupSize(i26, (MessageLite) unsafe2.getObject(t, j5), getMessageFieldSchema(i23));
+                        c = '?';
+                        i24 += i3;
+                        break;
                     }
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
                 default:
-                    z = false;
-                    i25 = i2;
-                    i24 += 3;
-                    i17 = 1;
-                    i18 = 1048575;
+                    c = '?';
+                    break;
             }
+            i23 += 3;
+            i12 = 267386880;
         }
         UnknownFieldSchema<?, ?> unknownFieldSchema2 = this.unknownFieldSchema;
-        int serializedSize = unknownFieldSchema2.getSerializedSize(unknownFieldSchema2.getFromMessage(t)) + i25;
+        int serializedSize = unknownFieldSchema2.getSerializedSize(unknownFieldSchema2.getFromMessage(t)) + i24;
         if (this.hasExtensions) {
             FieldSet<?> extensions = this.extensionSchema.getExtensions(t);
-            int i29 = 0;
-            for (int i30 = 0; i30 < extensions.fields.getNumArrayEntries(); i30++) {
-                Map.Entry<?, Object> arrayEntryAt = extensions.fields.getArrayEntryAt(i30);
-                i29 += FieldSet.computeFieldSize((FieldSet.FieldDescriptorLite) arrayEntryAt.getKey(), arrayEntryAt.getValue());
+            int i34 = 0;
+            for (int i35 = 0; i35 < extensions.fields.getNumArrayEntries(); i35++) {
+                Map.Entry<Object, Object> arrayEntryAt = extensions.fields.getArrayEntryAt(i35);
+                i34 = FieldSet.computeFieldSize((FieldSet.FieldDescriptorLite) arrayEntryAt.getKey(), arrayEntryAt.getValue()) + i34;
             }
-            for (Map.Entry<?, Object> entry : extensions.fields.getOverflowEntries()) {
-                i29 += FieldSet.computeFieldSize((FieldSet.FieldDescriptorLite) entry.getKey(), entry.getValue());
+            for (Map.Entry<Object, Object> entry : extensions.fields.getOverflowEntries()) {
+                i34 = FieldSet.computeFieldSize((FieldSet.FieldDescriptorLite) entry.getKey(), entry.getValue()) + i34;
             }
-            serializedSize += i29;
+            serializedSize += i34;
         }
         return serializedSize;
     }
 
+    /* JADX WARN: Code restructure failed: missing block: B:39:0x00de, code lost:
+        if (r3 != false) goto L81;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:79:0x01f3, code lost:
+        if (r3 != false) goto L81;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:80:0x01f6, code lost:
+        r8 = 1237;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:81:0x01f7, code lost:
+        r3 = r8;
+     */
     @Override // com.google.protobuf.Schema
-    public int hashCode(T t) {
-        int i;
+    /*
+        Code decompiled incorrectly, please refer to instructions dump.
+        To view partially-correct add '--show-bad-code' argument
+    */
+    public final int hashCode(T r11) {
+        /*
+            Method dump skipped, instructions count: 756
+            To view this dump add '--comments-level debug' option
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.google.protobuf.MessageSchema.hashCode(java.lang.Object):int");
+    }
+
+    public final boolean isFieldPresent(T t, int i) {
         int i2;
-        int length = this.buffer.length;
-        int i3 = 0;
-        for (int i4 = 0; i4 < length; i4 += 3) {
-            int typeAndOffsetAt = typeAndOffsetAt(i4);
-            int i5 = this.buffer[i4];
-            long offset = offset(typeAndOffsetAt);
-            int i6 = 37;
-            switch (type(typeAndOffsetAt)) {
+        boolean equals;
+        if (this.proto3) {
+            int typeAndOffsetAt = typeAndOffsetAt(i);
+            long j = typeAndOffsetAt & 1048575;
+            switch ((typeAndOffsetAt & 267386880) >>> 20) {
                 case 0:
-                    i2 = i3 * 53;
-                    i = Internal.hashLong(Double.doubleToLongBits(UnsafeUtil.getDouble(t, offset)));
-                    i3 = i + i2;
-                    break;
-                case 1:
-                    i2 = i3 * 53;
-                    i = Float.floatToIntBits(UnsafeUtil.getFloat(t, offset));
-                    i3 = i + i2;
-                    break;
-                case 2:
-                    i2 = i3 * 53;
-                    i = Internal.hashLong(UnsafeUtil.getLong(t, offset));
-                    i3 = i + i2;
-                    break;
-                case 3:
-                    i2 = i3 * 53;
-                    i = Internal.hashLong(UnsafeUtil.getLong(t, offset));
-                    i3 = i + i2;
-                    break;
-                case 4:
-                    i2 = i3 * 53;
-                    i = UnsafeUtil.getInt(t, offset);
-                    i3 = i + i2;
-                    break;
-                case 5:
-                    i2 = i3 * 53;
-                    i = Internal.hashLong(UnsafeUtil.getLong(t, offset));
-                    i3 = i + i2;
-                    break;
-                case 6:
-                    i2 = i3 * 53;
-                    i = UnsafeUtil.getInt(t, offset);
-                    i3 = i + i2;
-                    break;
-                case 7:
-                    i2 = i3 * 53;
-                    i = Internal.hashBoolean(UnsafeUtil.getBoolean(t, offset));
-                    i3 = i + i2;
-                    break;
-                case 8:
-                    i2 = i3 * 53;
-                    i = ((String) UnsafeUtil.getObject(t, offset)).hashCode();
-                    i3 = i + i2;
-                    break;
-                case 9:
-                    Object object = UnsafeUtil.getObject(t, offset);
-                    if (object != null) {
-                        i6 = object.hashCode();
+                    if (UnsafeUtil.getDouble(t, j) != 0.0d) {
+                        return true;
                     }
-                    i3 = (i3 * 53) + i6;
-                    break;
+                    return false;
+                case 1:
+                    if (UnsafeUtil.getFloat(t, j) != HingeAngleProviderKt.FULLY_CLOSED_DEGREES) {
+                        return true;
+                    }
+                    return false;
+                case 2:
+                    if (UnsafeUtil.getLong(t, j) != 0) {
+                        return true;
+                    }
+                    return false;
+                case 3:
+                    if (UnsafeUtil.getLong(t, j) != 0) {
+                        return true;
+                    }
+                    return false;
+                case 4:
+                    if (UnsafeUtil.getInt(t, j) != 0) {
+                        return true;
+                    }
+                    return false;
+                case 5:
+                    if (UnsafeUtil.getLong(t, j) != 0) {
+                        return true;
+                    }
+                    return false;
+                case 6:
+                    if (UnsafeUtil.getInt(t, j) != 0) {
+                        return true;
+                    }
+                    return false;
+                case 7:
+                    return UnsafeUtil.getBoolean(t, j);
+                case 8:
+                    Object object = UnsafeUtil.getObject(t, j);
+                    if (object instanceof String) {
+                        equals = ((String) object).isEmpty();
+                        break;
+                    } else if (object instanceof ByteString) {
+                        equals = ByteString.EMPTY.equals(object);
+                        break;
+                    } else {
+                        throw new IllegalArgumentException();
+                    }
+                case 9:
+                    if (UnsafeUtil.getObject(t, j) != null) {
+                        return true;
+                    }
+                    return false;
                 case 10:
-                    i2 = i3 * 53;
-                    i = UnsafeUtil.getObject(t, offset).hashCode();
-                    i3 = i + i2;
+                    equals = ByteString.EMPTY.equals(UnsafeUtil.getObject(t, j));
                     break;
                 case 11:
-                    i2 = i3 * 53;
-                    i = UnsafeUtil.getInt(t, offset);
-                    i3 = i + i2;
-                    break;
-                case 12:
-                    i2 = i3 * 53;
-                    i = UnsafeUtil.getInt(t, offset);
-                    i3 = i + i2;
-                    break;
-                case 13:
-                    i2 = i3 * 53;
-                    i = UnsafeUtil.getInt(t, offset);
-                    i3 = i + i2;
-                    break;
-                case 14:
-                    i2 = i3 * 53;
-                    i = Internal.hashLong(UnsafeUtil.getLong(t, offset));
-                    i3 = i + i2;
-                    break;
-                case 15:
-                    i2 = i3 * 53;
-                    i = UnsafeUtil.getInt(t, offset);
-                    i3 = i + i2;
-                    break;
-                case 16:
-                    i2 = i3 * 53;
-                    i = Internal.hashLong(UnsafeUtil.getLong(t, offset));
-                    i3 = i + i2;
-                    break;
-                case 17:
-                    Object object2 = UnsafeUtil.getObject(t, offset);
-                    if (object2 != null) {
-                        i6 = object2.hashCode();
+                    if (UnsafeUtil.getInt(t, j) != 0) {
+                        return true;
                     }
-                    i3 = (i3 * 53) + i6;
-                    break;
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                    i2 = i3 * 53;
-                    i = UnsafeUtil.getObject(t, offset).hashCode();
-                    i3 = i + i2;
-                    break;
-                case 50:
-                    i2 = i3 * 53;
-                    i = UnsafeUtil.getObject(t, offset).hashCode();
-                    i3 = i + i2;
-                    break;
-                case 51:
-                    if (isOneofPresent(t, i5, i4)) {
-                        i2 = i3 * 53;
-                        i = Internal.hashLong(Double.doubleToLongBits(oneofDoubleAt(t, offset)));
-                        i3 = i + i2;
-                        break;
-                    } else {
-                        break;
-                    }
-                case 52:
-                    if (isOneofPresent(t, i5, i4)) {
-                        i2 = i3 * 53;
-                        i = Float.floatToIntBits(oneofFloatAt(t, offset));
-                        i3 = i + i2;
-                        break;
-                    } else {
-                        break;
-                    }
-                case 53:
-                    if (isOneofPresent(t, i5, i4)) {
-                        i2 = i3 * 53;
-                        i = Internal.hashLong(oneofLongAt(t, offset));
-                        i3 = i + i2;
-                        break;
-                    } else {
-                        break;
-                    }
-                case 54:
-                    if (isOneofPresent(t, i5, i4)) {
-                        i2 = i3 * 53;
-                        i = Internal.hashLong(oneofLongAt(t, offset));
-                        i3 = i + i2;
-                        break;
-                    } else {
-                        break;
-                    }
-                case 55:
-                    if (isOneofPresent(t, i5, i4)) {
-                        i2 = i3 * 53;
-                        i = oneofIntAt(t, offset);
-                        i3 = i + i2;
-                        break;
-                    } else {
-                        break;
-                    }
-                case 56:
-                    if (isOneofPresent(t, i5, i4)) {
-                        i2 = i3 * 53;
-                        i = Internal.hashLong(oneofLongAt(t, offset));
-                        i3 = i + i2;
-                        break;
-                    } else {
-                        break;
-                    }
-                case 57:
-                    if (isOneofPresent(t, i5, i4)) {
-                        i2 = i3 * 53;
-                        i = oneofIntAt(t, offset);
-                        i3 = i + i2;
-                        break;
-                    } else {
-                        break;
-                    }
-                case 58:
-                    if (isOneofPresent(t, i5, i4)) {
-                        i2 = i3 * 53;
-                        i = Internal.hashBoolean(oneofBooleanAt(t, offset));
-                        i3 = i + i2;
-                        break;
-                    } else {
-                        break;
-                    }
-                case 59:
-                    if (isOneofPresent(t, i5, i4)) {
-                        i2 = i3 * 53;
-                        i = ((String) UnsafeUtil.getObject(t, offset)).hashCode();
-                        i3 = i + i2;
-                        break;
-                    } else {
-                        break;
-                    }
-                case 60:
-                    if (isOneofPresent(t, i5, i4)) {
-                        i2 = i3 * 53;
-                        i = UnsafeUtil.getObject(t, offset).hashCode();
-                        i3 = i + i2;
-                        break;
-                    } else {
-                        break;
-                    }
-                case 61:
-                    if (isOneofPresent(t, i5, i4)) {
-                        i2 = i3 * 53;
-                        i = UnsafeUtil.getObject(t, offset).hashCode();
-                        i3 = i + i2;
-                        break;
-                    } else {
-                        break;
-                    }
-                case 62:
-                    if (isOneofPresent(t, i5, i4)) {
-                        i2 = i3 * 53;
-                        i = oneofIntAt(t, offset);
-                        i3 = i + i2;
-                        break;
-                    } else {
-                        break;
-                    }
-                case 63:
-                    if (isOneofPresent(t, i5, i4)) {
-                        i2 = i3 * 53;
-                        i = oneofIntAt(t, offset);
-                        i3 = i + i2;
-                        break;
-                    } else {
-                        break;
-                    }
-                case 64:
-                    if (isOneofPresent(t, i5, i4)) {
-                        i2 = i3 * 53;
-                        i = oneofIntAt(t, offset);
-                        i3 = i + i2;
-                        break;
-                    } else {
-                        break;
-                    }
-                case 65:
-                    if (isOneofPresent(t, i5, i4)) {
-                        i2 = i3 * 53;
-                        i = Internal.hashLong(oneofLongAt(t, offset));
-                        i3 = i + i2;
-                        break;
-                    } else {
-                        break;
-                    }
-                case 66:
-                    if (isOneofPresent(t, i5, i4)) {
-                        i2 = i3 * 53;
-                        i = oneofIntAt(t, offset);
-                        i3 = i + i2;
-                        break;
-                    } else {
-                        break;
-                    }
-                case 67:
-                    if (isOneofPresent(t, i5, i4)) {
-                        i2 = i3 * 53;
-                        i = Internal.hashLong(oneofLongAt(t, offset));
-                        i3 = i + i2;
-                        break;
-                    } else {
-                        break;
-                    }
-                case 68:
-                    if (isOneofPresent(t, i5, i4)) {
-                        i2 = i3 * 53;
-                        i = UnsafeUtil.getObject(t, offset).hashCode();
-                        i3 = i + i2;
-                        break;
-                    } else {
-                        break;
-                    }
-            }
-        }
-        int hashCode = this.unknownFieldSchema.getFromMessage(t).hashCode() + (i3 * 53);
-        return this.hasExtensions ? (hashCode * 53) + this.extensionSchema.getExtensions(t).hashCode() : hashCode;
-    }
-
-    public final boolean isFieldPresent(T t, int i, int i2, int i3) {
-        if (this.proto3) {
-            return isFieldPresent(t, i);
-        }
-        return (i2 & i3) != 0;
-    }
-
-    /* JADX WARN: Multi-variable type inference failed */
-    @Override // com.google.protobuf.Schema
-    public final boolean isInitialized(T t) {
-        int i;
-        int i2 = -1;
-        int i3 = 0;
-        int i4 = 0;
-        while (true) {
-            boolean z = true;
-            if (i3 >= this.checkInitializedCount) {
-                return !this.hasExtensions || this.extensionSchema.getExtensions(t).isInitialized();
-            }
-            int i5 = this.intArray[i3];
-            int i6 = this.buffer[i5];
-            int typeAndOffsetAt = typeAndOffsetAt(i5);
-            if (!this.proto3) {
-                int i7 = this.buffer[i5 + 2];
-                int i8 = 1048575 & i7;
-                i = 1 << (i7 >>> 20);
-                if (i8 != i2) {
-                    i4 = UNSAFE.getInt(t, i8);
-                    i2 = i8;
-                }
-            } else {
-                i = 0;
-            }
-            if (((268435456 & typeAndOffsetAt) != 0) && !isFieldPresent(t, i5, i4, i)) {
-                return false;
-            }
-            int type = type(typeAndOffsetAt);
-            if (type != 9 && type != 17) {
-                if (type != 27) {
-                    if (type == 60 || type == 68) {
-                        if (isOneofPresent(t, i6, i5) && !getMessageFieldSchema(i5).isInitialized(UnsafeUtil.getObject(t, offset(typeAndOffsetAt)))) {
-                            return false;
-                        }
-                    } else if (type != 49) {
-                        if (type == 50 && !this.mapFieldSchema.forMapData(UnsafeUtil.getObject(t, offset(typeAndOffsetAt))).isEmpty()) {
-                            this.mapFieldSchema.forMapMetadata(this.objects[(i5 / 3) * 2]);
-                            Objects.requireNonNull(null);
-                            throw null;
-                        }
-                    }
-                }
-                List list = (List) UnsafeUtil.getObject(t, offset(typeAndOffsetAt));
-                if (!list.isEmpty()) {
-                    Schema messageFieldSchema = getMessageFieldSchema(i5);
-                    int i9 = 0;
-                    while (true) {
-                        if (i9 >= list.size()) {
-                            break;
-                        } else if (!messageFieldSchema.isInitialized(list.get(i9))) {
-                            z = false;
-                            break;
-                        } else {
-                            i9++;
-                        }
-                    }
-                }
-                if (!z) {
                     return false;
-                }
-            } else if (isFieldPresent(t, i5, i4, i) && !getMessageFieldSchema(i5).isInitialized(UnsafeUtil.getObject(t, offset(typeAndOffsetAt)))) {
-                return false;
+                case 12:
+                    if (UnsafeUtil.getInt(t, j) != 0) {
+                        return true;
+                    }
+                    return false;
+                case 13:
+                    if (UnsafeUtil.getInt(t, j) != 0) {
+                        return true;
+                    }
+                    return false;
+                case 14:
+                    if (UnsafeUtil.getLong(t, j) != 0) {
+                        return true;
+                    }
+                    return false;
+                case 15:
+                    if (UnsafeUtil.getInt(t, j) != 0) {
+                        return true;
+                    }
+                    return false;
+                case 16:
+                    if (UnsafeUtil.getLong(t, j) != 0) {
+                        return true;
+                    }
+                    return false;
+                case 17:
+                    if (UnsafeUtil.getObject(t, j) != null) {
+                        return true;
+                    }
+                    return false;
+                default:
+                    throw new IllegalArgumentException();
             }
-            i3++;
+            return !equals;
         }
+        if ((UnsafeUtil.getInt(t, i2 & 1048575) & (1 << (this.buffer[i + 2] >>> 20))) != 0) {
+            return true;
+        }
+        return false;
     }
 
     public final boolean isOneofPresent(T t, int i, int i2) {
-        return UnsafeUtil.getInt(t, (long) (this.buffer[i2 + 2] & 1048575)) == i;
+        if (UnsafeUtil.getInt(t, this.buffer[i2 + 2] & 1048575) == i) {
+            return true;
+        }
+        return false;
     }
 
     @Override // com.google.protobuf.Schema
-    public void makeImmutable(T t) {
+    public final void makeImmutable(T t) {
         int i;
         int i2 = this.checkInitializedCount;
         while (true) {
@@ -2764,10 +2062,10 @@ public final class MessageSchema<T> implements Schema<T> {
             if (i2 >= i) {
                 break;
             }
-            long offset = offset(typeAndOffsetAt(this.intArray[i2]));
-            Object object = UnsafeUtil.getObject(t, offset);
+            long typeAndOffsetAt = typeAndOffsetAt(this.intArray[i2]) & 1048575;
+            Object object = UnsafeUtil.getObject(t, typeAndOffsetAt);
             if (object != null) {
-                UnsafeUtil.putObject(t, offset, this.mapFieldSchema.toImmutable(object));
+                UnsafeUtil.putObject(t, typeAndOffsetAt, this.mapFieldSchema.toImmutable(object));
             }
             i2++;
         }
@@ -2783,305 +2081,37 @@ public final class MessageSchema<T> implements Schema<T> {
     }
 
     @Override // com.google.protobuf.Schema
-    public void mergeFrom(T t, T t2) {
-        Objects.requireNonNull(t2);
-        int i = 0;
-        while (true) {
-            int[] iArr = this.buffer;
-            if (i < iArr.length) {
-                int i2 = iArr[i + 1];
-                long offset = offset(i2);
-                int i3 = this.buffer[i];
-                switch (type(i2)) {
-                    case 0:
-                        if (!isFieldPresent(t2, i)) {
-                            break;
-                        } else {
-                            UnsafeUtil.putDouble(t, offset, UnsafeUtil.getDouble(t2, offset));
-                            setFieldPresent(t, i);
-                            break;
-                        }
-                    case 1:
-                        if (!isFieldPresent(t2, i)) {
-                            break;
-                        } else {
-                            UnsafeUtil.putFloat(t, offset, UnsafeUtil.getFloat(t2, offset));
-                            setFieldPresent(t, i);
-                            break;
-                        }
-                    case 2:
-                        if (!isFieldPresent(t2, i)) {
-                            break;
-                        } else {
-                            UnsafeUtil.putLong(t, offset, UnsafeUtil.getLong(t2, offset));
-                            setFieldPresent(t, i);
-                            break;
-                        }
-                    case 3:
-                        if (!isFieldPresent(t2, i)) {
-                            break;
-                        } else {
-                            UnsafeUtil.putLong(t, offset, UnsafeUtil.getLong(t2, offset));
-                            setFieldPresent(t, i);
-                            break;
-                        }
-                    case 4:
-                        if (!isFieldPresent(t2, i)) {
-                            break;
-                        } else {
-                            UnsafeUtil.putInt(t, offset, UnsafeUtil.getInt(t2, offset));
-                            setFieldPresent(t, i);
-                            break;
-                        }
-                    case 5:
-                        if (!isFieldPresent(t2, i)) {
-                            break;
-                        } else {
-                            UnsafeUtil.putLong(t, offset, UnsafeUtil.getLong(t2, offset));
-                            setFieldPresent(t, i);
-                            break;
-                        }
-                    case 6:
-                        if (!isFieldPresent(t2, i)) {
-                            break;
-                        } else {
-                            UnsafeUtil.putInt(t, offset, UnsafeUtil.getInt(t2, offset));
-                            setFieldPresent(t, i);
-                            break;
-                        }
-                    case 7:
-                        if (!isFieldPresent(t2, i)) {
-                            break;
-                        } else {
-                            UnsafeUtil.putBoolean(t, offset, UnsafeUtil.getBoolean(t2, offset));
-                            setFieldPresent(t, i);
-                            break;
-                        }
-                    case 8:
-                        if (!isFieldPresent(t2, i)) {
-                            break;
-                        } else {
-                            UnsafeUtil.putObject(t, offset, UnsafeUtil.getObject(t2, offset));
-                            setFieldPresent(t, i);
-                            break;
-                        }
-                    case 9:
-                        mergeMessage(t, t2, i);
-                        break;
-                    case 10:
-                        if (!isFieldPresent(t2, i)) {
-                            break;
-                        } else {
-                            UnsafeUtil.putObject(t, offset, UnsafeUtil.getObject(t2, offset));
-                            setFieldPresent(t, i);
-                            break;
-                        }
-                    case 11:
-                        if (!isFieldPresent(t2, i)) {
-                            break;
-                        } else {
-                            UnsafeUtil.putInt(t, offset, UnsafeUtil.getInt(t2, offset));
-                            setFieldPresent(t, i);
-                            break;
-                        }
-                    case 12:
-                        if (!isFieldPresent(t2, i)) {
-                            break;
-                        } else {
-                            UnsafeUtil.putInt(t, offset, UnsafeUtil.getInt(t2, offset));
-                            setFieldPresent(t, i);
-                            break;
-                        }
-                    case 13:
-                        if (!isFieldPresent(t2, i)) {
-                            break;
-                        } else {
-                            UnsafeUtil.putInt(t, offset, UnsafeUtil.getInt(t2, offset));
-                            setFieldPresent(t, i);
-                            break;
-                        }
-                    case 14:
-                        if (!isFieldPresent(t2, i)) {
-                            break;
-                        } else {
-                            UnsafeUtil.putLong(t, offset, UnsafeUtil.getLong(t2, offset));
-                            setFieldPresent(t, i);
-                            break;
-                        }
-                    case 15:
-                        if (!isFieldPresent(t2, i)) {
-                            break;
-                        } else {
-                            UnsafeUtil.putInt(t, offset, UnsafeUtil.getInt(t2, offset));
-                            setFieldPresent(t, i);
-                            break;
-                        }
-                    case 16:
-                        if (!isFieldPresent(t2, i)) {
-                            break;
-                        } else {
-                            UnsafeUtil.putLong(t, offset, UnsafeUtil.getLong(t2, offset));
-                            setFieldPresent(t, i);
-                            break;
-                        }
-                    case 17:
-                        mergeMessage(t, t2, i);
-                        break;
-                    case 18:
-                    case 19:
-                    case 20:
-                    case 21:
-                    case 22:
-                    case 23:
-                    case 24:
-                    case 25:
-                    case 26:
-                    case 27:
-                    case 28:
-                    case 29:
-                    case 30:
-                    case 31:
-                    case 32:
-                    case 33:
-                    case 34:
-                    case 35:
-                    case 36:
-                    case 37:
-                    case 38:
-                    case 39:
-                    case 40:
-                    case 41:
-                    case 42:
-                    case 43:
-                    case 44:
-                    case 45:
-                    case 46:
-                    case 47:
-                    case 48:
-                    case 49:
-                        this.listFieldSchema.mergeListsAt(t, t2, offset);
-                        break;
-                    case 50:
-                        MapFieldSchema mapFieldSchema = this.mapFieldSchema;
-                        Class<?> cls = SchemaUtil.GENERATED_MESSAGE_CLASS;
-                        UnsafeUtil.putObject(t, offset, mapFieldSchema.mergeFrom(UnsafeUtil.getObject(t, offset), UnsafeUtil.getObject(t2, offset)));
-                        break;
-                    case 51:
-                    case 52:
-                    case 53:
-                    case 54:
-                    case 55:
-                    case 56:
-                    case 57:
-                    case 58:
-                    case 59:
-                        if (!isOneofPresent(t2, i3, i)) {
-                            break;
-                        } else {
-                            UnsafeUtil.putObject(t, offset, UnsafeUtil.getObject(t2, offset));
-                            setOneofPresent(t, i3, i);
-                            break;
-                        }
-                    case 60:
-                        mergeOneofMessage(t, t2, i);
-                        break;
-                    case 61:
-                    case 62:
-                    case 63:
-                    case 64:
-                    case 65:
-                    case 66:
-                    case 67:
-                        if (!isOneofPresent(t2, i3, i)) {
-                            break;
-                        } else {
-                            UnsafeUtil.putObject(t, offset, UnsafeUtil.getObject(t2, offset));
-                            setOneofPresent(t, i3, i);
-                            break;
-                        }
-                    case 68:
-                        mergeOneofMessage(t, t2, i);
-                        break;
-                }
-                i += 3;
-            } else if (!this.proto3) {
-                UnknownFieldSchema<?, ?> unknownFieldSchema = this.unknownFieldSchema;
-                Class<?> cls2 = SchemaUtil.GENERATED_MESSAGE_CLASS;
-                unknownFieldSchema.setToMessage(t, unknownFieldSchema.merge(unknownFieldSchema.getFromMessage(t), unknownFieldSchema.getFromMessage(t2)));
-                if (this.hasExtensions) {
-                    SchemaUtil.mergeExtensions(this.extensionSchema, t, t2);
-                    return;
-                }
-                return;
-            } else {
-                return;
-            }
-        }
-    }
-
-    public final void mergeMessage(T t, T t2, int i) {
-        long offset = offset(this.buffer[i + 1]);
-        if (isFieldPresent(t2, i)) {
-            Object object = UnsafeUtil.getObject(t, offset);
-            Object object2 = UnsafeUtil.getObject(t2, offset);
-            if (object != null && object2 != null) {
-                UnsafeUtil.putObject(t, offset, Internal.mergeMessage(object, object2));
-                setFieldPresent(t, i);
-            } else if (object2 != null) {
-                UnsafeUtil.putObject(t, offset, object2);
-                setFieldPresent(t, i);
-            }
-        }
-    }
-
-    public final void mergeOneofMessage(T t, T t2, int i) {
-        int[] iArr = this.buffer;
-        int i2 = iArr[i + 1];
-        int i3 = iArr[i];
-        long offset = offset(i2);
-        if (isOneofPresent(t2, i3, i)) {
-            Object object = UnsafeUtil.getObject(t, offset);
-            Object object2 = UnsafeUtil.getObject(t2, offset);
-            if (object != null && object2 != null) {
-                UnsafeUtil.putObject(t, offset, Internal.mergeMessage(object, object2));
-                setOneofPresent(t, i3, i);
-            } else if (object2 != null) {
-                UnsafeUtil.putObject(t, offset, object2);
-                setOneofPresent(t, i3, i);
-            }
-        }
-    }
-
-    @Override // com.google.protobuf.Schema
-    public T newInstance() {
+    public final T newInstance() {
         return (T) this.newInstanceSchema.newInstance(this.defaultInstance);
     }
 
-    public final <K, V> int parseMapField(T t, byte[] bArr, int i, int i2, int i3, long j, ArrayDecoders.Registers registers) throws IOException {
+    public final void parseMapField(Object obj, byte[] bArr, int i, int i2, int i3, long j, ArrayDecoders.Registers registers) throws IOException {
         Unsafe unsafe = UNSAFE;
-        Object obj = this.objects[(i3 / 3) * 2];
-        Object object = unsafe.getObject(t, j);
+        Object mapFieldDefaultEntry = getMapFieldDefaultEntry(i3);
+        Object object = unsafe.getObject(obj, j);
         if (this.mapFieldSchema.isImmutable(object)) {
-            Object newMapField = this.mapFieldSchema.newMapField(obj);
+            MapFieldLite newMapField = this.mapFieldSchema.newMapField();
             this.mapFieldSchema.mergeFrom(newMapField, object);
-            unsafe.putObject(t, j, newMapField);
+            unsafe.putObject(obj, j, newMapField);
             object = newMapField;
         }
-        this.mapFieldSchema.forMapMetadata(obj);
+        this.mapFieldSchema.forMapMetadata(mapFieldDefaultEntry);
         this.mapFieldSchema.forMutableMapData(object);
         int decodeVarint32 = ArrayDecoders.decodeVarint32(bArr, i, registers);
         int i4 = registers.int1;
         if (i4 < 0 || i4 > i2 - decodeVarint32) {
             throw InvalidProtocolBufferException.truncatedMessage();
         }
-        Objects.requireNonNull(null);
         throw null;
     }
 
     public final int parseOneofField(T t, byte[] bArr, int i, int i2, int i3, int i4, int i5, int i6, int i7, long j, int i8, ArrayDecoders.Registers registers) throws IOException {
+        boolean z;
+        boolean z2;
+        Object obj;
+        Object obj2;
         Unsafe unsafe = UNSAFE;
         long j2 = this.buffer[i8 + 2] & 1048575;
-        boolean z = true;
         switch (i7) {
             case 51:
                 if (i5 == 1) {
@@ -3138,7 +2168,9 @@ public final class MessageSchema<T> implements Schema<T> {
             case 58:
                 if (i5 == 0) {
                     int decodeVarint642 = ArrayDecoders.decodeVarint64(bArr, i, registers);
-                    if (registers.long1 == 0) {
+                    if (registers.long1 != 0) {
+                        z = true;
+                    } else {
                         z = false;
                     }
                     unsafe.putObject(t, j, Boolean.valueOf(z));
@@ -3152,11 +2184,19 @@ public final class MessageSchema<T> implements Schema<T> {
                     int i13 = registers.int1;
                     if (i13 == 0) {
                         unsafe.putObject(t, j, "");
-                    } else if ((i6 & 536870912) == 0 || Utf8.isValidUtf8(bArr, decodeVarint322, decodeVarint322 + i13)) {
+                    } else {
+                        if ((i6 & 536870912) != 0) {
+                            if (Utf8.processor.partialIsValidUtf8(bArr, decodeVarint322, decodeVarint322 + i13) == 0) {
+                                z2 = true;
+                            } else {
+                                z2 = false;
+                            }
+                            if (!z2) {
+                                throw InvalidProtocolBufferException.invalidUtf8();
+                            }
+                        }
                         unsafe.putObject(t, j, new String(bArr, decodeVarint322, i13, Internal.UTF_8));
                         decodeVarint322 += i13;
-                    } else {
-                        throw InvalidProtocolBufferException.invalidUtf8();
                     }
                     unsafe.putInt(t, j2, i4);
                     return decodeVarint322;
@@ -3165,11 +2205,15 @@ public final class MessageSchema<T> implements Schema<T> {
             case 60:
                 if (i5 == 2) {
                     int decodeMessageField = ArrayDecoders.decodeMessageField(getMessageFieldSchema(i8), bArr, i, i2, registers);
-                    Object object = unsafe.getInt(t, j2) == i4 ? unsafe.getObject(t, j) : null;
-                    if (object == null) {
+                    if (unsafe.getInt(t, j2) == i4) {
+                        obj = unsafe.getObject(t, j);
+                    } else {
+                        obj = null;
+                    }
+                    if (obj == null) {
                         unsafe.putObject(t, j, registers.object1);
                     } else {
-                        unsafe.putObject(t, j, Internal.mergeMessage(object, registers.object1));
+                        unsafe.putObject(t, j, Internal.mergeMessage(obj, registers.object1));
                     }
                     unsafe.putInt(t, j2, i4);
                     return decodeMessageField;
@@ -3187,8 +2231,8 @@ public final class MessageSchema<T> implements Schema<T> {
                 if (i5 == 0) {
                     int decodeVarint323 = ArrayDecoders.decodeVarint32(bArr, i, registers);
                     int i14 = registers.int1;
-                    Internal.EnumVerifier enumVerifier = (Internal.EnumVerifier) this.objects[((i8 / 3) * 2) + 1];
-                    if (enumVerifier == null || enumVerifier.isInRange(i14)) {
+                    Internal.EnumVerifier enumFieldVerifier = getEnumFieldVerifier(i8);
+                    if (enumFieldVerifier == null || enumFieldVerifier.isInRange(i14)) {
                         unsafe.putObject(t, j, Integer.valueOf(i14));
                         unsafe.putInt(t, j2, i4);
                     } else {
@@ -3216,11 +2260,15 @@ public final class MessageSchema<T> implements Schema<T> {
             case 68:
                 if (i5 == 3) {
                     int decodeGroupField = ArrayDecoders.decodeGroupField(getMessageFieldSchema(i8), bArr, i, i2, (i3 & (-8)) | 4, registers);
-                    Object object2 = unsafe.getInt(t, j2) == i4 ? unsafe.getObject(t, j) : null;
-                    if (object2 == null) {
+                    if (unsafe.getInt(t, j2) == i4) {
+                        obj2 = unsafe.getObject(t, j);
+                    } else {
+                        obj2 = null;
+                    }
+                    if (obj2 == null) {
                         unsafe.putObject(t, j, registers.object1);
                     } else {
-                        unsafe.putObject(t, j, Internal.mergeMessage(object2, registers.object1));
+                        unsafe.putObject(t, j, Internal.mergeMessage(obj2, registers.object1));
                     }
                     unsafe.putInt(t, j2, i4);
                     return decodeGroupField;
@@ -3230,67 +2278,76 @@ public final class MessageSchema<T> implements Schema<T> {
         return i;
     }
 
-    /* JADX WARN: Code restructure failed: missing block: B:127:0x037d, code lost:
-        if (r0 != r28) goto L137;
+    /* JADX WARN: Code restructure failed: missing block: B:164:0x04c8, code lost:
+        if (r6 == (-1)) goto L166;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:136:0x03cb, code lost:
-        if (r0 != r14) goto L137;
+    /* JADX WARN: Code restructure failed: missing block: B:165:0x04ca, code lost:
+        r26.putInt(r13, r6, r7);
      */
-    /* JADX WARN: Code restructure failed: missing block: B:137:0x03cd, code lost:
-        r10 = r29;
-        r13 = r30;
-        r9 = r32;
-        r1 = r34;
-        r11 = r35;
-        r12 = r17;
-        r7 = r18;
-        r3 = r19;
-        r8 = r26;
+    /* JADX WARN: Code restructure failed: missing block: B:166:0x04d0, code lost:
+        r2 = r9.checkInitializedCount;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:138:0x03e1, code lost:
-        r9 = r32;
-        r6 = r34;
-        r2 = r0;
+    /* JADX WARN: Code restructure failed: missing block: B:168:0x04d4, code lost:
+        if (r2 >= r9.repeatedFieldOffsetStart) goto L217;
      */
-    /* JADX WARN: Removed duplicated region for block: B:145:0x03ff  */
-    /* JADX WARN: Removed duplicated region for block: B:153:0x043f  */
-    /* JADX WARN: Removed duplicated region for block: B:188:0x004a A[SYNTHETIC] */
-    /* JADX WARN: Removed duplicated region for block: B:20:0x0056  */
+    /* JADX WARN: Code restructure failed: missing block: B:169:0x04d6, code lost:
+        r9.filterMapUnknownEnumValues(r13, r9.intArray[r2], r3, r9.unknownFieldSchema);
+        r2 = r2 + 1;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:170:0x04e2, code lost:
+        if (r1 != 0) goto L175;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:172:0x04e6, code lost:
+        if (r0 != r33) goto L173;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:174:0x04ed, code lost:
+        throw com.google.protobuf.InvalidProtocolBufferException.parseFailure();
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:176:0x04f0, code lost:
+        if (r0 > r33) goto L179;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:177:0x04f2, code lost:
+        if (r4 != r1) goto L179;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:178:0x04f4, code lost:
+        return r0;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:180:0x04f9, code lost:
+        throw com.google.protobuf.InvalidProtocolBufferException.parseFailure();
+     */
+    /* JADX WARN: Removed duplicated region for block: B:145:0x0440 A[ADDED_TO_REGION] */
+    /* JADX WARN: Removed duplicated region for block: B:149:0x0455  */
+    /* JADX WARN: Removed duplicated region for block: B:159:0x049b  */
+    /* JADX WARN: Removed duplicated region for block: B:196:0x0050 A[SYNTHETIC] */
+    /* JADX WARN: Removed duplicated region for block: B:24:0x005b  */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public int parseProto2Message(T r30, byte[] r31, int r32, int r33, int r34, com.google.protobuf.ArrayDecoders.Registers r35) throws java.io.IOException {
+    public final int parseProto2Message(T r30, byte[] r31, int r32, int r33, int r34, com.google.protobuf.ArrayDecoders.Registers r35) throws java.io.IOException {
         /*
-            Method dump skipped, instructions count: 1224
+            Method dump skipped, instructions count: 1314
             To view this dump add '--comments-level debug' option
         */
         throw new UnsupportedOperationException("Method not decompiled: com.google.protobuf.MessageSchema.parseProto2Message(java.lang.Object, byte[], int, int, int, com.google.protobuf.ArrayDecoders$Registers):int");
     }
 
-    /* JADX WARN: Removed duplicated region for block: B:103:0x0215  */
-    /* JADX WARN: Removed duplicated region for block: B:54:0x0149  */
-    /* JADX WARN: Removed duplicated region for block: B:83:0x01c5  */
-    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:101:0x0212 -> B:102:0x0213). Please submit an issue!!! */
-    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:52:0x0146 -> B:53:0x0147). Please submit an issue!!! */
-    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:81:0x01c2 -> B:82:0x01c3). Please submit an issue!!! */
+    /* JADX WARN: Removed duplicated region for block: B:117:0x0247  */
+    /* JADX WARN: Removed duplicated region for block: B:65:0x0174  */
+    /* JADX WARN: Removed duplicated region for block: B:94:0x01f0  */
+    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:115:0x0244 -> B:116:0x0245). Please submit an issue!!! */
+    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:63:0x0171 -> B:64:0x0172). Please submit an issue!!! */
+    /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:92:0x01ed -> B:93:0x01ee). Please submit an issue!!! */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
     public final int parseRepeatedField(T r17, byte[] r18, int r19, int r20, int r21, int r22, int r23, int r24, long r25, int r27, long r28, com.google.protobuf.ArrayDecoders.Registers r30) throws java.io.IOException {
         /*
-            Method dump skipped, instructions count: 1002
+            Method dump skipped, instructions count: 1194
             To view this dump add '--comments-level debug' option
         */
         throw new UnsupportedOperationException("Method not decompiled: com.google.protobuf.MessageSchema.parseRepeatedField(java.lang.Object, byte[], int, int, int, int, int, int, long, int, long, com.google.protobuf.ArrayDecoders$Registers):int");
-    }
-
-    public final int positionForFieldNumber(int i) {
-        if (i < this.minFieldNumber || i > this.maxFieldNumber) {
-            return -1;
-        }
-        return slowPositionForFieldNumber(i, 0);
     }
 
     public final void setFieldPresent(T t, int i) {
@@ -3327,139 +2384,309 @@ public final class MessageSchema<T> implements Schema<T> {
         return this.buffer[i + 1];
     }
 
-    /* JADX WARN: Removed duplicated region for block: B:10:0x0025  */
-    /* JADX WARN: Removed duplicated region for block: B:163:0x061b  */
+    /* JADX WARN: Multi-variable type inference failed */
+    /* JADX WARN: Removed duplicated region for block: B:100:0x039d  */
+    /* JADX WARN: Removed duplicated region for block: B:101:0x03ae  */
+    /* JADX WARN: Removed duplicated region for block: B:102:0x03bf  */
+    /* JADX WARN: Removed duplicated region for block: B:103:0x03d0  */
+    /* JADX WARN: Removed duplicated region for block: B:104:0x03e1  */
+    /* JADX WARN: Removed duplicated region for block: B:105:0x03f2  */
+    /* JADX WARN: Removed duplicated region for block: B:106:0x0403  */
+    /* JADX WARN: Removed duplicated region for block: B:107:0x0414  */
+    /* JADX WARN: Removed duplicated region for block: B:10:0x0027  */
+    /* JADX WARN: Removed duplicated region for block: B:110:0x0429  */
+    /* JADX WARN: Removed duplicated region for block: B:113:0x0440  */
+    /* JADX WARN: Removed duplicated region for block: B:116:0x0458  */
+    /* JADX WARN: Removed duplicated region for block: B:119:0x046b  */
+    /* JADX WARN: Removed duplicated region for block: B:122:0x047e  */
+    /* JADX WARN: Removed duplicated region for block: B:125:0x0491  */
+    /* JADX WARN: Removed duplicated region for block: B:128:0x04a4  */
+    /* JADX WARN: Removed duplicated region for block: B:131:0x04b7  */
+    /* JADX WARN: Removed duplicated region for block: B:134:0x04d0  */
+    /* JADX WARN: Removed duplicated region for block: B:137:0x04e1  */
+    /* JADX WARN: Removed duplicated region for block: B:140:0x04f4  */
+    /* JADX WARN: Removed duplicated region for block: B:143:0x0507  */
+    /* JADX WARN: Removed duplicated region for block: B:146:0x0519  */
+    /* JADX WARN: Removed duplicated region for block: B:149:0x052b  */
+    /* JADX WARN: Removed duplicated region for block: B:152:0x053d  */
+    /* JADX WARN: Removed duplicated region for block: B:155:0x054f  */
+    /* JADX WARN: Removed duplicated region for block: B:158:0x0568  */
+    /* JADX WARN: Removed duplicated region for block: B:163:0x0586  */
+    /* JADX WARN: Removed duplicated region for block: B:20:0x005c  */
+    /* JADX WARN: Removed duplicated region for block: B:23:0x0071  */
+    /* JADX WARN: Removed duplicated region for block: B:26:0x0088  */
+    /* JADX WARN: Removed duplicated region for block: B:275:0x0580 A[SYNTHETIC] */
+    /* JADX WARN: Removed duplicated region for block: B:29:0x00a0  */
+    /* JADX WARN: Removed duplicated region for block: B:32:0x00b3  */
+    /* JADX WARN: Removed duplicated region for block: B:35:0x00c6  */
+    /* JADX WARN: Removed duplicated region for block: B:38:0x00d9  */
+    /* JADX WARN: Removed duplicated region for block: B:41:0x00ec  */
+    /* JADX WARN: Removed duplicated region for block: B:44:0x00ff  */
+    /* JADX WARN: Removed duplicated region for block: B:47:0x0118  */
+    /* JADX WARN: Removed duplicated region for block: B:50:0x0129  */
+    /* JADX WARN: Removed duplicated region for block: B:53:0x0142  */
+    /* JADX WARN: Removed duplicated region for block: B:56:0x0155  */
+    /* JADX WARN: Removed duplicated region for block: B:59:0x0168  */
+    /* JADX WARN: Removed duplicated region for block: B:62:0x017b  */
+    /* JADX WARN: Removed duplicated region for block: B:65:0x018e  */
+    /* JADX WARN: Removed duplicated region for block: B:68:0x01a1  */
+    /* JADX WARN: Removed duplicated region for block: B:71:0x01c1  */
+    /* JADX WARN: Removed duplicated region for block: B:74:0x01e1  */
+    /* JADX WARN: Removed duplicated region for block: B:75:0x01ec  */
+    /* JADX WARN: Removed duplicated region for block: B:76:0x0201  */
+    /* JADX WARN: Removed duplicated region for block: B:77:0x0212  */
+    /* JADX WARN: Removed duplicated region for block: B:78:0x0223  */
+    /* JADX WARN: Removed duplicated region for block: B:79:0x0234  */
+    /* JADX WARN: Removed duplicated region for block: B:80:0x0245  */
+    /* JADX WARN: Removed duplicated region for block: B:81:0x0256  */
+    /* JADX WARN: Removed duplicated region for block: B:82:0x0267  */
+    /* JADX WARN: Removed duplicated region for block: B:83:0x0278  */
+    /* JADX WARN: Removed duplicated region for block: B:84:0x0289  */
+    /* JADX WARN: Removed duplicated region for block: B:85:0x029a  */
+    /* JADX WARN: Removed duplicated region for block: B:86:0x02ab  */
+    /* JADX WARN: Removed duplicated region for block: B:87:0x02bc  */
+    /* JADX WARN: Removed duplicated region for block: B:88:0x02cd  */
+    /* JADX WARN: Removed duplicated region for block: B:89:0x02de  */
+    /* JADX WARN: Removed duplicated region for block: B:90:0x02ef  */
+    /* JADX WARN: Removed duplicated region for block: B:91:0x0300  */
+    /* JADX WARN: Removed duplicated region for block: B:92:0x0311  */
+    /* JADX WARN: Removed duplicated region for block: B:93:0x0322  */
+    /* JADX WARN: Removed duplicated region for block: B:94:0x0333  */
+    /* JADX WARN: Removed duplicated region for block: B:95:0x0344  */
+    /* JADX WARN: Removed duplicated region for block: B:96:0x0355  */
+    /* JADX WARN: Removed duplicated region for block: B:97:0x0366  */
+    /* JADX WARN: Removed duplicated region for block: B:98:0x037b  */
+    /* JADX WARN: Removed duplicated region for block: B:99:0x038c  */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public final void writeFieldsInAscendingOrderProto3(T r13, com.google.protobuf.Writer r14) throws java.io.IOException {
+    public final void writeFieldsInAscendingOrderProto3(java.lang.Object r14, com.google.protobuf.CodedOutputStreamWriter r15) throws java.io.IOException {
         /*
-            Method dump skipped, instructions count: 1736
+            Method dump skipped, instructions count: 1586
             To view this dump add '--comments-level debug' option
         */
-        throw new UnsupportedOperationException("Method not decompiled: com.google.protobuf.MessageSchema.writeFieldsInAscendingOrderProto3(java.lang.Object, com.google.protobuf.Writer):void");
+        throw new UnsupportedOperationException("Method not decompiled: com.google.protobuf.MessageSchema.writeFieldsInAscendingOrderProto3(java.lang.Object, com.google.protobuf.CodedOutputStreamWriter):void");
     }
 
-    public final <K, V> void writeMapHelper(Writer writer, int i, Object obj, int i2) throws IOException {
+    public final void writeMapHelper(CodedOutputStreamWriter codedOutputStreamWriter, int i, Object obj, int i2) throws IOException {
         if (obj != null) {
-            this.mapFieldSchema.forMapMetadata(this.objects[(i2 / 3) * 2]);
-            Map<?, ?> forMapData = this.mapFieldSchema.forMapData(obj);
-            CodedOutputStreamWriter codedOutputStreamWriter = (CodedOutputStreamWriter) writer;
-            Objects.requireNonNull(codedOutputStreamWriter.output);
-            Iterator<Map.Entry<?, ?>> it = forMapData.entrySet().iterator();
+            this.mapFieldSchema.forMapMetadata(getMapFieldDefaultEntry(i2));
+            MapFieldLite forMapData = this.mapFieldSchema.forMapData(obj);
+            codedOutputStreamWriter.output.getClass();
+            Iterator it = forMapData.entrySet().iterator();
             if (it.hasNext()) {
-                Map.Entry<?, ?> next = it.next();
+                Map.Entry entry = (Map.Entry) it.next();
                 codedOutputStreamWriter.output.writeTag(i, 2);
-                next.getKey();
-                next.getValue();
-                Objects.requireNonNull(null);
+                entry.getKey();
+                entry.getValue();
                 throw null;
             }
         }
     }
 
-    public final void writeString(int i, Object obj, Writer writer) throws IOException {
-        if (obj instanceof String) {
-            ((CodedOutputStreamWriter) writer).output.writeString(i, (String) obj);
-            return;
-        }
-        ((CodedOutputStreamWriter) writer).output.writeBytes(i, (ByteString) obj);
-    }
-
-    /* JADX WARN: Removed duplicated region for block: B:13:0x0039  */
-    /* JADX WARN: Removed duplicated region for block: B:176:0x0540  */
+    /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
+    /* JADX WARN: Multi-variable type inference failed */
+    /* JADX WARN: Removed duplicated region for block: B:100:0x02ce  */
+    /* JADX WARN: Removed duplicated region for block: B:101:0x02de  */
+    /* JADX WARN: Removed duplicated region for block: B:102:0x02ee  */
+    /* JADX WARN: Removed duplicated region for block: B:103:0x02fd  */
+    /* JADX WARN: Removed duplicated region for block: B:104:0x030c  */
+    /* JADX WARN: Removed duplicated region for block: B:105:0x031b  */
+    /* JADX WARN: Removed duplicated region for block: B:106:0x032a  */
+    /* JADX WARN: Removed duplicated region for block: B:107:0x0339  */
+    /* JADX WARN: Removed duplicated region for block: B:109:0x034a  */
+    /* JADX WARN: Removed duplicated region for block: B:110:0x0359  */
+    /* JADX WARN: Removed duplicated region for block: B:111:0x036c  */
+    /* JADX WARN: Removed duplicated region for block: B:112:0x037b  */
+    /* JADX WARN: Removed duplicated region for block: B:113:0x038b  */
+    /* JADX WARN: Removed duplicated region for block: B:114:0x039b  */
+    /* JADX WARN: Removed duplicated region for block: B:115:0x03ab  */
+    /* JADX WARN: Removed duplicated region for block: B:116:0x03bb  */
+    /* JADX WARN: Removed duplicated region for block: B:117:0x03cb  */
+    /* JADX WARN: Removed duplicated region for block: B:118:0x03db  */
+    /* JADX WARN: Removed duplicated region for block: B:119:0x03eb  */
+    /* JADX WARN: Removed duplicated region for block: B:120:0x03fb  */
+    /* JADX WARN: Removed duplicated region for block: B:123:0x040c  */
+    /* JADX WARN: Removed duplicated region for block: B:126:0x0422  */
+    /* JADX WARN: Removed duplicated region for block: B:129:0x0436  */
+    /* JADX WARN: Removed duplicated region for block: B:132:0x0445  */
+    /* JADX WARN: Removed duplicated region for block: B:135:0x0454  */
+    /* JADX WARN: Removed duplicated region for block: B:138:0x0463  */
+    /* JADX WARN: Removed duplicated region for block: B:13:0x003b  */
+    /* JADX WARN: Removed duplicated region for block: B:141:0x0472  */
+    /* JADX WARN: Removed duplicated region for block: B:144:0x0481  */
+    /* JADX WARN: Removed duplicated region for block: B:147:0x0496  */
+    /* JADX WARN: Removed duplicated region for block: B:150:0x04a3  */
+    /* JADX WARN: Removed duplicated region for block: B:153:0x04b2  */
+    /* JADX WARN: Removed duplicated region for block: B:156:0x04c0  */
+    /* JADX WARN: Removed duplicated region for block: B:159:0x04ce  */
+    /* JADX WARN: Removed duplicated region for block: B:162:0x04dc  */
+    /* JADX WARN: Removed duplicated region for block: B:165:0x04ea  */
+    /* JADX WARN: Removed duplicated region for block: B:168:0x04f8  */
+    /* JADX WARN: Removed duplicated region for block: B:171:0x050d  */
+    /* JADX WARN: Removed duplicated region for block: B:176:0x0527  */
+    /* JADX WARN: Removed duplicated region for block: B:31:0x0093  */
+    /* JADX WARN: Removed duplicated region for block: B:32:0x0096  */
+    /* JADX WARN: Removed duplicated region for block: B:35:0x00a8  */
+    /* JADX WARN: Removed duplicated region for block: B:38:0x00be  */
+    /* JADX WARN: Removed duplicated region for block: B:41:0x00d3  */
+    /* JADX WARN: Removed duplicated region for block: B:44:0x00e3  */
+    /* JADX WARN: Removed duplicated region for block: B:47:0x00f3  */
+    /* JADX WARN: Removed duplicated region for block: B:50:0x0103  */
+    /* JADX WARN: Removed duplicated region for block: B:53:0x0113  */
+    /* JADX WARN: Removed duplicated region for block: B:56:0x0124  */
+    /* JADX WARN: Removed duplicated region for block: B:59:0x013b  */
+    /* JADX WARN: Removed duplicated region for block: B:62:0x014a  */
+    /* JADX WARN: Removed duplicated region for block: B:65:0x0161  */
+    /* JADX WARN: Removed duplicated region for block: B:68:0x0172  */
+    /* JADX WARN: Removed duplicated region for block: B:71:0x0183  */
+    /* JADX WARN: Removed duplicated region for block: B:74:0x0194  */
+    /* JADX WARN: Removed duplicated region for block: B:77:0x01a5  */
+    /* JADX WARN: Removed duplicated region for block: B:80:0x01b6  */
+    /* JADX WARN: Removed duplicated region for block: B:83:0x01d4  */
+    /* JADX WARN: Removed duplicated region for block: B:86:0x01f2  */
+    /* JADX WARN: Removed duplicated region for block: B:87:0x01fb  */
+    /* JADX WARN: Removed duplicated region for block: B:88:0x020e  */
+    /* JADX WARN: Removed duplicated region for block: B:89:0x021e  */
+    /* JADX WARN: Removed duplicated region for block: B:90:0x022e  */
+    /* JADX WARN: Removed duplicated region for block: B:91:0x023e  */
+    /* JADX WARN: Removed duplicated region for block: B:92:0x024e  */
+    /* JADX WARN: Removed duplicated region for block: B:93:0x025e  */
+    /* JADX WARN: Removed duplicated region for block: B:94:0x026e  */
+    /* JADX WARN: Removed duplicated region for block: B:95:0x027e  */
+    /* JADX WARN: Removed duplicated region for block: B:96:0x028e  */
+    /* JADX WARN: Removed duplicated region for block: B:97:0x029e  */
+    /* JADX WARN: Removed duplicated region for block: B:98:0x02ae  */
+    /* JADX WARN: Removed duplicated region for block: B:99:0x02be  */
     @Override // com.google.protobuf.Schema
     /*
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public void writeTo(T r18, com.google.protobuf.Writer r19) throws java.io.IOException {
+    public final void writeTo(java.lang.Object r21, com.google.protobuf.CodedOutputStreamWriter r22) throws java.io.IOException {
         /*
-            Method dump skipped, instructions count: 1518
+            Method dump skipped, instructions count: 1492
             To view this dump add '--comments-level debug' option
         */
-        throw new UnsupportedOperationException("Method not decompiled: com.google.protobuf.MessageSchema.writeTo(java.lang.Object, com.google.protobuf.Writer):void");
+        throw new UnsupportedOperationException("Method not decompiled: com.google.protobuf.MessageSchema.writeTo(java.lang.Object, com.google.protobuf.CodedOutputStreamWriter):void");
     }
 
-    public final boolean isFieldPresent(T t, int i) {
-        if (this.proto3) {
-            int i2 = this.buffer[i + 1];
-            long offset = offset(i2);
-            switch (type(i2)) {
-                case 0:
-                    return UnsafeUtil.getDouble(t, offset) != 0.0d;
-                case 1:
-                    return UnsafeUtil.getFloat(t, offset) != HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
-                case 2:
-                    return UnsafeUtil.getLong(t, offset) != 0;
-                case 3:
-                    return UnsafeUtil.getLong(t, offset) != 0;
-                case 4:
-                    return UnsafeUtil.getInt(t, offset) != 0;
-                case 5:
-                    return UnsafeUtil.getLong(t, offset) != 0;
-                case 6:
-                    return UnsafeUtil.getInt(t, offset) != 0;
-                case 7:
-                    return UnsafeUtil.getBoolean(t, offset);
-                case 8:
-                    Object object = UnsafeUtil.getObject(t, offset);
-                    if (object instanceof String) {
-                        return !((String) object).isEmpty();
-                    }
-                    if (object instanceof ByteString) {
-                        return !ByteString.EMPTY.equals(object);
-                    }
-                    throw new IllegalArgumentException();
-                case 9:
-                    return UnsafeUtil.getObject(t, offset) != null;
-                case 10:
-                    return !ByteString.EMPTY.equals(UnsafeUtil.getObject(t, offset));
-                case 11:
-                    return UnsafeUtil.getInt(t, offset) != 0;
-                case 12:
-                    return UnsafeUtil.getInt(t, offset) != 0;
-                case 13:
-                    return UnsafeUtil.getInt(t, offset) != 0;
-                case 14:
-                    return UnsafeUtil.getLong(t, offset) != 0;
-                case 15:
-                    return UnsafeUtil.getInt(t, offset) != 0;
-                case 16:
-                    return UnsafeUtil.getLong(t, offset) != 0;
-                case 17:
-                    return UnsafeUtil.getObject(t, offset) != null;
-                default:
-                    throw new IllegalArgumentException();
-            }
+    public MessageSchema(int[] iArr, Object[] objArr, int i, int i2, MessageLite messageLite, boolean z, int[] iArr2, int i3, int i4, NewInstanceSchema newInstanceSchema, ListFieldSchema listFieldSchema, UnknownFieldSchema unknownFieldSchema, ExtensionSchema extensionSchema, MapFieldSchema mapFieldSchema) {
+        boolean z2;
+        this.buffer = iArr;
+        this.objects = objArr;
+        this.minFieldNumber = i;
+        this.maxFieldNumber = i2;
+        this.lite = messageLite instanceof GeneratedMessageLite;
+        this.proto3 = z;
+        if (extensionSchema == null || !extensionSchema.hasExtensions(messageLite)) {
+            z2 = false;
         } else {
-            int i3 = this.buffer[i + 2];
-            return (UnsafeUtil.getInt(t, (long) (i3 & 1048575)) & (1 << (i3 >>> 20))) != 0;
+            z2 = true;
+        }
+        this.hasExtensions = z2;
+        this.useCachedSizeField = false;
+        this.intArray = iArr2;
+        this.checkInitializedCount = i3;
+        this.repeatedFieldOffsetStart = i4;
+        this.newInstanceSchema = newInstanceSchema;
+        this.listFieldSchema = listFieldSchema;
+        this.unknownFieldSchema = unknownFieldSchema;
+        this.extensionSchema = extensionSchema;
+        this.defaultInstance = messageLite;
+        this.mapFieldSchema = mapFieldSchema;
+    }
+
+    public static List<?> listAt(Object obj, long j) {
+        return (List) UnsafeUtil.getObject(obj, j);
+    }
+
+    public static <T> int oneofIntAt(T t, long j) {
+        return ((Integer) UnsafeUtil.getObject(t, j)).intValue();
+    }
+
+    public static <T> long oneofLongAt(T t, long j) {
+        return ((Long) UnsafeUtil.getObject(t, j)).longValue();
+    }
+
+    public static Field reflectField(Class<?> cls, String str) {
+        Field[] declaredFields;
+        try {
+            return cls.getDeclaredField(str);
+        } catch (NoSuchFieldException unused) {
+            for (Field field : cls.getDeclaredFields()) {
+                if (str.equals(field.getName())) {
+                    return field;
+                }
+            }
+            throw new RuntimeException("Field " + str + " for " + cls.getName() + " not found. Known fields are " + Arrays.toString(declaredFields));
         }
     }
 
-    /* JADX WARN: Code restructure failed: missing block: B:105:0x0238, code lost:
-        if (r0 != r15) goto L108;
+    public final boolean arePresentForEquals(T t, T t2, int i) {
+        if (isFieldPresent(t, i) == isFieldPresent(t2, i)) {
+            return true;
+        }
+        return false;
+    }
+
+    public final void mergeMessage(T t, T t2, int i) {
+        long typeAndOffsetAt = typeAndOffsetAt(i) & 1048575;
+        if (isFieldPresent(t2, i)) {
+            Object object = UnsafeUtil.getObject(t, typeAndOffsetAt);
+            Object object2 = UnsafeUtil.getObject(t2, typeAndOffsetAt);
+            if (object != null && object2 != null) {
+                UnsafeUtil.putObject(t, typeAndOffsetAt, Internal.mergeMessage(object, object2));
+                setFieldPresent(t, i);
+            } else if (object2 != null) {
+                UnsafeUtil.putObject(t, typeAndOffsetAt, object2);
+                setFieldPresent(t, i);
+            }
+        }
+    }
+
+    public final void mergeOneofMessage(T t, T t2, int i) {
+        int typeAndOffsetAt = typeAndOffsetAt(i);
+        int i2 = this.buffer[i];
+        long j = typeAndOffsetAt & 1048575;
+        if (isOneofPresent(t2, i2, i)) {
+            Object object = UnsafeUtil.getObject(t, j);
+            Object object2 = UnsafeUtil.getObject(t2, j);
+            if (object != null && object2 != null) {
+                UnsafeUtil.putObject(t, j, Internal.mergeMessage(object, object2));
+                setOneofPresent(t, i2, i);
+            } else if (object2 != null) {
+                UnsafeUtil.putObject(t, j, object2);
+                setOneofPresent(t, i2, i);
+            }
+        }
+    }
+
+    /* JADX WARN: Code restructure failed: missing block: B:103:0x0208, code lost:
+        if (r0 != r15) goto L113;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:106:0x023b, code lost:
+    /* JADX WARN: Code restructure failed: missing block: B:112:0x0254, code lost:
+        if (r0 != r15) goto L113;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:113:0x0256, code lost:
+        r2 = r17;
+     */
+    /* JADX WARN: Code restructure failed: missing block: B:114:0x0259, code lost:
         r2 = r0;
      */
-    /* JADX WARN: Code restructure failed: missing block: B:96:0x01ee, code lost:
-        if (r0 != r15) goto L108;
-     */
     /* JADX WARN: Multi-variable type inference failed */
-    /* JADX WARN: Removed duplicated region for block: B:124:0x004b A[SYNTHETIC] */
-    /* JADX WARN: Removed duplicated region for block: B:22:0x0056  */
-    /* JADX WARN: Type inference failed for: r3v13, types: [int] */
+    /* JADX WARN: Removed duplicated region for block: B:136:0x0051 A[SYNTHETIC] */
+    /* JADX WARN: Removed duplicated region for block: B:26:0x005c  */
+    /* JADX WARN: Type inference failed for: r3v19, types: [int] */
     @Override // com.google.protobuf.Schema
     /*
         Code decompiled incorrectly, please refer to instructions dump.
         To view partially-correct add '--show-bad-code' argument
     */
-    public void mergeFrom(T r28, byte[] r29, int r30, int r31, com.google.protobuf.ArrayDecoders.Registers r32) throws java.io.IOException {
+    public final void mergeFrom(T r28, byte[] r29, int r30, int r31, com.google.protobuf.ArrayDecoders.Registers r32) throws java.io.IOException {
         /*
-            Method dump skipped, instructions count: 674
+            Method dump skipped, instructions count: 706
             To view this dump add '--comments-level debug' option
         */
         throw new UnsupportedOperationException("Method not decompiled: com.google.protobuf.MessageSchema.mergeFrom(java.lang.Object, byte[], int, int, com.google.protobuf.ArrayDecoders$Registers):void");

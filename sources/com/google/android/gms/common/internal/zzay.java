@@ -5,14 +5,15 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.internal.zzbkw;
+/* compiled from: ResolveAccountResponseCreator.java */
 /* loaded from: classes.dex */
 public final class zzay implements Parcelable.Creator<zzax> {
     @Override // android.os.Parcelable.Creator
     public final /* synthetic */ zzax createFromParcel(Parcel parcel) {
         int zza = zzbkw.zza(parcel);
         IBinder iBinder = null;
-        int i = 0;
         ConnectionResult connectionResult = null;
+        int i = 0;
         boolean z = false;
         boolean z2 = false;
         while (parcel.dataPosition() < zza) {

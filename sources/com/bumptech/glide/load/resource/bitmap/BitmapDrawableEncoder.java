@@ -9,22 +9,22 @@ import com.bumptech.glide.load.engine.Resource;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import java.io.File;
 /* loaded from: classes.dex */
-public class BitmapDrawableEncoder implements ResourceEncoder<BitmapDrawable> {
+public final class BitmapDrawableEncoder implements ResourceEncoder<BitmapDrawable> {
     public final BitmapPool bitmapPool;
     public final ResourceEncoder<Bitmap> encoder;
 
-    public BitmapDrawableEncoder(BitmapPool bitmapPool, ResourceEncoder<Bitmap> encoder) {
-        this.bitmapPool = bitmapPool;
-        this.encoder = encoder;
-    }
-
     @Override // com.bumptech.glide.load.Encoder
-    public boolean encode(Object data, File file, Options options) {
-        return this.encoder.encode(new BitmapResource(((BitmapDrawable) ((Resource) data).get()).getBitmap(), this.bitmapPool), file, options);
+    public final boolean encode(Object obj, File file, Options options) {
+        return this.encoder.encode(new BitmapResource(((BitmapDrawable) ((Resource) obj).get()).getBitmap(), this.bitmapPool), file, options);
     }
 
     @Override // com.bumptech.glide.load.ResourceEncoder
-    public EncodeStrategy getEncodeStrategy(Options options) {
+    public final EncodeStrategy getEncodeStrategy(Options options) {
         return this.encoder.getEncodeStrategy(options);
+    }
+
+    public BitmapDrawableEncoder(BitmapPool bitmapPool, BitmapEncoder bitmapEncoder) {
+        this.bitmapPool = bitmapPool;
+        this.encoder = bitmapEncoder;
     }
 }

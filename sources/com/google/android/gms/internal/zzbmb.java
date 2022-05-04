@@ -2,7 +2,8 @@ package com.google.android.gms.internal;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import androidx.slice.view.R$layout;
+import androidx.core.R$id;
+/* compiled from: StringToIntConverter.java */
 /* loaded from: classes.dex */
 public final class zzbmb extends zzbkv {
     public static final Parcelable.Creator<zzbmb> CREATOR = new zzbmd();
@@ -18,15 +19,15 @@ public final class zzbmb extends zzbkv {
 
     @Override // android.os.Parcelable
     public final void writeToParcel(Parcel parcel, int i) {
-        int zzb = R$layout.zzb(parcel, 20293);
+        int zzb = R$id.zzb(parcel, 20293);
         int i2 = this.zzc;
-        R$layout.zzb(parcel, 1, 4);
+        R$id.zzb(parcel, 1, 4);
         parcel.writeInt(i2);
-        R$layout.zza(parcel, 2, this.zza, false);
+        R$id.zza(parcel, 2, this.zza);
         int i3 = this.zzb;
-        R$layout.zzb(parcel, 3, 4);
+        R$id.zzb(parcel, 3, 4);
         parcel.writeInt(i3);
-        R$layout.zzc(parcel, zzb);
+        R$id.zzc(parcel, zzb);
     }
 
     public zzbmb(String str, int i) {

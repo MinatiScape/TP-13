@@ -10,12 +10,12 @@ import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalS
 public class GroupedRecentTaskInfo implements Parcelable {
     public static final Parcelable.Creator<GroupedRecentTaskInfo> CREATOR = new Parcelable.Creator<GroupedRecentTaskInfo>() { // from class: com.android.wm.shell.util.GroupedRecentTaskInfo.1
         @Override // android.os.Parcelable.Creator
-        public GroupedRecentTaskInfo createFromParcel(Parcel parcel) {
+        public final GroupedRecentTaskInfo createFromParcel(Parcel parcel) {
             return new GroupedRecentTaskInfo(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public GroupedRecentTaskInfo[] newArray(int i) {
+        public final GroupedRecentTaskInfo[] newArray(int i) {
             return new GroupedRecentTaskInfo[i];
         }
     };
@@ -23,18 +23,13 @@ public class GroupedRecentTaskInfo implements Parcelable {
     public ActivityManager.RecentTaskInfo mTaskInfo1;
     public ActivityManager.RecentTaskInfo mTaskInfo2;
 
-    public GroupedRecentTaskInfo(Parcel parcel) {
-        this.mTaskInfo1 = (ActivityManager.RecentTaskInfo) parcel.readTypedObject(ActivityManager.RecentTaskInfo.CREATOR);
-        this.mTaskInfo2 = (ActivityManager.RecentTaskInfo) parcel.readTypedObject(ActivityManager.RecentTaskInfo.CREATOR);
-        this.mStagedSplitBounds = (StagedSplitBounds) parcel.readTypedObject(StagedSplitBounds.CREATOR);
-    }
-
     @Override // android.os.Parcelable
-    public int describeContents() {
+    public final int describeContents() {
         return 0;
     }
 
-    public final String getTaskInfo(ActivityManager.RecentTaskInfo recentTaskInfo) {
+    public static String getTaskInfo(ActivityManager.RecentTaskInfo recentTaskInfo) {
+        Object obj;
         if (recentTaskInfo == null) {
             return null;
         }
@@ -42,13 +37,18 @@ public class GroupedRecentTaskInfo implements Parcelable {
         m.append(recentTaskInfo.taskId);
         m.append(" baseIntent=");
         Intent intent = recentTaskInfo.baseIntent;
-        m.append(intent != null ? intent.getComponent() : "null");
+        if (intent != null) {
+            obj = intent.getComponent();
+        } else {
+            obj = "null";
+        }
+        m.append(obj);
         m.append(" winMode=");
         m.append(WindowConfiguration.windowingModeToString(recentTaskInfo.getWindowingMode()));
         return m.toString();
     }
 
-    public String toString() {
+    public final String toString() {
         StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("Task1: ");
         m.append(getTaskInfo(this.mTaskInfo1));
         m.append(", Task2: ");
@@ -61,9 +61,15 @@ public class GroupedRecentTaskInfo implements Parcelable {
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
+    public final void writeToParcel(Parcel parcel, int i) {
         parcel.writeTypedObject(this.mTaskInfo1, i);
         parcel.writeTypedObject(this.mTaskInfo2, i);
         parcel.writeTypedObject(this.mStagedSplitBounds, i);
+    }
+
+    public GroupedRecentTaskInfo(Parcel parcel) {
+        this.mTaskInfo1 = (ActivityManager.RecentTaskInfo) parcel.readTypedObject(ActivityManager.RecentTaskInfo.CREATOR);
+        this.mTaskInfo2 = (ActivityManager.RecentTaskInfo) parcel.readTypedObject(ActivityManager.RecentTaskInfo.CREATOR);
+        this.mStagedSplitBounds = (StagedSplitBounds) parcel.readTypedObject(StagedSplitBounds.CREATOR);
     }
 }

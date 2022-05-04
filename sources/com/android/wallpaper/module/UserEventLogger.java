@@ -33,8 +33,6 @@ public interface UserEventLogger {
 
     void logNumDaysDailyRotationNotAttempted(int i);
 
-    void logRefreshDailyWallpaperButtonClicked();
-
     void logRestored();
 
     void logResumed(boolean z, boolean z2);

@@ -1,6 +1,6 @@
 package androidx.recyclerview.widget;
 /* loaded from: classes.dex */
-public class OpReorderer {
+public final class OpReorderer {
     public final Callback mCallback;
 
     /* loaded from: classes.dex */

@@ -1,22 +1,19 @@
 package com.google.protobuf;
-
-import com.google.protobuf.MapEntryLite;
-import java.util.Map;
 /* loaded from: classes.dex */
 public interface MapFieldSchema {
-    Map<?, ?> forMapData(Object obj);
+    MapFieldLite forMapData(Object obj);
 
-    MapEntryLite.Metadata<?, ?> forMapMetadata(Object obj);
+    void forMapMetadata(Object obj);
 
-    Map<?, ?> forMutableMapData(Object obj);
+    MapFieldLite forMutableMapData(Object obj);
 
     int getSerializedSize(int i, Object obj, Object obj2);
 
     boolean isImmutable(Object obj);
 
-    Object mergeFrom(Object obj, Object obj2);
+    MapFieldLite mergeFrom(Object obj, Object obj2);
 
-    Object newMapField(Object obj);
+    MapFieldLite newMapField();
 
     Object toImmutable(Object obj);
 }

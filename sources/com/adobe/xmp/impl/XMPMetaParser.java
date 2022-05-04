@@ -2,6 +2,7 @@ package com.adobe.xmp.impl;
 
 import com.adobe.xmp.XMPException;
 import com.adobe.xmp.options.ParseOptions;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
@@ -15,7 +16,7 @@ import org.w3c.dom.ProcessingInstruction;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 /* loaded from: classes.dex */
-public class XMPMetaParser {
+public final class XMPMetaParser {
     public static final Object XMP_RDF = new Object();
     public static DocumentBuilderFactory factory;
 
@@ -28,41 +29,6 @@ public class XMPMetaParser {
         } catch (Exception unused) {
         }
         factory = newInstance;
-    }
-
-    public static Object[] findRootNode(Node root, boolean xmpmetaRequired, Object[] result) {
-        NodeList childNodes = root.getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            Node item = childNodes.item(i);
-            if (7 == item.getNodeType()) {
-                ProcessingInstruction processingInstruction = (ProcessingInstruction) item;
-                if (processingInstruction.getTarget() == "xpacket") {
-                    if (result != null) {
-                        result[2] = processingInstruction.getData();
-                    }
-                }
-            }
-            if (!(3 == item.getNodeType() || 7 == item.getNodeType())) {
-                String namespaceURI = item.getNamespaceURI();
-                String localName = item.getLocalName();
-                if (("xmpmeta".equals(localName) || "xapmeta".equals(localName)) && "adobe:ns:meta/".equals(namespaceURI)) {
-                    return findRootNode(item, false, result);
-                }
-                if (xmpmetaRequired || !"RDF".equals(localName) || !"http://www.w3.org/1999/02/22-rdf-syntax-ns#".equals(namespaceURI)) {
-                    Object[] findRootNode = findRootNode(item, xmpmetaRequired, result);
-                    if (findRootNode != null) {
-                        return findRootNode;
-                    }
-                } else {
-                    if (result != null) {
-                        result[0] = item;
-                        result[1] = XMP_RDF;
-                    }
-                    return result;
-                }
-            }
-        }
-        return null;
     }
 
     public static Document parseInputSource(InputSource source) throws XMPException {
@@ -81,7 +47,7 @@ public class XMPMetaParser {
 
     public static Document parseXmlFromBytebuffer(ByteBuffer buffer, ParseOptions options) throws XMPException {
         try {
-            return parseInputSource(new InputSource(buffer.getByteStream()));
+            return parseInputSource(new InputSource(new ByteArrayInputStream(buffer.buffer, 0, buffer.length)));
         } catch (XMPException e) {
             if (e.getErrorCode() == 201 || e.getErrorCode() == 204) {
                 if (options.getOption(16) && "UTF-8".equals(buffer.getEncoding())) {
@@ -96,7 +62,11 @@ public class XMPMetaParser {
                         if (i >= i4) {
                             if (z) {
                                 for (int i5 = 0; i5 < i2; i5++) {
-                                    byteBuffer.append(Latin1Converter.convertToUTF8(bArr[i5]));
+                                    byte[] convertToUTF8 = Latin1Converter.convertToUTF8(bArr[i5]);
+                                    int length = convertToUTF8.length;
+                                    byteBuffer.ensureCapacity(byteBuffer.length + length);
+                                    System.arraycopy(convertToUTF8, 0, byteBuffer.buffer, byteBuffer.length, length);
+                                    byteBuffer.length += length;
                                 }
                             }
                             buffer = byteBuffer;
@@ -104,7 +74,11 @@ public class XMPMetaParser {
                             int i6 = buffer.buffer[i] & 255;
                             if (z) {
                                 if (i3 <= 0 || (i6 & 192) != 128) {
-                                    byteBuffer.append(Latin1Converter.convertToUTF8(bArr[0]));
+                                    byte[] convertToUTF82 = Latin1Converter.convertToUTF8(bArr[0]);
+                                    int length2 = convertToUTF82.length;
+                                    byteBuffer.ensureCapacity(byteBuffer.length + length2);
+                                    System.arraycopy(convertToUTF82, 0, byteBuffer.buffer, byteBuffer.length, length2);
+                                    byteBuffer.length += length2;
                                     i -= i2;
                                 } else {
                                     int i7 = i2 + 1;
@@ -131,11 +105,15 @@ public class XMPMetaParser {
                                 for (int i9 = i6; i3 < 8 && (i9 & 128) == 128; i9 <<= 1) {
                                     i3++;
                                 }
-                                i2++;
                                 bArr[i2] = (byte) i6;
+                                i2++;
                                 z = true;
                             } else {
-                                byteBuffer.append(Latin1Converter.convertToUTF8((byte) i6));
+                                byte[] convertToUTF83 = Latin1Converter.convertToUTF8((byte) i6);
+                                int length3 = convertToUTF83.length;
+                                byteBuffer.ensureCapacity(byteBuffer.length + length3);
+                                System.arraycopy(convertToUTF83, 0, byteBuffer.buffer, byteBuffer.length, length3);
+                                byteBuffer.length += length3;
                             }
                             i++;
                         } else {
@@ -143,11 +121,11 @@ public class XMPMetaParser {
                         }
                     }
                 }
-                if (!options.getFixControlChars()) {
-                    return parseInputSource(new InputSource(buffer.getByteStream()));
+                if (!options.getOption(8)) {
+                    return parseInputSource(new InputSource(new ByteArrayInputStream(buffer.buffer, 0, buffer.length)));
                 }
                 try {
-                    return parseInputSource(new InputSource(new FixASCIIControlsReader(new InputStreamReader(buffer.getByteStream(), buffer.getEncoding()))));
+                    return parseInputSource(new InputSource(new FixASCIIControlsReader(new InputStreamReader(new ByteArrayInputStream(buffer.buffer, 0, buffer.length), buffer.getEncoding()))));
                 } catch (UnsupportedEncodingException unused) {
                     throw new XMPException("Unsupported Encoding", 9, e);
                 }
@@ -155,5 +133,36 @@ public class XMPMetaParser {
                 throw e;
             }
         }
+    }
+
+    public static Object[] findRootNode(Node root, boolean xmpmetaRequired, Object[] result) {
+        NodeList childNodes = root.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node item = childNodes.item(i);
+            if (7 == item.getNodeType()) {
+                ProcessingInstruction processingInstruction = (ProcessingInstruction) item;
+                if (processingInstruction.getTarget() == "xpacket") {
+                    result[2] = processingInstruction.getData();
+                }
+            }
+            if (!(3 == item.getNodeType() || 7 == item.getNodeType())) {
+                String namespaceURI = item.getNamespaceURI();
+                String localName = item.getLocalName();
+                if (("xmpmeta".equals(localName) || "xapmeta".equals(localName)) && "adobe:ns:meta/".equals(namespaceURI)) {
+                    return findRootNode(item, false, result);
+                }
+                if (xmpmetaRequired || !"RDF".equals(localName) || !"http://www.w3.org/1999/02/22-rdf-syntax-ns#".equals(namespaceURI)) {
+                    Object[] findRootNode = findRootNode(item, xmpmetaRequired, result);
+                    if (findRootNode != null) {
+                        return findRootNode;
+                    }
+                } else {
+                    result[0] = item;
+                    result[1] = XMP_RDF;
+                    return result;
+                }
+            }
+        }
+        return null;
     }
 }

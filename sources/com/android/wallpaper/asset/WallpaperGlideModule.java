@@ -21,7 +21,7 @@ import java.io.InputStream;
 /* loaded from: classes.dex */
 public class WallpaperGlideModule implements GlideModule {
     @Override // com.bumptech.glide.module.AppliesOptions
-    public void applyOptions(Context context, GlideBuilder glideBuilder) {
+    public final void applyOptions(Context context, GlideBuilder glideBuilder) {
         glideBuilder.diskCacheFactory = new InternalCacheDiskCacheFactory(context, 104857600L);
         MemorySizeCalculator.Builder builder = new MemorySizeCalculator.Builder(context);
         builder.bitmapPoolScreens = 2.0f;
@@ -29,11 +29,21 @@ public class WallpaperGlideModule implements GlideModule {
         glideBuilder.memorySizeCalculator = new MemorySizeCalculator(builder);
         RequestOptions requestOptions = new RequestOptions();
         DecodeFormat decodeFormat = DecodeFormat.PREFER_ARGB_8888;
-        glideBuilder.defaultRequestOptions = requestOptions.set(Downsampler.DECODE_FORMAT, decodeFormat).set(GifOptions.DECODE_FORMAT, decodeFormat);
+        final RequestOptions requestOptions2 = requestOptions.set(Downsampler.DECODE_FORMAT, decodeFormat).set(GifOptions.DECODE_FORMAT, decodeFormat);
+        glideBuilder.defaultRequestOptionsFactory = new Glide.RequestOptionsFactory() { // from class: com.bumptech.glide.GlideBuilder.2
+            @Override // com.bumptech.glide.Glide.RequestOptionsFactory
+            public final RequestOptions build() {
+                RequestOptions requestOptions3 = requestOptions2;
+                if (requestOptions3 != null) {
+                    return requestOptions3;
+                }
+                return new RequestOptions();
+            }
+        };
     }
 
     @Override // com.bumptech.glide.module.RegistersComponents
-    public void registerComponents(Context context, Glide glide, Registry registry) {
+    public final void registerComponents(Registry registry) {
         registry.append(WallpaperModel.class, Drawable.class, new WallpaperModelLoader.WallpaperModelLoaderFactory());
         registry.append(ResourceAsset.class, InputStream.class, new ResourceAssetLoader.ResourceAssetLoaderFactory());
         registry.append(SystemStaticAsset.class, InputStream.class, new SystemStaticAssetLoader.SystemStaticAssetLoaderFactory());

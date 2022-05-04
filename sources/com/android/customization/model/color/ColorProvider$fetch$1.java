@@ -14,7 +14,9 @@ import kotlinx.coroutines.CoroutineScope;
 import kotlinx.coroutines.Dispatchers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-@DebugMetadata(c = "com.android.customization.model.color.ColorProvider$fetch$1", f = "ColorProvider.kt", l = {92}, m = "invokeSuspend")
+/* JADX INFO: Access modifiers changed from: package-private */
+/* compiled from: ColorProvider.kt */
+@DebugMetadata(c = "com.android.customization.model.color.ColorProvider$fetch$1", f = "ColorProvider.kt", l = {100}, m = "invokeSuspend")
 /* loaded from: classes.dex */
 public final class ColorProvider$fetch$1 extends SuspendLambda implements Function2<CoroutineScope, Continuation<? super Unit>, Object> {
     public final /* synthetic */ CustomizationManager.OptionsFetchedListener<ColorOption> $callback;
@@ -23,12 +25,11 @@ public final class ColorProvider$fetch$1 extends SuspendLambda implements Functi
     public final /* synthetic */ boolean $reload;
     public final /* synthetic */ boolean $wallpaperColorsChanged;
     public int label;
-    private /* synthetic */ CoroutineScope p$;
     public final /* synthetic */ ColorProvider this$0;
 
     /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
     public ColorProvider$fetch$1(ColorProvider colorProvider, boolean z, boolean z2, WallpaperColors wallpaperColors, WallpaperColors wallpaperColors2, CustomizationManager.OptionsFetchedListener<ColorOption> optionsFetchedListener, Continuation<? super ColorProvider$fetch$1> continuation) {
-        super(2, continuation);
+        super(continuation);
         this.this$0 = colorProvider;
         this.$reload = z;
         this.$wallpaperColorsChanged = z2;
@@ -40,13 +41,11 @@ public final class ColorProvider$fetch$1 extends SuspendLambda implements Functi
     @Override // kotlin.coroutines.jvm.internal.BaseContinuationImpl
     @NotNull
     public final Continuation<Unit> create(@Nullable Object obj, @NotNull Continuation<?> continuation) {
-        ColorProvider$fetch$1 colorProvider$fetch$1 = new ColorProvider$fetch$1(this.this$0, this.$reload, this.$wallpaperColorsChanged, this.$homeWallpaperColors, this.$lockWallpaperColors, this.$callback, continuation);
-        colorProvider$fetch$1.p$ = (CoroutineScope) obj;
-        return colorProvider$fetch$1;
+        return new ColorProvider$fetch$1(this.this$0, this.$reload, this.$wallpaperColorsChanged, this.$homeWallpaperColors, this.$lockWallpaperColors, this.$callback, continuation);
     }
 
     @Override // kotlin.jvm.functions.Function2
-    public Object invoke(CoroutineScope coroutineScope, Continuation<? super Unit> continuation) {
+    public final Object invoke(CoroutineScope coroutineScope, Continuation<? super Unit> continuation) {
         return ((ColorProvider$fetch$1) create(coroutineScope, continuation)).invokeSuspend(Unit.INSTANCE);
     }
 
@@ -62,7 +61,6 @@ public final class ColorProvider$fetch$1 extends SuspendLambda implements Functi
                 ColorProvider colorProvider = this.this$0;
                 if (colorProvider.colorBundles == null || this.$reload) {
                     this.label = 1;
-                    Dispatchers dispatchers = Dispatchers.INSTANCE;
                     Object withContext = BuildersKt.withContext(Dispatchers.IO, new ColorProvider$loadPreset$2(colorProvider, null), this);
                     if (withContext != obj2) {
                         withContext = Unit.INSTANCE;

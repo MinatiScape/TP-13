@@ -1,7 +1,6 @@
 package androidx.appcompat.widget;
 
 import android.content.Context;
-import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -12,29 +11,18 @@ import androidx.appcompat.view.menu.MenuAdapter;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuItemImpl;
 /* loaded from: classes.dex */
-public class MenuPopupWindow extends ListPopupWindow implements MenuItemHoverListener {
+public final class MenuPopupWindow extends ListPopupWindow implements MenuItemHoverListener {
     public MenuItemHoverListener mHoverListener;
 
     /* loaded from: classes.dex */
     public static class MenuDropDownListView extends DropDownListView {
         public final int mAdvanceKey;
         public MenuItemHoverListener mHoverListener;
-        public MenuItem mHoveredMenuItem;
+        public MenuItemImpl mHoveredMenuItem;
         public final int mRetreatKey;
 
-        public MenuDropDownListView(Context context, boolean z) {
-            super(context, z);
-            if (1 == context.getResources().getConfiguration().getLayoutDirection()) {
-                this.mAdvanceKey = 21;
-                this.mRetreatKey = 22;
-                return;
-            }
-            this.mAdvanceKey = 22;
-            this.mRetreatKey = 21;
-        }
-
         @Override // androidx.appcompat.widget.DropDownListView, android.view.View
-        public boolean onHoverEvent(MotionEvent motionEvent) {
+        public final boolean onHoverEvent(MotionEvent motionEvent) {
             int i;
             MenuAdapter menuAdapter;
             int pointToPosition;
@@ -53,11 +41,11 @@ public class MenuPopupWindow extends ListPopupWindow implements MenuItemHoverLis
                 if (motionEvent.getAction() != 10 && (pointToPosition = pointToPosition((int) motionEvent.getX(), (int) motionEvent.getY())) != -1 && (i2 = pointToPosition - i) >= 0 && i2 < menuAdapter.getCount()) {
                     menuItemImpl = menuAdapter.getItem(i2);
                 }
-                MenuItem menuItem = this.mHoveredMenuItem;
-                if (menuItem != menuItemImpl) {
+                MenuItemImpl menuItemImpl2 = this.mHoveredMenuItem;
+                if (menuItemImpl2 != menuItemImpl) {
                     MenuBuilder menuBuilder = menuAdapter.mAdapterMenu;
-                    if (menuItem != null) {
-                        this.mHoverListener.onItemHoverExit(menuBuilder, menuItem);
+                    if (menuItemImpl2 != null) {
+                        this.mHoverListener.onItemHoverExit(menuBuilder, menuItemImpl2);
                     }
                     this.mHoveredMenuItem = menuItemImpl;
                     if (menuItemImpl != null) {
@@ -68,8 +56,19 @@ public class MenuPopupWindow extends ListPopupWindow implements MenuItemHoverLis
             return super.onHoverEvent(motionEvent);
         }
 
+        public MenuDropDownListView(Context context, boolean z) {
+            super(context, z);
+            if (1 == context.getResources().getConfiguration().getLayoutDirection()) {
+                this.mAdvanceKey = 21;
+                this.mRetreatKey = 22;
+                return;
+            }
+            this.mAdvanceKey = 22;
+            this.mRetreatKey = 21;
+        }
+
         @Override // android.widget.ListView, android.widget.AbsListView, android.view.View, android.view.KeyEvent.Callback
-        public boolean onKeyDown(int i, KeyEvent keyEvent) {
+        public final boolean onKeyDown(int i, KeyEvent keyEvent) {
             MenuAdapter menuAdapter;
             ListMenuItemView listMenuItemView = (ListMenuItemView) getSelectedView();
             if (listMenuItemView != null && i == this.mAdvanceKey) {
@@ -93,27 +92,27 @@ public class MenuPopupWindow extends ListPopupWindow implements MenuItemHoverLis
         }
     }
 
-    public MenuPopupWindow(Context context, AttributeSet attributeSet, int i, int i2) {
+    public MenuPopupWindow(Context context, int i, int i2) {
         super(context, null, i, i2);
     }
 
     @Override // androidx.appcompat.widget.ListPopupWindow
-    public DropDownListView createDropDownListView(Context context, boolean z) {
+    public final DropDownListView createDropDownListView(Context context, boolean z) {
         MenuDropDownListView menuDropDownListView = new MenuDropDownListView(context, z);
         menuDropDownListView.mHoverListener = this;
         return menuDropDownListView;
     }
 
     @Override // androidx.appcompat.widget.MenuItemHoverListener
-    public void onItemHoverEnter(MenuBuilder menuBuilder, MenuItem menuItem) {
+    public final void onItemHoverEnter(MenuBuilder menuBuilder, MenuItemImpl menuItemImpl) {
         MenuItemHoverListener menuItemHoverListener = this.mHoverListener;
         if (menuItemHoverListener != null) {
-            menuItemHoverListener.onItemHoverEnter(menuBuilder, menuItem);
+            menuItemHoverListener.onItemHoverEnter(menuBuilder, menuItemImpl);
         }
     }
 
     @Override // androidx.appcompat.widget.MenuItemHoverListener
-    public void onItemHoverExit(MenuBuilder menuBuilder, MenuItem menuItem) {
+    public final void onItemHoverExit(MenuBuilder menuBuilder, MenuItem menuItem) {
         MenuItemHoverListener menuItemHoverListener = this.mHoverListener;
         if (menuItemHoverListener != null) {
             menuItemHoverListener.onItemHoverExit(menuBuilder, menuItem);

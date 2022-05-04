@@ -6,7 +6,6 @@ import com.google.protobuf.MessageLiteOrBuilder;
 import com.google.protobuf.Parser;
 import com.google.protobuf.ProtobufArrayList;
 import com.google.protobuf.RawMessageInfo;
-import java.util.List;
 /* loaded from: classes.dex */
 public final class ImaxWallpaperProto$Image extends GeneratedMessageLite<ImaxWallpaperProto$Image, Builder> implements MessageLiteOrBuilder {
     public static final int ACTION_URL_FIELD_NUMBER = 3;
@@ -33,16 +32,15 @@ public final class ImaxWallpaperProto$Image extends GeneratedMessageLite<ImaxWal
 
         /* loaded from: classes.dex */
         public static final class ActionTypeVerifier implements Internal.EnumVerifier {
-            public static final Internal.EnumVerifier INSTANCE = new ActionTypeVerifier();
+            public static final ActionTypeVerifier INSTANCE = new ActionTypeVerifier();
 
             @Override // com.google.protobuf.Internal.EnumVerifier
-            public boolean isInRange(int i) {
-                return ActionType.forNumber(i) != null;
+            public final boolean isInRange(int i) {
+                if (ActionType.forNumber(i) != null) {
+                    return true;
+                }
+                return false;
             }
-        }
-
-        ActionType(int i) {
-            this.value = i;
         }
 
         public static ActionType forNumber(int i) {
@@ -58,6 +56,10 @@ public final class ImaxWallpaperProto$Image extends GeneratedMessageLite<ImaxWal
             return LIVE_CASE;
         }
 
+        ActionType(int i) {
+            this.value = i;
+        }
+
         @Override // com.google.protobuf.Internal.EnumLite
         public final int getNumber() {
             return this.value;
@@ -66,7 +68,7 @@ public final class ImaxWallpaperProto$Image extends GeneratedMessageLite<ImaxWal
 
     /* loaded from: classes.dex */
     public static final class Builder extends GeneratedMessageLite.Builder<ImaxWallpaperProto$Image, Builder> implements MessageLiteOrBuilder {
-        public Builder(ImaxWallpaperProto$1 imaxWallpaperProto$1) {
+        public Builder() {
             super(ImaxWallpaperProto$Image.DEFAULT_INSTANCE);
         }
     }
@@ -77,12 +79,16 @@ public final class ImaxWallpaperProto$Image extends GeneratedMessageLite<ImaxWal
         GeneratedMessageLite.registerDefaultInstance(ImaxWallpaperProto$Image.class, imaxWallpaperProto$Image);
     }
 
-    public static ImaxWallpaperProto$Image getDefaultInstance() {
-        return DEFAULT_INSTANCE;
+    public final ActionType getType() {
+        ActionType forNumber = ActionType.forNumber(this.type_);
+        if (forNumber == null) {
+            return ActionType.UNKNOWN;
+        }
+        return forNumber;
     }
 
     @Override // com.google.protobuf.GeneratedMessageLite
-    public final Object dynamicMethod(GeneratedMessageLite.MethodToInvoke methodToInvoke, Object obj, Object obj2) {
+    public final Object dynamicMethod(GeneratedMessageLite.MethodToInvoke methodToInvoke) {
         switch (methodToInvoke.ordinal()) {
             case 0:
                 return (byte) 1;
@@ -93,7 +99,7 @@ public final class ImaxWallpaperProto$Image extends GeneratedMessageLite<ImaxWal
             case 3:
                 return new ImaxWallpaperProto$Image();
             case 4:
-                return new Builder(null);
+                return new Builder();
             case 5:
                 return DEFAULT_INSTANCE;
             case 6:
@@ -113,24 +119,23 @@ public final class ImaxWallpaperProto$Image extends GeneratedMessageLite<ImaxWal
         }
     }
 
-    public String getActionUrl() {
+    public static ImaxWallpaperProto$Image getDefaultInstance() {
+        return DEFAULT_INSTANCE;
+    }
+
+    public final String getActionUrl() {
         return this.actionUrl_;
     }
 
-    public long getAssetId() {
+    public final long getAssetId() {
         return this.assetId_;
     }
 
-    public List<ImaxWallpaperProto$Attribution> getAttributionList() {
+    public final Internal.ProtobufList getAttributionList() {
         return this.attribution_;
     }
 
-    public String getImageUrl() {
+    public final String getImageUrl() {
         return this.imageUrl_;
-    }
-
-    public ActionType getType() {
-        ActionType forNumber = ActionType.forNumber(this.type_);
-        return forNumber == null ? ActionType.UNKNOWN : forNumber;
     }
 }

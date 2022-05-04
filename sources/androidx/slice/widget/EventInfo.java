@@ -1,46 +1,33 @@
 package androidx.slice.widget;
 
-import android.support.media.ExifInterface$$ExternalSyntheticOutline0;
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
-import androidx.slice.core.SliceAction;
-import java.util.Comparator;
+import androidx.slice.widget.SliceView;
 /* loaded from: classes.dex */
-public class EventInfo {
+public final class EventInfo {
     public int actionType;
     public int rowIndex;
     public int rowTemplateType;
     public int sliceMode;
-    public int actionPosition = -1;
+    public int actionPosition = 0;
     public int actionIndex = -1;
     public int actionCount = -1;
     public int state = -1;
 
-    public EventInfo(int sliceMode, int actionType, int rowTemplateType, int rowIndex) {
-        this.sliceMode = sliceMode;
-        this.actionType = actionType;
-        this.rowTemplateType = rowTemplateType;
-        this.rowIndex = rowIndex;
-    }
-
-    public void setPosition(int actionPosition, int actionIndex, int actionCount) {
-        this.actionPosition = actionPosition;
-        this.actionIndex = actionIndex;
-        this.actionCount = actionCount;
-    }
-
-    public String toString() {
+    public final String toString() {
         String str;
         String str2;
         String str3;
         StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("mode=");
         int i = this.sliceMode;
-        Comparator<SliceAction> comparator = SliceView.SLICE_ACTION_PRIORITY_COMPARATOR;
+        SliceView.AnonymousClass3 r2 = SliceView.SLICE_ACTION_PRIORITY_COMPARATOR;
         if (i == 1) {
             str = "MODE SMALL";
-        } else if (i != 2) {
-            str = i != 3 ? ExifInterface$$ExternalSyntheticOutline0.m("unknown mode: ", i) : "MODE SHORTCUT";
-        } else {
+        } else if (i == 2) {
             str = "MODE LARGE";
+        } else if (i != 3) {
+            str = "unknown mode: " + i;
+        } else {
+            str = "MODE SHORTCUT";
         }
         m.append(str);
         m.append(", actionType=");
@@ -72,7 +59,7 @@ public class EventInfo {
                 str2 = str4;
                 break;
             default:
-                str2 = ExifInterface$$ExternalSyntheticOutline0.m("unknown action: ", i2);
+                str2 = "unknown action: " + i2;
                 break;
         }
         m.append(str2);
@@ -109,7 +96,7 @@ public class EventInfo {
             case 8:
                 break;
             default:
-                str4 = ExifInterface$$ExternalSyntheticOutline0.m("unknown row type: ", i3);
+                str4 = "unknown row type: " + i3;
                 break;
         }
         m.append(str4);
@@ -119,10 +106,12 @@ public class EventInfo {
         int i4 = this.actionPosition;
         if (i4 == 0) {
             str3 = "START";
-        } else if (i4 != 1) {
-            str3 = i4 != 2 ? ExifInterface$$ExternalSyntheticOutline0.m("unknown position: ", i4) : "CELL";
-        } else {
+        } else if (i4 == 1) {
             str3 = "END";
+        } else if (i4 != 2) {
+            str3 = "unknown position: " + i4;
+        } else {
+            str3 = "CELL";
         }
         m.append(str3);
         m.append(", actionIndex=");
@@ -132,5 +121,12 @@ public class EventInfo {
         m.append(", state=");
         m.append(this.state);
         return m.toString();
+    }
+
+    public EventInfo(int i, int i2, int i3, int i4) {
+        this.sliceMode = i;
+        this.actionType = i2;
+        this.rowTemplateType = i3;
+        this.rowIndex = i4;
     }
 }

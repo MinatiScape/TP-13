@@ -20,7 +20,7 @@ public interface INetworkTaskCallback extends IInterface {
             }
 
             @Override // com.google.android.gms.gcm.INetworkTaskCallback
-            public void taskFinished(int i) throws RemoteException {
+            public final void taskFinished(int i) throws RemoteException {
                 Parcel a_ = a_();
                 a_.writeInt(i);
                 zzb(2, a_);

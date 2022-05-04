@@ -4,6 +4,7 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewParent;
+import androidx.slice.compat.SliceProviderCompat$2;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 /* loaded from: classes.dex */
 public abstract class VirtualLayout extends ConstraintHelper {
@@ -11,10 +12,10 @@ public abstract class VirtualLayout extends ConstraintHelper {
     public boolean mApplyVisibilityOnAttach;
 
     @Override // androidx.constraintlayout.widget.ConstraintHelper
-    public void init(AttributeSet attributeSet) {
+    public final void init(AttributeSet attributeSet) {
         super.init(attributeSet);
         if (attributeSet != null) {
-            TypedArray obtainStyledAttributes = getContext().obtainStyledAttributes(attributeSet, R$styleable.ConstraintLayout_Layout);
+            TypedArray obtainStyledAttributes = getContext().obtainStyledAttributes(attributeSet, SliceProviderCompat$2.ConstraintLayout_Layout);
             int indexCount = obtainStyledAttributes.getIndexCount();
             for (int i = 0; i < indexCount; i++) {
                 int index = obtainStyledAttributes.getIndex(i);
@@ -28,7 +29,7 @@ public abstract class VirtualLayout extends ConstraintHelper {
     }
 
     @Override // android.view.View
-    public void onAttachedToWindow() {
+    public final void onAttachedToWindow() {
         ViewParent parent;
         super.onAttachedToWindow();
         if ((this.mApplyVisibilityOnAttach || this.mApplyElevationOnAttach) && (parent = getParent()) != null && (parent instanceof ConstraintLayout)) {
@@ -36,13 +37,13 @@ public abstract class VirtualLayout extends ConstraintHelper {
             int visibility = getVisibility();
             float elevation = getElevation();
             for (int i = 0; i < this.mCount; i++) {
-                View viewById = constraintLayout.getViewById(this.mIds[i]);
-                if (viewById != null) {
+                View view = constraintLayout.mChildrenByIds.get(this.mIds[i]);
+                if (view != null) {
                     if (this.mApplyVisibilityOnAttach) {
-                        viewById.setVisibility(visibility);
+                        view.setVisibility(visibility);
                     }
                     if (this.mApplyElevationOnAttach && elevation > HingeAngleProviderKt.FULLY_CLOSED_DEGREES) {
-                        viewById.setTranslationZ(viewById.getTranslationZ() + elevation);
+                        view.setTranslationZ(view.getTranslationZ() + elevation);
                     }
                 }
             }
@@ -50,14 +51,14 @@ public abstract class VirtualLayout extends ConstraintHelper {
     }
 
     @Override // android.view.View
-    public void setElevation(float f) {
+    public final void setElevation(float f) {
         super.setElevation(f);
-        applyLayoutFeatures();
+        applyLayoutFeatures$1();
     }
 
     @Override // android.view.View
-    public void setVisibility(int i) {
+    public final void setVisibility(int i) {
         super.setVisibility(i);
-        applyLayoutFeatures();
+        applyLayoutFeatures$1();
     }
 }

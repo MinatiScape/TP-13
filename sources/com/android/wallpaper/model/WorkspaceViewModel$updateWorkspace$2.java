@@ -3,6 +3,7 @@ package com.android.wallpaper.model;
 import androidx.lifecycle.MutableLiveData;
 import kotlin.jvm.functions.Function0;
 import kotlin.jvm.internal.Lambda;
+/* compiled from: WorkspaceViewModel.kt */
 /* loaded from: classes.dex */
 public final class WorkspaceViewModel$updateWorkspace$2 extends Lambda implements Function0<MutableLiveData<Boolean>> {
     public static final WorkspaceViewModel$updateWorkspace$2 INSTANCE = new WorkspaceViewModel$updateWorkspace$2();
@@ -12,7 +13,7 @@ public final class WorkspaceViewModel$updateWorkspace$2 extends Lambda implement
     }
 
     @Override // kotlin.jvm.functions.Function0
-    public MutableLiveData<Boolean> invoke() {
+    public final MutableLiveData<Boolean> invoke() {
         return new MutableLiveData<>();
     }
 }

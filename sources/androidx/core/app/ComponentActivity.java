@@ -17,41 +17,44 @@ import java.util.WeakHashMap;
 public class ComponentActivity extends Activity implements LifecycleOwner, KeyEventDispatcher$Component {
     public LifecycleRegistry mLifecycleRegistry = new LifecycleRegistry(this, true);
 
-    @Override // android.app.Activity, android.view.Window.Callback
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if (getWindow().getDecorView() != null) {
-            WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-        }
-        return super.dispatchKeyEvent(event);
-    }
-
-    @Override // android.app.Activity, android.view.Window.Callback
-    public boolean dispatchKeyShortcutEvent(KeyEvent event) {
-        if (getWindow().getDecorView() != null) {
-            WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
-        }
-        return super.dispatchKeyShortcutEvent(event);
-    }
-
     @Override // android.app.Activity
-    @SuppressLint({"RestrictedApi"})
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        ReportFragment.injectIfNeededIn(this);
-    }
-
-    @Override // android.app.Activity
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(Bundle bundle) {
         LifecycleRegistry lifecycleRegistry = this.mLifecycleRegistry;
         Lifecycle.State state = Lifecycle.State.CREATED;
         lifecycleRegistry.enforceMainThreadIfNeeded("markState");
         lifecycleRegistry.enforceMainThreadIfNeeded("setCurrentState");
         lifecycleRegistry.moveToState(state);
-        super.onSaveInstanceState(outState);
+        super.onSaveInstanceState(bundle);
     }
 
-    @Override // androidx.core.view.KeyEventDispatcher$Component
-    public boolean superDispatchKeyEvent(KeyEvent event) {
-        return super.dispatchKeyEvent(event);
+    @Override // android.app.Activity, android.view.Window.Callback
+    public boolean dispatchKeyEvent(KeyEvent keyEvent) {
+        if (getWindow().getDecorView() != null) {
+            WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
+        }
+        return superDispatchKeyEvent(keyEvent);
+    }
+
+    @Override // android.app.Activity, android.view.Window.Callback
+    public final boolean dispatchKeyShortcutEvent(KeyEvent keyEvent) {
+        if (getWindow().getDecorView() != null) {
+            WeakHashMap<View, ViewPropertyAnimatorCompat> weakHashMap = ViewCompat.sViewPropertyAnimatorMap;
+        }
+        return super.dispatchKeyShortcutEvent(keyEvent);
+    }
+
+    @Override // android.app.Activity
+    @SuppressLint({"RestrictedApi"})
+    public void onCreate(Bundle bundle) {
+        super.onCreate(bundle);
+        ReportFragment.injectIfNeededIn(this);
+    }
+
+    public final boolean superDispatchKeyEvent(KeyEvent keyEvent) {
+        return super.dispatchKeyEvent(keyEvent);
+    }
+
+    public LifecycleRegistry getLifecycle() {
+        return this.mLifecycleRegistry;
     }
 }

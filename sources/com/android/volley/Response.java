@@ -1,8 +1,9 @@
 package com.android.volley;
 
 import com.android.volley.Cache;
+import com.google.protobuf.MessageLite;
 /* loaded from: classes.dex */
-public class Response<T> {
+public final class Response<T> {
     public final Cache.Entry cacheEntry;
     public final VolleyError error;
     public boolean intermediate;
@@ -18,9 +19,10 @@ public class Response<T> {
         void onResponse(T t);
     }
 
-    public Response(T t, Cache.Entry entry) {
+    /* JADX WARN: Multi-variable type inference failed */
+    public Response(MessageLite messageLite, Cache.Entry entry) {
         this.intermediate = false;
-        this.result = t;
+        this.result = messageLite;
         this.cacheEntry = entry;
         this.error = null;
     }

@@ -9,7 +9,7 @@ public abstract class FastSafeParcelableJsonResponse extends FastJsonResponse im
         return 0;
     }
 
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
@@ -30,11 +30,16 @@ public abstract class FastSafeParcelableJsonResponse extends FastJsonResponse im
     }
 
     @Override // com.google.android.gms.common.server.response.FastJsonResponse
-    public Object getValueObject(String str) {
+    public Object getValueObject() {
         return null;
     }
 
-    public int hashCode() {
+    @Override // com.google.android.gms.common.server.response.FastJsonResponse
+    public boolean isPrimitiveFieldSet() {
+        return false;
+    }
+
+    public final int hashCode() {
         int i = 0;
         for (FastJsonResponse.Field<?, ?> field : getFieldMappings().values()) {
             if (isFieldSet(field)) {
@@ -42,10 +47,5 @@ public abstract class FastSafeParcelableJsonResponse extends FastJsonResponse im
             }
         }
         return i;
-    }
-
-    @Override // com.google.android.gms.common.server.response.FastJsonResponse
-    public boolean isPrimitiveFieldSet(String str) {
-        return false;
     }
 }

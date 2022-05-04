@@ -4,17 +4,18 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+/* JADX INFO: Access modifiers changed from: package-private */
 @SuppressLint({"BanParcelableUsage"})
 /* loaded from: classes.dex */
 public final class FragmentState implements Parcelable {
     public static final Parcelable.Creator<FragmentState> CREATOR = new Parcelable.Creator<FragmentState>() { // from class: androidx.fragment.app.FragmentState.1
         @Override // android.os.Parcelable.Creator
-        public FragmentState createFromParcel(Parcel parcel) {
+        public final FragmentState createFromParcel(Parcel parcel) {
             return new FragmentState(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public FragmentState[] newArray(int i) {
+        public final FragmentState[] newArray(int i) {
             return new FragmentState[i];
         }
     };
@@ -48,11 +49,11 @@ public final class FragmentState implements Parcelable {
     }
 
     @Override // android.os.Parcelable
-    public int describeContents() {
+    public final int describeContents() {
         return 0;
     }
 
-    public String toString() {
+    public final String toString() {
         StringBuilder sb = new StringBuilder(128);
         sb.append("FragmentState{");
         sb.append(this.mClassName);
@@ -87,7 +88,7 @@ public final class FragmentState implements Parcelable {
     }
 
     @Override // android.os.Parcelable
-    public void writeToParcel(Parcel parcel, int i) {
+    public final void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(this.mClassName);
         parcel.writeString(this.mWho);
         parcel.writeInt(this.mFromLayout ? 1 : 0);

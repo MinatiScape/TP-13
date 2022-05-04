@@ -1,14 +1,13 @@
 package com.google.android.gms.internal;
 
 import java.io.IOException;
-import java.util.Objects;
+/* compiled from: ClientAnalytics.java */
 /* loaded from: classes.dex */
 public final class zzgsw extends zzgrt<zzgsw> implements Cloneable {
     public static volatile zzgsw[] zza;
 
     public zzgsw() {
-        this.zzay = null;
-        this.zzaz = -1;
+        throw null;
     }
 
     @Override // com.google.android.gms.internal.zzgrt, com.google.android.gms.internal.zzgrz
@@ -20,12 +19,6 @@ public final class zzgsw extends zzgrt<zzgsw> implements Cloneable {
         }
     }
 
-    @Override // com.google.android.gms.internal.zzgrt, com.google.android.gms.internal.zzgrz
-    public final int computeSerializedSize() {
-        super.computeSerializedSize();
-        return 0;
-    }
-
     public final boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -34,8 +27,8 @@ public final class zzgsw extends zzgrt<zzgsw> implements Cloneable {
             return false;
         }
         zzgsw zzgswVar = (zzgsw) obj;
-        Objects.requireNonNull(zzgswVar);
-        Objects.requireNonNull(zzgswVar);
+        zzgswVar.getClass();
+        zzgswVar.getClass();
         zzgrv zzgrvVar = this.zzay;
         if (zzgrvVar != null && !zzgrvVar.zzb()) {
             return this.zzay.equals(zzgswVar.zzay);
@@ -45,11 +38,23 @@ public final class zzgsw extends zzgrt<zzgsw> implements Cloneable {
     }
 
     public final int hashCode() {
+        int i;
         zzgrv zzgrvVar = this.zzay;
-        return (-1637150801) + ((zzgrvVar == null || zzgrvVar.zzb()) ? 0 : this.zzay.hashCode());
+        if (zzgrvVar == null || zzgrvVar.zzb()) {
+            i = 0;
+        } else {
+            i = this.zzay.hashCode();
+        }
+        return (-1637150801) + i;
     }
 
     @Override // com.google.android.gms.internal.zzgrt, com.google.android.gms.internal.zzgrz
+    public final int computeSerializedSize() {
+        super.computeSerializedSize();
+        return 0;
+    }
+
+    @Override // com.google.android.gms.internal.zzgrt
     public final void writeTo(zzgrr zzgrrVar) throws IOException {
         super.writeTo(zzgrrVar);
     }

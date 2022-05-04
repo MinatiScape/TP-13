@@ -5,18 +5,10 @@ import com.bumptech.glide.load.engine.Initializable;
 import com.bumptech.glide.load.engine.Resource;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.util.Util;
-import java.util.Objects;
 /* loaded from: classes.dex */
-public class BitmapResource implements Resource<Bitmap>, Initializable {
+public final class BitmapResource implements Resource<Bitmap>, Initializable {
     public final Bitmap bitmap;
     public final BitmapPool bitmapPool;
-
-    public BitmapResource(Bitmap bitmap, BitmapPool bitmapPool) {
-        Objects.requireNonNull(bitmap, "Bitmap must not be null");
-        this.bitmap = bitmap;
-        Objects.requireNonNull(bitmapPool, "BitmapPool must not be null");
-        this.bitmapPool = bitmapPool;
-    }
 
     public static BitmapResource obtain(Bitmap bitmap, BitmapPool bitmapPool) {
         if (bitmap == null) {
@@ -26,27 +18,39 @@ public class BitmapResource implements Resource<Bitmap>, Initializable {
     }
 
     @Override // com.bumptech.glide.load.engine.Resource
-    public Bitmap get() {
-        return this.bitmap;
-    }
-
-    @Override // com.bumptech.glide.load.engine.Resource
-    public Class<Bitmap> getResourceClass() {
-        return Bitmap.class;
-    }
-
-    @Override // com.bumptech.glide.load.engine.Resource
-    public int getSize() {
+    public final int getSize() {
         return Util.getBitmapByteSize(this.bitmap);
     }
 
     @Override // com.bumptech.glide.load.engine.Initializable
-    public void initialize() {
+    public final void initialize() {
         this.bitmap.prepareToDraw();
     }
 
     @Override // com.bumptech.glide.load.engine.Resource
-    public void recycle() {
+    public final void recycle() {
         this.bitmapPool.put(this.bitmap);
+    }
+
+    public BitmapResource(Bitmap bitmap, BitmapPool bitmapPool) {
+        if (bitmap != null) {
+            this.bitmap = bitmap;
+            if (bitmapPool != null) {
+                this.bitmapPool = bitmapPool;
+                return;
+            }
+            throw new NullPointerException("BitmapPool must not be null");
+        }
+        throw new NullPointerException("Bitmap must not be null");
+    }
+
+    @Override // com.bumptech.glide.load.engine.Resource
+    public final Bitmap get() {
+        return this.bitmap;
+    }
+
+    @Override // com.bumptech.glide.load.engine.Resource
+    public final Class<Bitmap> getResourceClass() {
+        return Bitmap.class;
     }
 }

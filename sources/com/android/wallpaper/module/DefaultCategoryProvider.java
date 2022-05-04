@@ -3,22 +3,23 @@ package com.android.wallpaper.module;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import androidx.cardview.R$style;
 import com.android.volley.VolleyError;
 import com.android.wallpaper.model.Category;
 import com.android.wallpaper.model.CategoryProvider;
 import com.android.wallpaper.model.CategoryReceiver;
-import com.android.wallpaper.network.ServerFetcher;
+import com.android.wallpaper.network.ServerFetcher$ResultsCallback;
 import com.google.android.apps.common.volley.request.ProtoRequest;
 import com.google.android.apps.wallpaper.backdrop.BackdropFetcher;
 import com.google.android.apps.wallpaper.module.WallpaperCategoryProvider;
 import com.google.chrome.dongle.imax.wallpaper2.protos.ImaxWallpaperProto$Collection;
 import com.google.chrome.dongle.imax.wallpaper2.protos.ImaxWallpaperProto$GetCollectionsRequest;
 import com.google.chrome.dongle.imax.wallpaper2.protos.ImaxWallpaperProto$GetCollectionsResponse;
+import com.google.protobuf.Internal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public class DefaultCategoryProvider implements CategoryProvider {
     public static List<Category> sSystemCategories;
@@ -36,18 +37,13 @@ public class DefaultCategoryProvider implements CategoryProvider {
         public PartnerProvider mPartnerProvider;
         public CategoryReceiver mReceiver;
 
-        public FetchCategoriesTask(CategoryReceiver categoryReceiver, Context context) {
-            this.mReceiver = categoryReceiver;
-            this.mAppContext = context.getApplicationContext();
-        }
-
         @Override // android.os.AsyncTask
-        public void onPostExecute(Void r1) {
+        public final void onPostExecute(Void r1) {
             this.mReceiver.doneFetchingCategories();
         }
 
         @Override // android.os.AsyncTask
-        public void onProgressUpdate(Category[] categoryArr) {
+        public final void onProgressUpdate(Category[] categoryArr) {
             Category[] categoryArr2 = categoryArr;
             super.onProgressUpdate(categoryArr2);
             for (Category category : categoryArr2) {
@@ -56,36 +52,49 @@ public class DefaultCategoryProvider implements CategoryProvider {
                 }
             }
         }
+
+        public FetchCategoriesTask(CategoryReceiver categoryReceiver, Context context) {
+            this.mReceiver = categoryReceiver;
+            this.mAppContext = context.getApplicationContext();
+        }
     }
 
-    public DefaultCategoryProvider(Context context) {
-        this.mAppContext = context.getApplicationContext();
-        this.mNetworkStatusNotifier = InjectorProvider.getInjector().getNetworkStatusNotifier(context);
+    public final Category getCategory(String str) {
+        for (int i = 0; i < this.mCategories.size(); i++) {
+            Category category = this.mCategories.get(i);
+            if (category.mCollectionId.equals(str)) {
+                return category;
+            }
+        }
+        return null;
     }
 
-    public void fetchCategories(final CategoryReceiver categoryReceiver, boolean z) {
+    /* JADX WARN: Type inference failed for: r3v0, types: [com.android.wallpaper.model.CategoryReceiver, com.google.android.apps.wallpaper.module.WallpaperCategoryProvider$1] */
+    /* JADX WARN: Type inference failed for: r7v5, types: [com.google.android.apps.wallpaper.backdrop.BackdropCategory$1] */
+    public final void fetchCategories(final CategoryReceiver categoryReceiver, boolean z) {
         if (z || !this.mFetchedCategories) {
             if (z) {
                 this.mCategories.clear();
                 this.mFetchedCategories = false;
             }
             this.mNetworkStatus = ((DefaultNetworkStatusNotifier) this.mNetworkStatusNotifier).getNetworkStatus();
-            this.mLocale = getLocale();
+            this.mLocale = this.mAppContext.getResources().getConfiguration().getLocales().get(0);
             final WallpaperCategoryProvider wallpaperCategoryProvider = (WallpaperCategoryProvider) this;
             final int[] iArr = {0};
-            final CategoryReceiver categoryReceiver2 = new CategoryReceiver() { // from class: com.google.android.apps.wallpaper.module.WallpaperCategoryProvider.1
+            final ?? r3 = new CategoryReceiver() { // from class: com.google.android.apps.wallpaper.module.WallpaperCategoryProvider.1
                 @Override // com.android.wallpaper.model.CategoryReceiver
-                public void doneFetchingCategories() {
+                public final void doneFetchingCategories() {
                     int[] iArr2 = iArr;
-                    iArr2[0] = iArr2[0] + 1;
-                    if (iArr2[0] == 2) {
+                    int i = iArr2[0] + 1;
+                    iArr2[0] = i;
+                    if (i == 2) {
                         categoryReceiver.doneFetchingCategories();
                     }
                     WallpaperCategoryProvider.this.mFetchedCategories = true;
                 }
 
                 @Override // com.android.wallpaper.model.CategoryReceiver
-                public void onCategoryReceived(Category category) {
+                public final void onCategoryReceived(Category category) {
                     categoryReceiver.onCategoryReceived(category);
                     int indexOf = WallpaperCategoryProvider.this.mCategories.indexOf(category);
                     if (indexOf >= 0) {
@@ -95,65 +104,61 @@ public class DefaultCategoryProvider implements CategoryProvider {
                     }
                 }
             };
-            new WallpaperCategoryProvider.GoogleFetchCategoriesTask(categoryReceiver2, wallpaperCategoryProvider.mAppContext, z).execute(new Void[0]);
+            new WallpaperCategoryProvider.GoogleFetchCategoriesTask(r3, wallpaperCategoryProvider.mAppContext, z).execute(new Void[0]);
             final Context context = wallpaperCategoryProvider.mAppContext;
-            Injector injector = InjectorProvider.getInjector();
+            Injector injector = R$style.getInjector();
             if (((DefaultNetworkStatusNotifier) injector.getNetworkStatusNotifier(context)).getNetworkStatus() == 0) {
-                categoryReceiver2.doneFetchingCategories();
+                r3.doneFetchingCategories();
                 return;
             }
-            ServerFetcher serverFetcher = ((GoogleWallpapersInjector) injector).getServerFetcher(context);
-            ServerFetcher.ResultsCallback<ImaxWallpaperProto$Collection> resultsCallback = new ServerFetcher.ResultsCallback<ImaxWallpaperProto$Collection>() { // from class: com.google.android.apps.wallpaper.backdrop.BackdropCategory.1
-                @Override // com.android.wallpaper.network.ServerFetcher.ResultsCallback
-                public void onError(VolleyError volleyError) {
+            BackdropFetcher serverFetcher = ((GoogleWallpapersInjector) injector).getServerFetcher(context);
+            final ?? r7 = new ServerFetcher$ResultsCallback<ImaxWallpaperProto$Collection>() { // from class: com.google.android.apps.wallpaper.backdrop.BackdropCategory.1
+                public final /* synthetic */ int val$priority = 201;
+
+                @Override // com.android.wallpaper.network.ServerFetcher$ResultsCallback
+                public final void onError(VolleyError volleyError) {
                     Log.e("BackdropCategory", "Unable to fetch Backdrop wallpaper categories", volleyError);
-                    categoryReceiver2.doneFetchingCategories();
+                    r3.doneFetchingCategories();
                 }
 
-                @Override // com.android.wallpaper.network.ServerFetcher.ResultsCallback
-                public void onSuccess(List<ImaxWallpaperProto$Collection> list) {
-                    for (ImaxWallpaperProto$Collection imaxWallpaperProto$Collection : list) {
-                        BackdropCategory backdropCategory = new BackdropCategory(imaxWallpaperProto$Collection, r1);
-                        categoryReceiver2.onCategoryReceived(backdropCategory);
+                @Override // com.android.wallpaper.network.ServerFetcher$ResultsCallback
+                public final void onSuccess(Internal.ProtobufList protobufList) {
+                    Iterator<E> it = protobufList.iterator();
+                    while (it.hasNext()) {
+                        BackdropCategory backdropCategory = new BackdropCategory((ImaxWallpaperProto$Collection) it.next(), this.val$priority);
+                        r3.onCategoryReceived(backdropCategory);
                         backdropCategory.fetchWallpapers(context, null, false);
                     }
-                    categoryReceiver2.doneFetchingCategories();
+                    r3.doneFetchingCategories();
                 }
             };
-            BackdropFetcher backdropFetcher = (BackdropFetcher) serverFetcher;
-            Objects.requireNonNull(backdropFetcher);
+            serverFetcher.getClass();
             ProtoRequest.Builder builder = new ProtoRequest.Builder();
-            ProtoRequest.Callback<ImaxWallpaperProto$GetCollectionsResponse> callback = new ProtoRequest.Callback<ImaxWallpaperProto$GetCollectionsResponse>(backdropFetcher, resultsCallback) { // from class: com.google.android.apps.wallpaper.backdrop.BackdropFetcher.1
-                public final /* synthetic */ ServerFetcher.ResultsCallback val$collectionsCallback;
-
-                {
-                    this.val$collectionsCallback = resultsCallback;
-                }
-
+            ProtoRequest.Callback<ImaxWallpaperProto$GetCollectionsResponse> callback = new ProtoRequest.Callback<ImaxWallpaperProto$GetCollectionsResponse>() { // from class: com.google.android.apps.wallpaper.backdrop.BackdropFetcher.1
                 @Override // com.android.volley.Response.ErrorListener
-                public void onErrorResponse(VolleyError volleyError) {
-                    this.val$collectionsCallback.onError(volleyError);
+                public final void onErrorResponse(VolleyError volleyError) {
+                    r7.onError(volleyError);
                 }
 
                 @Override // com.android.volley.Response.Listener
-                public void onResponse(Object obj) {
-                    this.val$collectionsCallback.onSuccess(((ImaxWallpaperProto$GetCollectionsResponse) obj).getCollectionsList());
+                public final void onResponse(Object obj) {
+                    r7.onSuccess(((ImaxWallpaperProto$GetCollectionsResponse) obj).getCollectionsList());
                 }
             };
             ImaxWallpaperProto$GetCollectionsRequest.Builder newBuilder = ImaxWallpaperProto$GetCollectionsRequest.newBuilder();
-            String language = backdropFetcher.getLanguage();
+            String language = BackdropFetcher.getLanguage();
             newBuilder.copyOnWrite();
-            ImaxWallpaperProto$GetCollectionsRequest.access$4400((ImaxWallpaperProto$GetCollectionsRequest) newBuilder.instance, language);
-            List<String> filteringLabelList = backdropFetcher.getFilteringLabelList(context);
+            ImaxWallpaperProto$GetCollectionsRequest.m43$$Nest$msetLanguage((ImaxWallpaperProto$GetCollectionsRequest) newBuilder.instance, language);
+            ArrayList filteringLabelList = serverFetcher.getFilteringLabelList(context);
             newBuilder.copyOnWrite();
-            ImaxWallpaperProto$GetCollectionsRequest.access$5200((ImaxWallpaperProto$GetCollectionsRequest) newBuilder.instance, filteringLabelList);
+            ImaxWallpaperProto$GetCollectionsRequest.m42$$Nest$maddAllFilteringLabel((ImaxWallpaperProto$GetCollectionsRequest) newBuilder.instance, filteringLabelList);
             builder.url = "https://clients3.google.com/cast/chromecast/home/wallpaper/collections?rt=b";
             builder.requestMethod = 1;
             builder.requestBody = newBuilder.build();
             builder.callback = callback;
             builder.responseParser = ImaxWallpaperProto$GetCollectionsResponse.parser();
             builder.headers.put("Accept", "application/x-protobuf");
-            backdropFetcher.mRequester.addToRequestQueue(new ProtoRequest(builder));
+            serverFetcher.mRequester.addToRequestQueue(new ProtoRequest(builder));
             return;
         }
         Iterator<Category> it = this.mCategories.iterator();
@@ -163,33 +168,8 @@ public class DefaultCategoryProvider implements CategoryProvider {
         categoryReceiver.doneFetchingCategories();
     }
 
-    public Category getCategory(int i) {
-        if (this.mFetchedCategories) {
-            return this.mCategories.get(i);
-        }
-        throw new IllegalStateException("Categories are not available");
-    }
-
-    public final Locale getLocale() {
-        return this.mAppContext.getResources().getConfiguration().getLocales().get(0);
-    }
-
-    public boolean resetIfNeeded() {
-        if (this.mNetworkStatus == ((DefaultNetworkStatusNotifier) this.mNetworkStatusNotifier).getNetworkStatus() && this.mLocale == getLocale()) {
-            return false;
-        }
-        this.mCategories.clear();
-        this.mFetchedCategories = false;
-        return true;
-    }
-
-    public Category getCategory(String str) {
-        for (int i = 0; i < this.mCategories.size(); i++) {
-            Category category = this.mCategories.get(i);
-            if (category.mCollectionId.equals(str)) {
-                return category;
-            }
-        }
-        return null;
+    public DefaultCategoryProvider(Context context) {
+        this.mAppContext = context.getApplicationContext();
+        this.mNetworkStatusNotifier = R$style.getInjector().getNetworkStatusNotifier(context);
     }
 }

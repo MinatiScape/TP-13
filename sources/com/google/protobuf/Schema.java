@@ -20,5 +20,5 @@ public interface Schema<T> {
 
     T newInstance();
 
-    void writeTo(T t, Writer writer) throws IOException;
+    void writeTo(Object obj, CodedOutputStreamWriter codedOutputStreamWriter) throws IOException;
 }

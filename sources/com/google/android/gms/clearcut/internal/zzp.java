@@ -8,14 +8,15 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.common.data.DataHolder;
 import com.google.android.gms.internal.zzfa;
 import com.google.android.gms.internal.zzfb;
+/* compiled from: IClearcutLoggerCallbacks.java */
 /* loaded from: classes.dex */
-public abstract class zzp extends zzfa implements zzo {
+public abstract class zzp extends zzfa {
     public zzp() {
         attachInterface(this, "com.google.android.gms.clearcut.internal.IClearcutLoggerCallbacks");
     }
 
     @Override // android.os.Binder
-    public boolean onTransact(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
+    public final boolean onTransact(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
         if (zza(i, parcel, parcel2, i2)) {
             return true;
         }

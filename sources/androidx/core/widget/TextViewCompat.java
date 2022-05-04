@@ -1,29 +1,42 @@
 package androidx.core.widget;
 
-import android.graphics.Paint;
-import android.widget.TextView;
-import androidx.core.util.Preconditions;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuItem;
 /* loaded from: classes.dex */
 public final class TextViewCompat {
-    public static void setLastBaselineToBottomHeight(final TextView textView, int lastBaselineToBottomHeight) {
-        int i;
-        Preconditions.checkArgumentNonnegative(lastBaselineToBottomHeight);
-        Paint.FontMetricsInt fontMetricsInt = textView.getPaint().getFontMetricsInt();
-        if (textView.getIncludeFontPadding()) {
-            i = fontMetricsInt.bottom;
-        } else {
-            i = fontMetricsInt.descent;
+    public static ActionMode.Callback unwrapCustomSelectionActionModeCallback(ActionMode.Callback callback) {
+        if (!(callback instanceof OreoCallback)) {
+            return callback;
         }
-        if (lastBaselineToBottomHeight > Math.abs(i)) {
-            textView.setPadding(textView.getPaddingLeft(), textView.getPaddingTop(), textView.getPaddingRight(), lastBaselineToBottomHeight - i);
-        }
+        ((OreoCallback) callback).getClass();
+        return null;
     }
 
-    public static void setLineHeight(final TextView textView, int lineHeight) {
-        Preconditions.checkArgumentNonnegative(lineHeight);
-        int fontMetricsInt = textView.getPaint().getFontMetricsInt(null);
-        if (lineHeight != fontMetricsInt) {
-            textView.setLineSpacing(lineHeight - fontMetricsInt, 1.0f);
+    /* loaded from: classes.dex */
+    public static class OreoCallback implements ActionMode.Callback {
+        public OreoCallback() {
+            throw null;
+        }
+
+        @Override // android.view.ActionMode.Callback
+        public final boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+            throw null;
+        }
+
+        @Override // android.view.ActionMode.Callback
+        public final boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+            throw null;
+        }
+
+        @Override // android.view.ActionMode.Callback
+        public final boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+            throw null;
+        }
+
+        @Override // android.view.ActionMode.Callback
+        public final void onDestroyActionMode(ActionMode actionMode) {
+            throw null;
         }
     }
 }

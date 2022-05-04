@@ -10,25 +10,27 @@ public final class SliceSpec implements VersionedParcelable {
         this.mRevision = 1;
     }
 
-    public boolean equals(Object obj) {
+    public final String toString() {
+        return String.format("SliceSpec{%s,%d}", this.mType, Integer.valueOf(this.mRevision));
+    }
+
+    public final boolean equals(Object obj) {
         if (!(obj instanceof SliceSpec)) {
             return false;
         }
         SliceSpec sliceSpec = (SliceSpec) obj;
-        return this.mType.equals(sliceSpec.mType) && this.mRevision == sliceSpec.mRevision;
+        if (!this.mType.equals(sliceSpec.mType) || this.mRevision != sliceSpec.mRevision) {
+            return false;
+        }
+        return true;
     }
 
-    public int hashCode() {
+    public final int hashCode() {
         return this.mType.hashCode() + this.mRevision;
     }
 
-    public String toString() {
-        return String.format("SliceSpec{%s,%d}", this.mType, Integer.valueOf(this.mRevision));
-    }
-
-    public SliceSpec(String type, int revision) {
-        this.mRevision = 1;
-        this.mType = type;
-        this.mRevision = revision;
+    public SliceSpec(String str, int i) {
+        this.mType = str;
+        this.mRevision = i;
     }
 }

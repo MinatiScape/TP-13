@@ -2,11 +2,11 @@ package com.android.customization.model.grid;
 
 import android.content.Context;
 import com.android.wallpaper.util.PreviewUtils;
-import java.util.List;
+import java.util.ArrayList;
 /* loaded from: classes.dex */
-public class LauncherGridOptionsProvider {
+public final class LauncherGridOptionsProvider {
     public final Context mContext;
-    public List<GridOption> mOptions;
+    public ArrayList mOptions;
     public final PreviewUtils mPreviewUtils;
 
     public LauncherGridOptionsProvider(Context context, String str) {

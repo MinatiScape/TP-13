@@ -3,6 +3,7 @@ package com.google.android.gms.phenotype;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.android.gms.internal.zzbkw;
+/* compiled from: ConfigurationCreator.java */
 /* loaded from: classes.dex */
 public final class zzb implements Parcelable.Creator<Configuration> {
     @Override // android.os.Parcelable.Creator

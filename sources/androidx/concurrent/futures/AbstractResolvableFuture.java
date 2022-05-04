@@ -3,11 +3,9 @@ package androidx.concurrent.futures;
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
 import com.android.systemui.flags.FlagManager;
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.Objects;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
@@ -26,10 +24,7 @@ public abstract class AbstractResolvableFuture<V> implements ListenableFuture<V>
 
     /* loaded from: classes.dex */
     public static abstract class AtomicHelper {
-        public AtomicHelper(AnonymousClass1 r1) {
-        }
-
-        public abstract boolean casListeners(AbstractResolvableFuture<?> abstractResolvableFuture, Listener listener, Listener listener2);
+        public abstract boolean casListeners(AbstractResolvableFuture abstractResolvableFuture, Listener listener);
 
         public abstract boolean casValue(AbstractResolvableFuture<?> abstractResolvableFuture, Object obj, Object obj2);
 
@@ -45,7 +40,6 @@ public abstract class AbstractResolvableFuture<V> implements ListenableFuture<V>
         public static final Cancellation CAUSELESS_CANCELLED;
         public static final Cancellation CAUSELESS_INTERRUPTED;
         public final Throwable cause;
-        public final boolean wasInterrupted;
 
         static {
             if (AbstractResolvableFuture.GENERATE_CANCELLATION_CAUSES) {
@@ -58,7 +52,6 @@ public abstract class AbstractResolvableFuture<V> implements ListenableFuture<V>
         }
 
         public Cancellation(boolean z, Throwable th) {
-            this.wasInterrupted = z;
             this.cause = th;
         }
     }
@@ -70,7 +63,7 @@ public abstract class AbstractResolvableFuture<V> implements ListenableFuture<V>
         static {
             new Failure(new Throwable("Failure occurred while trying to finish a future.") { // from class: androidx.concurrent.futures.AbstractResolvableFuture.Failure.1
                 @Override // java.lang.Throwable
-                public synchronized Throwable fillInStackTrace() {
+                public final synchronized Throwable fillInStackTrace() {
                     return this;
                 }
             });
@@ -78,20 +71,17 @@ public abstract class AbstractResolvableFuture<V> implements ListenableFuture<V>
 
         public Failure(Throwable th) {
             boolean z = AbstractResolvableFuture.GENERATE_CANCELLATION_CAUSES;
-            Objects.requireNonNull(th);
+            th.getClass();
             this.exception = th;
         }
     }
 
     /* loaded from: classes.dex */
     public static final class Listener {
-        public static final Listener TOMBSTONE = new Listener(null, null);
+        public static final Listener TOMBSTONE = new Listener();
         public Listener next;
         public final Runnable task = null;
         public final Executor executor = null;
-
-        public Listener(Runnable runnable, Executor executor) {
-        }
     }
 
     /* loaded from: classes.dex */
@@ -102,68 +92,44 @@ public abstract class AbstractResolvableFuture<V> implements ListenableFuture<V>
         public final AtomicReferenceFieldUpdater<Waiter, Thread> waiterThreadUpdater;
         public final AtomicReferenceFieldUpdater<AbstractResolvableFuture, Waiter> waitersUpdater;
 
+        @Override // androidx.concurrent.futures.AbstractResolvableFuture.AtomicHelper
+        public final boolean casListeners(AbstractResolvableFuture abstractResolvableFuture, Listener listener) {
+            return this.listenersUpdater.compareAndSet(abstractResolvableFuture, listener, Listener.TOMBSTONE);
+        }
+
+        @Override // androidx.concurrent.futures.AbstractResolvableFuture.AtomicHelper
+        public final boolean casValue(AbstractResolvableFuture<?> abstractResolvableFuture, Object obj, Object obj2) {
+            return this.valueUpdater.compareAndSet(abstractResolvableFuture, obj, obj2);
+        }
+
+        @Override // androidx.concurrent.futures.AbstractResolvableFuture.AtomicHelper
+        public final boolean casWaiters(AbstractResolvableFuture<?> abstractResolvableFuture, Waiter waiter, Waiter waiter2) {
+            return this.waitersUpdater.compareAndSet(abstractResolvableFuture, waiter, waiter2);
+        }
+
+        @Override // androidx.concurrent.futures.AbstractResolvableFuture.AtomicHelper
+        public final void putNext(Waiter waiter, Waiter waiter2) {
+            this.waiterNextUpdater.lazySet(waiter, waiter2);
+        }
+
+        @Override // androidx.concurrent.futures.AbstractResolvableFuture.AtomicHelper
+        public final void putThread(Waiter waiter, Thread thread) {
+            this.waiterThreadUpdater.lazySet(waiter, thread);
+        }
+
         public SafeAtomicHelper(AtomicReferenceFieldUpdater<Waiter, Thread> atomicReferenceFieldUpdater, AtomicReferenceFieldUpdater<Waiter, Waiter> atomicReferenceFieldUpdater2, AtomicReferenceFieldUpdater<AbstractResolvableFuture, Waiter> atomicReferenceFieldUpdater3, AtomicReferenceFieldUpdater<AbstractResolvableFuture, Listener> atomicReferenceFieldUpdater4, AtomicReferenceFieldUpdater<AbstractResolvableFuture, Object> atomicReferenceFieldUpdater5) {
-            super(null);
             this.waiterThreadUpdater = atomicReferenceFieldUpdater;
             this.waiterNextUpdater = atomicReferenceFieldUpdater2;
             this.waitersUpdater = atomicReferenceFieldUpdater3;
             this.listenersUpdater = atomicReferenceFieldUpdater4;
             this.valueUpdater = atomicReferenceFieldUpdater5;
         }
-
-        @Override // androidx.concurrent.futures.AbstractResolvableFuture.AtomicHelper
-        public boolean casListeners(AbstractResolvableFuture<?> abstractResolvableFuture, Listener listener, Listener listener2) {
-            return this.listenersUpdater.compareAndSet(abstractResolvableFuture, listener, listener2);
-        }
-
-        @Override // androidx.concurrent.futures.AbstractResolvableFuture.AtomicHelper
-        public boolean casValue(AbstractResolvableFuture<?> abstractResolvableFuture, Object obj, Object obj2) {
-            return this.valueUpdater.compareAndSet(abstractResolvableFuture, obj, obj2);
-        }
-
-        @Override // androidx.concurrent.futures.AbstractResolvableFuture.AtomicHelper
-        public boolean casWaiters(AbstractResolvableFuture<?> abstractResolvableFuture, Waiter waiter, Waiter waiter2) {
-            return this.waitersUpdater.compareAndSet(abstractResolvableFuture, waiter, waiter2);
-        }
-
-        @Override // androidx.concurrent.futures.AbstractResolvableFuture.AtomicHelper
-        public void putNext(Waiter waiter, Waiter waiter2) {
-            this.waiterNextUpdater.lazySet(waiter, waiter2);
-        }
-
-        @Override // androidx.concurrent.futures.AbstractResolvableFuture.AtomicHelper
-        public void putThread(Waiter waiter, Thread thread) {
-            this.waiterThreadUpdater.lazySet(waiter, thread);
-        }
-    }
-
-    /* loaded from: classes.dex */
-    public static final class SetFuture<V> implements Runnable {
-        @Override // java.lang.Runnable
-        public void run() {
-            throw null;
-        }
     }
 
     /* loaded from: classes.dex */
     public static final class SynchronizedHelper extends AtomicHelper {
-        public SynchronizedHelper() {
-            super(null);
-        }
-
         @Override // androidx.concurrent.futures.AbstractResolvableFuture.AtomicHelper
-        public boolean casListeners(AbstractResolvableFuture<?> abstractResolvableFuture, Listener listener, Listener listener2) {
-            synchronized (abstractResolvableFuture) {
-                if (abstractResolvableFuture.listeners != listener) {
-                    return false;
-                }
-                abstractResolvableFuture.listeners = listener2;
-                return true;
-            }
-        }
-
-        @Override // androidx.concurrent.futures.AbstractResolvableFuture.AtomicHelper
-        public boolean casValue(AbstractResolvableFuture<?> abstractResolvableFuture, Object obj, Object obj2) {
+        public final boolean casValue(AbstractResolvableFuture<?> abstractResolvableFuture, Object obj, Object obj2) {
             synchronized (abstractResolvableFuture) {
                 if (abstractResolvableFuture.value != obj) {
                     return false;
@@ -174,7 +140,7 @@ public abstract class AbstractResolvableFuture<V> implements ListenableFuture<V>
         }
 
         @Override // androidx.concurrent.futures.AbstractResolvableFuture.AtomicHelper
-        public boolean casWaiters(AbstractResolvableFuture<?> abstractResolvableFuture, Waiter waiter, Waiter waiter2) {
+        public final boolean casWaiters(AbstractResolvableFuture<?> abstractResolvableFuture, Waiter waiter, Waiter waiter2) {
             synchronized (abstractResolvableFuture) {
                 if (abstractResolvableFuture.waiters != waiter) {
                     return false;
@@ -185,156 +151,40 @@ public abstract class AbstractResolvableFuture<V> implements ListenableFuture<V>
         }
 
         @Override // androidx.concurrent.futures.AbstractResolvableFuture.AtomicHelper
-        public void putNext(Waiter waiter, Waiter waiter2) {
+        public final boolean casListeners(AbstractResolvableFuture abstractResolvableFuture, Listener listener) {
+            Listener listener2 = Listener.TOMBSTONE;
+            synchronized (abstractResolvableFuture) {
+                if (abstractResolvableFuture.listeners != listener) {
+                    return false;
+                }
+                abstractResolvableFuture.listeners = listener2;
+                return true;
+            }
+        }
+
+        @Override // androidx.concurrent.futures.AbstractResolvableFuture.AtomicHelper
+        public final void putNext(Waiter waiter, Waiter waiter2) {
             waiter.next = waiter2;
         }
 
         @Override // androidx.concurrent.futures.AbstractResolvableFuture.AtomicHelper
-        public void putThread(Waiter waiter, Thread thread) {
+        public final void putThread(Waiter waiter, Thread thread) {
             waiter.thread = thread;
         }
     }
 
     /* loaded from: classes.dex */
     public static final class Waiter {
-        public static final Waiter TOMBSTONE = new Waiter(false);
+        public static final Waiter TOMBSTONE = new Waiter(0);
         public volatile Waiter next;
         public volatile Thread thread;
 
-        public Waiter(boolean z) {
+        public Waiter(int i) {
         }
 
         public Waiter() {
             AbstractResolvableFuture.ATOMIC_HELPER.putThread(this, Thread.currentThread());
         }
-    }
-
-    static {
-        AtomicHelper atomicHelper;
-        Throwable th;
-        try {
-            atomicHelper = new SafeAtomicHelper(AtomicReferenceFieldUpdater.newUpdater(Waiter.class, Thread.class, "thread"), AtomicReferenceFieldUpdater.newUpdater(Waiter.class, Waiter.class, "next"), AtomicReferenceFieldUpdater.newUpdater(AbstractResolvableFuture.class, Waiter.class, "waiters"), AtomicReferenceFieldUpdater.newUpdater(AbstractResolvableFuture.class, Listener.class, "listeners"), AtomicReferenceFieldUpdater.newUpdater(AbstractResolvableFuture.class, Object.class, FlagManager.FIELD_VALUE));
-            th = null;
-        } catch (Throwable th2) {
-            th = th2;
-            atomicHelper = new SynchronizedHelper();
-        }
-        ATOMIC_HELPER = atomicHelper;
-        if (th != null) {
-            log.log(Level.SEVERE, "SafeAtomicHelper is broken!", th);
-        }
-        NULL = new Object();
-    }
-
-    public static void complete(AbstractResolvableFuture<?> abstractResolvableFuture) {
-        Waiter waiter;
-        Listener listener;
-        do {
-            waiter = abstractResolvableFuture.waiters;
-        } while (!ATOMIC_HELPER.casWaiters(abstractResolvableFuture, waiter, Waiter.TOMBSTONE));
-        while (waiter != null) {
-            Thread thread = waiter.thread;
-            if (thread != null) {
-                waiter.thread = null;
-                LockSupport.unpark(thread);
-            }
-            waiter = waiter.next;
-        }
-        do {
-            listener = abstractResolvableFuture.listeners;
-        } while (!ATOMIC_HELPER.casListeners(abstractResolvableFuture, listener, Listener.TOMBSTONE));
-        Listener listener2 = null;
-        while (listener != null) {
-            Listener listener3 = listener.next;
-            listener.next = listener2;
-            listener2 = listener;
-            listener = listener3;
-        }
-        while (listener2 != null) {
-            Listener listener4 = listener2.next;
-            Runnable runnable = listener2.task;
-            if (!(runnable instanceof SetFuture)) {
-                Executor executor = listener2.executor;
-                try {
-                    executor.execute(runnable);
-                } catch (RuntimeException e) {
-                    log.log(Level.SEVERE, "RuntimeException while executing runnable " + runnable + " with executor " + executor, (Throwable) e);
-                }
-                listener2 = listener4;
-            } else {
-                Objects.requireNonNull((SetFuture) runnable);
-                throw null;
-            }
-        }
-    }
-
-    public static <V> V getUninterruptibly(Future<V> future) throws ExecutionException {
-        V v;
-        boolean z = false;
-        while (true) {
-            try {
-                v = future.get();
-                break;
-            } catch (InterruptedException unused) {
-                z = true;
-            } catch (Throwable th) {
-                if (z) {
-                    Thread.currentThread().interrupt();
-                }
-                throw th;
-            }
-        }
-        if (z) {
-            Thread.currentThread().interrupt();
-        }
-        return v;
-    }
-
-    public final void addDoneString(StringBuilder sb) {
-        try {
-            Object uninterruptibly = getUninterruptibly(this);
-            sb.append("SUCCESS, result=[");
-            sb.append(uninterruptibly == this ? "this future" : String.valueOf(uninterruptibly));
-            sb.append("]");
-        } catch (CancellationException unused) {
-            sb.append("CANCELLED");
-        } catch (RuntimeException e) {
-            sb.append("UNKNOWN, cause=[");
-            sb.append(e.getClass());
-            sb.append(" thrown from get()]");
-        } catch (ExecutionException e2) {
-            sb.append("FAILURE, cause=[");
-            sb.append(e2.getCause());
-            sb.append("]");
-        }
-    }
-
-    @Override // java.util.concurrent.Future
-    public final boolean cancel(boolean z) {
-        Cancellation cancellation;
-        Object obj = this.value;
-        if (!(obj == null) && !(obj instanceof SetFuture)) {
-            return false;
-        }
-        if (GENERATE_CANCELLATION_CAUSES) {
-            cancellation = new Cancellation(z, new CancellationException("Future.cancel() was called."));
-        } else if (z) {
-            cancellation = Cancellation.CAUSELESS_INTERRUPTED;
-        } else {
-            cancellation = Cancellation.CAUSELESS_CANCELLED;
-        }
-        while (!ATOMIC_HELPER.casValue(this, obj, cancellation)) {
-            obj = this.value;
-            if (!(obj instanceof SetFuture)) {
-                return false;
-            }
-        }
-        complete(this);
-        if (!(obj instanceof SetFuture)) {
-            return true;
-        }
-        Objects.requireNonNull((SetFuture) obj);
-        throw null;
     }
 
     /* JADX WARN: Code restructure failed: missing block: B:23:0x004c, code lost:
@@ -359,7 +209,7 @@ public abstract class AbstractResolvableFuture<V> implements ListenableFuture<V>
         if ((r5 & (!(r4 instanceof androidx.concurrent.futures.AbstractResolvableFuture.SetFuture))) == false) goto L33;
      */
     /* JADX WARN: Code restructure failed: missing block: B:32:0x0066, code lost:
-        return getDoneValue(r4);
+        return (V) getDoneValue(r4);
      */
     /* JADX WARN: Code restructure failed: missing block: B:33:0x0067, code lost:
         r4 = r10 - java.lang.System.nanoTime();
@@ -389,48 +239,6 @@ public abstract class AbstractResolvableFuture<V> implements ListenableFuture<V>
         throw new UnsupportedOperationException("Method not decompiled: androidx.concurrent.futures.AbstractResolvableFuture.get(long, java.util.concurrent.TimeUnit):java.lang.Object");
     }
 
-    /* JADX WARN: Multi-variable type inference failed */
-    public final V getDoneValue(Object obj) throws ExecutionException {
-        if (obj instanceof Cancellation) {
-            Throwable th = ((Cancellation) obj).cause;
-            CancellationException cancellationException = new CancellationException("Task was cancelled.");
-            cancellationException.initCause(th);
-            throw cancellationException;
-        } else if (obj instanceof Failure) {
-            throw new ExecutionException(((Failure) obj).exception);
-        } else if (obj == NULL) {
-            return null;
-        } else {
-            return obj;
-        }
-    }
-
-    @Override // java.util.concurrent.Future
-    public final boolean isCancelled() {
-        return this.value instanceof Cancellation;
-    }
-
-    @Override // java.util.concurrent.Future
-    public final boolean isDone() {
-        Object obj = this.value;
-        return (!(obj instanceof SetFuture)) & (obj != null);
-    }
-
-    public String pendingToString() {
-        Object obj = this.value;
-        if (obj instanceof SetFuture) {
-            Objects.requireNonNull((SetFuture) obj);
-            return "setFuture=[null]";
-        } else if (!(this instanceof ScheduledFuture)) {
-            return null;
-        } else {
-            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("remaining delay=[");
-            m.append(((ScheduledFuture) this).getDelay(TimeUnit.MILLISECONDS));
-            m.append(" ms]");
-            return m.toString();
-        }
-    }
-
     public final void removeWaiter(Waiter waiter) {
         waiter.thread = null;
         while (true) {
@@ -457,27 +265,195 @@ public abstract class AbstractResolvableFuture<V> implements ListenableFuture<V>
         }
     }
 
-    public boolean set(V v) {
-        if (v == null) {
-            v = (V) NULL;
+    static {
+        AtomicHelper atomicHelper;
+        Throwable th;
+        try {
+            atomicHelper = new SafeAtomicHelper(AtomicReferenceFieldUpdater.newUpdater(Waiter.class, Thread.class, "thread"), AtomicReferenceFieldUpdater.newUpdater(Waiter.class, Waiter.class, "next"), AtomicReferenceFieldUpdater.newUpdater(AbstractResolvableFuture.class, Waiter.class, "waiters"), AtomicReferenceFieldUpdater.newUpdater(AbstractResolvableFuture.class, Listener.class, "listeners"), AtomicReferenceFieldUpdater.newUpdater(AbstractResolvableFuture.class, Object.class, FlagManager.EXTRA_VALUE));
+            th = null;
+        } catch (Throwable th2) {
+            th = th2;
+            atomicHelper = new SynchronizedHelper();
         }
-        if (!ATOMIC_HELPER.casValue(this, null, v)) {
-            return false;
+        ATOMIC_HELPER = atomicHelper;
+        if (th != null) {
+            log.log(Level.SEVERE, "SafeAtomicHelper is broken!", th);
         }
-        complete(this);
-        return true;
+        NULL = new Object();
     }
 
-    public boolean setException(Throwable th) {
-        Objects.requireNonNull(th);
-        if (!ATOMIC_HELPER.casValue(this, null, new Failure(th))) {
-            return false;
+    public static void complete(AbstractResolvableFuture<?> abstractResolvableFuture) {
+        Waiter waiter;
+        Listener listener;
+        do {
+            waiter = abstractResolvableFuture.waiters;
+        } while (!ATOMIC_HELPER.casWaiters(abstractResolvableFuture, waiter, Waiter.TOMBSTONE));
+        while (waiter != null) {
+            Thread thread = waiter.thread;
+            if (thread != null) {
+                waiter.thread = null;
+                LockSupport.unpark(thread);
+            }
+            waiter = waiter.next;
         }
-        complete(this);
-        return true;
+        do {
+            listener = abstractResolvableFuture.listeners;
+        } while (!ATOMIC_HELPER.casListeners(abstractResolvableFuture, listener));
+        Listener listener2 = null;
+        while (listener != null) {
+            Listener listener3 = listener.next;
+            listener.next = listener2;
+            listener2 = listener;
+            listener = listener3;
+        }
+        while (listener2 != null) {
+            Listener listener4 = listener2.next;
+            Runnable runnable = listener2.task;
+            if (!(runnable instanceof SetFuture)) {
+                Executor executor = listener2.executor;
+                try {
+                    executor.execute(runnable);
+                } catch (RuntimeException e) {
+                    log.log(Level.SEVERE, "RuntimeException while executing runnable " + runnable + " with executor " + executor, (Throwable) e);
+                }
+                listener2 = listener4;
+            } else {
+                ((SetFuture) runnable).getClass();
+                throw null;
+            }
+        }
     }
 
-    public String toString() {
+    public static Object getDoneValue(Object obj) throws ExecutionException {
+        if (obj instanceof Cancellation) {
+            Throwable th = ((Cancellation) obj).cause;
+            CancellationException cancellationException = new CancellationException("Task was cancelled.");
+            cancellationException.initCause(th);
+            throw cancellationException;
+        } else if (obj instanceof Failure) {
+            throw new ExecutionException(((Failure) obj).exception);
+        } else if (obj == NULL) {
+            return null;
+        } else {
+            return obj;
+        }
+    }
+
+    public final void addDoneString(StringBuilder sb) {
+        V v;
+        String str;
+        boolean z = false;
+        while (true) {
+            try {
+                try {
+                    v = get();
+                    break;
+                } catch (InterruptedException unused) {
+                    z = true;
+                } catch (Throwable th) {
+                    if (z) {
+                        Thread.currentThread().interrupt();
+                    }
+                    throw th;
+                }
+            } catch (CancellationException unused2) {
+                sb.append("CANCELLED");
+                return;
+            } catch (RuntimeException e) {
+                sb.append("UNKNOWN, cause=[");
+                sb.append(e.getClass());
+                sb.append(" thrown from get()]");
+                return;
+            } catch (ExecutionException e2) {
+                sb.append("FAILURE, cause=[");
+                sb.append(e2.getCause());
+                sb.append("]");
+                return;
+            }
+        }
+        if (z) {
+            Thread.currentThread().interrupt();
+        }
+        sb.append("SUCCESS, result=[");
+        if (v == this) {
+            str = "this future";
+        } else {
+            str = String.valueOf(v);
+        }
+        sb.append(str);
+        sb.append("]");
+    }
+
+    @Override // java.util.concurrent.Future
+    public final boolean cancel(boolean z) {
+        boolean z2;
+        Cancellation cancellation;
+        Object obj = this.value;
+        if (obj == null) {
+            z2 = true;
+        } else {
+            z2 = false;
+        }
+        if (!z2 && !(obj instanceof SetFuture)) {
+            return false;
+        }
+        if (GENERATE_CANCELLATION_CAUSES) {
+            cancellation = new Cancellation(z, new CancellationException("Future.cancel() was called."));
+        } else if (z) {
+            cancellation = Cancellation.CAUSELESS_INTERRUPTED;
+        } else {
+            cancellation = Cancellation.CAUSELESS_CANCELLED;
+        }
+        while (!ATOMIC_HELPER.casValue(this, obj, cancellation)) {
+            obj = this.value;
+            if (!(obj instanceof SetFuture)) {
+                return false;
+            }
+        }
+        complete(this);
+        if (!(obj instanceof SetFuture)) {
+            return true;
+        }
+        ((SetFuture) obj).getClass();
+        throw null;
+    }
+
+    @Override // java.util.concurrent.Future
+    public final boolean isCancelled() {
+        return this.value instanceof Cancellation;
+    }
+
+    @Override // java.util.concurrent.Future
+    public final boolean isDone() {
+        Object obj;
+        boolean z;
+        if (this.value != null) {
+            z = true;
+        } else {
+            z = false;
+        }
+        return (!(obj instanceof SetFuture)) & z;
+    }
+
+    public String pendingToString() {
+        Object obj = this.value;
+        if (obj instanceof SetFuture) {
+            StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("setFuture=[");
+            ((SetFuture) obj).getClass();
+            m.append("null");
+            m.append("]");
+            return m.toString();
+        } else if (!(this instanceof ScheduledFuture)) {
+            return null;
+        } else {
+            StringBuilder m2 = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("remaining delay=[");
+            m2.append(((ScheduledFuture) this).getDelay(TimeUnit.MILLISECONDS));
+            m2.append(" ms]");
+            return m2.toString();
+        }
+    }
+
+    public final String toString() {
         String str;
         StringBuilder sb = new StringBuilder();
         sb.append(super.toString());
@@ -530,7 +506,7 @@ public abstract class AbstractResolvableFuture<V> implements ListenableFuture<V>
         if ((r4 & (!(r0 instanceof androidx.concurrent.futures.AbstractResolvableFuture.SetFuture))) == false) goto L17;
      */
     /* JADX WARN: Code restructure failed: missing block: B:26:0x004a, code lost:
-        return getDoneValue(r0);
+        return (V) getDoneValue(r0);
      */
     /* JADX WARN: Code restructure failed: missing block: B:27:0x004b, code lost:
         removeWaiter(r3);
@@ -561,7 +537,7 @@ public abstract class AbstractResolvableFuture<V> implements ListenableFuture<V>
             r4 = r4 ^ r2
             r3 = r3 & r4
             if (r3 == 0) goto L1a
-            java.lang.Object r6 = r6.getDoneValue(r0)
+            java.lang.Object r6 = getDoneValue(r0)
             return r6
         L1a:
             androidx.concurrent.futures.AbstractResolvableFuture$Waiter r0 = r6.waiters
@@ -589,7 +565,7 @@ public abstract class AbstractResolvableFuture<V> implements ListenableFuture<V>
             r5 = r5 ^ r2
             r4 = r4 & r5
             if (r4 == 0) goto L30
-            java.lang.Object r6 = r6.getDoneValue(r0)
+            java.lang.Object r6 = getDoneValue(r0)
             return r6
         L4b:
             r6.removeWaiter(r3)
@@ -601,8 +577,8 @@ public abstract class AbstractResolvableFuture<V> implements ListenableFuture<V>
             androidx.concurrent.futures.AbstractResolvableFuture$Waiter r4 = androidx.concurrent.futures.AbstractResolvableFuture.Waiter.TOMBSTONE
             if (r0 != r4) goto L25
         L5a:
-            java.lang.Object r0 = r6.value
-            java.lang.Object r6 = r6.getDoneValue(r0)
+            java.lang.Object r6 = r6.value
+            java.lang.Object r6 = getDoneValue(r6)
             return r6
         L61:
             java.lang.InterruptedException r6 = new java.lang.InterruptedException
@@ -610,5 +586,13 @@ public abstract class AbstractResolvableFuture<V> implements ListenableFuture<V>
             throw r6
         */
         throw new UnsupportedOperationException("Method not decompiled: androidx.concurrent.futures.AbstractResolvableFuture.get():java.lang.Object");
+    }
+
+    /* loaded from: classes.dex */
+    public static final class SetFuture<V> implements Runnable {
+        @Override // java.lang.Runnable
+        public final void run() {
+            throw null;
+        }
     }
 }

@@ -14,24 +14,24 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.RippleDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import androidx.core.graphics.ColorUtils;
+import com.android.systemui.shared.R;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
-import com.google.android.material.drawable.DrawableUtils;
-import com.google.android.material.elevation.ElevationOverlayProvider;
 import com.google.android.material.internal.TextDrawableHelper;
 import com.google.android.material.internal.ViewUtils;
 import com.google.android.material.resources.TextAppearance;
 import com.google.android.material.ripple.RippleUtils;
 import com.google.android.material.shape.MaterialShapeDrawable;
-import com.google.android.material.shape.ShapeAppearanceModel;
+import com.google.android.material.shape.ShapeAppearancePathProvider;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 /* loaded from: classes.dex */
-public class ChipDrawable extends MaterialShapeDrawable implements Drawable.Callback, TextDrawableHelper.TextDrawableDelegate {
+public final class ChipDrawable extends MaterialShapeDrawable implements Drawable.Callback, TextDrawableHelper.TextDrawableDelegate {
     public static final int[] DEFAULT_STATE = {16842910};
     public static final ShapeDrawable closeIconRippleMask = new ShapeDrawable(new OvalShape());
     public boolean checkable;
@@ -51,7 +51,7 @@ public class ChipDrawable extends MaterialShapeDrawable implements Drawable.Call
     public ColorStateList chipSurfaceColor;
     public Drawable closeIcon;
     public float closeIconEndPadding;
-    public Drawable closeIconRipple;
+    public RippleDrawable closeIconRipple;
     public float closeIconSize;
     public float closeIconStartPadding;
     public int[] closeIconStateSet;
@@ -74,6 +74,7 @@ public class ChipDrawable extends MaterialShapeDrawable implements Drawable.Call
     public boolean isShapeThemingEnabled;
     public int maxWidth;
     public ColorStateList rippleColor;
+    public boolean shouldDrawText;
     public final TextDrawableHelper textDrawableHelper;
     public float textEndPadding;
     public float textStartPadding;
@@ -91,25 +92,45 @@ public class ChipDrawable extends MaterialShapeDrawable implements Drawable.Call
     public PorterDuff.Mode tintMode = PorterDuff.Mode.SRC_IN;
     public WeakReference<Delegate> delegate = new WeakReference<>(null);
     public CharSequence text = "";
-    public boolean shouldDrawText = true;
 
     /* loaded from: classes.dex */
     public interface Delegate {
         void onChipDrawableSizeChange();
     }
 
-    public ChipDrawable(Context context, AttributeSet attributeSet, int i, int i2) {
-        super(ShapeAppearanceModel.builder(context, attributeSet, i, i2).build());
-        this.drawableState.elevationOverlayProvider = new ElevationOverlayProvider(context);
-        updateZ();
-        this.context = context;
-        TextDrawableHelper textDrawableHelper = new TextDrawableHelper(this);
-        this.textDrawableHelper = textDrawableHelper;
-        textDrawableHelper.textPaint.density = context.getResources().getDisplayMetrics().density;
-        int[] iArr = DEFAULT_STATE;
-        setState(iArr);
-        setCloseIconState(iArr);
-        closeIconRippleMask.setTint(-1);
+    @Override // com.google.android.material.shape.MaterialShapeDrawable, android.graphics.drawable.Drawable
+    public final int getOpacity() {
+        return -3;
+    }
+
+    @Override // com.google.android.material.shape.MaterialShapeDrawable, android.graphics.drawable.Drawable
+    public final boolean isStateful() {
+        ColorStateList colorStateList;
+        if (isStateful(this.chipSurfaceColor) || isStateful(this.chipBackgroundColor) || isStateful(this.chipStrokeColor)) {
+            return true;
+        }
+        if (this.useCompatRipple && isStateful(this.compatRippleColor)) {
+            return true;
+        }
+        TextAppearance textAppearance = this.textDrawableHelper.textAppearance;
+        if ((textAppearance == null || (colorStateList = textAppearance.textColor) == null || !colorStateList.isStateful()) ? false : true) {
+            return true;
+        }
+        return (this.checkedIconVisible && this.checkedIcon != null && this.checkable) || isStateful(this.chipIcon) || isStateful(this.checkedIcon) || isStateful(this.tint);
+    }
+
+    @Override // com.google.android.material.shape.MaterialShapeDrawable, android.graphics.drawable.Drawable, com.google.android.material.internal.TextDrawableHelper.TextDrawableDelegate
+    public final boolean onStateChange(int[] iArr) {
+        if (this.isShapeThemingEnabled) {
+            super.onStateChange(iArr);
+        }
+        return onStateChange(iArr, this.closeIconStateSet);
+    }
+
+    public static void unapplyChildDrawable(Drawable drawable) {
+        if (drawable != null) {
+            drawable.setCallback(null);
+        }
     }
 
     public final void applyChildDrawable(Drawable drawable) {
@@ -125,87 +146,33 @@ public class ChipDrawable extends MaterialShapeDrawable implements Drawable.Call
                 drawable.setTintList(this.closeIconTint);
                 return;
             }
-            if (drawable.isStateful()) {
-                drawable.setState(getState());
-            }
             Drawable drawable2 = this.chipIcon;
             if (drawable == drawable2 && this.hasChipIconTint) {
                 drawable2.setTintList(this.chipIconTint);
             }
-        }
-    }
-
-    public final void calculateChipIconBounds(Rect rect, RectF rectF) {
-        rectF.setEmpty();
-        if (showsChipIcon() || showsCheckedIcon()) {
-            float f = this.chipStartPadding + this.iconStartPadding;
-            float currentChipIconWidth = getCurrentChipIconWidth();
-            if (getLayoutDirection() == 0) {
-                float f2 = rect.left + f;
-                rectF.left = f2;
-                rectF.right = f2 + currentChipIconWidth;
-            } else {
-                float f3 = rect.right - f;
-                rectF.right = f3;
-                rectF.left = f3 - currentChipIconWidth;
+            if (drawable.isStateful()) {
+                drawable.setState(getState());
             }
-            Drawable drawable = this.currentChecked ? this.checkedIcon : this.chipIcon;
-            float f4 = this.chipIconSize;
-            if (f4 <= HingeAngleProviderKt.FULLY_CLOSED_DEGREES && drawable != null) {
-                float ceil = (float) Math.ceil(ViewUtils.dpToPx(this.context, 24));
-                if (drawable.getIntrinsicHeight() <= ceil) {
-                    ceil = drawable.getIntrinsicHeight();
-                }
-                f4 = ceil;
-            }
-            float exactCenterY = rect.exactCenterY() - (f4 / 2.0f);
-            rectF.top = exactCenterY;
-            rectF.bottom = exactCenterY + f4;
         }
-    }
-
-    public float calculateChipIconWidth() {
-        if (!showsChipIcon() && !showsCheckedIcon()) {
-            return HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
-        }
-        return getCurrentChipIconWidth() + this.iconStartPadding + this.iconEndPadding;
-    }
-
-    public final void calculateCloseIconBounds(Rect rect, RectF rectF) {
-        rectF.setEmpty();
-        if (showsCloseIcon()) {
-            float f = this.chipEndPadding + this.closeIconEndPadding;
-            if (getLayoutDirection() == 0) {
-                float f2 = rect.right - f;
-                rectF.right = f2;
-                rectF.left = f2 - this.closeIconSize;
-            } else {
-                float f3 = rect.left + f;
-                rectF.left = f3;
-                rectF.right = f3 + this.closeIconSize;
-            }
-            float exactCenterY = rect.exactCenterY();
-            float f4 = this.closeIconSize;
-            float f5 = exactCenterY - (f4 / 2.0f);
-            rectF.top = f5;
-            rectF.bottom = f5 + f4;
-        }
-    }
-
-    public float calculateCloseIconWidth() {
-        return showsCloseIcon() ? this.closeIconStartPadding + this.closeIconSize + this.closeIconEndPadding : HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
     }
 
     @Override // com.google.android.material.shape.MaterialShapeDrawable, android.graphics.drawable.Drawable
-    public void draw(Canvas canvas) {
+    public final void draw(Canvas canvas) {
         int i;
         int i2;
         int i3;
         int i4;
         int i5;
+        float f;
+        boolean z;
+        int i6;
         Rect bounds = getBounds();
         if (!bounds.isEmpty() && (i = this.alpha) != 0) {
-            int saveLayerAlpha = i < 255 ? canvas.saveLayerAlpha(bounds.left, bounds.top, bounds.right, bounds.bottom, i) : 0;
+            if (i < 255) {
+                i2 = canvas.saveLayerAlpha(bounds.left, bounds.top, bounds.right, bounds.bottom, i);
+            } else {
+                i2 = 0;
+            }
             if (!this.isShapeThemingEnabled) {
                 this.chipPaint.setColor(this.currentChipSurfaceColor);
                 this.chipPaint.setStyle(Paint.Style.FILL);
@@ -227,7 +194,9 @@ public class ChipDrawable extends MaterialShapeDrawable implements Drawable.Call
             if (this.isShapeThemingEnabled) {
                 super.draw(canvas);
             }
-            if (this.chipStrokeWidth > HingeAngleProviderKt.FULLY_CLOSED_DEGREES && !this.isShapeThemingEnabled) {
+            float f2 = this.chipStrokeWidth;
+            float f3 = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
+            if (f2 > HingeAngleProviderKt.FULLY_CLOSED_DEGREES && !this.isShapeThemingEnabled) {
                 this.chipPaint.setColor(this.currentChipStrokeColor);
                 this.chipPaint.setStyle(Paint.Style.STROKE);
                 if (!this.isShapeThemingEnabled) {
@@ -239,10 +208,10 @@ public class ChipDrawable extends MaterialShapeDrawable implements Drawable.Call
                     paint2.setColorFilter(colorFilter2);
                 }
                 RectF rectF = this.rectF;
-                float f = this.chipStrokeWidth / 2.0f;
-                rectF.set(bounds.left + f, bounds.top + f, bounds.right - f, bounds.bottom - f);
-                float f2 = this.chipCornerRadius - (this.chipStrokeWidth / 2.0f);
-                canvas.drawRoundRect(this.rectF, f2, f2, this.chipPaint);
+                float f4 = this.chipStrokeWidth / 2.0f;
+                rectF.set(bounds.left + f4, bounds.top + f4, bounds.right - f4, bounds.bottom - f4);
+                float f5 = this.chipCornerRadius - (this.chipStrokeWidth / 2.0f);
+                canvas.drawRoundRect(this.rectF, f5, f5, this.chipPaint);
             }
             this.chipPaint.setColor(this.currentCompatRippleColor);
             this.chipPaint.setStyle(Paint.Style.FILL);
@@ -250,33 +219,37 @@ public class ChipDrawable extends MaterialShapeDrawable implements Drawable.Call
             if (!this.isShapeThemingEnabled) {
                 canvas.drawRoundRect(this.rectF, getChipCornerRadius(), getChipCornerRadius(), this.chipPaint);
             } else {
-                calculatePathForSize(new RectF(bounds), this.shapePath);
+                RectF rectF2 = new RectF(bounds);
+                Path path = this.shapePath;
+                ShapeAppearancePathProvider shapeAppearancePathProvider = this.pathProvider;
+                MaterialShapeDrawable.MaterialShapeDrawableState materialShapeDrawableState = this.drawableState;
+                shapeAppearancePathProvider.calculatePath(materialShapeDrawableState.shapeAppearanceModel, materialShapeDrawableState.interpolation, rectF2, this.pathShadowListener, path);
                 drawShape(canvas, this.chipPaint, this.shapePath, this.drawableState.shapeAppearanceModel, getBoundsAsRectF());
             }
             if (showsChipIcon()) {
                 calculateChipIconBounds(bounds, this.rectF);
-                RectF rectF2 = this.rectF;
-                float f3 = rectF2.left;
-                float f4 = rectF2.top;
-                canvas.translate(f3, f4);
+                RectF rectF3 = this.rectF;
+                float f6 = rectF3.left;
+                float f7 = rectF3.top;
+                canvas.translate(f6, f7);
                 this.chipIcon.setBounds(0, 0, (int) this.rectF.width(), (int) this.rectF.height());
                 this.chipIcon.draw(canvas);
-                canvas.translate(-f3, -f4);
+                canvas.translate(-f6, -f7);
             }
             if (showsCheckedIcon()) {
                 calculateChipIconBounds(bounds, this.rectF);
-                RectF rectF3 = this.rectF;
-                float f5 = rectF3.left;
-                float f6 = rectF3.top;
-                canvas.translate(f5, f6);
+                RectF rectF4 = this.rectF;
+                float f8 = rectF4.left;
+                float f9 = rectF4.top;
+                canvas.translate(f8, f9);
                 this.checkedIcon.setBounds(0, 0, (int) this.rectF.width(), (int) this.rectF.height());
                 this.checkedIcon.draw(canvas);
-                canvas.translate(-f5, -f6);
+                canvas.translate(-f8, -f9);
             }
             if (!this.shouldDrawText || this.text == null) {
-                i2 = saveLayerAlpha;
-                i3 = 0;
-                i4 = 255;
+                i3 = i2;
+                i4 = 0;
+                i5 = 255;
             } else {
                 PointF pointF = this.pointF;
                 pointF.set(HingeAngleProviderKt.FULLY_CLOSED_DEGREES, HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
@@ -294,20 +267,20 @@ public class ChipDrawable extends MaterialShapeDrawable implements Drawable.Call
                     Paint.FontMetrics fontMetrics = this.fontMetrics;
                     pointF.y = bounds.centerY() - ((fontMetrics.descent + fontMetrics.ascent) / 2.0f);
                 }
-                RectF rectF4 = this.rectF;
-                rectF4.setEmpty();
+                RectF rectF5 = this.rectF;
+                rectF5.setEmpty();
                 if (this.text != null) {
                     float calculateChipIconWidth2 = calculateChipIconWidth() + this.chipStartPadding + this.textStartPadding;
                     float calculateCloseIconWidth = calculateCloseIconWidth() + this.chipEndPadding + this.textEndPadding;
                     if (getLayoutDirection() == 0) {
-                        rectF4.left = bounds.left + calculateChipIconWidth2;
-                        rectF4.right = bounds.right - calculateCloseIconWidth;
+                        rectF5.left = bounds.left + calculateChipIconWidth2;
+                        rectF5.right = bounds.right - calculateCloseIconWidth;
                     } else {
-                        rectF4.left = bounds.left + calculateCloseIconWidth;
-                        rectF4.right = bounds.right - calculateChipIconWidth2;
+                        rectF5.left = bounds.left + calculateCloseIconWidth;
+                        rectF5.right = bounds.right - calculateChipIconWidth2;
                     }
-                    rectF4.top = bounds.top;
-                    rectF4.bottom = bounds.bottom;
+                    rectF5.top = bounds.top;
+                    rectF5.bottom = bounds.bottom;
                 }
                 TextDrawableHelper textDrawableHelper = this.textDrawableHelper;
                 if (textDrawableHelper.textAppearance != null) {
@@ -316,52 +289,81 @@ public class ChipDrawable extends MaterialShapeDrawable implements Drawable.Call
                     textDrawableHelper2.textAppearance.updateDrawState(this.context, textDrawableHelper2.textPaint, textDrawableHelper2.fontCallback);
                 }
                 this.textDrawableHelper.textPaint.setTextAlign(align);
-                boolean z = Math.round(this.textDrawableHelper.getTextWidth(this.text.toString())) > Math.round(this.rectF.width());
+                TextDrawableHelper textDrawableHelper3 = this.textDrawableHelper;
+                String charSequence = this.text.toString();
+                if (!textDrawableHelper3.textWidthDirty) {
+                    f = textDrawableHelper3.textWidth;
+                } else {
+                    if (charSequence != null) {
+                        f3 = textDrawableHelper3.textPaint.measureText((CharSequence) charSequence, 0, charSequence.length());
+                    }
+                    textDrawableHelper3.textWidth = f3;
+                    textDrawableHelper3.textWidthDirty = false;
+                    f = f3;
+                }
+                if (Math.round(f) > Math.round(this.rectF.width())) {
+                    z = true;
+                } else {
+                    z = false;
+                }
                 if (z) {
-                    i5 = canvas.save();
+                    i6 = canvas.save();
                     canvas.clipRect(this.rectF);
                 } else {
-                    i5 = 0;
+                    i6 = 0;
                 }
-                CharSequence charSequence = this.text;
+                CharSequence charSequence2 = this.text;
                 if (z && this.truncateAt != null) {
-                    charSequence = TextUtils.ellipsize(charSequence, this.textDrawableHelper.textPaint, this.rectF.width(), this.truncateAt);
+                    charSequence2 = TextUtils.ellipsize(charSequence2, this.textDrawableHelper.textPaint, this.rectF.width(), this.truncateAt);
                 }
-                CharSequence charSequence2 = charSequence;
-                int length = charSequence2.length();
+                CharSequence charSequence3 = charSequence2;
+                int length = charSequence3.length();
                 PointF pointF2 = this.pointF;
-                i2 = saveLayerAlpha;
-                i3 = 0;
-                i4 = 255;
-                canvas.drawText(charSequence2, 0, length, pointF2.x, pointF2.y, this.textDrawableHelper.textPaint);
+                i3 = i2;
+                i4 = 0;
+                i5 = 255;
+                canvas.drawText(charSequence3, 0, length, pointF2.x, pointF2.y, this.textDrawableHelper.textPaint);
                 if (z) {
-                    canvas.restoreToCount(i5);
+                    canvas.restoreToCount(i6);
                 }
             }
             if (showsCloseIcon()) {
-                calculateCloseIconBounds(bounds, this.rectF);
-                RectF rectF5 = this.rectF;
-                float f7 = rectF5.left;
-                float f8 = rectF5.top;
-                canvas.translate(f7, f8);
-                this.closeIcon.setBounds(i3, i3, (int) this.rectF.width(), (int) this.rectF.height());
+                RectF rectF6 = this.rectF;
+                rectF6.setEmpty();
+                if (showsCloseIcon()) {
+                    float f10 = this.chipEndPadding + this.closeIconEndPadding;
+                    if (getLayoutDirection() == 0) {
+                        float f11 = bounds.right - f10;
+                        rectF6.right = f11;
+                        rectF6.left = f11 - this.closeIconSize;
+                    } else {
+                        float f12 = bounds.left + f10;
+                        rectF6.left = f12;
+                        rectF6.right = f12 + this.closeIconSize;
+                    }
+                    float exactCenterY = bounds.exactCenterY();
+                    float f13 = this.closeIconSize;
+                    float f14 = exactCenterY - (f13 / 2.0f);
+                    rectF6.top = f14;
+                    rectF6.bottom = f14 + f13;
+                }
+                RectF rectF7 = this.rectF;
+                float f15 = rectF7.left;
+                float f16 = rectF7.top;
+                canvas.translate(f15, f16);
+                this.closeIcon.setBounds(i4, i4, (int) this.rectF.width(), (int) this.rectF.height());
                 this.closeIconRipple.setBounds(this.closeIcon.getBounds());
                 this.closeIconRipple.jumpToCurrentState();
                 this.closeIconRipple.draw(canvas);
-                canvas.translate(-f7, -f8);
+                canvas.translate(-f15, -f16);
             }
-            if (this.alpha < i4) {
-                canvas.restoreToCount(i2);
+            if (this.alpha < i5) {
+                canvas.restoreToCount(i3);
             }
         }
     }
 
-    @Override // android.graphics.drawable.Drawable
-    public int getAlpha() {
-        return this.alpha;
-    }
-
-    public float getChipCornerRadius() {
+    public final float getChipCornerRadius() {
         if (this.isShapeThemingEnabled) {
             return this.drawableState.shapeAppearanceModel.topLeftCornerSize.getCornerSize(getBoundsAsRectF());
         }
@@ -369,34 +371,35 @@ public class ChipDrawable extends MaterialShapeDrawable implements Drawable.Call
     }
 
     @Override // android.graphics.drawable.Drawable
-    public ColorFilter getColorFilter() {
-        return this.colorFilter;
-    }
-
-    public final float getCurrentChipIconWidth() {
-        Drawable drawable = this.currentChecked ? this.checkedIcon : this.chipIcon;
-        float f = this.chipIconSize;
-        return (f > HingeAngleProviderKt.FULLY_CLOSED_DEGREES || drawable == null) ? f : drawable.getIntrinsicWidth();
-    }
-
-    @Override // android.graphics.drawable.Drawable
-    public int getIntrinsicHeight() {
+    public final int getIntrinsicHeight() {
         return (int) this.chipMinHeight;
     }
 
     @Override // android.graphics.drawable.Drawable
-    public int getIntrinsicWidth() {
-        return Math.min(Math.round(calculateCloseIconWidth() + this.textDrawableHelper.getTextWidth(this.text.toString()) + calculateChipIconWidth() + this.chipStartPadding + this.textStartPadding + this.textEndPadding + this.chipEndPadding), this.maxWidth);
-    }
-
-    @Override // com.google.android.material.shape.MaterialShapeDrawable, android.graphics.drawable.Drawable
-    public int getOpacity() {
-        return -3;
+    public final int getIntrinsicWidth() {
+        float f;
+        float f2;
+        float calculateChipIconWidth = calculateChipIconWidth() + this.chipStartPadding + this.textStartPadding;
+        TextDrawableHelper textDrawableHelper = this.textDrawableHelper;
+        String charSequence = this.text.toString();
+        if (!textDrawableHelper.textWidthDirty) {
+            f = textDrawableHelper.textWidth;
+        } else {
+            if (charSequence == null) {
+                f2 = HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
+            } else {
+                f2 = textDrawableHelper.textPaint.measureText((CharSequence) charSequence, 0, charSequence.length());
+            }
+            textDrawableHelper.textWidth = f2;
+            textDrawableHelper.textWidthDirty = false;
+            f = f2;
+        }
+        return Math.min(Math.round(calculateCloseIconWidth() + f + calculateChipIconWidth + this.textEndPadding + this.chipEndPadding), this.maxWidth);
     }
 
     @Override // com.google.android.material.shape.MaterialShapeDrawable, android.graphics.drawable.Drawable
     @TargetApi(21)
-    public void getOutline(Outline outline) {
+    public final void getOutline(Outline outline) {
         if (this.isShapeThemingEnabled) {
             super.getOutline(outline);
             return;
@@ -410,108 +413,33 @@ public class ChipDrawable extends MaterialShapeDrawable implements Drawable.Call
         outline.setAlpha(this.alpha / 255.0f);
     }
 
-    @Override // android.graphics.drawable.Drawable.Callback
-    public void invalidateDrawable(Drawable drawable) {
-        Drawable.Callback callback = getCallback();
-        if (callback != null) {
-            callback.invalidateDrawable(this);
-        }
-    }
-
-    @Override // com.google.android.material.shape.MaterialShapeDrawable, android.graphics.drawable.Drawable
-    public boolean isStateful() {
-        ColorStateList colorStateList;
-        if (!isStateful(this.chipSurfaceColor) && !isStateful(this.chipBackgroundColor) && !isStateful(this.chipStrokeColor) && (!this.useCompatRipple || !isStateful(this.compatRippleColor))) {
-            TextAppearance textAppearance = this.textDrawableHelper.textAppearance;
-            if (!((textAppearance == null || (colorStateList = textAppearance.textColor) == null || !colorStateList.isStateful()) ? false : true)) {
-                if (!(this.checkedIconVisible && this.checkedIcon != null && this.checkable) && !isStateful(this.chipIcon) && !isStateful(this.checkedIcon) && !isStateful(this.tint)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    @Override // android.graphics.drawable.Drawable
-    public boolean onLayoutDirectionChanged(int i) {
-        boolean onLayoutDirectionChanged = super.onLayoutDirectionChanged(i);
-        if (showsChipIcon()) {
-            onLayoutDirectionChanged |= this.chipIcon.setLayoutDirection(i);
-        }
-        if (showsCheckedIcon()) {
-            onLayoutDirectionChanged |= this.checkedIcon.setLayoutDirection(i);
-        }
-        if (showsCloseIcon()) {
-            onLayoutDirectionChanged |= this.closeIcon.setLayoutDirection(i);
-        }
-        if (!onLayoutDirectionChanged) {
-            return true;
-        }
-        invalidateSelf();
-        return true;
-    }
-
-    @Override // android.graphics.drawable.Drawable
-    public boolean onLevelChange(int i) {
-        boolean onLevelChange = super.onLevelChange(i);
-        if (showsChipIcon()) {
-            onLevelChange |= this.chipIcon.setLevel(i);
-        }
-        if (showsCheckedIcon()) {
-            onLevelChange |= this.checkedIcon.setLevel(i);
-        }
-        if (showsCloseIcon()) {
-            onLevelChange |= this.closeIcon.setLevel(i);
-        }
-        if (onLevelChange) {
-            invalidateSelf();
-        }
-        return onLevelChange;
-    }
-
-    public void onSizeChange() {
+    public final void onSizeChange() {
         Delegate delegate = this.delegate.get();
         if (delegate != null) {
             delegate.onChipDrawableSizeChange();
         }
     }
 
-    @Override // com.google.android.material.shape.MaterialShapeDrawable, android.graphics.drawable.Drawable, com.google.android.material.internal.TextDrawableHelper.TextDrawableDelegate
-    public boolean onStateChange(int[] iArr) {
-        if (this.isShapeThemingEnabled) {
-            super.onStateChange(iArr);
-        }
-        return onStateChange(iArr, this.closeIconStateSet);
-    }
-
-    @Override // com.google.android.material.internal.TextDrawableHelper.TextDrawableDelegate
-    public void onTextSizeChange() {
-        onSizeChange();
-        invalidateSelf();
-    }
-
-    @Override // android.graphics.drawable.Drawable.Callback
-    public void scheduleDrawable(Drawable drawable, Runnable runnable, long j) {
-        Drawable.Callback callback = getCallback();
-        if (callback != null) {
-            callback.scheduleDrawable(this, runnable, j);
-        }
-    }
-
     @Override // com.google.android.material.shape.MaterialShapeDrawable, android.graphics.drawable.Drawable
-    public void setAlpha(int i) {
+    public final void setAlpha(int i) {
         if (this.alpha != i) {
             this.alpha = i;
             invalidateSelf();
         }
     }
 
-    public void setCheckedIconVisible(boolean z) {
+    public final void setCheckedIconVisible(boolean z) {
+        boolean z2;
         if (this.checkedIconVisible != z) {
             boolean showsCheckedIcon = showsCheckedIcon();
             this.checkedIconVisible = z;
             boolean showsCheckedIcon2 = showsCheckedIcon();
             if (showsCheckedIcon != showsCheckedIcon2) {
+                z2 = true;
+            } else {
+                z2 = false;
+            }
+            if (z2) {
                 if (showsCheckedIcon2) {
                     applyChildDrawable(this.checkedIcon);
                 } else {
@@ -523,12 +451,18 @@ public class ChipDrawable extends MaterialShapeDrawable implements Drawable.Call
         }
     }
 
-    public void setChipIconVisible(boolean z) {
+    public final void setChipIconVisible(boolean z) {
+        boolean z2;
         if (this.chipIconVisible != z) {
             boolean showsChipIcon = showsChipIcon();
             this.chipIconVisible = z;
             boolean showsChipIcon2 = showsChipIcon();
             if (showsChipIcon != showsChipIcon2) {
+                z2 = true;
+            } else {
+                z2 = false;
+            }
+            if (z2) {
                 if (showsChipIcon2) {
                     applyChildDrawable(this.chipIcon);
                 } else {
@@ -540,23 +474,18 @@ public class ChipDrawable extends MaterialShapeDrawable implements Drawable.Call
         }
     }
 
-    public boolean setCloseIconState(int[] iArr) {
-        if (Arrays.equals(this.closeIconStateSet, iArr)) {
-            return false;
-        }
-        this.closeIconStateSet = iArr;
-        if (showsCloseIcon()) {
-            return onStateChange(getState(), iArr);
-        }
-        return false;
-    }
-
-    public void setCloseIconVisible(boolean z) {
+    public final void setCloseIconVisible(boolean z) {
+        boolean z2;
         if (this.closeIconVisible != z) {
             boolean showsCloseIcon = showsCloseIcon();
             this.closeIconVisible = z;
             boolean showsCloseIcon2 = showsCloseIcon();
             if (showsCloseIcon != showsCloseIcon2) {
+                z2 = true;
+            } else {
+                z2 = false;
+            }
+            if (z2) {
                 if (showsCloseIcon2) {
                     applyChildDrawable(this.closeIcon);
                 } else {
@@ -569,26 +498,14 @@ public class ChipDrawable extends MaterialShapeDrawable implements Drawable.Call
     }
 
     @Override // com.google.android.material.shape.MaterialShapeDrawable, android.graphics.drawable.Drawable
-    public void setColorFilter(ColorFilter colorFilter) {
+    public final void setColorFilter(ColorFilter colorFilter) {
         if (this.colorFilter != colorFilter) {
             this.colorFilter = colorFilter;
             invalidateSelf();
         }
     }
 
-    public void setText(CharSequence charSequence) {
-        if (charSequence == null) {
-            charSequence = "";
-        }
-        if (!TextUtils.equals(this.text, charSequence)) {
-            this.text = charSequence;
-            this.textDrawableHelper.textWidthDirty = true;
-            invalidateSelf();
-            onSizeChange();
-        }
-    }
-
-    public void setTextAppearance(TextAppearance textAppearance) {
+    public final void setTextAppearance(TextAppearance textAppearance) {
         TextDrawableHelper textDrawableHelper = this.textDrawableHelper;
         Context context = this.context;
         if (textDrawableHelper.textAppearance != textAppearance) {
@@ -609,7 +526,7 @@ public class ChipDrawable extends MaterialShapeDrawable implements Drawable.Call
     }
 
     @Override // com.google.android.material.shape.MaterialShapeDrawable, android.graphics.drawable.Drawable
-    public void setTintList(ColorStateList colorStateList) {
+    public final void setTintList(ColorStateList colorStateList) {
         if (this.tint != colorStateList) {
             this.tint = colorStateList;
             onStateChange(getState());
@@ -617,24 +534,190 @@ public class ChipDrawable extends MaterialShapeDrawable implements Drawable.Call
     }
 
     @Override // com.google.android.material.shape.MaterialShapeDrawable, android.graphics.drawable.Drawable
-    public void setTintMode(PorterDuff.Mode mode) {
+    public final void setTintMode(PorterDuff.Mode mode) {
+        PorterDuffColorFilter porterDuffColorFilter;
         if (this.tintMode != mode) {
             this.tintMode = mode;
-            this.tintFilter = DrawableUtils.updateTintFilter(this, this.tint, mode);
+            ColorStateList colorStateList = this.tint;
+            if (colorStateList == null || mode == null) {
+                porterDuffColorFilter = null;
+            } else {
+                porterDuffColorFilter = new PorterDuffColorFilter(colorStateList.getColorForState(getState(), 0), mode);
+            }
+            this.tintFilter = porterDuffColorFilter;
             invalidateSelf();
         }
     }
 
-    public void setUseCompatRipple(boolean z) {
-        if (this.useCompatRipple != z) {
-            this.useCompatRipple = z;
-            this.compatRippleColor = z ? RippleUtils.sanitizeRippleDrawableColor(this.rippleColor) : null;
-            onStateChange(getState());
+    public final boolean showsCheckedIcon() {
+        if (!this.checkedIconVisible || this.checkedIcon == null || !this.currentChecked) {
+            return false;
+        }
+        return true;
+    }
+
+    public final boolean showsChipIcon() {
+        if (!this.chipIconVisible || this.chipIcon == null) {
+            return false;
+        }
+        return true;
+    }
+
+    public final boolean showsCloseIcon() {
+        if (!this.closeIconVisible || this.closeIcon == null) {
+            return false;
+        }
+        return true;
+    }
+
+    public ChipDrawable(Context context, AttributeSet attributeSet, int i) {
+        super(context, attributeSet, i, R.style.Widget_MaterialComponents_Chip_Action);
+        initializeElevationOverlay(context);
+        this.context = context;
+        TextDrawableHelper textDrawableHelper = new TextDrawableHelper(this);
+        this.textDrawableHelper = textDrawableHelper;
+        textDrawableHelper.textPaint.density = context.getResources().getDisplayMetrics().density;
+        int[] iArr = DEFAULT_STATE;
+        setState(iArr);
+        if (!Arrays.equals(this.closeIconStateSet, iArr)) {
+            this.closeIconStateSet = iArr;
+            if (showsCloseIcon()) {
+                onStateChange(getState(), iArr);
+            }
+        }
+        this.shouldDrawText = true;
+        closeIconRippleMask.setTint(-1);
+    }
+
+    public final void calculateChipIconBounds(Rect rect, RectF rectF) {
+        Drawable drawable;
+        Drawable drawable2;
+        rectF.setEmpty();
+        if (showsChipIcon() || showsCheckedIcon()) {
+            float f = this.chipStartPadding + this.iconStartPadding;
+            if (this.currentChecked) {
+                drawable = this.checkedIcon;
+            } else {
+                drawable = this.chipIcon;
+            }
+            float f2 = this.chipIconSize;
+            if (f2 <= HingeAngleProviderKt.FULLY_CLOSED_DEGREES && drawable != null) {
+                f2 = drawable.getIntrinsicWidth();
+            }
+            if (getLayoutDirection() == 0) {
+                float f3 = rect.left + f;
+                rectF.left = f3;
+                rectF.right = f3 + f2;
+            } else {
+                float f4 = rect.right - f;
+                rectF.right = f4;
+                rectF.left = f4 - f2;
+            }
+            if (this.currentChecked) {
+                drawable2 = this.checkedIcon;
+            } else {
+                drawable2 = this.chipIcon;
+            }
+            float f5 = this.chipIconSize;
+            if (f5 <= HingeAngleProviderKt.FULLY_CLOSED_DEGREES && drawable2 != null) {
+                float ceil = (float) Math.ceil(ViewUtils.dpToPx(this.context, 24));
+                if (drawable2.getIntrinsicHeight() <= ceil) {
+                    ceil = drawable2.getIntrinsicHeight();
+                }
+                f5 = ceil;
+            }
+            float exactCenterY = rect.exactCenterY() - (f5 / 2.0f);
+            rectF.top = exactCenterY;
+            rectF.bottom = exactCenterY + f5;
+        }
+    }
+
+    public final float calculateChipIconWidth() {
+        Drawable drawable;
+        if (!showsChipIcon() && !showsCheckedIcon()) {
+            return HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
+        }
+        float f = this.iconStartPadding;
+        if (this.currentChecked) {
+            drawable = this.checkedIcon;
+        } else {
+            drawable = this.chipIcon;
+        }
+        float f2 = this.chipIconSize;
+        if (f2 <= HingeAngleProviderKt.FULLY_CLOSED_DEGREES && drawable != null) {
+            f2 = drawable.getIntrinsicWidth();
+        }
+        return f2 + f + this.iconEndPadding;
+    }
+
+    public final float calculateCloseIconWidth() {
+        if (showsCloseIcon()) {
+            return this.closeIconStartPadding + this.closeIconSize + this.closeIconEndPadding;
+        }
+        return HingeAngleProviderKt.FULLY_CLOSED_DEGREES;
+    }
+
+    @Override // android.graphics.drawable.Drawable.Callback
+    public final void invalidateDrawable(Drawable drawable) {
+        Drawable.Callback callback = getCallback();
+        if (callback != null) {
+            callback.invalidateDrawable(this);
         }
     }
 
     @Override // android.graphics.drawable.Drawable
-    public boolean setVisible(boolean z, boolean z2) {
+    public final boolean onLayoutDirectionChanged(int i) {
+        boolean onLayoutDirectionChanged = super.onLayoutDirectionChanged(i);
+        if (showsChipIcon()) {
+            onLayoutDirectionChanged |= this.chipIcon.setLayoutDirection(i);
+        }
+        if (showsCheckedIcon()) {
+            onLayoutDirectionChanged |= this.checkedIcon.setLayoutDirection(i);
+        }
+        if (showsCloseIcon()) {
+            onLayoutDirectionChanged |= this.closeIcon.setLayoutDirection(i);
+        }
+        if (!onLayoutDirectionChanged) {
+            return true;
+        }
+        invalidateSelf();
+        return true;
+    }
+
+    @Override // android.graphics.drawable.Drawable
+    public final boolean onLevelChange(int i) {
+        boolean onLevelChange = super.onLevelChange(i);
+        if (showsChipIcon()) {
+            onLevelChange |= this.chipIcon.setLevel(i);
+        }
+        if (showsCheckedIcon()) {
+            onLevelChange |= this.checkedIcon.setLevel(i);
+        }
+        if (showsCloseIcon()) {
+            onLevelChange |= this.closeIcon.setLevel(i);
+        }
+        if (onLevelChange) {
+            invalidateSelf();
+        }
+        return onLevelChange;
+    }
+
+    @Override // com.google.android.material.internal.TextDrawableHelper.TextDrawableDelegate
+    public final void onTextSizeChange() {
+        onSizeChange();
+        invalidateSelf();
+    }
+
+    @Override // android.graphics.drawable.Drawable.Callback
+    public final void scheduleDrawable(Drawable drawable, Runnable runnable, long j) {
+        Drawable.Callback callback = getCallback();
+        if (callback != null) {
+            callback.scheduleDrawable(this, runnable, j);
+        }
+    }
+
+    @Override // android.graphics.drawable.Drawable
+    public final boolean setVisible(boolean z, boolean z2) {
         boolean visible = super.setVisible(z, z2);
         if (showsChipIcon()) {
             visible |= this.chipIcon.setVisible(z, z2);
@@ -651,26 +734,8 @@ public class ChipDrawable extends MaterialShapeDrawable implements Drawable.Call
         return visible;
     }
 
-    public final boolean showsCheckedIcon() {
-        return this.checkedIconVisible && this.checkedIcon != null && this.currentChecked;
-    }
-
-    public final boolean showsChipIcon() {
-        return this.chipIconVisible && this.chipIcon != null;
-    }
-
-    public final boolean showsCloseIcon() {
-        return this.closeIconVisible && this.closeIcon != null;
-    }
-
-    public final void unapplyChildDrawable(Drawable drawable) {
-        if (drawable != null) {
-            drawable.setCallback(null);
-        }
-    }
-
     @Override // android.graphics.drawable.Drawable.Callback
-    public void unscheduleDrawable(Drawable drawable, Runnable runnable) {
+    public final void unscheduleDrawable(Drawable drawable, Runnable runnable) {
         Drawable.Callback callback = getCallback();
         if (callback != null) {
             callback.unscheduleDrawable(this, runnable);
@@ -748,7 +813,9 @@ public class ChipDrawable extends MaterialShapeDrawable implements Drawable.Call
         int colorForState4 = colorStateList5 != null ? colorStateList5.getColorForState(iArr, this.currentTint) : 0;
         if (this.currentTint != colorForState4) {
             this.currentTint = colorForState4;
-            this.tintFilter = DrawableUtils.updateTintFilter(this, this.tint, this.tintMode);
+            ColorStateList colorStateList6 = this.tint;
+            PorterDuff.Mode mode = this.tintMode;
+            this.tintFilter = (colorStateList6 == null || mode == null) ? null : new PorterDuffColorFilter(colorStateList6.getColorForState(getState(), 0), mode);
         } else {
             z3 = onStateChange;
         }
@@ -782,5 +849,15 @@ public class ChipDrawable extends MaterialShapeDrawable implements Drawable.Call
 
     public static boolean isStateful(Drawable drawable) {
         return drawable != null && drawable.isStateful();
+    }
+
+    @Override // com.google.android.material.shape.MaterialShapeDrawable, android.graphics.drawable.Drawable
+    public final int getAlpha() {
+        return this.alpha;
+    }
+
+    @Override // android.graphics.drawable.Drawable
+    public final ColorFilter getColorFilter() {
+        return this.colorFilter;
     }
 }

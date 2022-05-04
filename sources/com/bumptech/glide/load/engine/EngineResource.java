@@ -1,56 +1,32 @@
 package com.bumptech.glide.load.engine;
 
-import android.os.Looper;
+import androidx.collection.ContainerHelpers;
 import com.bumptech.glide.load.Key;
-import java.util.Objects;
 /* loaded from: classes.dex */
-public class EngineResource<Z> implements Resource<Z> {
+public final class EngineResource<Z> implements Resource<Z> {
     public int acquired;
-    public final boolean isCacheable;
+    public final boolean isMemoryCacheable;
     public final boolean isRecyclable;
     public boolean isRecycled;
-    public Key key;
-    public ResourceListener listener;
+    public final Key key;
+    public final ResourceListener listener;
     public final Resource<Z> resource;
 
     /* loaded from: classes.dex */
     public interface ResourceListener {
+        void onResourceReleased(Key key, EngineResource<?> engineResource);
     }
 
-    public EngineResource(Resource<Z> toWrap, boolean isCacheable, boolean isRecyclable) {
-        Objects.requireNonNull(toWrap, "Argument must not be null");
-        this.resource = toWrap;
-        this.isCacheable = isCacheable;
-        this.isRecyclable = isRecyclable;
-    }
-
-    public void acquire() {
-        if (this.isRecycled) {
-            throw new IllegalStateException("Cannot acquire a recycled resource");
-        } else if (Looper.getMainLooper().equals(Looper.myLooper())) {
+    public final synchronized void acquire() {
+        if (!this.isRecycled) {
             this.acquired++;
         } else {
-            throw new IllegalThreadStateException("Must call acquire on the main thread");
+            throw new IllegalStateException("Cannot acquire a recycled resource");
         }
     }
 
     @Override // com.bumptech.glide.load.engine.Resource
-    public Z get() {
-        return this.resource.get();
-    }
-
-    @Override // com.bumptech.glide.load.engine.Resource
-    public Class<Z> getResourceClass() {
-        return this.resource.getResourceClass();
-    }
-
-    @Override // com.bumptech.glide.load.engine.Resource
-    public int getSize() {
-        return this.resource.getSize();
-    }
-
-    @Override // com.bumptech.glide.load.engine.Resource
-    public void recycle() {
+    public final synchronized void recycle() {
         if (this.acquired > 0) {
             throw new IllegalStateException("Cannot recycle a resource while it is still acquired");
         } else if (!this.isRecycled) {
@@ -63,41 +39,52 @@ public class EngineResource<Z> implements Resource<Z> {
         }
     }
 
-    public void release() {
-        if (this.acquired <= 0) {
-            throw new IllegalStateException("Cannot release a recycled or not yet acquired resource");
-        } else if (Looper.getMainLooper().equals(Looper.myLooper())) {
-            int i = this.acquired - 1;
-            this.acquired = i;
-            if (i == 0) {
-                ((Engine) this.listener).onResourceReleased(this.key, this);
+    public final void release$1() {
+        boolean z;
+        synchronized (this) {
+            int i = this.acquired;
+            if (i > 0) {
+                z = true;
+                int i2 = i - 1;
+                this.acquired = i2;
+                if (i2 != 0) {
+                    z = false;
+                }
+            } else {
+                throw new IllegalStateException("Cannot release a recycled or not yet acquired resource");
             }
-        } else {
-            throw new IllegalThreadStateException("Must call release on the main thread");
+        }
+        if (z) {
+            this.listener.onResourceReleased(this.key, this);
         }
     }
 
-    public String toString() {
-        boolean z = this.isCacheable;
-        String valueOf = String.valueOf(this.listener);
-        String valueOf2 = String.valueOf(this.key);
-        int i = this.acquired;
-        boolean z2 = this.isRecycled;
-        String valueOf3 = String.valueOf(this.resource);
-        StringBuilder sb = new StringBuilder(valueOf3.length() + valueOf2.length() + valueOf.length() + 101);
-        sb.append("EngineResource{isCacheable=");
-        sb.append(z);
-        sb.append(", listener=");
-        sb.append(valueOf);
-        sb.append(", key=");
-        sb.append(valueOf2);
-        sb.append(", acquired=");
-        sb.append(i);
-        sb.append(", isRecycled=");
-        sb.append(z2);
-        sb.append(", resource=");
-        sb.append(valueOf3);
-        sb.append('}');
-        return sb.toString();
+    public final synchronized String toString() {
+        return "EngineResource{isMemoryCacheable=" + this.isMemoryCacheable + ", listener=" + this.listener + ", key=" + this.key + ", acquired=" + this.acquired + ", isRecycled=" + this.isRecycled + ", resource=" + this.resource + '}';
+    }
+
+    @Override // com.bumptech.glide.load.engine.Resource
+    public final Z get() {
+        return this.resource.get();
+    }
+
+    @Override // com.bumptech.glide.load.engine.Resource
+    public final Class<Z> getResourceClass() {
+        return this.resource.getResourceClass();
+    }
+
+    @Override // com.bumptech.glide.load.engine.Resource
+    public final int getSize() {
+        return this.resource.getSize();
+    }
+
+    public EngineResource(Resource<Z> resource, boolean z, boolean z2, Key key, ResourceListener resourceListener) {
+        ContainerHelpers.checkNotNull(resource);
+        this.resource = resource;
+        this.isMemoryCacheable = z;
+        this.isRecyclable = z2;
+        this.key = key;
+        ContainerHelpers.checkNotNull(resourceListener);
+        this.listener = resourceListener;
     }
 }

@@ -6,6 +6,7 @@ public final class Android {
 
     static {
         Class<?> cls;
+        boolean z;
         Class<?> cls2 = null;
         try {
             cls = Class.forName("libcore.io.Memory");
@@ -17,10 +18,11 @@ public final class Android {
             cls2 = Class.forName("org.robolectric.Robolectric");
         } catch (Throwable unused2) {
         }
-        IS_ROBOLECTRIC = cls2 != null;
-    }
-
-    public static boolean isOnAndroidDevice() {
-        return MEMORY_CLASS != null && !IS_ROBOLECTRIC;
+        if (cls2 != null) {
+            z = true;
+        } else {
+            z = false;
+        }
+        IS_ROBOLECTRIC = z;
     }
 }

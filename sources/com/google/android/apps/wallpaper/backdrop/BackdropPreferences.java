@@ -3,22 +3,11 @@ package com.google.android.apps.wallpaper.backdrop;
 import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.SharedPreferences;
-import com.android.wallpaper.module.DefaultWallpaperPreferences$$ExternalSyntheticOutline0;
 /* loaded from: classes.dex */
-public class BackdropPreferences {
+public final class BackdropPreferences {
     public static BackdropPreferences sInstance;
     public SharedPreferences mSharedPrefs;
-
-    public BackdropPreferences(Context context) {
-        this.mSharedPrefs = context.getSharedPreferences("wallpaper-backdrop", 0);
-        final BackupManager backupManager = new BackupManager(context);
-        this.mSharedPrefs.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener(this) { // from class: com.google.android.apps.wallpaper.backdrop.BackdropPreferences.1
-            @Override // android.content.SharedPreferences.OnSharedPreferenceChangeListener
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String str) {
-                backupManager.dataChanged();
-            }
-        });
-    }
+    public AnonymousClass1 mSharedPrefsChangedListener;
 
     public static BackdropPreferences getInstance(Context context) {
         if (sInstance == null) {
@@ -27,23 +16,18 @@ public class BackdropPreferences {
         return sInstance;
     }
 
-    public void clear() {
-        this.mSharedPrefs.edit().remove("collection_id").remove("collection_name").remove("required_network_state").remove("resume_token").apply();
-    }
-
-    public String getCollectionId() {
-        return this.mSharedPrefs.getString("collection_id", null);
-    }
-
-    public String getCollectionName() {
-        return this.mSharedPrefs.getString("collection_name", null);
-    }
-
-    public String getResumeToken() {
-        return this.mSharedPrefs.getString("resume_token", null);
-    }
-
-    public void setResumeToken(String str) {
-        DefaultWallpaperPreferences$$ExternalSyntheticOutline0.m(this.mSharedPrefs, "resume_token", str);
+    /* JADX WARN: Multi-variable type inference failed */
+    /* JADX WARN: Type inference failed for: r3v1, types: [com.google.android.apps.wallpaper.backdrop.BackdropPreferences$1, android.content.SharedPreferences$OnSharedPreferenceChangeListener] */
+    public BackdropPreferences(Context context) {
+        this.mSharedPrefs = context.getSharedPreferences("wallpaper-backdrop", 0);
+        final BackupManager backupManager = new BackupManager(context);
+        ?? r3 = new SharedPreferences.OnSharedPreferenceChangeListener() { // from class: com.google.android.apps.wallpaper.backdrop.BackdropPreferences.1
+            @Override // android.content.SharedPreferences.OnSharedPreferenceChangeListener
+            public final void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String str) {
+                backupManager.dataChanged();
+            }
+        };
+        this.mSharedPrefsChangedListener = r3;
+        this.mSharedPrefs.registerOnSharedPreferenceChangeListener(r3);
     }
 }

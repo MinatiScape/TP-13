@@ -2,10 +2,10 @@ package androidx.slice.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import androidx.slice.view.R$styleable;
+import androidx.core.R$styleable;
 import com.android.systemui.shared.R;
 /* loaded from: classes.dex */
-public class RowStyle {
+public final class RowStyle {
     public int mActionDividerHeight;
     public int mBottomDividerEndPadding;
     public int mBottomDividerStartPadding;
@@ -57,29 +57,22 @@ public class RowStyle {
         this.mImageSize = context.getResources().getDimensionPixelSize(R.dimen.abc_slice_small_image_size);
     }
 
-    public static Integer getOptionalColor(TypedArray a, int colorRes) {
-        if (a.hasValue(colorRes)) {
-            return Integer.valueOf(a.getColor(colorRes, 0));
+    public final int getSubtitleColor() {
+        Integer num = this.mSubtitleColor;
+        if (num != null) {
+            return num.intValue();
+        }
+        return this.mSliceStyle.mSubtitleColor;
+    }
+
+    public static Integer getOptionalColor(TypedArray typedArray, int i) {
+        if (typedArray.hasValue(i)) {
+            return Integer.valueOf(typedArray.getColor(i, 0));
         }
         return null;
     }
 
-    public int getSubtitleColor() {
-        Integer num = this.mSubtitleColor;
-        return num != null ? num.intValue() : this.mSliceStyle.mSubtitleColor;
-    }
-
-    public int getTintColor() {
-        Integer num = this.mTintColor;
-        return num != null ? num.intValue() : this.mSliceStyle.mTintColor;
-    }
-
-    public int getTitleColor() {
-        Integer num = this.mTitleColor;
-        return num != null ? num.intValue() : this.mSliceStyle.mTitleColor;
-    }
-
-    public RowStyle(Context context, int resId, SliceStyle sliceStyle) {
+    public RowStyle(Context context, int i, SliceStyle sliceStyle) {
         this.mTitleItemStartPadding = -1;
         this.mTitleItemEndPadding = -1;
         this.mContentStartPadding = -1;
@@ -101,7 +94,7 @@ public class RowStyle {
         this.mIconSize = -1;
         this.mDisableRecyclerViewItemAnimator = false;
         this.mSliceStyle = sliceStyle;
-        TypedArray obtainStyledAttributes = context.getTheme().obtainStyledAttributes(resId, R$styleable.RowStyle);
+        TypedArray obtainStyledAttributes = context.getTheme().obtainStyledAttributes(i, R$styleable.RowStyle);
         try {
             this.mTitleItemStartPadding = (int) obtainStyledAttributes.getDimension(22, -1.0f);
             this.mTitleItemEndPadding = (int) obtainStyledAttributes.getDimension(21, -1.0f);

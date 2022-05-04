@@ -1,4 +1,4 @@
 package androidx.core.app;
 /* loaded from: classes.dex */
-public class Person {
+public final class Person {
 }

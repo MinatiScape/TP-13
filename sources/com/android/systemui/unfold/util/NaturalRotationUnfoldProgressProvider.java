@@ -7,6 +7,7 @@ import android.view.IWindowManager;
 import com.android.systemui.unfold.UnfoldTransitionProgressProvider;
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
+/* compiled from: NaturalRotationUnfoldProgressProvider.kt */
 /* loaded from: classes.dex */
 public final class NaturalRotationUnfoldProgressProvider implements UnfoldTransitionProgressProvider {
     @NotNull
@@ -19,6 +20,7 @@ public final class NaturalRotationUnfoldProgressProvider implements UnfoldTransi
     @NotNull
     private final IWindowManager windowManagerInterface;
 
+    /* compiled from: NaturalRotationUnfoldProgressProvider.kt */
     /* loaded from: classes.dex */
     public final class RotationWatcher extends IRotationWatcher.Stub {
         public final /* synthetic */ NaturalRotationUnfoldProgressProvider this$0;
@@ -44,11 +46,21 @@ public final class NaturalRotationUnfoldProgressProvider implements UnfoldTransi
 
     /* JADX INFO: Access modifiers changed from: private */
     public final void onRotationChanged(int i) {
-        boolean z = i == 0 || i == 2;
+        boolean z;
+        if (i == 0 || i == 2) {
+            z = true;
+        } else {
+            z = false;
+        }
         if (this.isNaturalRotation != z) {
             this.isNaturalRotation = z;
             this.scopedUnfoldTransitionProgressProvider.setReadyToHandleTransition(z);
         }
+    }
+
+    public void addCallback(@NotNull UnfoldTransitionProgressProvider.TransitionProgressListener listener) {
+        Intrinsics.checkNotNullParameter(listener, "listener");
+        this.scopedUnfoldTransitionProgressProvider.addCallback(listener);
     }
 
     @Override // com.android.systemui.unfold.UnfoldTransitionProgressProvider
@@ -70,11 +82,6 @@ public final class NaturalRotationUnfoldProgressProvider implements UnfoldTransi
             Intrinsics.checkNotNullExpressionValue(rethrowFromSystemServer, "e.rethrowFromSystemServer()");
             throw rethrowFromSystemServer;
         }
-    }
-
-    public void addCallback(@NotNull UnfoldTransitionProgressProvider.TransitionProgressListener listener) {
-        Intrinsics.checkNotNullParameter(listener, "listener");
-        this.scopedUnfoldTransitionProgressProvider.addCallback(listener);
     }
 
     public void removeCallback(@NotNull UnfoldTransitionProgressProvider.TransitionProgressListener listener) {

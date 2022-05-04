@@ -1,33 +1,12 @@
 package android.support.v4.util;
 /* loaded from: classes.dex */
-public class SparseArrayCompat<E> implements Cloneable {
+public final class SparseArrayCompat<E> implements Cloneable {
     public static final Object DELETED = new Object();
     public int[] mKeys;
     public int mSize;
     public Object[] mValues;
 
-    public SparseArrayCompat() {
-        int i;
-        int i2 = 4;
-        while (true) {
-            i = 40;
-            if (i2 >= 32) {
-                break;
-            }
-            int i3 = (1 << i2) - 12;
-            if (40 <= i3) {
-                i = i3;
-                break;
-            }
-            i2++;
-        }
-        int i4 = i / 4;
-        this.mKeys = new int[i4];
-        this.mValues = new Object[i4];
-        this.mSize = 0;
-    }
-
-    public Object clone() throws CloneNotSupportedException {
+    public final Object clone() throws CloneNotSupportedException {
         SparseArrayCompat sparseArrayCompat = null;
         try {
             SparseArrayCompat sparseArrayCompat2 = (SparseArrayCompat) super.clone();
@@ -43,7 +22,7 @@ public class SparseArrayCompat<E> implements Cloneable {
         }
     }
 
-    public String toString() {
+    public final String toString() {
         int i = this.mSize;
         if (i <= 0) {
             return "{}";
@@ -65,5 +44,26 @@ public class SparseArrayCompat<E> implements Cloneable {
         }
         sb.append('}');
         return sb.toString();
+    }
+
+    public SparseArrayCompat() {
+        int i;
+        int i2 = 4;
+        while (true) {
+            i = 40;
+            if (i2 >= 32) {
+                break;
+            }
+            int i3 = (1 << i2) - 12;
+            if (40 <= i3) {
+                i = i3;
+                break;
+            }
+            i2++;
+        }
+        int i4 = i / 4;
+        this.mKeys = new int[i4];
+        this.mValues = new Object[i4];
+        this.mSize = 0;
     }
 }

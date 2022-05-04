@@ -15,10 +15,6 @@ public final class AnimateLayoutChangeDetector {
         marginLayoutParams.setMargins(0, 0, 0, 0);
     }
 
-    public AnimateLayoutChangeDetector(LinearLayoutManager linearLayoutManager) {
-        this.mLayoutManager = linearLayoutManager;
-    }
-
     public static boolean hasRunningChangingLayoutTransition(View view) {
         if (view instanceof ViewGroup) {
             ViewGroup viewGroup = (ViewGroup) view;
@@ -34,5 +30,9 @@ public final class AnimateLayoutChangeDetector {
             }
         }
         return false;
+    }
+
+    public AnimateLayoutChangeDetector(LinearLayoutManager linearLayoutManager) {
+        this.mLayoutManager = linearLayoutManager;
     }
 }

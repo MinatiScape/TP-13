@@ -48,10 +48,6 @@ public class TaskStackChangeListeners {
         private final List<TaskStackChangeListener> mTaskStackListeners = new ArrayList();
         private final List<TaskStackChangeListener> mTmpListeners = new ArrayList();
 
-        public Impl(Looper looper) {
-            this.mHandler = new Handler(looper, this);
-        }
-
         public void addListener(TaskStackChangeListener taskStackChangeListener) {
             synchronized (this.mTaskStackListeners) {
                 this.mTaskStackListeners.add(taskStackChangeListener);
@@ -68,8 +64,11 @@ public class TaskStackChangeListeners {
 
         @Override // android.os.Handler.Callback
         public boolean handleMessage(Message message) {
+            boolean z;
+            boolean z2;
+            boolean z3;
             synchronized (this.mTaskStackListeners) {
-                boolean z = false;
+                boolean z4 = false;
                 switch (message.what) {
                     case 1:
                         Trace.beginSection("onTaskStackChanged");
@@ -95,13 +94,21 @@ public class TaskStackChangeListeners {
                     case 4:
                         SomeArgs someArgs = (SomeArgs) message.obj;
                         ActivityManager.RunningTaskInfo runningTaskInfo = (ActivityManager.RunningTaskInfo) someArgs.arg1;
-                        boolean z2 = someArgs.argi1 != 0;
-                        boolean z3 = someArgs.argi2 != 0;
-                        if (someArgs.argi3 != 0) {
+                        if (someArgs.argi1 != 0) {
                             z = true;
+                        } else {
+                            z = false;
+                        }
+                        if (someArgs.argi2 != 0) {
+                            z2 = true;
+                        } else {
+                            z2 = false;
+                        }
+                        if (someArgs.argi3 != 0) {
+                            z4 = true;
                         }
                         for (int size4 = this.mTaskStackListeners.size() - 1; size4 >= 0; size4--) {
-                            this.mTaskStackListeners.get(size4).onActivityRestartAttempt(runningTaskInfo, z2, z3, z);
+                            this.mTaskStackListeners.get(size4).onActivityRestartAttempt(runningTaskInfo, z, z2, z4);
                         }
                         break;
                     case 6:
@@ -174,7 +181,13 @@ public class TaskStackChangeListeners {
                         break;
                     case 20:
                         for (int size18 = this.mTaskStackListeners.size() - 1; size18 >= 0; size18--) {
-                            this.mTaskStackListeners.get(size18).onRecentTaskListFrozenChanged(message.arg1 != 0);
+                            TaskStackChangeListener taskStackChangeListener = this.mTaskStackListeners.get(size18);
+                            if (message.arg1 != 0) {
+                                z3 = true;
+                            } else {
+                                z3 = false;
+                            }
+                            taskStackChangeListener.onRecentTaskListFrozenChanged(z3);
                         }
                         break;
                     case 21:
@@ -225,16 +238,6 @@ public class TaskStackChangeListeners {
 
         public void onActivityRequestedOrientationChanged(int i, int i2) {
             this.mHandler.obtainMessage(15, i, i2).sendToTarget();
-        }
-
-        public void onActivityRestartAttempt(ActivityManager.RunningTaskInfo runningTaskInfo, boolean z, boolean z2, boolean z3) {
-            SomeArgs obtain = SomeArgs.obtain();
-            obtain.arg1 = runningTaskInfo;
-            obtain.argi1 = z ? 1 : 0;
-            obtain.argi2 = z2 ? 1 : 0;
-            obtain.argi3 = z3 ? 1 : 0;
-            this.mHandler.removeMessages(4);
-            this.mHandler.obtainMessage(4, obtain).sendToTarget();
         }
 
         public void onActivityRotation(int i) {
@@ -317,6 +320,20 @@ public class TaskStackChangeListeners {
                 }
             }
         }
+
+        public Impl(Looper looper) {
+            this.mHandler = new Handler(looper, this);
+        }
+
+        public void onActivityRestartAttempt(ActivityManager.RunningTaskInfo runningTaskInfo, boolean z, boolean z2, boolean z3) {
+            SomeArgs obtain = SomeArgs.obtain();
+            obtain.arg1 = runningTaskInfo;
+            obtain.argi1 = z ? 1 : 0;
+            obtain.argi2 = z2 ? 1 : 0;
+            obtain.argi3 = z3 ? 1 : 0;
+            this.mHandler.removeMessages(4);
+            this.mHandler.obtainMessage(4, obtain).sendToTarget();
+        }
     }
 
     /* loaded from: classes.dex */
@@ -334,13 +351,6 @@ public class TaskStackChangeListeners {
         }
     }
 
-    private TaskStackChangeListeners() {
-    }
-
-    public static TaskStackChangeListeners getInstance() {
-        return INSTANCE;
-    }
-
     public void registerTaskStackListener(TaskStackChangeListener taskStackChangeListener) {
         synchronized (this.mImpl) {
             this.mImpl.addListener(taskStackChangeListener);
@@ -351,5 +361,12 @@ public class TaskStackChangeListeners {
         synchronized (this.mImpl) {
             this.mImpl.removeListener(taskStackChangeListener);
         }
+    }
+
+    private TaskStackChangeListeners() {
+    }
+
+    public static TaskStackChangeListeners getInstance() {
+        return INSTANCE;
     }
 }

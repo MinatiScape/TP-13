@@ -1,6 +1,7 @@
 package androidx.lifecycle;
 
 import androidx.lifecycle.Lifecycle;
+/* JADX INFO: Access modifiers changed from: package-private */
 /* loaded from: classes.dex */
 public class FullLifecycleObserverAdapter implements LifecycleEventObserver {
     public final FullLifecycleObserver mFullLifecycleObserver;
@@ -45,31 +46,26 @@ public class FullLifecycleObserverAdapter implements LifecycleEventObserver {
         }
     }
 
-    public FullLifecycleObserverAdapter(FullLifecycleObserver fullLifecycleObserver, LifecycleEventObserver lifecycleEventObserver) {
-        this.mFullLifecycleObserver = fullLifecycleObserver;
-        this.mLifecycleEventObserver = lifecycleEventObserver;
-    }
-
     @Override // androidx.lifecycle.LifecycleEventObserver
-    public void onStateChanged(LifecycleOwner lifecycleOwner, Lifecycle.Event event) {
+    public final void onStateChanged(LifecycleOwner lifecycleOwner, Lifecycle.Event event) {
         switch (AnonymousClass1.$SwitchMap$androidx$lifecycle$Lifecycle$Event[event.ordinal()]) {
             case 1:
-                this.mFullLifecycleObserver.onCreate(lifecycleOwner);
+                this.mFullLifecycleObserver.onCreate();
                 break;
             case 2:
-                this.mFullLifecycleObserver.onStart(lifecycleOwner);
+                this.mFullLifecycleObserver.onStart$1();
                 break;
             case 3:
-                this.mFullLifecycleObserver.onResume(lifecycleOwner);
+                this.mFullLifecycleObserver.onResume$1();
                 break;
             case 4:
-                this.mFullLifecycleObserver.onPause(lifecycleOwner);
+                this.mFullLifecycleObserver.onPause$1();
                 break;
             case 5:
-                this.mFullLifecycleObserver.onStop(lifecycleOwner);
+                this.mFullLifecycleObserver.onStop$1();
                 break;
             case 6:
-                this.mFullLifecycleObserver.onDestroy(lifecycleOwner);
+                this.mFullLifecycleObserver.onDestroy$1();
                 break;
             case 7:
                 throw new IllegalArgumentException("ON_ANY must not been send by anybody");
@@ -78,5 +74,10 @@ public class FullLifecycleObserverAdapter implements LifecycleEventObserver {
         if (lifecycleEventObserver != null) {
             lifecycleEventObserver.onStateChanged(lifecycleOwner, event);
         }
+    }
+
+    public FullLifecycleObserverAdapter(FullLifecycleObserver fullLifecycleObserver, LifecycleEventObserver lifecycleEventObserver) {
+        this.mFullLifecycleObserver = fullLifecycleObserver;
+        this.mLifecycleEventObserver = lifecycleEventObserver;
     }
 }

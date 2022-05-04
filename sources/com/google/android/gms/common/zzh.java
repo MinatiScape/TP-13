@@ -1,14 +1,11 @@
 package com.google.android.gms.common;
 
 import java.lang.ref.WeakReference;
+/* compiled from: GoogleCertificates.java */
 /* loaded from: classes.dex */
 public abstract class zzh extends zzf {
     public static final WeakReference<byte[]> zzb = new WeakReference<>(null);
     public WeakReference<byte[]> zza = zzb;
-
-    public zzh(byte[] bArr) {
-        super(bArr);
-    }
 
     @Override // com.google.android.gms.common.zzf
     public final byte[] zza() {
@@ -24,4 +21,8 @@ public abstract class zzh extends zzf {
     }
 
     public abstract byte[] zzd();
+
+    public zzh(byte[] bArr) {
+        super(bArr);
+    }
 }

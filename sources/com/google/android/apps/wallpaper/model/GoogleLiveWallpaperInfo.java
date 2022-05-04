@@ -15,12 +15,12 @@ import com.google.android.apps.wallpaper.asset.GoogleLiveWallpaperThumbAsset;
 public class GoogleLiveWallpaperInfo extends LiveWallpaperInfo {
     public static final Parcelable.Creator<GoogleLiveWallpaperInfo> CREATOR = new Parcelable.Creator<GoogleLiveWallpaperInfo>() { // from class: com.google.android.apps.wallpaper.model.GoogleLiveWallpaperInfo.1
         @Override // android.os.Parcelable.Creator
-        public GoogleLiveWallpaperInfo createFromParcel(Parcel parcel) {
+        public final GoogleLiveWallpaperInfo createFromParcel(Parcel parcel) {
             return new GoogleLiveWallpaperInfo(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public GoogleLiveWallpaperInfo[] newArray(int i) {
+        public final GoogleLiveWallpaperInfo[] newArray(int i) {
             return new GoogleLiveWallpaperInfo[i];
         }
     };
@@ -29,24 +29,31 @@ public class GoogleLiveWallpaperInfo extends LiveWallpaperInfo {
         super(wallpaperInfo, true, null);
     }
 
+    public GoogleLiveWallpaperInfo(WallpaperInfo wallpaperInfo, int i) {
+        super(wallpaperInfo, false, null);
+    }
+
     @Override // com.android.wallpaper.model.LiveWallpaperInfo, com.android.wallpaper.model.WallpaperInfo
-    public Asset getThumbAsset(Context context) {
+    public final Asset getThumbAsset(Context context) {
+        Uri uri;
         Bundle bundle;
         String string;
         if (this.mThumbAsset == null) {
             ServiceInfo serviceInfo = this.mInfo.getServiceInfo();
-            Uri parse = (serviceInfo == null || (bundle = serviceInfo.metaData) == null || (string = bundle.getString("android.service.wallpaper.thumbnail")) == null) ? null : Uri.parse(string);
-            if (parse != null) {
-                this.mThumbAsset = new LiveWallpaperThumbAsset(context, this.mInfo, parse);
+            if (serviceInfo == null || (bundle = serviceInfo.metaData) == null || (string = bundle.getString("android.service.wallpaper.thumbnail")) == null) {
+                uri = null;
+            } else {
+                uri = Uri.parse(string);
+            }
+            if (uri != null) {
+                LiveWallpaperThumbAsset liveWallpaperThumbAsset = new LiveWallpaperThumbAsset(context, this.mInfo);
+                liveWallpaperThumbAsset.mUri = uri;
+                this.mThumbAsset = liveWallpaperThumbAsset;
             } else {
                 this.mThumbAsset = new GoogleLiveWallpaperThumbAsset(context, this.mInfo);
             }
         }
         return this.mThumbAsset;
-    }
-
-    public GoogleLiveWallpaperInfo(WallpaperInfo wallpaperInfo, boolean z, String str) {
-        super(wallpaperInfo, z, str);
     }
 
     public GoogleLiveWallpaperInfo(Parcel parcel) {

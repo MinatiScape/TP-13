@@ -13,23 +13,37 @@ import android.text.TextUtils;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import java.io.InputStream;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 /* loaded from: classes.dex */
 public class SkiaImageRegionDecoder implements ImageRegionDecoder {
     public BitmapRegionDecoder decoder;
-    public final ReadWriteLock decoderLock = new ReentrantReadWriteLock(true);
+    public final ReentrantReadWriteLock decoderLock = new ReentrantReadWriteLock(true);
     public final Bitmap.Config bitmapConfig = Bitmap.Config.RGB_565;
 
-    @Keep
-    public SkiaImageRegionDecoder() {
-        List<Integer> list = SubsamplingScaleImageView.VALID_ORIENTATIONS;
+    @Override // com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder
+    public final synchronized boolean isReady() {
+        boolean z;
+        BitmapRegionDecoder bitmapRegionDecoder = this.decoder;
+        if (bitmapRegionDecoder != null) {
+            if (!bitmapRegionDecoder.isRecycled()) {
+                z = true;
+            }
+        }
+        z = false;
+        return z;
     }
 
     @Override // com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder
-    public Bitmap decodeRegion(Rect rect, int i) {
-        getDecodeLock().lock();
+    public final synchronized void recycle() {
+        this.decoderLock.writeLock().lock();
+        this.decoder.recycle();
+        this.decoder = null;
+        this.decoderLock.writeLock().unlock();
+    }
+
+    @Override // com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder
+    public final Bitmap decodeRegion(Rect rect, int i) {
+        this.decoderLock.readLock().lock();
         try {
             BitmapRegionDecoder bitmapRegionDecoder = this.decoder;
             if (bitmapRegionDecoder == null || bitmapRegionDecoder.isRecycled()) {
@@ -44,16 +58,17 @@ public class SkiaImageRegionDecoder implements ImageRegionDecoder {
             }
             throw new RuntimeException("Skia image decoder returned null bitmap - image format may not be supported");
         } finally {
-            getDecodeLock().unlock();
+            this.decoderLock.readLock().unlock();
         }
     }
 
-    public final Lock getDecodeLock() {
-        return this.decoderLock.readLock();
+    @Keep
+    public SkiaImageRegionDecoder() {
+        List<Integer> list = SubsamplingScaleImageView.VALID_ORIENTATIONS;
     }
 
     @Override // com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder
-    public Point init(Context context, Uri uri) throws Exception {
+    public final Point init(Context context, Uri uri) throws Exception {
         Resources resources;
         int i;
         String uri2 = uri.toString();
@@ -97,26 +112,5 @@ public class SkiaImageRegionDecoder implements ImageRegionDecoder {
             }
         }
         return new Point(this.decoder.getWidth(), this.decoder.getHeight());
-    }
-
-    @Override // com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder
-    public synchronized boolean isReady() {
-        boolean z;
-        BitmapRegionDecoder bitmapRegionDecoder = this.decoder;
-        if (bitmapRegionDecoder != null) {
-            if (!bitmapRegionDecoder.isRecycled()) {
-                z = true;
-            }
-        }
-        z = false;
-        return z;
-    }
-
-    @Override // com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder
-    public synchronized void recycle() {
-        this.decoderLock.writeLock().lock();
-        this.decoder.recycle();
-        this.decoder = null;
-        this.decoderLock.writeLock().unlock();
     }
 }

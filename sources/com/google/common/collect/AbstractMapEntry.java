@@ -1,19 +1,10 @@
 package com.google.common.collect;
 
-import androidx.viewpager2.widget.FakeDrag$$ExternalSyntheticOutline0;
+import com.adobe.xmp.impl.XMPNode$$ExternalSyntheticOutline0;
 import com.google.common.base.Objects;
 import java.util.Map;
 /* loaded from: classes.dex */
 public abstract class AbstractMapEntry<K, V> implements Map.Entry<K, V> {
-    @Override // java.util.Map.Entry
-    public boolean equals(Object object) {
-        if (!(object instanceof Map.Entry)) {
-            return false;
-        }
-        Map.Entry entry = (Map.Entry) object;
-        return Objects.equal(getKey(), entry.getKey()) && Objects.equal(getValue(), entry.getValue());
-    }
-
     @Override // java.util.Map.Entry
     public abstract K getKey();
 
@@ -21,20 +12,42 @@ public abstract class AbstractMapEntry<K, V> implements Map.Entry<K, V> {
     public abstract V getValue();
 
     @Override // java.util.Map.Entry
-    public int hashCode() {
-        K key = getKey();
-        V value = getValue();
-        int i = 0;
-        int hashCode = key == null ? 0 : key.hashCode();
-        if (value != null) {
-            i = value.hashCode();
+    public boolean equals(Object object) {
+        if (!(object instanceof Map.Entry)) {
+            return false;
         }
-        return hashCode ^ i;
+        Map.Entry entry = (Map.Entry) object;
+        if (!Objects.equal(getKey(), entry.getKey()) || !Objects.equal(getValue(), entry.getValue())) {
+            return false;
+        }
+        return true;
     }
 
-    public String toString() {
+    @Override // java.util.Map.Entry
+    public V setValue(V value) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override // java.util.Map.Entry
+    public int hashCode() {
+        int i;
+        K key = getKey();
+        V value = getValue();
+        int i2 = 0;
+        if (key == null) {
+            i = 0;
+        } else {
+            i = key.hashCode();
+        }
+        if (value != null) {
+            i2 = value.hashCode();
+        }
+        return i ^ i2;
+    }
+
+    public final String toString() {
         String valueOf = String.valueOf(getKey());
         String valueOf2 = String.valueOf(getValue());
-        return FakeDrag$$ExternalSyntheticOutline0.m(valueOf2.length() + valueOf.length() + 1, valueOf, "=", valueOf2);
+        return XMPNode$$ExternalSyntheticOutline0.m(valueOf2.length() + valueOf.length() + 1, valueOf, "=", valueOf2);
     }
 }

@@ -3,153 +3,103 @@ package com.google.android.material.textfield;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
-import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.EditText;
-import androidx.appcompat.content.res.AppCompatResources;
 import com.android.systemui.shared.R;
 import com.android.systemui.unfold.updates.hinge.HingeAngleProviderKt;
 import com.google.android.material.animation.AnimationUtils;
 import com.google.android.material.internal.CheckableImageButton;
 import com.google.android.material.textfield.TextInputLayout;
 /* loaded from: classes.dex */
-public class ClearTextEndIconDelegate extends EndIconDelegate {
+public final class ClearTextEndIconDelegate extends EndIconDelegate {
     public AnimatorSet iconInAnim;
     public ValueAnimator iconOutAnim;
-    public final TextWatcher clearTextEndIconTextWatcher = new TextWatcher() { // from class: com.google.android.material.textfield.ClearTextEndIconDelegate.1
-        /* JADX WARN: Code restructure failed: missing block: B:11:0x001a, code lost:
-            if ((r4.length() > 0) != false) goto L13;
-         */
+    public final AnonymousClass1 clearTextEndIconTextWatcher = new TextWatcher() { // from class: com.google.android.material.textfield.ClearTextEndIconDelegate.1
         @Override // android.text.TextWatcher
-        /*
-            Code decompiled incorrectly, please refer to instructions dump.
-            To view partially-correct add '--show-bad-code' argument
-        */
-        public void afterTextChanged(android.text.Editable r4) {
-            /*
-                r3 = this;
-                com.google.android.material.textfield.ClearTextEndIconDelegate r3 = com.google.android.material.textfield.ClearTextEndIconDelegate.this
-                com.google.android.material.textfield.TextInputLayout r0 = r3.textInputLayout
-                java.lang.CharSequence r1 = r0.suffixText
-                if (r1 == 0) goto L9
-                return
-            L9:
-                boolean r0 = r0.hasFocus()
-                r1 = 1
-                r2 = 0
-                if (r0 == 0) goto L1d
-                int r4 = r4.length()
-                if (r4 <= 0) goto L19
-                r4 = r1
-                goto L1a
-            L19:
-                r4 = r2
-            L1a:
-                if (r4 == 0) goto L1d
-                goto L1e
-            L1d:
-                r1 = r2
-            L1e:
-                r3.animateIcon(r1)
-                return
-            */
-            throw new UnsupportedOperationException("Method not decompiled: com.google.android.material.textfield.ClearTextEndIconDelegate.AnonymousClass1.afterTextChanged(android.text.Editable):void");
+        public final void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
         }
 
         @Override // android.text.TextWatcher
-        public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+        public final void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
         }
 
         @Override // android.text.TextWatcher
-        public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-        }
-    };
-    public final View.OnFocusChangeListener onFocusChangeListener = new View.OnFocusChangeListener() { // from class: com.google.android.material.textfield.ClearTextEndIconDelegate.2
-        @Override // android.view.View.OnFocusChangeListener
-        public void onFocusChange(View view, boolean z) {
-            boolean z2 = true;
-            boolean z3 = !TextUtils.isEmpty(((EditText) view).getText());
+        public final void afterTextChanged(Editable editable) {
             ClearTextEndIconDelegate clearTextEndIconDelegate = ClearTextEndIconDelegate.this;
-            if (!z3 || !z) {
-                z2 = false;
+            if (clearTextEndIconDelegate.textInputLayout.suffixText == null) {
+                clearTextEndIconDelegate.animateIcon(ClearTextEndIconDelegate.access$000(clearTextEndIconDelegate));
             }
-            clearTextEndIconDelegate.animateIcon(z2);
         }
     };
-    public final TextInputLayout.OnEditTextAttachedListener clearTextOnEditTextAttachedListener = new TextInputLayout.OnEditTextAttachedListener() { // from class: com.google.android.material.textfield.ClearTextEndIconDelegate.3
-        /* JADX WARN: Code restructure failed: missing block: B:8:0x0017, code lost:
-            if ((r0.getText().length() > 0) != false) goto L10;
-         */
-        @Override // com.google.android.material.textfield.TextInputLayout.OnEditTextAttachedListener
-        /*
-            Code decompiled incorrectly, please refer to instructions dump.
-            To view partially-correct add '--show-bad-code' argument
-        */
-        public void onEditTextAttached(com.google.android.material.textfield.TextInputLayout r5) {
-            /*
-                r4 = this;
-                android.widget.EditText r0 = r5.editText
-                boolean r1 = r0.hasFocus()
-                r2 = 1
-                r3 = 0
-                if (r1 == 0) goto L1a
-                android.text.Editable r1 = r0.getText()
-                int r1 = r1.length()
-                if (r1 <= 0) goto L16
-                r1 = r2
-                goto L17
-            L16:
-                r1 = r3
-            L17:
-                if (r1 == 0) goto L1a
-                goto L1b
-            L1a:
-                r2 = r3
-            L1b:
-                r5.setEndIconVisible(r2)
-                r5.setEndIconCheckable(r3)
-                com.google.android.material.textfield.ClearTextEndIconDelegate r5 = com.google.android.material.textfield.ClearTextEndIconDelegate.this
-                android.view.View$OnFocusChangeListener r5 = r5.onFocusChangeListener
-                r0.setOnFocusChangeListener(r5)
-                com.google.android.material.textfield.ClearTextEndIconDelegate r5 = com.google.android.material.textfield.ClearTextEndIconDelegate.this
-                android.text.TextWatcher r5 = r5.clearTextEndIconTextWatcher
-                r0.removeTextChangedListener(r5)
-                com.google.android.material.textfield.ClearTextEndIconDelegate r4 = com.google.android.material.textfield.ClearTextEndIconDelegate.this
-                android.text.TextWatcher r4 = r4.clearTextEndIconTextWatcher
-                r0.addTextChangedListener(r4)
-                return
-            */
-            throw new UnsupportedOperationException("Method not decompiled: com.google.android.material.textfield.ClearTextEndIconDelegate.AnonymousClass3.onEditTextAttached(com.google.android.material.textfield.TextInputLayout):void");
+    public final AnonymousClass2 onFocusChangeListener = new View.OnFocusChangeListener() { // from class: com.google.android.material.textfield.ClearTextEndIconDelegate.2
+        @Override // android.view.View.OnFocusChangeListener
+        public final void onFocusChange(View view, boolean z) {
+            ClearTextEndIconDelegate clearTextEndIconDelegate = ClearTextEndIconDelegate.this;
+            clearTextEndIconDelegate.animateIcon(ClearTextEndIconDelegate.access$000(clearTextEndIconDelegate));
         }
     };
-    public final TextInputLayout.OnEndIconChangedListener endIconChangedListener = new TextInputLayout.OnEndIconChangedListener() { // from class: com.google.android.material.textfield.ClearTextEndIconDelegate.4
+    public final AnonymousClass3 clearTextOnEditTextAttachedListener = new AnonymousClass3();
+    public final AnonymousClass4 endIconChangedListener = new TextInputLayout.OnEndIconChangedListener() { // from class: com.google.android.material.textfield.ClearTextEndIconDelegate.4
         @Override // com.google.android.material.textfield.TextInputLayout.OnEndIconChangedListener
-        public void onEndIconChanged(TextInputLayout textInputLayout, int i) {
+        public final void onEndIconChanged(TextInputLayout textInputLayout, int i) {
             final EditText editText = textInputLayout.editText;
             if (editText != null && i == 2) {
                 editText.post(new Runnable() { // from class: com.google.android.material.textfield.ClearTextEndIconDelegate.4.1
                     @Override // java.lang.Runnable
-                    public void run() {
+                    public final void run() {
                         editText.removeTextChangedListener(ClearTextEndIconDelegate.this.clearTextEndIconTextWatcher);
+                        ClearTextEndIconDelegate.this.animateIcon(true);
                     }
                 });
                 if (editText.getOnFocusChangeListener() == ClearTextEndIconDelegate.this.onFocusChangeListener) {
                     editText.setOnFocusChangeListener(null);
                 }
+                View.OnFocusChangeListener onFocusChangeListener = ClearTextEndIconDelegate.this.endIconView.getOnFocusChangeListener();
+                ClearTextEndIconDelegate clearTextEndIconDelegate = ClearTextEndIconDelegate.this;
+                if (onFocusChangeListener == clearTextEndIconDelegate.onFocusChangeListener) {
+                    clearTextEndIconDelegate.endIconView.setOnFocusChangeListener(null);
+                }
             }
         }
     };
 
-    public ClearTextEndIconDelegate(TextInputLayout textInputLayout) {
-        super(textInputLayout);
+    /* renamed from: com.google.android.material.textfield.ClearTextEndIconDelegate$3  reason: invalid class name */
+    /* loaded from: classes.dex */
+    public class AnonymousClass3 implements TextInputLayout.OnEditTextAttachedListener {
+        public AnonymousClass3() {
+        }
+
+        @Override // com.google.android.material.textfield.TextInputLayout.OnEditTextAttachedListener
+        public final void onEditTextAttached(TextInputLayout textInputLayout) {
+            EditText editText = textInputLayout.editText;
+            textInputLayout.setEndIconVisible(ClearTextEndIconDelegate.access$000(ClearTextEndIconDelegate.this));
+            editText.setOnFocusChangeListener(ClearTextEndIconDelegate.this.onFocusChangeListener);
+            ClearTextEndIconDelegate clearTextEndIconDelegate = ClearTextEndIconDelegate.this;
+            clearTextEndIconDelegate.endIconView.setOnFocusChangeListener(clearTextEndIconDelegate.onFocusChangeListener);
+            editText.removeTextChangedListener(ClearTextEndIconDelegate.this.clearTextEndIconTextWatcher);
+            editText.addTextChangedListener(ClearTextEndIconDelegate.this.clearTextEndIconTextWatcher);
+        }
+    }
+
+    public static boolean access$000(ClearTextEndIconDelegate clearTextEndIconDelegate) {
+        EditText editText = clearTextEndIconDelegate.textInputLayout.editText;
+        if (editText == null || ((!editText.hasFocus() && !clearTextEndIconDelegate.endIconView.hasFocus()) || editText.getText().length() <= 0)) {
+            return false;
+        }
+        return true;
     }
 
     public final void animateIcon(boolean z) {
-        boolean z2 = this.textInputLayout.isEndIconVisible() == z;
+        boolean z2;
+        if (this.textInputLayout.isEndIconVisible() == z) {
+            z2 = true;
+        } else {
+            z2 = false;
+        }
         if (z && !this.iconInAnim.isRunning()) {
             this.iconOutAnim.cancel();
             this.iconInAnim.start();
@@ -166,45 +116,61 @@ public class ClearTextEndIconDelegate extends EndIconDelegate {
     }
 
     @Override // com.google.android.material.textfield.EndIconDelegate
-    public void initialize() {
-        this.textInputLayout.setEndIconDrawable(AppCompatResources.getDrawable(this.context, R.drawable.mtrl_ic_cancel));
+    public final void initialize() {
         TextInputLayout textInputLayout = this.textInputLayout;
-        textInputLayout.setEndIconContentDescription(textInputLayout.getResources().getText(R.string.clear_text_end_icon_content_description));
+        int i = this.customEndIcon;
+        if (i == 0) {
+            i = R.drawable.mtrl_ic_cancel;
+        }
+        textInputLayout.setEndIconDrawable(i);
         TextInputLayout textInputLayout2 = this.textInputLayout;
+        textInputLayout2.setEndIconContentDescription(textInputLayout2.getResources().getText(R.string.clear_text_end_icon_content_description));
+        CheckableImageButton checkableImageButton = this.textInputLayout.endIconView;
+        if (checkableImageButton.checkable) {
+            checkableImageButton.checkable = false;
+            checkableImageButton.sendAccessibilityEvent(0);
+        }
+        TextInputLayout textInputLayout3 = this.textInputLayout;
         View.OnClickListener onClickListener = new View.OnClickListener() { // from class: com.google.android.material.textfield.ClearTextEndIconDelegate.5
             @Override // android.view.View.OnClickListener
-            public void onClick(View view) {
+            public final void onClick(View view) {
                 Editable text = ClearTextEndIconDelegate.this.textInputLayout.editText.getText();
                 if (text != null) {
                     text.clear();
                 }
-                ClearTextEndIconDelegate.this.textInputLayout.refreshEndIconDrawableState();
+                TextInputLayout textInputLayout4 = ClearTextEndIconDelegate.this.textInputLayout;
+                textInputLayout4.refreshIconDrawableState(textInputLayout4.endIconView, textInputLayout4.endIconTintList);
             }
         };
-        CheckableImageButton checkableImageButton = textInputLayout2.endIconView;
-        View.OnLongClickListener onLongClickListener = textInputLayout2.endIconOnLongClickListener;
-        checkableImageButton.setOnClickListener(onClickListener);
-        TextInputLayout.setIconClickable(checkableImageButton, onLongClickListener);
-        this.textInputLayout.addOnEditTextAttachedListener(this.clearTextOnEditTextAttachedListener);
+        CheckableImageButton checkableImageButton2 = textInputLayout3.endIconView;
+        View.OnLongClickListener onLongClickListener = textInputLayout3.endIconOnLongClickListener;
+        checkableImageButton2.setOnClickListener(onClickListener);
+        TextInputLayout.setIconClickable(checkableImageButton2, onLongClickListener);
+        TextInputLayout textInputLayout4 = this.textInputLayout;
+        AnonymousClass3 r1 = this.clearTextOnEditTextAttachedListener;
+        textInputLayout4.editTextAttachedListeners.add(r1);
+        if (textInputLayout4.editText != null) {
+            r1.onEditTextAttached(textInputLayout4);
+        }
         this.textInputLayout.endIconChangedListeners.add(this.endIconChangedListener);
         ValueAnimator ofFloat = ValueAnimator.ofFloat(0.8f, 1.0f);
         ofFloat.setInterpolator(AnimationUtils.LINEAR_OUT_SLOW_IN_INTERPOLATOR);
         ofFloat.setDuration(150L);
         ofFloat.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() { // from class: com.google.android.material.textfield.ClearTextEndIconDelegate.9
             @Override // android.animation.ValueAnimator.AnimatorUpdateListener
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+            public final void onAnimationUpdate(ValueAnimator valueAnimator) {
                 float floatValue = ((Float) valueAnimator.getAnimatedValue()).floatValue();
                 ClearTextEndIconDelegate.this.endIconView.setScaleX(floatValue);
                 ClearTextEndIconDelegate.this.endIconView.setScaleY(floatValue);
             }
         });
         ValueAnimator ofFloat2 = ValueAnimator.ofFloat(HingeAngleProviderKt.FULLY_CLOSED_DEGREES, 1.0f);
-        TimeInterpolator timeInterpolator = AnimationUtils.LINEAR_INTERPOLATOR;
-        ofFloat2.setInterpolator(timeInterpolator);
+        LinearInterpolator linearInterpolator = AnimationUtils.LINEAR_INTERPOLATOR;
+        ofFloat2.setInterpolator(linearInterpolator);
         ofFloat2.setDuration(100L);
         ofFloat2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() { // from class: com.google.android.material.textfield.ClearTextEndIconDelegate.8
             @Override // android.animation.ValueAnimator.AnimatorUpdateListener
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+            public final void onAnimationUpdate(ValueAnimator valueAnimator) {
                 ClearTextEndIconDelegate.this.endIconView.setAlpha(((Float) valueAnimator.getAnimatedValue()).floatValue());
             }
         });
@@ -213,32 +179,39 @@ public class ClearTextEndIconDelegate extends EndIconDelegate {
         animatorSet.playTogether(ofFloat, ofFloat2);
         this.iconInAnim.addListener(new AnimatorListenerAdapter() { // from class: com.google.android.material.textfield.ClearTextEndIconDelegate.6
             @Override // android.animation.AnimatorListenerAdapter, android.animation.Animator.AnimatorListener
-            public void onAnimationStart(Animator animator) {
+            public final void onAnimationStart(Animator animator) {
                 ClearTextEndIconDelegate.this.textInputLayout.setEndIconVisible(true);
             }
         });
         ValueAnimator ofFloat3 = ValueAnimator.ofFloat(1.0f, HingeAngleProviderKt.FULLY_CLOSED_DEGREES);
-        ofFloat3.setInterpolator(timeInterpolator);
+        ofFloat3.setInterpolator(linearInterpolator);
         ofFloat3.setDuration(100L);
         ofFloat3.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() { // from class: com.google.android.material.textfield.ClearTextEndIconDelegate.8
             @Override // android.animation.ValueAnimator.AnimatorUpdateListener
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+            public final void onAnimationUpdate(ValueAnimator valueAnimator) {
                 ClearTextEndIconDelegate.this.endIconView.setAlpha(((Float) valueAnimator.getAnimatedValue()).floatValue());
             }
         });
         this.iconOutAnim = ofFloat3;
         ofFloat3.addListener(new AnimatorListenerAdapter() { // from class: com.google.android.material.textfield.ClearTextEndIconDelegate.7
             @Override // android.animation.AnimatorListenerAdapter, android.animation.Animator.AnimatorListener
-            public void onAnimationEnd(Animator animator) {
+            public final void onAnimationEnd(Animator animator) {
                 ClearTextEndIconDelegate.this.textInputLayout.setEndIconVisible(false);
             }
         });
     }
 
     @Override // com.google.android.material.textfield.EndIconDelegate
-    public void onSuffixVisibilityChanged(boolean z) {
+    public final void onSuffixVisibilityChanged(boolean z) {
         if (this.textInputLayout.suffixText != null) {
             animateIcon(z);
         }
+    }
+
+    /* JADX WARN: Type inference failed for: r1v1, types: [com.google.android.material.textfield.ClearTextEndIconDelegate$1] */
+    /* JADX WARN: Type inference failed for: r1v2, types: [com.google.android.material.textfield.ClearTextEndIconDelegate$2] */
+    /* JADX WARN: Type inference failed for: r1v4, types: [com.google.android.material.textfield.ClearTextEndIconDelegate$4] */
+    public ClearTextEndIconDelegate(TextInputLayout textInputLayout, int i) {
+        super(textInputLayout, i);
     }
 }

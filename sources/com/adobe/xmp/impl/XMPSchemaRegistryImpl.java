@@ -1,47 +1,34 @@
 package com.adobe.xmp.impl;
 
-import androidx.recyclerview.R$attr$$ExternalSyntheticOutline0;
 import com.adobe.xmp.XMPException;
-import com.adobe.xmp.XMPPathFactory$$ExternalSyntheticOutline0;
-import com.adobe.xmp.XMPSchemaRegistry;
 import com.adobe.xmp.options.AliasOptions;
 import com.adobe.xmp.options.PropertyOptions;
 import com.adobe.xmp.properties.XMPAliasInfo;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 /* loaded from: classes.dex */
-public final class XMPSchemaRegistryImpl implements XMPSchemaRegistry {
-    public Map namespaceToPrefixMap = new HashMap();
-    public Map prefixToNamespaceMap = new HashMap();
-    public Map aliasMap = new HashMap();
+public final class XMPSchemaRegistryImpl {
+    public HashMap namespaceToPrefixMap = new HashMap();
+    public HashMap prefixToNamespaceMap = new HashMap();
+    public HashMap aliasMap = new HashMap();
     public Pattern p = Pattern.compile("[/*?\\[\\]]");
 
-    public XMPSchemaRegistryImpl() {
-        try {
-            registerStandardNamespaces();
-            registerStandardAliases();
-        } catch (XMPException unused) {
-            throw new RuntimeException("The XMPSchemaRegistry cannot be initialized!");
-        }
-    }
-
-    public synchronized XMPAliasInfo findAlias(String qname) {
-        return (XMPAliasInfo) this.aliasMap.get(qname);
-    }
-
-    public synchronized String getNamespacePrefix(String namespaceURI) {
+    public final synchronized String getNamespacePrefix(String namespaceURI) {
         return (String) this.namespaceToPrefixMap.get(namespaceURI);
     }
 
-    public synchronized void registerAlias(String aliasNS, String aliasProp, final String actualNS, final String actualProp, final AliasOptions aliasForm) throws XMPException {
+    public final synchronized void registerAlias(String aliasNS, String aliasProp, final String actualNS, final String actualProp, final AliasOptions aliasForm) throws XMPException {
         final AliasOptions aliasOptions;
+        String str;
+        String str2;
         ParameterAsserts.assertSchemaNS(aliasNS);
         ParameterAsserts.assertPropName(aliasProp);
         ParameterAsserts.assertSchemaNS(actualNS);
         ParameterAsserts.assertPropName(actualProp);
         if (aliasForm != null) {
-            aliasOptions = new AliasOptions(XMPNodeUtils.verifySetOptions(new PropertyOptions(aliasForm.options), null).options);
+            PropertyOptions propertyOptions = new PropertyOptions(aliasForm.options);
+            XMPNodeUtils.verifySetOptions(propertyOptions);
+            aliasOptions = new AliasOptions(propertyOptions.options);
         } else {
             aliasOptions = new AliasOptions();
         }
@@ -53,40 +40,54 @@ public final class XMPSchemaRegistryImpl implements XMPSchemaRegistry {
         if (namespacePrefix == null) {
             throw new XMPException("Alias namespace is not registered", 101);
         } else if (namespacePrefix2 != null) {
-            String concat = aliasProp.length() != 0 ? namespacePrefix.concat(aliasProp) : new String(namespacePrefix);
-            if (!this.aliasMap.containsKey(concat)) {
-                if (!this.aliasMap.containsKey(actualProp.length() != 0 ? namespacePrefix2.concat(actualProp) : new String(namespacePrefix2))) {
-                    this.aliasMap.put(concat, new XMPAliasInfo() { // from class: com.adobe.xmp.impl.XMPSchemaRegistryImpl.1
+            if (aliasProp.length() != 0) {
+                str = namespacePrefix.concat(aliasProp);
+            } else {
+                str = new String(namespacePrefix);
+            }
+            if (!this.aliasMap.containsKey(str)) {
+                HashMap hashMap = this.aliasMap;
+                if (actualProp.length() != 0) {
+                    str2 = namespacePrefix2.concat(actualProp);
+                } else {
+                    str2 = new String(namespacePrefix2);
+                }
+                if (!hashMap.containsKey(str2)) {
+                    this.aliasMap.put(str, new XMPAliasInfo() { // from class: com.adobe.xmp.impl.XMPSchemaRegistryImpl.1
+                        public final String toString() {
+                            String str3 = namespacePrefix2;
+                            String str4 = actualProp;
+                            String str5 = actualNS;
+                            String valueOf = String.valueOf(aliasOptions);
+                            StringBuilder sb = new StringBuilder(valueOf.length() + ParseRDF$$ExternalSyntheticOutline0.m(str5, ParseRDF$$ExternalSyntheticOutline0.m(str4, ParseRDF$$ExternalSyntheticOutline0.m(str3, 14))));
+                            sb.append(str3);
+                            sb.append(str4);
+                            sb.append(" NS(");
+                            sb.append(str5);
+                            sb.append("), FORM (");
+                            sb.append(valueOf);
+                            sb.append(")");
+                            return sb.toString();
+                        }
+
                         @Override // com.adobe.xmp.properties.XMPAliasInfo
-                        public AliasOptions getAliasForm() {
+                        public final AliasOptions getAliasForm() {
                             return aliasOptions;
                         }
 
                         @Override // com.adobe.xmp.properties.XMPAliasInfo
-                        public String getNamespace() {
+                        public final String getNamespace() {
                             return actualNS;
                         }
 
                         @Override // com.adobe.xmp.properties.XMPAliasInfo
-                        public String getPrefix() {
+                        public final String getPrefix() {
                             return namespacePrefix2;
                         }
 
                         @Override // com.adobe.xmp.properties.XMPAliasInfo
-                        public String getPropName() {
+                        public final String getPropName() {
                             return actualProp;
-                        }
-
-                        public String toString() {
-                            String str = namespacePrefix2;
-                            String str2 = actualProp;
-                            String str3 = actualNS;
-                            String valueOf = String.valueOf(aliasOptions);
-                            StringBuilder m = R$attr$$ExternalSyntheticOutline0.m(valueOf.length() + XMPPathFactory$$ExternalSyntheticOutline0.m(str3, XMPPathFactory$$ExternalSyntheticOutline0.m(str2, XMPPathFactory$$ExternalSyntheticOutline0.m(str, 14))), str, str2, " NS(", str3);
-                            m.append("), FORM (");
-                            m.append(valueOf);
-                            m.append(")");
-                            return m.toString();
                         }
                     });
                 } else {
@@ -100,7 +101,7 @@ public final class XMPSchemaRegistryImpl implements XMPSchemaRegistry {
         }
     }
 
-    public synchronized String registerNamespace(String namespaceURI, String suggestedPrefix) throws XMPException {
+    public final synchronized String registerNamespace(String namespaceURI, String suggestedPrefix) throws XMPException {
         ParameterAsserts.assertSchemaNS(namespaceURI);
         if (suggestedPrefix == null || suggestedPrefix.length() == 0) {
             throw new XMPException("Empty prefix", 4);
@@ -228,5 +229,14 @@ public final class XMPSchemaRegistryImpl implements XMPSchemaRegistry {
         registerNamespace("http://ns.adobe.com/xap/1.0/sType/Job#", "stJob");
         registerNamespace("http://ns.adobe.com/xap/1.0/sType/ManifestItem#", "stMfs");
         registerNamespace("http://ns.adobe.com/xmp/Identifier/qual/1.0/", "xmpidq");
+    }
+
+    public XMPSchemaRegistryImpl() {
+        try {
+            registerStandardNamespaces();
+            registerStandardAliases();
+        } catch (XMPException unused) {
+            throw new RuntimeException("The XMPSchemaRegistry cannot be initialized!");
+        }
     }
 }

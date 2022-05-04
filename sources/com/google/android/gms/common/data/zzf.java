@@ -5,13 +5,14 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.android.gms.internal.zzbkw;
+/* compiled from: DataHolderCreator.java */
 /* loaded from: classes.dex */
 public final class zzf implements Parcelable.Creator<DataHolder> {
     @Override // android.os.Parcelable.Creator
     public final DataHolder createFromParcel(Parcel parcel) {
         int zza = zzbkw.zza(parcel);
-        String[] strArr = null;
         int i = 0;
+        String[] strArr = null;
         CursorWindow[] cursorWindowArr = null;
         Bundle bundle = null;
         int i2 = 0;

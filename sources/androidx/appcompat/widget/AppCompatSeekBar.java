@@ -7,8 +7,14 @@ import android.util.AttributeSet;
 import android.widget.SeekBar;
 import com.android.systemui.shared.R;
 /* loaded from: classes.dex */
-public class AppCompatSeekBar extends SeekBar {
+public final class AppCompatSeekBar extends SeekBar {
     public final AppCompatSeekBarHelper mAppCompatSeekBarHelper;
+
+    @Override // android.widget.AbsSeekBar, android.widget.ProgressBar, android.view.View
+    public final synchronized void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        this.mAppCompatSeekBarHelper.drawTickMarks(canvas);
+    }
 
     public AppCompatSeekBar(Context context, AttributeSet attributeSet) {
         super(context, attributeSet, R.attr.seekBarStyle);
@@ -19,7 +25,7 @@ public class AppCompatSeekBar extends SeekBar {
     }
 
     @Override // android.widget.AbsSeekBar, android.widget.ProgressBar, android.view.View
-    public void drawableStateChanged() {
+    public final void drawableStateChanged() {
         super.drawableStateChanged();
         AppCompatSeekBarHelper appCompatSeekBarHelper = this.mAppCompatSeekBarHelper;
         Drawable drawable = appCompatSeekBarHelper.mTickMark;
@@ -29,17 +35,11 @@ public class AppCompatSeekBar extends SeekBar {
     }
 
     @Override // android.widget.AbsSeekBar, android.widget.ProgressBar, android.view.View
-    public void jumpDrawablesToCurrentState() {
+    public final void jumpDrawablesToCurrentState() {
         super.jumpDrawablesToCurrentState();
         Drawable drawable = this.mAppCompatSeekBarHelper.mTickMark;
         if (drawable != null) {
             drawable.jumpToCurrentState();
         }
-    }
-
-    @Override // android.widget.AbsSeekBar, android.widget.ProgressBar, android.view.View
-    public synchronized void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        this.mAppCompatSeekBarHelper.drawTickMarks(canvas);
     }
 }

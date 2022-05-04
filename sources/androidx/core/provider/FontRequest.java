@@ -1,10 +1,8 @@
 package androidx.core.provider;
 
 import android.support.media.ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0;
-import android.support.v4.app.FragmentTabHost$SavedState$$ExternalSyntheticOutline0;
 import android.util.Base64;
 import java.util.List;
-import java.util.Objects;
 /* loaded from: classes.dex */
 public final class FontRequest {
     public final List<List<byte[]>> mCertificates;
@@ -13,16 +11,7 @@ public final class FontRequest {
     public final String mProviderPackage;
     public final String mQuery;
 
-    public FontRequest(String providerAuthority, String providerPackage, String query, List<List<byte[]>> certificates) {
-        this.mProviderAuthority = providerAuthority;
-        this.mProviderPackage = providerPackage;
-        this.mQuery = query;
-        Objects.requireNonNull(certificates);
-        this.mCertificates = certificates;
-        this.mIdentifier = providerAuthority + "-" + providerPackage + "-" + query;
-    }
-
-    public String toString() {
+    public final String toString() {
         StringBuilder sb = new StringBuilder();
         StringBuilder m = ExifInterface$ByteOrderedDataInputStream$$ExternalSyntheticOutline0.m("FontRequest {mProviderAuthority: ");
         m.append(this.mProviderAuthority);
@@ -42,6 +31,17 @@ public final class FontRequest {
             }
             sb.append(" ]");
         }
-        return FragmentTabHost$SavedState$$ExternalSyntheticOutline0.m(sb, "}", "mCertificatesArray: 0");
+        sb.append("}");
+        sb.append("mCertificatesArray: 0");
+        return sb.toString();
+    }
+
+    public FontRequest(String str, String str2, String str3, List<List<byte[]>> list) {
+        this.mProviderAuthority = str;
+        this.mProviderPackage = str2;
+        this.mQuery = str3;
+        list.getClass();
+        this.mCertificates = list;
+        this.mIdentifier = str + "-" + str2 + "-" + str3;
     }
 }

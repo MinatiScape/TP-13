@@ -5,6 +5,7 @@ import android.app.WallpaperColors;
 import android.graphics.Bitmap;
 import com.android.wallpaper.model.LiveWallpaperInfo;
 import com.android.wallpaper.model.WallpaperInfo;
+import java.util.ArrayList;
 import java.util.List;
 /* loaded from: classes.dex */
 public interface WallpaperPreferences {
@@ -18,9 +19,9 @@ public interface WallpaperPreferences {
 
     int getAppLaunchCount();
 
-    List<Long> getDailyRotationsInLastWeek();
+    ArrayList getDailyRotationsInLastWeek();
 
-    List<Long> getDailyRotationsPreviousDay();
+    ArrayList getDailyRotationsPreviousDay();
 
     long getDailyWallpaperEnabledTimestamp();
 
@@ -42,8 +43,6 @@ public interface WallpaperPreferences {
 
     String getHomeWallpaperBackingFileName();
 
-    String getHomeWallpaperBaseImageUrl();
-
     String getHomeWallpaperCollectionId();
 
     long getHomeWallpaperHashCode();
@@ -60,8 +59,6 @@ public interface WallpaperPreferences {
     long getLastDailyLogTimestamp();
 
     long getLastDailyRotationTimestamp();
-
-    long getLastSyncTimestamp();
 
     int getLockWallpaperActionIconRes();
 
@@ -89,6 +86,8 @@ public interface WallpaperPreferences {
     int getPendingDailyWallpaperUpdateStatus();
 
     int getPendingWallpaperSetStatus();
+
+    WallpaperColors getWallpaperColors(String str);
 
     int getWallpaperPresentationMode();
 
@@ -135,8 +134,6 @@ public interface WallpaperPreferences {
 
     void setLastDailyLogTimestamp(long j);
 
-    void setLastSyncTimestamp(long j);
-
     void setLockWallpaperActionIconRes(int i);
 
     void setLockWallpaperActionLabelRes(int i);
@@ -156,11 +153,11 @@ public interface WallpaperPreferences {
 
     void setPendingDailyWallpaperUpdateStatus(int i);
 
-    void setPendingDailyWallpaperUpdateStatusSync(int i);
+    void setPendingDailyWallpaperUpdateStatusSync();
 
     void setPendingWallpaperSetStatus(int i);
 
-    void setPendingWallpaperSetStatusSync(int i);
+    void setPendingWallpaperSetStatusSync();
 
     void setWallpaperPresentationMode(int i);
 
@@ -172,6 +169,8 @@ public interface WallpaperPreferences {
 
     default void storeLatestHomeWallpaper(String str, List<String> list, String str2, String str3, Bitmap bitmap, WallpaperColors wallpaperColors) {
     }
+
+    void storeWallpaperColors(String str, WallpaperColors wallpaperColors);
 
     void updateDailyWallpaperSet(int i, String str, String str2);
 }

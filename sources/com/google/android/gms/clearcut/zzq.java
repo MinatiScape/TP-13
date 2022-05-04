@@ -5,19 +5,20 @@ import android.os.Parcelable;
 import com.google.android.gms.clearcut.internal.PlayLoggerContext;
 import com.google.android.gms.internal.zzbkw;
 import com.google.android.gms.phenotype.ExperimentTokens;
+/* compiled from: LogEventParcelableCreator.java */
 /* loaded from: classes.dex */
 public final class zzq implements Parcelable.Creator<LogEventParcelable> {
     @Override // android.os.Parcelable.Creator
     public final /* synthetic */ LogEventParcelable createFromParcel(Parcel parcel) {
         int zza = zzbkw.zza(parcel);
         PlayLoggerContext playLoggerContext = null;
-        boolean z = true;
         byte[] bArr = null;
         int[] iArr = null;
         String[] strArr = null;
         int[] iArr2 = null;
         byte[][] bArr2 = null;
         ExperimentTokens[] experimentTokensArr = null;
+        boolean z = true;
         while (parcel.dataPosition() < zza) {
             int readInt = parcel.readInt();
             switch (65535 & readInt) {

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
+/* compiled from: ConnectionlessInProgressCalls.java */
 /* loaded from: classes.dex */
 public final class zzaf {
     public final Map<BasePendingResult<?>, Boolean> zza = Collections.synchronizedMap(new WeakHashMap());
@@ -23,7 +24,13 @@ public final class zzaf {
         }
         for (Map.Entry entry : hashMap.entrySet()) {
             if (z || ((Boolean) entry.getValue()).booleanValue()) {
-                ((BasePendingResult) entry.getKey()).zzd(status);
+                BasePendingResult basePendingResult = (BasePendingResult) entry.getKey();
+                synchronized (basePendingResult.zza) {
+                    if (!basePendingResult.zze()) {
+                        basePendingResult.zza((BasePendingResult) basePendingResult.zza(status));
+                        basePendingResult.zzm = true;
+                    }
+                }
             }
         }
         for (Map.Entry entry2 : hashMap2.entrySet()) {

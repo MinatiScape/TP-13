@@ -6,15 +6,12 @@ import com.google.protobuf.Internal;
 import com.google.protobuf.LazyField;
 import com.google.protobuf.MessageLite;
 import com.google.protobuf.SmallSortedMap;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 /* loaded from: classes.dex */
 public final class FieldSet<FieldDescriptorType extends FieldDescriptorLite<FieldDescriptorType>> {
-    public static final FieldSet DEFAULT_INSTANCE = new FieldSet(true);
-    public final SmallSortedMap<FieldDescriptorType, Object> fields;
+    public final SmallSortedMap.AnonymousClass1 fields;
     public boolean hasLazyField;
     public boolean isImmutable;
 
@@ -22,15 +19,15 @@ public final class FieldSet<FieldDescriptorType extends FieldDescriptorLite<Fiel
     public interface FieldDescriptorLite<T extends FieldDescriptorLite<T>> extends Comparable<T> {
         WireFormat$JavaType getLiteJavaType();
 
-        WireFormat$FieldType getLiteType();
+        void getLiteType();
 
-        int getNumber();
+        void getNumber();
 
-        MessageLite.Builder internalMergeFrom(MessageLite.Builder builder, MessageLite messageLite);
+        GeneratedMessageLite.Builder internalMergeFrom(MessageLite.Builder builder, MessageLite messageLite);
 
-        boolean isPacked();
+        void isPacked();
 
-        boolean isRepeated();
+        void isRepeated();
     }
 
     public FieldSet() {
@@ -39,103 +36,22 @@ public final class FieldSet<FieldDescriptorType extends FieldDescriptorLite<Fiel
         this.fields = new SmallSortedMap.AnonymousClass1(16);
     }
 
-    public static int computeElementSize(WireFormat$FieldType wireFormat$FieldType, int i, Object obj) {
-        int computeTagSize = CodedOutputStream.computeTagSize(i);
-        if (wireFormat$FieldType == WireFormat$FieldType.GROUP) {
-            computeTagSize *= 2;
-        }
-        return computeElementSizeNoTag(wireFormat$FieldType, obj) + computeTagSize;
-    }
-
-    public static int computeElementSizeNoTag(WireFormat$FieldType wireFormat$FieldType, Object obj) {
-        switch (wireFormat$FieldType.ordinal()) {
-            case 0:
-                ((Double) obj).doubleValue();
-                Logger logger = CodedOutputStream.logger;
-                return 8;
-            case 1:
-                ((Float) obj).floatValue();
-                Logger logger2 = CodedOutputStream.logger;
-                return 4;
-            case 2:
-                return CodedOutputStream.computeUInt64SizeNoTag(((Long) obj).longValue());
-            case 3:
-                return CodedOutputStream.computeUInt64SizeNoTag(((Long) obj).longValue());
-            case 4:
-                return CodedOutputStream.computeInt32SizeNoTag(((Integer) obj).intValue());
-            case 5:
-                ((Long) obj).longValue();
-                Logger logger3 = CodedOutputStream.logger;
-                return 8;
-            case 6:
-                ((Integer) obj).intValue();
-                Logger logger4 = CodedOutputStream.logger;
-                return 4;
-            case 7:
-                ((Boolean) obj).booleanValue();
-                Logger logger5 = CodedOutputStream.logger;
-                return 1;
-            case 8:
-                if (obj instanceof ByteString) {
-                    return CodedOutputStream.computeBytesSizeNoTag((ByteString) obj);
-                }
-                return CodedOutputStream.computeStringSizeNoTag((String) obj);
-            case 9:
-                Logger logger6 = CodedOutputStream.logger;
-                return ((MessageLite) obj).getSerializedSize();
-            case 10:
-                if (obj instanceof LazyField) {
-                    return CodedOutputStream.computeLazyFieldSizeNoTag((LazyField) obj);
-                }
-                Logger logger7 = CodedOutputStream.logger;
-                return CodedOutputStream.computeLengthDelimitedFieldSize(((MessageLite) obj).getSerializedSize());
-            case 11:
-                if (obj instanceof ByteString) {
-                    return CodedOutputStream.computeBytesSizeNoTag((ByteString) obj);
-                }
-                Logger logger8 = CodedOutputStream.logger;
-                return CodedOutputStream.computeLengthDelimitedFieldSize(((byte[]) obj).length);
-            case 12:
-                return CodedOutputStream.computeUInt32SizeNoTag(((Integer) obj).intValue());
-            case 13:
-                if (obj instanceof Internal.EnumLite) {
-                    return CodedOutputStream.computeInt32SizeNoTag(((Internal.EnumLite) obj).getNumber());
-                }
-                return CodedOutputStream.computeInt32SizeNoTag(((Integer) obj).intValue());
-            case 14:
-                ((Integer) obj).intValue();
-                Logger logger9 = CodedOutputStream.logger;
-                return 4;
-            case 15:
-                ((Long) obj).longValue();
-                Logger logger10 = CodedOutputStream.logger;
-                return 8;
-            case 16:
-                return CodedOutputStream.computeSInt32SizeNoTag(((Integer) obj).intValue());
-            case 17:
-                return CodedOutputStream.computeSInt64SizeNoTag(((Long) obj).longValue());
-            default:
-                throw new RuntimeException("There is no way to get here, but the compiler thinks otherwise.");
-        }
-    }
-
-    public static int computeFieldSize(FieldDescriptorLite<?> fieldDescriptorLite, Object obj) {
-        WireFormat$FieldType liteType = fieldDescriptorLite.getLiteType();
-        int number = fieldDescriptorLite.getNumber();
-        if (!fieldDescriptorLite.isRepeated()) {
-            return computeElementSize(liteType, number, obj);
-        }
-        int i = 0;
-        if (fieldDescriptorLite.isPacked()) {
-            for (Object obj2 : (List) obj) {
-                i += computeElementSizeNoTag(liteType, obj2);
+    public final boolean isInitialized() {
+        for (int i = 0; i < this.fields.getNumArrayEntries(); i++) {
+            if (!isInitialized(this.fields.getArrayEntryAt(i))) {
+                return false;
             }
-            return CodedOutputStream.computeTagSize(number) + i + CodedOutputStream.computeUInt32SizeNoTag(i);
         }
-        for (Object obj3 : (List) obj) {
-            i += computeElementSize(liteType, number, obj3);
+        for (Map.Entry<Object, Object> entry : this.fields.getOverflowEntries()) {
+            if (!isInitialized(entry)) {
+                return false;
+            }
         }
-        return i;
+        return true;
+    }
+
+    static {
+        new FieldSet(0);
     }
 
     /* JADX WARN: Code restructure failed: missing block: B:11:0x0022, code lost:
@@ -157,7 +73,7 @@ public final class FieldSet<FieldDescriptorType extends FieldDescriptorLite<Fiel
     public static void verifyType(com.google.protobuf.WireFormat$FieldType r2, java.lang.Object r3) {
         /*
             java.nio.charset.Charset r0 = com.google.protobuf.Internal.UTF_8
-            java.util.Objects.requireNonNull(r3)
+            r3.getClass()
             com.google.protobuf.WireFormat$JavaType r2 = r2.getJavaType()
             int r2 = r2.ordinal()
             r0 = 1
@@ -228,17 +144,21 @@ public final class FieldSet<FieldDescriptorType extends FieldDescriptorLite<Fiel
         throw new UnsupportedOperationException("Method not decompiled: com.google.protobuf.FieldSet.verifyType(com.google.protobuf.WireFormat$FieldType, java.lang.Object):void");
     }
 
-    public final Object cloneIfMutable(Object obj) {
-        if (!(obj instanceof byte[])) {
-            return obj;
+    /* JADX WARN: Multi-variable type inference failed */
+    public final FieldSet<FieldDescriptorType> clone() {
+        FieldSet<FieldDescriptorType> fieldSet = (FieldSet<FieldDescriptorType>) new FieldSet();
+        for (int i = 0; i < this.fields.getNumArrayEntries(); i++) {
+            Map.Entry<Object, Object> arrayEntryAt = this.fields.getArrayEntryAt(i);
+            fieldSet.setField((FieldDescriptorLite) arrayEntryAt.getKey(), arrayEntryAt.getValue());
         }
-        byte[] bArr = (byte[]) obj;
-        byte[] bArr2 = new byte[bArr.length];
-        System.arraycopy(bArr, 0, bArr2, 0, bArr.length);
-        return bArr2;
+        for (Map.Entry<Object, Object> entry : this.fields.getOverflowEntries()) {
+            fieldSet.setField((FieldDescriptorLite) entry.getKey(), entry.getValue());
+        }
+        fieldSet.hasLazyField = this.hasLazyField;
+        return fieldSet;
     }
 
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
@@ -248,140 +168,203 @@ public final class FieldSet<FieldDescriptorType extends FieldDescriptorLite<Fiel
         return this.fields.equals(((FieldSet) obj).fields);
     }
 
-    public Object getField(FieldDescriptorType fielddescriptortype) {
+    public final Object getField(FieldDescriptorType fielddescriptortype) {
         Object obj = this.fields.get(fielddescriptortype);
-        return obj instanceof LazyField ? ((LazyField) obj).getValue() : obj;
+        if (obj instanceof LazyField) {
+            return ((LazyField) obj).getValue(null);
+        }
+        return obj;
     }
 
-    public final int getMessageSetSerializedSize(Map.Entry<FieldDescriptorType, Object> entry) {
-        FieldDescriptorType key = entry.getKey();
-        Object value = entry.getValue();
-        if (key.getLiteJavaType() != WireFormat$JavaType.MESSAGE || key.isRepeated() || key.isPacked()) {
-            return computeFieldSize(key, value);
-        }
-        if (value instanceof LazyField) {
-            return CodedOutputStream.computeLazyFieldSizeNoTag((LazyField) value) + CodedOutputStream.computeTagSize(3) + CodedOutputStream.computeUInt32Size(2, entry.getKey().getNumber()) + (CodedOutputStream.computeTagSize(1) * 2);
-        }
-        return CodedOutputStream.computeLengthDelimitedFieldSize(((MessageLite) value).getSerializedSize()) + CodedOutputStream.computeTagSize(3) + CodedOutputStream.computeUInt32Size(2, entry.getKey().getNumber()) + (CodedOutputStream.computeTagSize(1) * 2);
-    }
-
-    public int hashCode() {
+    public final int hashCode() {
         return this.fields.hashCode();
     }
 
-    public boolean isEmpty() {
-        return this.fields.isEmpty();
-    }
-
-    public boolean isInitialized() {
-        for (int i = 0; i < this.fields.getNumArrayEntries(); i++) {
-            if (!isInitialized(this.fields.getArrayEntryAt(i))) {
-                return false;
-            }
-        }
-        for (Map.Entry<FieldDescriptorType, Object> entry : this.fields.getOverflowEntries()) {
-            if (!isInitialized(entry)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public Iterator<Map.Entry<FieldDescriptorType, Object>> iterator() {
+    public final Iterator<Map.Entry<FieldDescriptorType, Object>> iterator() {
         if (this.hasLazyField) {
-            return new LazyField.LazyIterator(this.fields.entrySet().iterator());
+            return new LazyField.LazyIterator(((SmallSortedMap.EntrySet) this.fields.entrySet()).iterator());
         }
-        return this.fields.entrySet().iterator();
+        return ((SmallSortedMap.EntrySet) this.fields.entrySet()).iterator();
+    }
+
+    public static int computeElementSize(WireFormat$FieldType wireFormat$FieldType, int i, Object obj) {
+        int computeTagSize = CodedOutputStream.computeTagSize(i);
+        if (wireFormat$FieldType == WireFormat$FieldType.GROUP) {
+            computeTagSize *= 2;
+        }
+        return computeElementSizeNoTag(wireFormat$FieldType, obj) + computeTagSize;
+    }
+
+    public static int computeElementSizeNoTag(WireFormat$FieldType wireFormat$FieldType, Object obj) {
+        switch (wireFormat$FieldType.ordinal()) {
+            case 0:
+                ((Double) obj).doubleValue();
+                Logger logger = CodedOutputStream.logger;
+                return 8;
+            case 1:
+                ((Float) obj).floatValue();
+                Logger logger2 = CodedOutputStream.logger;
+                return 4;
+            case 2:
+                return CodedOutputStream.computeUInt64SizeNoTag(((Long) obj).longValue());
+            case 3:
+                return CodedOutputStream.computeUInt64SizeNoTag(((Long) obj).longValue());
+            case 4:
+                return CodedOutputStream.computeInt32SizeNoTag(((Integer) obj).intValue());
+            case 5:
+                ((Long) obj).longValue();
+                Logger logger3 = CodedOutputStream.logger;
+                return 8;
+            case 6:
+                ((Integer) obj).intValue();
+                Logger logger4 = CodedOutputStream.logger;
+                return 4;
+            case 7:
+                ((Boolean) obj).booleanValue();
+                Logger logger5 = CodedOutputStream.logger;
+                return 1;
+            case 8:
+                if (!(obj instanceof ByteString)) {
+                    return CodedOutputStream.computeStringSizeNoTag((String) obj);
+                }
+                Logger logger6 = CodedOutputStream.logger;
+                int size = ((ByteString) obj).size();
+                return CodedOutputStream.computeUInt32SizeNoTag(size) + size;
+            case 9:
+                Logger logger7 = CodedOutputStream.logger;
+                return ((MessageLite) obj).getSerializedSize();
+            case 10:
+                if (obj instanceof LazyField) {
+                    return CodedOutputStream.computeLazyFieldSizeNoTag((LazyField) obj);
+                }
+                Logger logger8 = CodedOutputStream.logger;
+                int serializedSize = ((MessageLite) obj).getSerializedSize();
+                return CodedOutputStream.computeUInt32SizeNoTag(serializedSize) + serializedSize;
+            case 11:
+                if (obj instanceof ByteString) {
+                    Logger logger9 = CodedOutputStream.logger;
+                    int size2 = ((ByteString) obj).size();
+                    return CodedOutputStream.computeUInt32SizeNoTag(size2) + size2;
+                }
+                Logger logger10 = CodedOutputStream.logger;
+                int length = ((byte[]) obj).length;
+                return CodedOutputStream.computeUInt32SizeNoTag(length) + length;
+            case 12:
+                return CodedOutputStream.computeUInt32SizeNoTag(((Integer) obj).intValue());
+            case 13:
+                if (obj instanceof Internal.EnumLite) {
+                    return CodedOutputStream.computeInt32SizeNoTag(((Internal.EnumLite) obj).getNumber());
+                }
+                return CodedOutputStream.computeInt32SizeNoTag(((Integer) obj).intValue());
+            case 14:
+                ((Integer) obj).intValue();
+                Logger logger11 = CodedOutputStream.logger;
+                return 4;
+            case 15:
+                ((Long) obj).longValue();
+                Logger logger12 = CodedOutputStream.logger;
+                return 8;
+            case 16:
+                int intValue = ((Integer) obj).intValue();
+                return CodedOutputStream.computeUInt32SizeNoTag((intValue >> 31) ^ (intValue << 1));
+            case 17:
+                long longValue = ((Long) obj).longValue();
+                return CodedOutputStream.computeUInt64SizeNoTag((longValue >> 63) ^ (longValue << 1));
+            default:
+                throw new RuntimeException("There is no way to get here, but the compiler thinks otherwise.");
+        }
+    }
+
+    public static int computeFieldSize(FieldDescriptorLite<?> fieldDescriptorLite, Object obj) {
+        fieldDescriptorLite.getLiteType();
+        fieldDescriptorLite.getNumber();
+        fieldDescriptorLite.isRepeated();
+        return computeElementSize(null, 0, obj);
+    }
+
+    public static int getMessageSetSerializedSize(Map.Entry entry) {
+        FieldDescriptorLite fieldDescriptorLite = (FieldDescriptorLite) entry.getKey();
+        Object value = entry.getValue();
+        if (fieldDescriptorLite.getLiteJavaType() != WireFormat$JavaType.MESSAGE) {
+            return computeFieldSize(fieldDescriptorLite, value);
+        }
+        fieldDescriptorLite.isRepeated();
+        fieldDescriptorLite.isPacked();
+        if (value instanceof LazyField) {
+            ((FieldDescriptorLite) entry.getKey()).getNumber();
+            return CodedOutputStream.computeLazyFieldSizeNoTag((LazyField) value) + CodedOutputStream.computeTagSize(3) + CodedOutputStream.computeUInt32Size(2, 0) + (CodedOutputStream.computeTagSize(1) * 2);
+        }
+        ((FieldDescriptorLite) entry.getKey()).getNumber();
+        int computeUInt32Size = CodedOutputStream.computeUInt32Size(2, 0) + (CodedOutputStream.computeTagSize(1) * 2);
+        int computeTagSize = CodedOutputStream.computeTagSize(3);
+        int serializedSize = ((MessageLite) value).getSerializedSize();
+        return CodedOutputStream.computeUInt32SizeNoTag(serializedSize) + serializedSize + computeTagSize + computeUInt32Size;
     }
 
     public final void mergeFromField(Map.Entry<FieldDescriptorType, Object> entry) {
         FieldDescriptorType key = entry.getKey();
-        Object value = entry.getValue();
+        byte[] value = entry.getValue();
         if (value instanceof LazyField) {
-            value = ((LazyField) value).getValue();
+            value = ((LazyField) value).getValue(null);
         }
-        if (key.isRepeated()) {
+        key.isRepeated();
+        if (key.getLiteJavaType() == WireFormat$JavaType.MESSAGE) {
             Object field = getField(key);
             if (field == null) {
-                field = new ArrayList();
-            }
-            for (Object obj : (List) value) {
-                ((List) field).add(cloneIfMutable(obj));
-            }
-            this.fields.put((SmallSortedMap<FieldDescriptorType, Object>) key, (FieldDescriptorType) field);
-        } else if (key.getLiteJavaType() == WireFormat$JavaType.MESSAGE) {
-            Object field2 = getField(key);
-            if (field2 == null) {
-                this.fields.put((SmallSortedMap<FieldDescriptorType, Object>) key, (FieldDescriptorType) cloneIfMutable(value));
+                SmallSortedMap.AnonymousClass1 r4 = this.fields;
+                if (value instanceof byte[]) {
+                    byte[] bArr = (byte[]) value;
+                    byte[] bArr2 = new byte[bArr.length];
+                    System.arraycopy(bArr, 0, bArr2, 0, bArr.length);
+                    value = bArr2;
+                }
+                r4.put((SmallSortedMap.AnonymousClass1) key, (FieldDescriptorType) value);
                 return;
             }
-            this.fields.put((SmallSortedMap<FieldDescriptorType, Object>) key, (FieldDescriptorType) ((GeneratedMessageLite.Builder) key.internalMergeFrom(((MessageLite) field2).toBuilder(), (MessageLite) value)).build());
-        } else {
-            this.fields.put((SmallSortedMap<FieldDescriptorType, Object>) key, (FieldDescriptorType) cloneIfMutable(value));
+            this.fields.put((SmallSortedMap.AnonymousClass1) key, (FieldDescriptorType) key.internalMergeFrom(((MessageLite) field).toBuilder$1(), (MessageLite) value).build());
+            return;
         }
+        SmallSortedMap.AnonymousClass1 r42 = this.fields;
+        if (value instanceof byte[]) {
+            byte[] bArr3 = (byte[]) value;
+            byte[] bArr4 = new byte[bArr3.length];
+            System.arraycopy(bArr3, 0, bArr4, 0, bArr3.length);
+            value = bArr4;
+        }
+        r42.put((SmallSortedMap.AnonymousClass1) key, (FieldDescriptorType) value);
     }
 
-    public void setField(FieldDescriptorType fielddescriptortype, Object obj) {
-        if (!fielddescriptortype.isRepeated()) {
-            verifyType(fielddescriptortype.getLiteType(), obj);
-        } else if (obj instanceof List) {
-            ArrayList arrayList = new ArrayList();
-            arrayList.addAll((List) obj);
-            Iterator it = arrayList.iterator();
-            while (it.hasNext()) {
-                verifyType(fielddescriptortype.getLiteType(), it.next());
-            }
-            obj = arrayList;
-        } else {
-            throw new IllegalArgumentException("Wrong object type used with protocol message reflection.");
-        }
+    public final void setField(FieldDescriptorType fielddescriptortype, Object obj) {
+        fielddescriptortype.isRepeated();
+        fielddescriptortype.getLiteType();
+        verifyType(null, obj);
         if (obj instanceof LazyField) {
             this.hasLazyField = true;
         }
-        this.fields.put((SmallSortedMap<FieldDescriptorType, Object>) fielddescriptortype, (FieldDescriptorType) obj);
+        this.fields.put((SmallSortedMap.AnonymousClass1) fielddescriptortype, (FieldDescriptorType) obj);
     }
 
-    public FieldSet<FieldDescriptorType> clone() {
-        FieldSet<FieldDescriptorType> fieldSet = new FieldSet<>();
-        for (int i = 0; i < this.fields.getNumArrayEntries(); i++) {
-            Map.Entry<FieldDescriptorType, Object> arrayEntryAt = this.fields.getArrayEntryAt(i);
-            fieldSet.setField(arrayEntryAt.getKey(), arrayEntryAt.getValue());
-        }
-        for (Map.Entry<FieldDescriptorType, Object> entry : this.fields.getOverflowEntries()) {
-            fieldSet.setField(entry.getKey(), entry.getValue());
-        }
-        fieldSet.hasLazyField = this.hasLazyField;
-        return fieldSet;
-    }
-
-    public final boolean isInitialized(Map.Entry<FieldDescriptorType, Object> entry) {
-        FieldDescriptorType key = entry.getKey();
-        if (key.getLiteJavaType() == WireFormat$JavaType.MESSAGE) {
-            if (key.isRepeated()) {
-                for (MessageLite messageLite : (List) entry.getValue()) {
-                    if (!messageLite.isInitialized()) {
-                        return false;
-                    }
+    public static boolean isInitialized(Map.Entry entry) {
+        FieldDescriptorLite fieldDescriptorLite = (FieldDescriptorLite) entry.getKey();
+        if (fieldDescriptorLite.getLiteJavaType() == WireFormat$JavaType.MESSAGE) {
+            fieldDescriptorLite.isRepeated();
+            Object value = entry.getValue();
+            if (value instanceof MessageLite) {
+                if (!((MessageLite) value).isInitialized()) {
+                    return false;
                 }
+            } else if (value instanceof LazyField) {
+                return true;
             } else {
-                Object value = entry.getValue();
-                if (value instanceof MessageLite) {
-                    if (!((MessageLite) value).isInitialized()) {
-                        return false;
-                    }
-                } else if (value instanceof LazyField) {
-                    return true;
-                } else {
-                    throw new IllegalArgumentException("Wrong object type used with protocol message reflection.");
-                }
+                throw new IllegalArgumentException("Wrong object type used with protocol message reflection.");
             }
         }
         return true;
     }
 
-    public FieldSet(boolean z) {
+    public FieldSet(int i) {
         this.hasLazyField = false;
-        int i = SmallSortedMap.$r8$clinit;
+        int i2 = SmallSortedMap.$r8$clinit;
         SmallSortedMap.AnonymousClass1 r0 = new SmallSortedMap.AnonymousClass1(0);
         this.fields = r0;
         if (!this.isImmutable) {
